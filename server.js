@@ -146,10 +146,7 @@ app.post('/api/generate-preview', async (req, res) => {
       contents: [{ role: 'user', parts }],
     });
 
-    const partsOut =
-  response?.candidates?.[0]?.content?.parts || [];
-
-const partsOut =
+   const partsOut =
   response?.candidates?.[0]?.content?.parts || [];
 
 const outPart = partsOut.find(
@@ -161,7 +158,10 @@ const outPart = partsOut.find(
 const inline = outPart?.inlineData || outPart?.inline_data;
 
 if (!inline?.data) {
-  console.log("Gemini raw response:", JSON.stringify(response, null, 2));
+  console.log(
+    "Gemini raw response:",
+    JSON.stringify(response, null, 2)
+  );
 
   const text =
     partsOut
@@ -174,10 +174,15 @@ if (!inline?.data) {
     detail: text,
   });
 }
-      const text = response?.candidates?.[0]?.content?.parts?.map((part) => part.text).filter(Boolean).join('\n') || '';
-      return res.status(502).json({ error: '이미지 결과를 받지 못했습니다.', detail: text });
-    }
 
+const mimeType =
+  inline.mimeType ||
+  inline.mime_type ||
+  'image/png';
+
+res.json({
+  imageUrl: `data:${mimeType};base64,${inline.data}`
+});
     const mimeType = inline.mimeType || inline.mime_type || 'image/png';
     res.json({ imageUrl: `data:${mimeType};base64,${inline.data}` });
   } catch (error) {
