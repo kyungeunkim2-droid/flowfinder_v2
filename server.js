@@ -176,11 +176,27 @@ if (!inline?.data) {
 }
 
 if (!inline?.data) {
-  ...
+  console.log("Gemini raw response:", JSON.stringify(response, null, 2));
+
+  const text =
+    partsOut
+      .map((part) => part.text)
+      .filter(Boolean)
+      .join('\n') || '';
+
+  return res.status(502).json({
+    error: '이미지 결과를 받지 못했습니다.',
+    detail: text,
+  });
 }
 
-    const mimeType = inline.mimeType || inline.mime_type || 'image/png';
-    res.json({ imageUrl: `data:${mimeType};base64,${inline.data}` });
+const mimeType = inline.mimeType || inline.mime_type || 'image/png';
+
+res.json({
+  imageUrl: `data:${mimeType};base64,${inline.data}`
+});
+
+    
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message || '이미지 생성 실패' });
