@@ -140,14 +140,13 @@ app.post('/api/generate-preview', async (req, res) => {
       }
     }
 
-    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-    const response = await ai.models.generateContent({
-      model: MODEL,
-      contents: [{ role: 'user', parts }],
-    });
+ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+const response = await ai.models.generateContent({
+  model: MODEL,
+  contents: [{ role: 'user', parts }],
+});
 
-   const partsOut =
-  response?.candidates?.[0]?.content?.parts || [];
+const partsOut = response?.candidates?.[0]?.content?.parts || [];
 
 const outPart = partsOut.find(
   (part) =>
@@ -158,26 +157,6 @@ const outPart = partsOut.find(
 const inline = outPart?.inlineData || outPart?.inline_data;
 
 if (!inline?.data) {
-  console.log(
-    "Gemini raw response:",
-    JSON.stringify(response, null, 2)
-  );
-
-  const text =
-    partsOut
-      .map((part) => part.text)
-      .filter(Boolean)
-      .join('\n') || '';
-
-  return res.status(502).json({
-    error: '이미지 결과를 받지 못했습니다.',
-    detail: text,
-  });
-}
-
-if (!inline?.data) {
-  console.log("Gemini raw response:", JSON.stringify(response, null, 2));
-
   const text =
     partsOut
       .map((part) => part.text)
@@ -193,7 +172,7 @@ if (!inline?.data) {
 const mimeType = inline.mimeType || inline.mime_type || 'image/png';
 
 res.json({
-  imageUrl: `data:${mimeType};base64,${inline.data}`
+  imageUrl: `data:${mimeType};base64,${inline.data}`,
 });
 
     
