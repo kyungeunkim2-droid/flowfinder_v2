@@ -175,14 +175,10 @@ if (!inline?.data) {
   });
 }
 
-const mimeType =
-  inline.mimeType ||
-  inline.mime_type ||
-  'image/png';
+if (!inline?.data) {
+  ...
+}
 
-res.json({
-  imageUrl: `data:${mimeType};base64,${inline.data}`
-});
     const mimeType = inline.mimeType || inline.mime_type || 'image/png';
     res.json({ imageUrl: `data:${mimeType};base64,${inline.data}` });
   } catch (error) {
