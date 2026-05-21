@@ -1452,7 +1452,7 @@ var TEXTURE_MAP = {
     HWBKM:'textures/desktop/standard/HW.png', WWWW:'textures/desktop/standard/WW.jpg', WWDSG:'textures/desktop/standard/WW.jpg', WWKBKM:'textures/desktop/standard/WW.jpg', WWK:'textures/desktop/standard/WW.jpg', OCY:'textures/desktop/standard/OSG.jpg', OCYWW:'textures/desktop/standard/OSG.jpg', OCYDSG:'textures/desktop/standard/OSG.jpg',
     BGM:'textures/desktop/laminate/BGM.jpg', BKA:'textures/desktop/laminate/BKA.jpg', CC:'textures/desktop/laminate/CC.jpg', CGY:'textures/desktop/laminate/CGY.jpg', FIV:'textures/desktop/laminate/FIV.jpg', FK:'textures/desktop/laminate/FK.jpg', GG:'textures/desktop/laminate/GG.jpg', IO:'textures/desktop/laminate/IO.jpg', KAP:'textures/desktop/laminate/KAP.jpg', LD:'textures/desktop/laminate/LD.jpg', LL:'textures/desktop/laminate/LL.jpg', LT:'textures/desktop/laminate/LT.jpg', MDB:'textures/desktop/laminate/MDB.png', NBK:'textures/desktop/laminate/NBK.jpg', NSS:'textures/desktop/laminate/NSS.jpg', OHN:'textures/desktop/laminate/OHN.jpg', RCN:'textures/desktop/laminate/RCN.jpg', TL:'textures/desktop/laminate/TL.jpg', TRZ:'textures/desktop/laminate/TRZ.jpg', UA:'textures/desktop/laminate/UA.jpg', WP:'textures/desktop/laminate/WP.jpg', WW_LAM:'textures/desktop/laminate/WW.jpg',
     DBL:'textures/desktop/veneer/DBL.jpg', NCE:'textures/desktop/veneer/NCE.jpg', NMOK:'textures/desktop/veneer/NMOK.jpg', OB:'textures/desktop/veneer/OB.jpg', OGG:'textures/desktop/veneer/OGG.jpg',
-    LEG_WW:'textures/leg/standard/WW.png', LEG_BKM:'textures/leg/standard/BKM.png', LEG_DSG:'textures/leg/standard/DSG.png', LEG_DCR:'textures/leg/standard/DCR.png', LEG_TS:'textures/leg/standard/TS.png',
+    LEG_WW:'textures/leg/standard/WW.png', LEG_BKM:'/textures/leg/standard/BKM.png', LEG_DSG:'textures/leg/standard/DSG.png', LEG_DCR:'textures/leg/standard/DCR.png', LEG_TS:'textures/leg/standard/TS.png',
     '1P1':'textures/screen/straight/standard/1P1.jpg', '1P2':'textures/screen/straight/standard/1P2.jpg', '1P4':'textures/screen/straight/standard/1P4.jpg', '1P4A':'textures/screen/straight/standard/1P4.jpg', '1P4B':'textures/screen/straight/standard/1P4.jpg', '1P5':'textures/screen/straight/custom/1P5.jpg', '1P7':'textures/screen/straight/standard/1P7.jpg', MBE:'textures/screen/straight/custom/MBE.jpg', MGR:'textures/screen/straight/custom/MGR.jpg'
   };
   Object.keys(localMap).forEach(function(k){ TEXTURE_MAP[k] = localMap[k]; });
@@ -7658,8 +7658,8 @@ button.material-btn{
     '061K.jpg':'textures/screen/front/custom/061.jpg','064K.jpg':'textures/screen/front/custom/064.jpg','067K.jpg':'textures/screen/front/custom/067.jpg',
     '071.jpg':'textures/screen/front/custom/071.jpg','071A.jpg':'textures/screen/front/custom/071A.jpg','072.jpg':'textures/screen/front/custom/072.jpg','074.jpg':'textures/screen/front/custom/074.jpg',
     '371.jpg':'textures/screen/front/custom/371.jpg','452A.jpg':'textures/screen/front/custom/452A.png','452N.jpg':'textures/screen/front/custom/452N.jpg','457.jpg':'textures/screen/front/custom/457.jpg','458.jpg':'textures/screen/front/custom/458.jpg',
-    'bkm.jpg':'textures/pegboard/bkm.jpg','dsg.jpg':'textures/pegboard/dsg.jpg','wew.jpg':'textures/pegboard/wew.jpg',
-    'screen_mask.png':'scenes/standard_straight/masks/screen_mask.png'
+    'bkm.jpg':'/textures/desktop/standard/bkm.jpg','dsg.jpg':'/textures/pegboard/dsg.jpg','wew.jpg':'/textures/pegboard/wew.jpg',
+    'screen_mask.png':'/scenes/standard_straight/masks/screen_mask.png'
   };
   function fixImg(img){
     if(!img || img.__ffAssetFallbackTried) return;
