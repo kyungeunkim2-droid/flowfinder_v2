@@ -149,6 +149,9 @@ app.post('/api/generate-preview', async (req, res) => {
     const partsOut =
   response?.candidates?.[0]?.content?.parts || [];
 
+const partsOut =
+  response?.candidates?.[0]?.content?.parts || [];
+
 const outPart = partsOut.find(
   (part) =>
     (part.inlineData && part.inlineData.data) ||
@@ -162,7 +165,7 @@ if (!inline?.data) {
 
   const text =
     partsOut
-      ?.map((part) => part.text)
+      .map((part) => part.text)
       .filter(Boolean)
       .join('\n') || '';
 
