@@ -146,9 +146,31 @@ app.post('/api/generate-preview', async (req, res) => {
       contents: [{ role: 'user', parts }],
     });
 
-    const outPart = response?.candidates?.[0]?.content?.parts?.find((part) => part.inlineData || part.inline_data);
-    const inline = outPart?.inlineData || outPart?.inline_data;
-    if (!inline?.data) {
+    const partsOut =
+  response?.candidates?.[0]?.content?.parts || [];
+
+const outPart = partsOut.find(
+  (part) =>
+    (part.inlineData && part.inlineData.data) ||
+    (part.inline_data && part.inline_data.data)
+);
+
+const inline = outPart?.inlineData || outPart?.inline_data;
+
+if (!inline?.data) {
+  console.log("Gemini raw response:", JSON.stringify(response, null, 2));
+
+  const text =
+    partsOut
+      ?.map((part) => part.text)
+      .filter(Boolean)
+      .join('\n') || '';
+
+  return res.status(502).json({
+    error: '이미지 결과를 받지 못했습니다.',
+    detail: text,
+  });
+}
       const text = response?.candidates?.[0]?.content?.parts?.map((part) => part.text).filter(Boolean).join('\n') || '';
       return res.status(502).json({ error: '이미지 결과를 받지 못했습니다.', detail: text });
     }
