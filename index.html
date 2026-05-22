@@ -11745,3 +11745,77 @@ setTimeout(()=>{
   }, 500);
 })();
 </script>
+
+
+<!-- === FF PATCH: block folder-only texture URLs === -->
+<script id="ff-block-folder-only-texture-urls">
+(function(){
+  const BAD_FOLDER_PATTERNS = [
+    "/textures/leg/standard/",
+    "textures/leg/standard/",
+    "/textures/desktop/standard/",
+    "textures/desktop/standard/",
+    "/textures/screen/front/standard/",
+    "textures/screen/front/standard/"
+  ];
+
+  function isFolderOnlyUrl(src){
+    if(!src || typeof src !== "string") return true;
+    const clean = src.split("?")[0].split("#")[0];
+    return BAD_FOLDER_PATTERNS.some(p => clean === p || clean.endsWith(p));
+  }
+
+  function safeImgSrc(img, src){
+    if(!img) return;
+    if(isFolderOnlyUrl(src)){
+      img.removeAttribute("src");
+      img.style.display = "none";
+      return;
+    }
+    img.style.display = "";
+    img.src = src;
+  }
+
+  window.ffSafeImgSrc = safeImgSrc;
+
+  const rawSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value){
+    if(this.tagName === "IMG" && String(name).toLowerCase() === "src" && isFolderOnlyUrl(String(value))){
+      this.removeAttribute("src");
+      this.style.display = "none";
+      return;
+    }
+    return rawSetAttribute.call(this, name, value);
+  };
+
+  const rawImageSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, "src");
+  if(rawImageSrc && rawImageSrc.set){
+    Object.defineProperty(HTMLImageElement.prototype, "src", {
+      get: rawImageSrc.get,
+      set: function(value){
+        if(isFolderOnlyUrl(String(value))){
+          this.removeAttribute("src");
+          this.style.display = "none";
+          return;
+        }
+        rawImageSrc.set.call(this, value);
+      }
+    });
+  }
+
+  function cleanExistingImages(){
+    document.querySelectorAll("img").forEach(img => {
+      const src = img.getAttribute("src") || "";
+      if(isFolderOnlyUrl(src)){
+        img.removeAttribute("src");
+        img.style.display = "none";
+      }
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", cleanExistingImages);
+  setTimeout(cleanExistingImages, 300);
+  setTimeout(cleanExistingImages, 1000);
+})();
+</script>
+
