@@ -1,47 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<script id="ff-remove-broken-assets-hard-block">
-(function(){
-  const BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-  const BAD = new Set(['data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==','data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==','data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==','data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==','']);
-  function fixed(v){
-    if(!v || typeof v !== 'string') return v;
-    const clean = v.split(/[?#]/)[0];
-    const name = clean.split('/').pop();
-    if(BAD.has(name)) return BLANK;
-    return v;
-  }
-  const imgProto = HTMLImageElement.prototype;
-  const srcDesc = Object.getOwnPropertyDescriptor(imgProto, 'src');
-  if(srcDesc && srcDesc.set && srcDesc.get){
-    Object.defineProperty(imgProto, 'src', {
-      configurable: true,
-      enumerable: srcDesc.enumerable,
-      get: srcDesc.get,
-      set: function(v){ return srcDesc.set.call(this, fixed(v)); }
-    });
-  }
-  const origSetAttribute = Element.prototype.setAttribute;
-  Element.prototype.setAttribute = function(name, value){
-    if(this.tagName === 'IMG' && String(name).toLowerCase() === 'src') {
-      value = fixed(String(value));
-    }
-    return origSetAttribute.call(this, name, value);
-  };
-  const origFetch = window.fetch;
-  window.fetch = function(input, init){
-    const url = typeof input === 'string' ? input : (input && input.url) || '';
-    const name = String(url).split(/[?#]/)[0].split('/').pop();
-    if(BAD.has(name)){
-      return Promise.resolve(new Response(new Blob([],{type:'image/gif'}), {status:204, statusText:'No Content'}));
-    }
-    return origFetch.apply(this, arguments);
-  };
-  window.FF_ASSET_BLOCKLIST = BAD;
-  window.FF_BLANK_IMAGE = BLANK;
-})();
-</script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
