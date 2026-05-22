@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<link rel="icon" href="data:,">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1242,67 +1241,6 @@ body.ff-dashboard-preview #ff-right-summary-panel{display:flex!important;}
   [src*="bkm.jpg"], [src*="dsg.jpg"], [src*="wew.jpg"], [src*="screen_mask.png"], [src*="BKM.png"] { display:none !important; }
   #pegboard-ref-panel, [id*="pegboard"], [class*="pegboard"], [data-option*="pegboard"], [data-code="BKM"], [data-code="DSG"], [data-code="WEW"] { display:none !important; }
 </style>
-
-<style id="ff-desk-option-preview-style">
-.ff-desk-option-preview-box{
-  margin-top:14px;
-  border:1px solid rgba(74,222,128,.28);
-  background:rgba(6,18,20,.65);
-  border-radius:16px;
-  padding:12px;
-}
-.ff-desk-option-preview-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  color:#fff;
-  font-size:13px;
-  font-weight:900;
-  margin-bottom:10px;
-}
-.ff-desk-option-preview-title span{
-  color:#4ade80;
-  font-size:11px;
-}
-.ff-desk-option-preview-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:10px;
-}
-.ff-desk-option-card{
-  border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.045);
-  border-radius:14px;
-  padding:8px;
-  min-height:120px;
-}
-.ff-desk-option-card img{
-  width:100%;
-  height:78px;
-  object-fit:contain;
-  display:block;
-  background:#fff;
-  border-radius:10px;
-  margin-bottom:7px;
-}
-.ff-desk-option-card b{
-  display:block;
-  color:#fff;
-  font-size:12px;
-  line-height:1.25;
-}
-.ff-desk-option-card small{
-  display:block;
-  color:#9ca3af;
-  font-size:10px;
-  margin-top:2px;
-}
-@media(max-width:700px){
-  .ff-desk-option-preview-grid{grid-template-columns:1fr;}
-}
-</style>
-
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -1558,7 +1496,7 @@ var TEXTURE_MAP = {
 
   // 다리 전용
   'LEG_WW': 'textures/leg/standard/WW.png',
-  'LEG_BKM': '',
+  'LEG_BKM': 'textures/leg/standard/',
   'LEG_DSG': 'textures/leg/standard/DSG.png',
   'LEG_DCR': 'textures/leg/standard/DCR.png',
   'LEG_TS': 'textures/leg/standard/TS.png'
@@ -1570,7 +1508,7 @@ var TEXTURE_MAP = {
     HWBKM:'textures/desktop/standard/HW.png', WWWW:'textures/desktop/standard/WW.jpg', WWDSG:'textures/desktop/standard/WW.jpg', WWKBKM:'textures/desktop/standard/WW.jpg', WWK:'textures/desktop/standard/WW.jpg', OCY:'textures/desktop/standard/OSG.jpg', OCYWW:'textures/desktop/standard/OSG.jpg', OCYDSG:'textures/desktop/standard/OSG.jpg',
     BGM:'textures/desktop/laminate/BGM.jpg', BKA:'textures/desktop/laminate/BKA.jpg', CC:'textures/desktop/laminate/CC.jpg', CGY:'textures/desktop/laminate/CGY.jpg', FIV:'textures/desktop/laminate/FIV.jpg', FK:'textures/desktop/laminate/FK.jpg', GG:'textures/desktop/laminate/GG.jpg', IO:'textures/desktop/laminate/IO.jpg', KAP:'textures/desktop/laminate/KAP.jpg', LD:'textures/desktop/laminate/LD.jpg', LL:'textures/desktop/laminate/LL.jpg', LT:'textures/desktop/laminate/LT.jpg', MDB:'textures/desktop/laminate/MDB.png', NBK:'textures/desktop/laminate/NBK.jpg', NSS:'textures/desktop/laminate/NSS.jpg', OHN:'textures/desktop/laminate/OHN.jpg', RCN:'textures/desktop/laminate/RCN.jpg', TL:'textures/desktop/laminate/TL.jpg', TRZ:'textures/desktop/laminate/TRZ.jpg', UA:'textures/desktop/laminate/UA.jpg', WP:'textures/desktop/laminate/WP.jpg', WW_LAM:'textures/desktop/laminate/WW.jpg',
     DBL:'textures/desktop/veneer/DBL.jpg', NCE:'textures/desktop/veneer/NCE.jpg', NMOK:'textures/desktop/veneer/NMOK.jpg', OB:'textures/desktop/veneer/OB.jpg', OGG:'textures/desktop/veneer/OGG.jpg',
-    LEG_WW:'textures/leg/standard/WW.png', LEG_BKM:'', LEG_DSG:'textures/leg/standard/DSG.png', LEG_DCR:'textures/leg/standard/DCR.png', LEG_TS:'textures/leg/standard/TS.png',
+    LEG_WW:'textures/leg/standard/WW.png', LEG_BKM:'textures/leg/standard/', LEG_DSG:'textures/leg/standard/DSG.png', LEG_DCR:'textures/leg/standard/DCR.png', LEG_TS:'textures/leg/standard/TS.png',
     '1P1':'textures/screen/straight/standard/1P1.jpg', '1P2':'textures/screen/straight/standard/1P2.jpg', '1P4':'textures/screen/straight/standard/1P4.jpg', '1P4A':'textures/screen/straight/standard/1P4.jpg', '1P4B':'textures/screen/straight/standard/1P4.jpg', '1P5':'textures/screen/straight/custom/1P5.jpg', '1P7':'textures/screen/straight/standard/1P7.jpg', MBE:'textures/screen/straight/custom/MBE.jpg', MGR:'textures/screen/straight/custom/MGR.jpg'
   };
   Object.keys(localMap).forEach(function(k){ TEXTURE_MAP[k] = localMap[k]; });
@@ -4765,7 +4703,7 @@ startFlow();
 
 /* ── FlowFinder local mask renderer injected ── */
 (function() {
-  var FF_MANIFEST = {"products": {"desk_duct": {"label": "덕트형 데스크", "type": "desk", "base": "products/desk_duct/base/base.png", "masks": {"leg_mask": "products/desk_duct/masks/leg_mask.png", "top_mask": "products/desk_duct/masks/top_mask.png"}}, "desk_standard": {"label": "일반형 데스크", "type": "desk", "base": "products/desk_standard/base/base.png", "masks": {"leg_mask": "products/desk_standard/masks/leg_mask.png", "top_mask": "products/desk_standard/masks/top_mask.png"}}, "screen_front": {"label": "전면 스크린", "type": "screen", "base": "products/screen_front/base/base.png", "masks": {"leg_mask": "products/screen_front/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_front/masks/top_mask.png"}}, "screen_lshape": {"label": "L형 스크린", "type": "screen", "base": "products/screen_lshape/base/base.png", "masks": {"leg_mask": "products/screen_lshape/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_lshape/masks/top_mask.png"}}, "screen_side": {"label": "사이드 스크린", "type": "screen", "base": "products/screen_side/base/base.png", "masks": {"leg_mask": "products/screen_side/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_side/masks/top_mask.png"}}, "screen_straight": {"label": "일자형 스크린", "type": "screen", "base": "products/screen_straight/base/base.png", "masks": {"leg_mask": "products/screen_straight/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_straight/masks/top_mask.png"}}}, "textures": {"desktop": {"standard": [{"code": "HW", "file": "textures/desktop/standard/HW.png"}, {"code": "OSG", "file": "textures/desktop/standard/OSG.jpg"}, {"code": "WW", "file": "textures/desktop/standard/WW.jpg"}], "veneer": [{"code": "DBL", "file": "textures/desktop/veneer/DBL.jpg"}, {"code": "NCE", "file": "textures/desktop/veneer/NCE.jpg"}, {"code": "NMOK", "file": "textures/desktop/veneer/NMOK.jpg"}, {"code": "OB", "file": "textures/desktop/veneer/OB.jpg"}, {"code": "OGG", "file": "textures/desktop/veneer/OGG.jpg"}], "laminate": [{"code": "BGM", "file": "textures/desktop/laminate/BGM.jpg"}, {"code": "BKA", "file": "textures/desktop/laminate/BKA.jpg"}, {"code": "CC", "file": "textures/desktop/laminate/CC.jpg"}, {"code": "CGY", "file": "textures/desktop/laminate/CGY.jpg"}, {"code": "FIV", "file": "textures/desktop/laminate/FIV.jpg"}, {"code": "FK", "file": "textures/desktop/laminate/FK.jpg"}, {"code": "GG", "file": "textures/desktop/laminate/GG.jpg"}, {"code": "IO", "file": "textures/desktop/laminate/IO.jpg"}, {"code": "KAP", "file": "textures/desktop/laminate/KAP.jpg"}, {"code": "LD", "file": "textures/desktop/laminate/LD.jpg"}, {"code": "LL", "file": "textures/desktop/laminate/LL.jpg"}, {"code": "LT", "file": "textures/desktop/laminate/LT.jpg"}, {"code": "MDB", "file": "textures/desktop/laminate/MDB.png"}, {"code": "NBK", "file": "textures/desktop/laminate/NBK.jpg"}, {"code": "NSS", "file": "textures/desktop/laminate/NSS.jpg"}, {"code": "OHN", "file": "textures/desktop/laminate/OHN.jpg"}, {"code": "RCN", "file": "textures/desktop/laminate/RCN.jpg"}, {"code": "TL", "file": "textures/desktop/laminate/TL.jpg"}, {"code": "TRZ", "file": "textures/desktop/laminate/TRZ.jpg"}, {"code": "UA", "file": "textures/desktop/laminate/UA.jpg"}, {"code": "WP", "file": "textures/desktop/laminate/WP.jpg"}, {"code": "WW", "file": "textures/desktop/laminate/WW.jpg"}]}, "screen": {"front": {"standard": [{"code": "061", "file": "textures/screen/front/standard/061.jpg"}, {"code": "064", "file": "textures/screen/front/standard/064.jpg"}, {"code": "067", "file": "textures/screen/front/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/front/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/front/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/front/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/front/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/front/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/front/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/front/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/front/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/front/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/front/custom/067.jpg"}, {"code": "071", "file": "textures/screen/front/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/front/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/front/custom/072.jpg"}, {"code": "074", "file": "textures/screen/front/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/front/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/front/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/front/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/front/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/front/custom/452A.png"}, {"code": "452N", "file": "textures/screen/front/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/front/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/front/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/front/custom/458.jpg"}]}, "side": {"standard": [{"code": "061", "file": "textures/screen/side/standard/061.jpg"}, {"code": "064", "file": "textures/screen/side/standard/064.jpg"}, {"code": "067", "file": "textures/screen/side/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/side/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/side/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/side/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/side/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/side/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/side/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/side/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/side/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/side/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/side/custom/067.jpg"}, {"code": "071", "file": "textures/screen/side/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/side/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/side/custom/072.jpg"}, {"code": "074", "file": "textures/screen/side/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/side/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/side/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/side/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/side/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/side/custom/452A.png"}, {"code": "452N", "file": "textures/screen/side/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/side/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/side/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/side/custom/458.jpg"}]}, "straight": {"standard": [{"code": "1P1", "file": "textures/screen/straight/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/straight/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/straight/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/straight/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/straight/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/straight/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/straight/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/straight/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/straight/custom/MGR.jpg"}]}, "lshape": {"standard": [{"code": "1P1", "file": "textures/screen/lshape/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/lshape/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/lshape/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/lshape/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/lshape/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/lshape/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/lshape/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/lshape/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/lshape/custom/MGR.jpg"}]}}, "leg": {"standard": [{"code": "WW", "file": "textures/leg/standard/WW.png"}, {"code": "BKM", "file": ""}, {"code": "DCR", "file": "textures/leg/standard/DCR.png"}, {"code": "TS", "file": "textures/leg/standard/TS.png"}], "custom": []}}};
+  var FF_MANIFEST = {"products": {"desk_duct": {"label": "덕트형 데스크", "type": "desk", "base": "products/desk_duct/base/base.png", "masks": {"leg_mask": "products/desk_duct/masks/leg_mask.png", "top_mask": "products/desk_duct/masks/top_mask.png"}}, "desk_standard": {"label": "일반형 데스크", "type": "desk", "base": "products/desk_standard/base/base.png", "masks": {"leg_mask": "products/desk_standard/masks/leg_mask.png", "top_mask": "products/desk_standard/masks/top_mask.png"}}, "screen_front": {"label": "전면 스크린", "type": "screen", "base": "products/screen_front/base/base.png", "masks": {"leg_mask": "products/screen_front/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_front/masks/top_mask.png"}}, "screen_lshape": {"label": "L형 스크린", "type": "screen", "base": "products/screen_lshape/base/base.png", "masks": {"leg_mask": "products/screen_lshape/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_lshape/masks/top_mask.png"}}, "screen_side": {"label": "사이드 스크린", "type": "screen", "base": "products/screen_side/base/base.png", "masks": {"leg_mask": "products/screen_side/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_side/masks/top_mask.png"}}, "screen_straight": {"label": "일자형 스크린", "type": "screen", "base": "products/screen_straight/base/base.png", "masks": {"leg_mask": "products/screen_straight/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_straight/masks/top_mask.png"}}}, "textures": {"desktop": {"standard": [{"code": "HW", "file": "textures/desktop/standard/HW.png"}, {"code": "OSG", "file": "textures/desktop/standard/OSG.jpg"}, {"code": "WW", "file": "textures/desktop/standard/WW.jpg"}], "veneer": [{"code": "DBL", "file": "textures/desktop/veneer/DBL.jpg"}, {"code": "NCE", "file": "textures/desktop/veneer/NCE.jpg"}, {"code": "NMOK", "file": "textures/desktop/veneer/NMOK.jpg"}, {"code": "OB", "file": "textures/desktop/veneer/OB.jpg"}, {"code": "OGG", "file": "textures/desktop/veneer/OGG.jpg"}], "laminate": [{"code": "BGM", "file": "textures/desktop/laminate/BGM.jpg"}, {"code": "BKA", "file": "textures/desktop/laminate/BKA.jpg"}, {"code": "CC", "file": "textures/desktop/laminate/CC.jpg"}, {"code": "CGY", "file": "textures/desktop/laminate/CGY.jpg"}, {"code": "FIV", "file": "textures/desktop/laminate/FIV.jpg"}, {"code": "FK", "file": "textures/desktop/laminate/FK.jpg"}, {"code": "GG", "file": "textures/desktop/laminate/GG.jpg"}, {"code": "IO", "file": "textures/desktop/laminate/IO.jpg"}, {"code": "KAP", "file": "textures/desktop/laminate/KAP.jpg"}, {"code": "LD", "file": "textures/desktop/laminate/LD.jpg"}, {"code": "LL", "file": "textures/desktop/laminate/LL.jpg"}, {"code": "LT", "file": "textures/desktop/laminate/LT.jpg"}, {"code": "MDB", "file": "textures/desktop/laminate/MDB.png"}, {"code": "NBK", "file": "textures/desktop/laminate/NBK.jpg"}, {"code": "NSS", "file": "textures/desktop/laminate/NSS.jpg"}, {"code": "OHN", "file": "textures/desktop/laminate/OHN.jpg"}, {"code": "RCN", "file": "textures/desktop/laminate/RCN.jpg"}, {"code": "TL", "file": "textures/desktop/laminate/TL.jpg"}, {"code": "TRZ", "file": "textures/desktop/laminate/TRZ.jpg"}, {"code": "UA", "file": "textures/desktop/laminate/UA.jpg"}, {"code": "WP", "file": "textures/desktop/laminate/WP.jpg"}, {"code": "WW", "file": "textures/desktop/laminate/WW.jpg"}]}, "screen": {"front": {"standard": [{"code": "061", "file": "textures/screen/front/standard/061.jpg"}, {"code": "064", "file": "textures/screen/front/standard/064.jpg"}, {"code": "067", "file": "textures/screen/front/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/front/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/front/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/front/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/front/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/front/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/front/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/front/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/front/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/front/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/front/custom/067.jpg"}, {"code": "071", "file": "textures/screen/front/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/front/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/front/custom/072.jpg"}, {"code": "074", "file": "textures/screen/front/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/front/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/front/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/front/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/front/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/front/custom/452A.png"}, {"code": "452N", "file": "textures/screen/front/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/front/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/front/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/front/custom/458.jpg"}]}, "side": {"standard": [{"code": "061", "file": "textures/screen/side/standard/061.jpg"}, {"code": "064", "file": "textures/screen/side/standard/064.jpg"}, {"code": "067", "file": "textures/screen/side/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/side/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/side/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/side/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/side/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/side/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/side/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/side/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/side/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/side/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/side/custom/067.jpg"}, {"code": "071", "file": "textures/screen/side/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/side/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/side/custom/072.jpg"}, {"code": "074", "file": "textures/screen/side/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/side/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/side/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/side/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/side/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/side/custom/452A.png"}, {"code": "452N", "file": "textures/screen/side/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/side/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/side/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/side/custom/458.jpg"}]}, "straight": {"standard": [{"code": "1P1", "file": "textures/screen/straight/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/straight/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/straight/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/straight/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/straight/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/straight/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/straight/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/straight/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/straight/custom/MGR.jpg"}]}, "lshape": {"standard": [{"code": "1P1", "file": "textures/screen/lshape/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/lshape/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/lshape/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/lshape/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/lshape/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/lshape/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/lshape/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/lshape/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/lshape/custom/MGR.jpg"}]}}, "leg": {"standard": [{"code": "WW", "file": "textures/leg/standard/WW.png"}, {"code": "BKM", "file": "textures/leg/standard/"}, {"code": "DCR", "file": "textures/leg/standard/DCR.png"}, {"code": "TS", "file": "textures/leg/standard/TS.png"}], "custom": []}}};
   var FF_LABELS = {
     standard:'표준품', veneer:'무늬목', laminate:'라미네이트', custom:'주문품',
     front:'전면 스크린', side:'사이드 스크린', straight:'일자형 스크린', lshape:'L형 스크린'
@@ -7764,7 +7702,31 @@ button.material-btn{
 </script>
 
 
-
+<script>
+(function(){
+  var FF_ASSET_BASENAME_FALLBACK = {
+    '3F2.jpg':'textures/screen/front/standard/3F2.jpg','3F1.jpg':'textures/screen/front/standard/3F1.jpg',
+    '067.jpg':'textures/screen/front/standard/067.jpg','064.jpg':'textures/screen/front/standard/064.jpg','061.jpg':'textures/screen/front/standard/061.jpg',
+    '001.jpg':'textures/screen/front/custom/001.jpg','001A.jpg':'textures/screen/front/custom/001A.jpg','001B.jpg':'textures/screen/front/custom/001B.jpg',
+    '004.jpg':'textures/screen/front/custom/004.jpg','004B.jpg':'textures/screen/front/custom/004B.jpg',
+    '007.jpg':'textures/screen/front/custom/007.jpg','007B.jpg':'textures/screen/front/custom/007B.jpg',
+    '014.jpg':'textures/screen/front/custom/014.jpg','014A.jpg':'textures/screen/front/custom/014A.jpg',
+    '061K.jpg':'textures/screen/front/custom/061.jpg','064K.jpg':'textures/screen/front/custom/064.jpg','067K.jpg':'textures/screen/front/custom/067.jpg',
+    '071.jpg':'textures/screen/front/custom/071.jpg','071A.jpg':'textures/screen/front/custom/071A.jpg','072.jpg':'textures/screen/front/custom/072.jpg','074.jpg':'textures/screen/front/custom/074.jpg',
+    '371.jpg':'textures/screen/front/custom/371.jpg','452A.jpg':'textures/screen/front/custom/452A.png','452N.jpg':'textures/screen/front/custom/452N.jpg','457.jpg':'textures/screen/front/custom/457.jpg','458.jpg':'textures/screen/front/custom/458.jpg',
+    '':'textures/leg/standard/','':'textures/leg/standard/DSG.png','':'textures/desktop/standard/WEW.jpg',
+    '':''
+  };
+  function fixImg(img){
+    if(!img || img.__ffAssetFallbackTried) return;
+    var src = img.getAttribute('src') || '';
+    var base = src.split('?')[0].split('#')[0].split('/').pop();
+    var next = FF_ASSET_BASENAME_FALLBACK[base];
+    if(next && src !== next && src !== '/' + next){ img.__ffAssetFallbackTried = true; img.src = next; }
+  }
+  document.addEventListener('error', function(e){ if(e.target && e.target.tagName === 'IMG') fixImg(e.target); }, true);
+})();
+</script>
 
 
 
@@ -7791,9 +7753,9 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
 (function(){
   
   const BLANK='';
-  const LEG_TEXTURES={WW:'/textures/leg/standard/WW.png',DSG:'/textures/leg/standard/DSG.png',BKM:'',DCR:'/textures/leg/standard/DCR.png',TS:'/textures/leg/standard/TS.png'};
+  const LEG_TEXTURES={WW:'/textures/leg/standard/WW.png',DSG:'/textures/leg/standard/DSG.png',BKM:'/textures/leg/standard/',DCR:'/textures/leg/standard/DCR.png',TS:'/textures/leg/standard/TS.png'};
   const DESK_TEXTURES={WW:'/textures/desktop/standard/WW.jpg',WWK:'/textures/desktop/standard/WW.jpg',OCY:'/textures/desktop/standard/OSG.jpg',HW:'/textures/desktop/standard/HW.png'};
-  function fixUrl(u){if(!u||typeof u!=='string')return u;if(u.startsWith('data:')||u.startsWith('blob:')||/^https?:/.test(u))return u;const clean=u.split(/[?#]/)[0];const base=clean.split('/').pop();if(['','','','','',''].includes(base))return BLANK;if(base==='')return '';if(base==='')return '';if(clean.startsWith('pegboard/')||clean.includes('/pegboard/'))return BLANK;if(clean.startsWith('screen/custom/'))return u.replace(/^screen\/custom\//,'/textures/screen/front/custom/');if(clean.startsWith('screen/standard/'))return u.replace(/^screen\/standard\//,'/textures/screen/front/standard/');if(clean.startsWith('leg/'))return '/textures/'+clean;return u;}
+  function fixUrl(u){if(!u||typeof u!=='string')return u;if(u.startsWith('data:')||u.startsWith('blob:')||/^https?:/.test(u))return u;const clean=u.split(/[?#]/)[0];const base=clean.split('/').pop();if(['','','','','',''].includes(base))return BLANK;if(base==='')return '';if(base==='')return '/textures/leg/standard/';if(clean.startsWith('pegboard/')||clean.includes('/pegboard/'))return BLANK;if(clean.startsWith('screen/custom/'))return u.replace(/^screen\/custom\//,'/textures/screen/front/custom/');if(clean.startsWith('screen/standard/'))return u.replace(/^screen\/standard\//,'/textures/screen/front/standard/');if(clean.startsWith('leg/'))return '/textures/'+clean;return u;}
   function patchImages(){document.querySelectorAll('img').forEach(function(img){const src=img.getAttribute('src')||'';const fixed=fixUrl(src);if(fixed&&fixed!==src)img.setAttribute('src',fixed);if(!img.dataset.ffBrokenHandler){img.dataset.ffBrokenHandler='1';img.addEventListener('error',function(){const now=img.getAttribute('src')||'';const next=fixUrl(now);if(next&&next!==now){img.src=next;return;}img.classList.add('ff-broken-hidden');img.src=BLANK;});}});document.querySelectorAll('#pegboard-ref-panel,#set-pegboard-note,[id*="pegboard"],[class*="pegboard"]').forEach(function(el){el.remove();});}
   function textFrom(sel,fallback){const el=document.querySelector(sel);return(el&&el.textContent.trim())||fallback||'-';}
   function activeMaterialFromLabels(label){const groups=Array.from(document.querySelectorAll('.material-button-section,.btn-group,.color-pair-grid,#messages'));let best='';groups.forEach(function(g){const t=g.textContent||'';if(label&&!t.includes(label))return;const active=g.querySelector('.material-btn.active,.material-btn.selected,.choice-btn.selected,.choice-btn.multi-selected');if(active)best=active.textContent.replace('선택','').trim().split(/\s+/).pop()||best;});return best;}
@@ -7861,139 +7823,61 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
 })();
 </script>
 
-
-<!-- === DESK OPTION IMAGE PREVIEW PATCH === -->
-<script id="ff-desk-option-preview-patch">
-(function(){
-  // 이미지 파일 경로는 실제 폴더명에 맞춰 필요 시 여기만 바꾸면 됩니다.
-  window.DESK_OPTION_THUMBS = window.DESK_OPTION_THUMBS || {
-    leg: {
-      '사다리형': 'images/options/legs/사다리형.png',
-      '원형': 'images/options/legs/원형.png',
-      'A자형': 'images/options/legs/A자형.png'
-    },
-    move: {
-      '고정형·글라이드': 'images/options/move/글라이드.png',
-      '이동형·캐스터': 'images/options/move/캐스터.png',
-      '글라이드': 'images/options/move/글라이드.png',
-      '캐스터': 'images/options/move/캐스터.png'
-    },
-    top: {
-      '스퀘어 상판': 'images/options/top/스퀘어상판.png',
-      '라운드 상판': 'images/options/top/라운드상판.png',
-      '스퀘어': 'images/options/top/스퀘어상판.png',
-      '라운드': 'images/options/top/라운드상판.png'
-    }
-  };
-
-  function getDeskOptionState(){
-    var product = (window.state && state.__ffProduct) || {};
-    var opts = product.deskOptions || {};
-    return [
-      { type:'leg', label:'다리형태', value: opts.leg || state?.current?.leg || state?.current?.legType },
-      { type:'move', label:'이동방식', value: opts.move || state?.current?.move || state?.current?.moveType },
-      { type:'top', label:'상판형태', value: opts.top || state?.current?.top || state?.current?.topType }
-    ].filter(function(x){ return !!x.value; });
-  }
-
-  window.updateDeskOptionPreview = function(){
-    var host = document.getElementById('ff-desk-option-preview');
-    var deskSection = document.getElementById('ff-v6-desk-section');
-
-    // v6 데스크 확장창이 있으면 그 안에 미리보기 박스를 자동 생성
-    if (!host && deskSection) {
-      host = document.createElement('div');
-      host.id = 'ff-desk-option-preview';
-      host.className = 'ff-desk-option-preview-box';
-      var panel = deskSection.querySelector('.ff-v6-panel') || deskSection;
-      var actions = panel.querySelector('.ff-v6-actions');
-      if (actions) panel.insertBefore(host, actions);
-      else panel.appendChild(host);
-    }
-
-    // 기존 set-composite-area를 쓰는 화면이면 그쪽에도 표시 가능
-    if (!host) host = document.getElementById('set-composite-area');
-    if (!host) return;
-
-    var opts = getDeskOptionState();
-
-    if (!opts.length) {
-      host.style.display = 'none';
-      host.innerHTML = '';
-      return;
-    }
-
-    var html = '<div class="ff-desk-option-preview-title">옵션별 미리보기 <span>선택 이미지</span></div>';
-    html += '<div class="ff-desk-option-preview-grid">';
-
-    opts.forEach(function(opt){
-      var src = window.DESK_OPTION_THUMBS[opt.type] && window.DESK_OPTION_THUMBS[opt.type][opt.value];
-      if (!src) return;
-
-      html += '<div class="ff-desk-option-card">' +
-        '<img src="' + src + '" alt="' + opt.value + '" onerror="this.style.display=\\'none\\'; this.parentElement.insertAdjacentHTML(\\'afterbegin\\', \\'<div style=&quot;height:78px;display:flex;align-items:center;justify-content:center;background:#fff;color:#111;border-radius:10px;font-size:11px;margin-bottom:7px;&quot;>이미지 없음</div>\\');">' +
-        '<b>' + opt.value + '</b>' +
-        '<small>' + opt.label + '</small>' +
-      '</div>';
-    });
-
-    html += '</div>';
-
-    host.style.display = 'block';
-    host.innerHTML = html;
-  };
-
-  // 기존 v6 함수가 있으면 클릭 시 미리보기까지 갱신되도록 감싸기
-  function wrapV6OptionSetter(){
-    if (typeof window.ffSetDeskOptionV6 !== 'function' || window.ffSetDeskOptionV6.__previewWrapped) return;
-
-    var original = window.ffSetDeskOptionV6;
-    window.ffSetDeskOptionV6 = function(btn, key, value){
-      original.apply(this, arguments);
-      setTimeout(window.updateDeskOptionPreview, 0);
-    };
-    window.ffSetDeskOptionV6.__previewWrapped = true;
-  }
-
-  // 데스크 확장 시 미리보기 박스 자리 생성
-  function wrapV6DeskExpand(){
-    if (typeof window.ffExpandDeskV6 !== 'function' || window.ffExpandDeskV6.__previewWrapped) return;
-
-    var original = window.ffExpandDeskV6;
-    window.ffExpandDeskV6 = function(btn, desk){
-      original.apply(this, arguments);
-      setTimeout(window.updateDeskOptionPreview, 0);
-    };
-    window.ffExpandDeskV6.__previewWrapped = true;
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    var timer = setInterval(function(){
-      wrapV6OptionSetter();
-      wrapV6DeskExpand();
-    }, 300);
-
-    setTimeout(function(){ clearInterval(timer); }, 6000);
-  });
-
-  // 혹시 버튼 onclick을 직접 수정하지 않아도 동작하도록 클릭 이벤트도 보조 연결
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest('button');
-    if (!btn) return;
-    setTimeout(function(){
-      if ((btn.hasAttribute('data-v6-leg') || btn.hasAttribute('data-v6-move') || btn.hasAttribute('data-v6-top')) &&
-          typeof window.updateDeskOptionPreview === 'function') {
-        window.updateDeskOptionPreview();
-      }
-    }, 50);
-  });
-})();
-</script>
-<!-- === END DESK OPTION IMAGE PREVIEW PATCH === -->
-
 </body>
 
+<script id="ff-final-asset-fallback-v2">
+(function(){
+  var map = {
+    "": "",
+    "": "/textures/leg/standard/",
+    "": "",
+    "DSG.png": "/textures/leg/standard/DSG.png",
+    "": "",
+    "WEW.jpg": "",
+    "": ''
+  };
 
+  function fixedUrl(raw){
+    if(!raw || typeof raw !== "string" || raw.startsWith("data:") || raw.startsWith("blob:")) return raw;
+    var clean = raw.split("?")[0].split("#")[0];
+    var base = clean.split("/").pop();
+    return map[base] || raw;
+  }
+
+  function fixImg(img){
+    if(!img || !img.getAttribute) return;
+    var src = img.getAttribute("src") || "";
+    var next = fixedUrl(src);
+    if(next && next !== src){
+      img.setAttribute("src", next);
+    }
+  }
+
+  function scan(){
+    document.querySelectorAll("img").forEach(fixImg);
+  }
+
+  document.addEventListener("DOMContentLoaded", scan);
+  window.addEventListener("load", scan);
+  setInterval(scan, 1200);
+
+  document.addEventListener("error", function(e){
+    if(e.target && e.target.tagName === "IMG"){
+      fixImg(e.target);
+    }
+  }, true);
+
+  var mo = new MutationObserver(function(list){
+    list.forEach(function(m){
+      m.addedNodes && m.addedNodes.forEach(function(n){
+        if(n && n.tagName === "IMG") fixImg(n);
+        if(n && n.querySelectorAll) n.querySelectorAll("img").forEach(fixImg);
+      });
+    });
+  });
+  if(document.documentElement) mo.observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
 
 </html>
 <style id="ff-fixed40-portrait-chat-preview">
@@ -9085,3 +8969,2010 @@ button.material-btn{
   obs.observe(document.documentElement, {childList:true, subtree:true});
 })();
 </script>
+
+<!-- === FLOW PATCH: category first, product detail flow, option yes/no === -->
+<style id="ff-category-flow-v4-style">
+.ff-cat-box{border:1px solid rgba(46,242,201,.22);background:rgba(6,21,34,.72);border-radius:18px;padding:14px;margin-top:8px;}
+.ff-cat-title{font-size:15px;font-weight:900;color:#fff;margin-bottom:8px;}
+.ff-cat-section{margin-top:12px;}
+.ff-cat-section b{display:block;color:#2ef2c9;font-size:12px;margin-bottom:8px;letter-spacing:.2px;}
+.ff-cat-btns{display:flex;flex-wrap:wrap;gap:8px;}
+.ff-cat-btn{border:1px solid rgba(255,255,255,.16);background:#111827;color:#eaf6ff;border-radius:999px;padding:9px 13px;font-size:13px;font-weight:900;cursor:pointer;transition:.15s;}
+.ff-cat-btn:hover{border-color:#2ef2c9;transform:translateY(-1px);}
+.ff-cat-btn.selected{background:linear-gradient(135deg,#2ef2c9,#7c3aed);color:#07111f;border-color:#2ef2c9;box-shadow:0 0 0 3px rgba(46,242,201,.18);}
+.ff-cat-help{font-size:11px;color:#91a7bd;margin-top:6px;line-height:1.5;}
+.ff-cat-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+.ff-cat-actions button{border-radius:999px;padding:9px 15px;border:1px solid rgba(255,255,255,.16);background:#1f2937;color:#fff;font-weight:900;cursor:pointer;}
+.ff-cat-actions button.primary{background:linear-gradient(135deg,#ff7a1a,#ff4d00);border-color:#ff7a1a;}
+</style>
+<script id="ff-category-flow-v4-script">
+(function(){
+  function safe(fn){ try{ fn && fn(); }catch(e){ console.warn(e); } }
+  function addBot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
+  function addUser(html){ if(typeof addMsg==='function') addMsg('user', html); }
+  function catInfo(name){ return (window.USER_CATEGORIES && USER_CATEGORIES[name]) || {}; }
+  function isDesk(name){ return /데스크/.test(name); }
+  function isScreen(name){ return /스크린/.test(name); }
+  function getMode(info){ return (typeof ffDataTypeForMode==='function') ? ffDataTypeForMode(info) : (info.type || 'set'); }
+  function getKeys(name, info){ return (typeof ffUnitKeysForMode==='function') ? ffUnitKeysForMode(name, info.keys || []) : (info.keys || []); }
+  function dataFor(mode){ return mode === 'set' ? (window.SET_DATA || {}) : (window.UNIT_DATA || {}); }
+
+  window.__ffDeskChoice = '';
+  window.__ffScreenChoices = [];
+
+  function refreshCatButtons(){
+    document.querySelectorAll('[data-ff-desk-choice]').forEach(function(btn){
+      btn.classList.toggle('selected', btn.getAttribute('data-ff-desk-choice') === window.__ffDeskChoice);
+    });
+    document.querySelectorAll('[data-ff-screen-choice]').forEach(function(btn){
+      var v=btn.getAttribute('data-ff-screen-choice');
+      btn.classList.toggle('selected', window.__ffScreenChoices.indexOf(v)!==-1);
+    });
+  }
+
+  window.ffSelectDeskCategoryV4 = function(name){
+    window.__ffDeskChoice = name;
+    refreshCatButtons();
+  };
+
+  window.ffToggleScreenCategoryV4 = function(name){
+    var multi = (name === '전면 스크린' || name === '사이드 스크린');
+    if(multi){
+      window.__ffScreenChoices = window.__ffScreenChoices.filter(function(v){ return v !== '일자형 스크린' && v !== 'L형 스크린'; });
+      var i=window.__ffScreenChoices.indexOf(name);
+      if(i===-1) window.__ffScreenChoices.push(name); else window.__ffScreenChoices.splice(i,1);
+    }else{
+      window.__ffScreenChoices = window.__ffScreenChoices.indexOf(name)!==-1 ? [] : [name];
+    }
+    refreshCatButtons();
+  };
+
+  window.askSetCategories = function(){
+    if(window.state){ state.step='choose_products'; state.type='세트상품'; state.current = { type:'세트상품' }; safe(updateCurrent); safe(updateFlowBar); }
+    window.__ffDeskChoice = '';
+    window.__ffScreenChoices = [];
+    var html = '<div class="ff-cat-box">'
+      + '<div class="ff-cat-title">어떤 제품을 찾으세요?</div>'
+      + '<div class="ff-cat-section"><b>데스크 카테고리</b><div class="ff-cat-btns">'
+      + '<button class="ff-cat-btn" data-ff-desk-choice="일반형 데스크" onclick="ffSelectDeskCategoryV4(\'일반형 데스크\')">일반형 데스크</button>'
+      + '<button class="ff-cat-btn" data-ff-desk-choice="덕트형 데스크" onclick="ffSelectDeskCategoryV4(\'덕트형 데스크\')">덕트형 데스크</button>'
+      + '</div><div class="ff-cat-help">데스크는 둘 중 하나만 선택됩니다.</div></div>'
+      + '<div class="ff-cat-section"><b>스크린 카테고리</b><div class="ff-cat-btns">'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="전면 스크린" onclick="ffToggleScreenCategoryV4(\'전면 스크린\')">전면 스크린</button>'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="사이드 스크린" onclick="ffToggleScreenCategoryV4(\'사이드 스크린\')">사이드 스크린</button>'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="일자형 스크린" onclick="ffToggleScreenCategoryV4(\'일자형 스크린\')">일자형 스크린</button>'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="L형 스크린" onclick="ffToggleScreenCategoryV4(\'L형 스크린\')">L형 스크린</button>'
+      + '</div><div class="ff-cat-help">전면 스크린과 사이드 스크린은 함께 선택할 수 있고, 일자형/L형은 단독 선택됩니다.</div></div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffAskCategoryConfirmV4()">선택 완료</button></div>'
+      + '</div>';
+    addBot(html);
+  };
+
+  window.startFlow = function(){
+    if(window.state){
+      state.step='choose_products'; state.type='세트상품'; state.selectedCategories=[]; state.currentCatIdx=0; state.current={};
+      state.cartItems = state.cartItems || []; state.pendingPegboard=false; state.__ffV4Active=true;
+      safe(updateCurrent); safe(updatePreview); safe(updateFlowBar);
+    }
+    var p=document.getElementById('set-product-selector'); if(p) p.style.display='none';
+    addBot('안녕하세요! FlowFinder AI 견적상담 챗봇입니다. 😊');
+    window.askSetCategories();
+  };
+
+  window.ffAskCategoryConfirmV4 = function(){
+    var selected=[];
+    if(window.__ffDeskChoice) selected.push(window.__ffDeskChoice);
+    selected = selected.concat(window.__ffScreenChoices || []);
+    if(!selected.length){ addBot('<span class="error-msg">데스크 또는 스크린 카테고리를 하나 이상 선택해주세요.</span>'); return; }
+    addUser(selected.join(' / '));
+    addBot('<div class="ff-cat-box"><div class="ff-cat-title">선택을 완료하시겠습니까?</div>'
+      + '<div class="ff-cat-help">선택 제품: <b style="color:#fff">' + selected.join(' / ') + '</b></div>'
+      + '<div class="ff-cat-actions"><button onclick="ffBackCategoryV4()">이전 단계</button><button class="primary" onclick="ffProceedCategoriesV4()">이어하기</button></div></div>');
+  };
+  window.ffBackCategoryV4 = function(){ window.askSetCategories(); };
+  window.ffProceedCategoriesV4 = function(){
+    var selected=[]; if(window.__ffDeskChoice) selected.push(window.__ffDeskChoice); selected = selected.concat(window.__ffScreenChoices || []);
+    if(window.state){ state.type='세트상품'; state.selectedCategories=selected; state.currentCatIdx=0; state.__ffV4Active=true; state.__ffAskOptionsAfterProducts=true; }
+    if(typeof processNextCategory==='function') processNextCategory();
+  };
+
+  var oldProcessNext = window.processNextCategory;
+  window.processNextCategory = function(){
+    if(window.state && state.__ffV4Active){
+      if(state.currentCatIdx >= (state.selectedCategories||[]).length){
+        state.current={}; safe(updateCurrent);
+        return window.ffAskOptionsAfterProductsV4();
+      }
+      var name = state.selectedCategories[state.currentCatIdx++];
+      state.product=null; state.subKey=null; state.code=null; state.color=null; state.colorType=null; state.factory=null; state.price=null; state.basePrice=null;
+      state.w=null; state.d=null; state.h=null; state.legType=null; state.casterType=null; state._legLabel=null; state.topShape=null; state.rateLabel=null; state.rateVal=null;
+      state._deskTopColor=null; state._deskLegColor=null; state.current={type:state.type, product:name}; safe(updateCurrent);
+      return window.startCategoryFlow(name);
+    }
+    return oldProcessNext ? oldProcessNext.apply(this, arguments) : undefined;
+  };
+
+  var oldStartCategoryFlow = window.startCategoryFlow;
+  window.startCategoryFlow = function(catName){
+    if(!(window.state && state.__ffV4Active)) return oldStartCategoryFlow ? oldStartCategoryFlow.apply(this, arguments) : undefined;
+    var info=catInfo(catName); if(!info){ return window.processNextCategory(); }
+    var mode=getMode(info); var keys=getKeys(catName, info); var key=keys[0] || catName; var data=dataFor(mode);
+    state.subKey=key; state._currentItems=(data && data[key]) || []; state._currentDataType=mode; state._currentProductKey=key; state._currentCatName=catName;
+    if(isDesk(catName)){
+      state.__ffV4Order='desk_options_first';
+      addBot('<b>' + catName + '</b><br>옵션을 선택해주세요.');
+      return askLegType(catName);
+    }
+    if(isScreen(catName)){
+      state.__ffV4Order='screen_size_first';
+      addBot('<b>' + catName + '</b>');
+      return askSizeInput(catName);
+    }
+    return oldStartCategoryFlow ? oldStartCategoryFlow.apply(this, arguments) : undefined;
+  };
+
+  var oldAskTopShape = window.askTopShape;
+  window.askTopShape = function(catName){
+    if(window.state && state.__ffV4Order==='desk_options_first'){
+      addBot('상판 형태를 선택해주세요:');
+      return addButtons(['직각 상판','라운드 상판'], function(){ askCasterType(catName); }, function(v){
+        safe(function(){ saveHistory(function(){ askTopShape(catName); }); });
+        state.topShape=v; state.current.topShape=v; safe(updateCurrent);
+        state.__ffV4Order='desk_size_next';
+        askSizeInput(catName);
+      });
+    }
+    return oldAskTopShape ? oldAskTopShape.apply(this, arguments) : undefined;
+  };
+
+  var oldAfterSizeInput = window.afterSizeInput;
+  window.afterSizeInput = function(parsed){
+    if(window.state && (state.__ffV4Order==='desk_size_next' || state.__ffV4Order==='screen_size_first')){
+      var catName=state._currentCatName; var info=catInfo(catName);
+      parsed=parsed||{}; state.w=parsed.w; state.d=parsed.d; state.h=parsed.h;
+      var sizeStr=''; if(parsed.w) sizeStr+='W'+parsed.w; if(parsed.d) sizeStr+=' D'+parsed.d; if(parsed.h) sizeStr+=' H'+parsed.h;
+      if(sizeStr){ state.current.size=sizeStr; safe(updateCurrent); }
+      if(typeof checkSizeRule==='function'){
+        var check=checkSizeRule(catName, parsed.w, parsed.d, parsed.h);
+        if(!check.ok){ addBot('<div class="warning-box">⛔ 해당 사이즈는 주문이 불가합니다.<br>(' + check.errors.join(' / ') + ')</div>'); return askSizeInput(catName); }
+      }
+      if(state.__ffV4Order==='desk_size_next'){
+        state.__ffV4Order='desk_color_after_size';
+        return askColorTypeFirst(catName, state._currentDataType, state._currentItems, state._currentProductKey);
+      }
+      if(state.__ffV4Order==='screen_size_first'){
+        state.__ffV4Order='screen_color_after_size';
+        if(info.isScreen && parsed.h && typeof askScreenTopGap==='function') return askScreenTopGap(catName, parsed.h);
+        return askColorTypeFirst(catName, state._currentDataType, state._currentItems, state._currentProductKey);
+      }
+    }
+    return oldAfterSizeInput ? oldAfterSizeInput.apply(this, arguments) : undefined;
+  };
+
+  var oldSubmitTopGapForm = window.submitTopGapForm;
+  window.submitTopGapForm = function(fid2){
+    if(!(window.state && state.__ffV4Order==='screen_color_after_size')) return oldSubmitTopGapForm ? oldSubmitTopGapForm.apply(this, arguments) : undefined;
+    var el=document.getElementById('screen-top-'+fid2); if(!el || el.disabled) return;
+    var val=parseInt(el.value), newH=state._screenNewH || 590;
+    if(!val || val<1 || val>=newH){ el.style.borderColor='#f87171'; el.focus(); return; }
+    el.disabled=true; var btn=document.querySelector('[onclick="submitTopGapForm('+fid2+')"]'); if(btn) btn.disabled=true;
+    addUser('상판 위 ' + val + 'mm');
+    var below=newH-val, catName=state._currentCatName, baseH=(catName==='일자형 스크린'||catName==='L형 스크린')?590:715, diff=newH-baseH;
+    state._screenTopGap=val; state.current.size=(state.current.size||'') + ' / 상판위 ' + val + 'mm'; safe(updateCurrent);
+    addBot('📐 스크린 사이즈 정리:<br>· 변경 H: <b>' + newH + 'mm</b>' + (diff!==0?' <span style="color:#888;font-size:11px;">(기준 '+baseH+' 대비 '+(diff>0?'+':'')+diff+'mm)</span>':'') + '<br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+below+'mm</b>');
+    return askColorTypeFirst(catName, state._currentDataType, state._currentItems, state._currentProductKey);
+  };
+
+  var oldAfterColorSelected = window.afterColorSelected;
+  window.afterColorSelected = function(catName, dataType, items, productKey){
+    if(window.state && (state.__ffV4Order==='desk_color_after_size' || state.__ffV4Order==='screen_color_after_size')){
+      if(dataType === 'unit'){
+        var filtered=(items||[]).filter(function(i){ return i.color === state.color; });
+        var factories=[]; filtered.forEach(function(i){ if(factories.indexOf(i.factory)===-1) factories.push(i.factory); });
+        state.factory=factories[0] || null;
+      }else state.factory=null;
+      state.__ffV4Order='';
+      return calcAndFinish(catName);
+    }
+    return oldAfterColorSelected ? oldAfterColorSelected.apply(this, arguments) : undefined;
+  };
+
+  window.ffAskOptionsAfterProductsV4 = function(){
+    addBot('<div class="ff-cat-box"><div class="ff-cat-title">다음 작업을 선택해주세요.</div><div class="ff-cat-help">옵션을 추가하시겠습니까?</div><div class="ff-cat-actions"><button class="primary" onclick="ffShowOptionChoicesV4()">예</button><button onclick="ffSkipOptionsToFinalV4()">아니요</button></div></div>');
+  };
+  window.ffSkipOptionsToFinalV4 = function(){ addUser('아니요'); if(typeof showFinalQuote==='function') showFinalQuote(); else if(typeof askContinue==='function') askContinue(); };
+  window.ffShowOptionChoicesV4 = function(){
+    addUser('예');
+    addBot('<div class="ff-cat-box"><div class="ff-cat-title">추가 옵션을 선택해주세요.</div>'
+      + '<div class="ff-cat-section"><b>멀티탭</b><div class="ff-cat-btns"><button class="ff-cat-btn" onclick="ffAddSimpleOptionV4(\'멀티탭\')">멀티탭</button></div></div>'
+      + '<div class="ff-cat-section"><b>PC홀더</b><div class="ff-cat-btns"><button class="ff-cat-btn" onclick="ffAddSimpleOptionV4(\'PC홀더\')">PC홀더</button></div></div>'
+      + '<div class="ff-cat-section"><b>기타</b><div class="ff-cat-btns"><button class="ff-cat-btn" onclick="ffAddSimpleOptionV4(\'가방걸이\')">가방걸이</button><button class="ff-cat-btn" onclick="ffAddSimpleOptionV4(\'탑 마운트 모니터 암\')">탑 마운트 모니터 암</button></div></div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffFinishOptionsV4()">옵션 선택 완료</button><button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button></div></div>');
+  };
+  window.ffAddSimpleOptionV4 = function(name){
+    if(!window.state) return;
+    state.cartItems = state.cartItems || [];
+    state.cartItems.push({ product:name, color:'-', size:'-', finalPrice:0, price:0, sessionId:state._sessionId || 0 });
+    addUser(name);
+    safe(updatePreview);
+  };
+  window.ffFinishOptionsV4 = function(){ if(typeof showFinalQuote==='function') showFinalQuote(); else if(typeof askContinue==='function') askContinue(); };
+})();
+</script>
+
+
+<!-- === FF FINAL PATCH: category first flow + priced additional options === -->
+<style id="ff-final-category-option-style">
+.ff-final-option-card{
+  display:block;
+  width:100%;
+  text-align:left;
+  margin:7px 0;
+  padding:11px 12px;
+  border-radius:14px;
+  border:1px solid rgba(46,242,201,.28);
+  background:rgba(7,21,35,.92);
+  color:#fff;
+  cursor:pointer;
+  transition:.16s;
+}
+.ff-final-option-card:hover{
+  border-color:#2df2cb;
+  transform:translateY(-1px);
+  box-shadow:0 0 0 2px rgba(45,242,203,.12),0 10px 24px rgba(0,0,0,.25);
+}
+.ff-final-option-card b{display:block;font-size:13px;margin-bottom:4px;color:#fff;}
+.ff-final-option-card small{display:block;color:#9fb1c8;font-size:11px;line-height:1.5;}
+.ff-final-price{color:#2df2cb;font-weight:900;}
+.ff-final-note{color:#ffbf7a!important;}
+.ff-cat-section b{display:block;margin-bottom:8px;}
+.ff-cat-help strong{color:#2df2cb;}
+</style>
+<script id="ff-final-category-option-flow">
+(function(){
+  function safe(fn){ try{ if(typeof fn === 'function') return fn(); }catch(e){ console.warn(e); } }
+  function bot(html){
+    if(typeof addBot === 'function') return addBot(html);
+    if(typeof addMsg === 'function') return addMsg('bot', html);
+  }
+  function user(text){
+    if(typeof addUser === 'function') return addUser(text);
+    if(typeof addMsg === 'function') return addMsg('user', text);
+  }
+  function won(n){ return (Number(n)||0).toLocaleString('ko-KR') + '원'; }
+
+  window.ADDITIONAL_OPTIONS = {
+    power: [
+      { category:"멀티탭", name:"외장 3구 멀티탭", detail:"USB A타입 2포트", code:"CA311", colors:["WW","BK"], price:36000, customTopRate:true, note:"상판 주문품 요율 적용" },
+      { category:"멀티탭", name:"매립형 3구 슬라이딩 멀티탭", detail:"USB A타입 1포트 + C타입 1포트", code:"CA3310NN", colors:["WW","BK"], price:53000, customTopRate:true, note:"상판 주문품 요율 적용" },
+      { category:"멀티탭", name:"매립형 2구 멀티탭", detail:"USB C타입 2포트", code:"CA3203C", colors:["WW","BK"], price:52000, customTopRate:true, note:"상판 주문품 요율 적용" }
+    ],
+    pcHolder: [
+      { category:"PC홀더", name:"행잉 PC홀더", detail:"행잉형", code:"CA0020", colors:["WH","BK"], price:151000, customTopRate:false, note:"" },
+      { category:"PC홀더", name:"스트랩 PC홀더", detail:"스트랩형", code:"CA0022", colors:["BK"], price:75000, customTopRate:false, note:"" },
+      { category:"PC홀더", name:"보급형 행잉 PC홀더", detail:"보급형", code:"CA0021", colors:["BK"], price:39000, customTopRate:false, note:"" }
+    ],
+    etc: [
+      { category:"기타", name:"가방걸이", detail:"투명", code:"CBR0001H", colors:["XX(투명)"], price:6000, customTopRate:true, note:"상판 주문품 요율 적용" },
+      { category:"기타", name:"탑 마운트 모니터 암", detail:"탑 마운트", code:"CA0514", colors:["BK"], price:92000, customTopRate:false, note:"" }
+    ]
+  };
+
+  window.__ffDeskChoice = '';
+  window.__ffScreenChoices = [];
+
+  function refreshCatButtons(){
+    document.querySelectorAll('[data-ff-desk-choice]').forEach(function(btn){
+      btn.classList.toggle('selected', btn.getAttribute('data-ff-desk-choice') === window.__ffDeskChoice);
+    });
+    document.querySelectorAll('[data-ff-screen-choice]').forEach(function(btn){
+      var v = btn.getAttribute('data-ff-screen-choice');
+      btn.classList.toggle('selected', window.__ffScreenChoices.indexOf(v) !== -1);
+    });
+  }
+
+  window.ffSelectDeskCategoryV4 = function(name){
+    window.__ffDeskChoice = name;
+    refreshCatButtons();
+  };
+
+  window.ffToggleScreenCategoryV4 = function(name){
+    var multi = (name === '전면 스크린' || name === '사이드 스크린');
+    if(multi){
+      window.__ffScreenChoices = window.__ffScreenChoices.filter(function(v){ return v !== '일자형 스크린' && v !== 'L형 스크린'; });
+      var i = window.__ffScreenChoices.indexOf(name);
+      if(i === -1) window.__ffScreenChoices.push(name);
+      else window.__ffScreenChoices.splice(i, 1);
+    }else{
+      window.__ffScreenChoices = window.__ffScreenChoices.indexOf(name) !== -1 ? [] : [name];
+    }
+    refreshCatButtons();
+  };
+
+  window.askSetCategories = function(){
+    if(window.state){
+      state.step = 'choose_products';
+      state.type = '제품 선택';
+      state.current = { type:'제품 선택' };
+      state.selectedCategories = [];
+      state.currentCatIdx = 0;
+      safe(updateCurrent); safe(updateFlowBar);
+    }
+    window.__ffDeskChoice = '';
+    window.__ffScreenChoices = [];
+    bot('<div class="ff-cat-box">'
+      + '<div class="ff-cat-title">어떤 제품을 찾으세요?</div>'
+      + '<div class="ff-cat-help">카테고리별로 선택해주세요.</div>'
+      + '<div class="ff-cat-section"><b>데스크 카테고리</b><div class="ff-cat-btns">'
+      + '<button class="ff-cat-btn" data-ff-desk-choice="일반형 데스크" onclick="ffSelectDeskCategoryV4(\'일반형 데스크\')">일반형 데스크</button>'
+      + '<button class="ff-cat-btn" data-ff-desk-choice="덕트형 데스크" onclick="ffSelectDeskCategoryV4(\'덕트형 데스크\')">덕트형 데스크</button>'
+      + '</div><div class="ff-cat-help">데스크는 둘 중 하나만 선택됩니다.</div></div>'
+      + '<div class="ff-cat-section"><b>스크린 카테고리</b><div class="ff-cat-btns">'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="전면 스크린" onclick="ffToggleScreenCategoryV4(\'전면 스크린\')">전면 스크린</button>'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="사이드 스크린" onclick="ffToggleScreenCategoryV4(\'사이드 스크린\')">사이드 스크린</button>'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="일자형 스크린" onclick="ffToggleScreenCategoryV4(\'일자형 스크린\')">일자형 스크린</button>'
+      + '<button class="ff-cat-btn" data-ff-screen-choice="L형 스크린" onclick="ffToggleScreenCategoryV4(\'L형 스크린\')">L형 스크린</button>'
+      + '</div><div class="ff-cat-help">전면 스크린과 사이드 스크린은 복수 선택 가능, 일자형/L형은 단독 선택입니다.</div></div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffAskCategoryConfirmV4()">선택 완료</button></div>'
+      + '</div>');
+  };
+
+  window.startFlow = function(){
+    var msgs = document.getElementById('messages');
+    if(msgs) msgs.innerHTML = '';
+    if(window.state){
+      state.step='choose_products';
+      state.type='제품 선택';
+      state.selectedCategories=[];
+      state.currentCatIdx=0;
+      state.current={ type:'제품 선택' };
+      state.cartItems = state.cartItems || [];
+      state.__ffV4Active = true;
+      state.__ffAskOptionsAfterProducts = true;
+      safe(updateCurrent); safe(updatePreview); safe(updateFlowBar);
+    }
+    var p = document.getElementById('set-product-selector');
+    if(p) p.style.display='none';
+    bot('안녕하세요! FlowFinder AI 견적상담 챗봇입니다. 😊');
+    window.askSetCategories();
+  };
+
+  window.ffAskCategoryConfirmV4 = function(){
+    var selected = [];
+    if(window.__ffDeskChoice) selected.push(window.__ffDeskChoice);
+    selected = selected.concat(window.__ffScreenChoices || []);
+    if(!selected.length){
+      bot('<span class="error-msg">데스크 또는 스크린 카테고리를 하나 이상 선택해주세요.</span>');
+      return;
+    }
+    user(selected.join(' / '));
+    bot('<div class="ff-cat-box"><div class="ff-cat-title">선택을 완료하시겠습니까?</div>'
+      + '<div class="ff-cat-help">선택 제품: <strong>' + selected.join(' / ') + '</strong></div>'
+      + '<div class="ff-cat-actions"><button onclick="ffBackCategoryV4()">이전 단계</button><button class="primary" onclick="ffProceedCategoriesV4()">이어하기</button></div></div>');
+  };
+
+  window.ffBackCategoryV4 = function(){ window.askSetCategories(); };
+
+  window.ffProceedCategoriesV4 = function(){
+    var selected = [];
+    if(window.__ffDeskChoice) selected.push(window.__ffDeskChoice);
+    selected = selected.concat(window.__ffScreenChoices || []);
+    if(window.state){
+      state.type = '제품 선택';
+      state.selectedCategories = selected;
+      state.currentCatIdx = 0;
+      state.__ffV4Active = true;
+      state.__ffAskOptionsAfterProducts = true;
+    }
+    if(typeof processNextCategory === 'function') processNextCategory();
+  };
+
+  window.ffAskOptionsAfterProductsV4 = function(){
+    bot('<div class="ff-cat-box"><div class="ff-cat-title">다음 작업을 선택해주세요.</div>'
+      + '<div class="ff-cat-help">옵션을 추가하시겠습니까?</div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffShowOptionChoicesV4()">예</button><button onclick="ffSkipOptionsToFinalV4()">아니요</button></div></div>');
+  };
+
+  window.ffSkipOptionsToFinalV4 = function(){
+    user('아니요');
+    if(typeof showFinalQuote === 'function') showFinalQuote();
+    else if(typeof askContinue === 'function') askContinue();
+  };
+
+  function optionButton(group, index, item){
+    return '<button class="ff-final-option-card" onclick="ffChoosePricedOptionV5(\'' + group + '\',' + index + ')">'
+      + '<b>' + item.name + '</b>'
+      + '<small>' + item.detail + ' / 코드: ' + item.code + '</small>'
+      + '<small>색상: ' + item.colors.join(', ') + ' / <span class="ff-final-price">' + won(item.price) + '</span></small>'
+      + (item.customTopRate ? '<small class="ff-final-note">※ ' + (item.note || '상판 주문품 요율 적용') + '</small>' : '')
+      + '</button>';
+  }
+
+  window.ffShowOptionChoicesV4 = function(){
+    user('예');
+    var h = '<div class="ff-cat-box"><div class="ff-cat-title">추가 옵션을 선택해주세요.</div>'
+      + '<div class="ff-cat-section"><b>멀티탭</b>'
+      + ADDITIONAL_OPTIONS.power.map(function(item,i){ return optionButton('power', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-section"><b>PC홀더</b>'
+      + ADDITIONAL_OPTIONS.pcHolder.map(function(item,i){ return optionButton('pcHolder', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-section"><b>기타</b>'
+      + ADDITIONAL_OPTIONS.etc.map(function(item,i){ return optionButton('etc', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffFinishOptionsV4()">옵션 선택 완료</button><button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button></div></div>';
+    bot(h);
+  };
+
+  window.ffChoosePricedOptionV5 = function(group, index){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item) return;
+    if(item.colors && item.colors.length > 1){
+      var html = '<div class="ff-cat-box"><div class="ff-cat-title">' + item.name + '</div>'
+        + '<div class="ff-cat-help">색상을 선택해주세요. 가격: <strong>' + won(item.price) + '</strong></div>'
+        + '<div class="ff-cat-btns">'
+        + item.colors.map(function(c){ return '<button class="ff-cat-btn" onclick="ffAddPricedOptionV5(\'' + group + '\',' + index + ',\'' + c + '\')">' + c + '</button>'; }).join('')
+        + '</div></div>';
+      bot(html);
+    }else{
+      window.ffAddPricedOptionV5(group, index, item.colors && item.colors[0] ? item.colors[0] : '-');
+    }
+  };
+
+  window.ffAddPricedOptionV5 = function(group, index, color){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item || !window.state) return;
+    state.cartItems = state.cartItems || [];
+    var name = item.name + (color && color !== '-' ? ' / ' + color : '');
+    state.cartItems.push({
+      product: item.name,
+      category: item.category,
+      code: item.code,
+      detail: item.detail,
+      color: color || '-',
+      size: '-',
+      price: item.price,
+      finalPrice: item.price,
+      optionPrice: item.price,
+      customTopRate: !!item.customTopRate,
+      note: item.note || '',
+      sessionId: state._sessionId || 0,
+      isAdditionalOption: true
+    });
+    user(name + ' / ' + won(item.price));
+    bot('<div class="tip-box">추가되었습니다: <b>' + item.name + '</b><br>코드: ' + item.code + ' / 색상: ' + (color || '-') + ' / 가격: <b>' + won(item.price) + '</b>' + (item.customTopRate ? '<br>※ 상판 주문품 요율 적용' : '') + '</div>');
+    safe(updatePreview); safe(updateCurrent);
+  };
+
+  window.ffFinishOptionsV4 = function(){
+    if(typeof showFinalQuote === 'function') showFinalQuote();
+    else if(typeof askContinue === 'function') askContinue();
+  };
+
+  function removeOldSetSingleMessages(){
+    var msgs = document.getElementById('messages');
+    if(!msgs) return;
+    var txt = msgs.innerText || '';
+    if(txt.indexOf('세트상품') !== -1 || txt.indexOf('단품상품') !== -1){
+      window.startFlow();
+    }
+  }
+
+  function bootFinalFlow(){
+    setTimeout(function(){
+      removeOldSetSingleMessages();
+      var msgs = document.getElementById('messages');
+      if(msgs && !msgs.innerText.trim()) window.startFlow();
+    }, 120);
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootFinalFlow);
+  else bootFinalFlow();
+})();
+</script>
+
+
+
+<!-- === FF PATCH: hide option code/price from user + color button choice === -->
+<style id="ff-hide-price-code-option-style">
+.ff-final-option-card small.ff-internal-hidden { display:none !important; }
+.ff-final-user-detail { color:#9fb1c8; font-size:11px; line-height:1.5; display:block; }
+.ff-color-choice-wrap{
+  margin-top:10px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.ff-color-choice-btn{
+  border:1px solid rgba(45,242,203,.28);
+  background:rgba(7,21,35,.92);
+  color:#fff;
+  padding:9px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:800;
+}
+.ff-color-choice-btn:hover{
+  border-color:#2df2cb;
+  box-shadow:0 0 0 2px rgba(45,242,203,.12);
+}
+</style>
+
+<script id="ff-hide-price-code-option-flow">
+(function(){
+  function won(n){ return (Number(n)||0).toLocaleString('ko-KR') + '원'; }
+  function bot(html){
+    if(typeof addBot === 'function') return addBot(html);
+    if(typeof addMsg === 'function') return addMsg('bot', html);
+  }
+  function user(text){
+    if(typeof addUser === 'function') return addUser(text);
+    if(typeof addMsg === 'function') return addMsg('user', text);
+  }
+  function safe(fn){ try{ if(typeof fn === 'function') return fn(); }catch(e){ console.warn(e); } }
+
+  function optionButtonClean(group, index, item){
+    return '<button class="ff-final-option-card" onclick="ffChoosePricedOptionV6(\'' + group + '\',' + index + ')">'
+      + '<b>' + item.name + '</b>'
+      + '<span class="ff-final-user-detail">' + (item.detail || '') + '</span>'
+      + '</button>';
+  }
+
+  window.ffShowOptionChoicesV4 = function(){
+    user('예');
+    var h = '<div class="ff-cat-box"><div class="ff-cat-title">추가 옵션을 선택해주세요.</div>'
+      + '<div class="ff-cat-help">필요한 옵션을 선택한 뒤 색상을 골라주세요.</div>'
+      + '<div class="ff-cat-section"><b>멀티탭</b>'
+      + ADDITIONAL_OPTIONS.power.map(function(item,i){ return optionButtonClean('power', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-section"><b>PC홀더</b>'
+      + ADDITIONAL_OPTIONS.pcHolder.map(function(item,i){ return optionButtonClean('pcHolder', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-section"><b>기타</b>'
+      + ADDITIONAL_OPTIONS.etc.map(function(item,i){ return optionButtonClean('etc', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffFinishOptionsV4()">옵션 선택 완료</button><button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button></div></div>';
+    bot(h);
+  };
+
+  window.ffChoosePricedOptionV6 = function(group, index){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item) return;
+
+    var colors = item.colors && item.colors.length ? item.colors : ['-'];
+    var html = '<div class="ff-cat-box"><div class="ff-cat-title">' + item.name + '</div>'
+      + '<div class="ff-cat-help">색상을 선택해주세요.</div>'
+      + '<div class="ff-color-choice-wrap">'
+      + colors.map(function(c){
+          return '<button class="ff-color-choice-btn" onclick="ffAddPricedOptionV6(\'' + group + '\',' + index + ',\'' + c + '\')">' + c + '</button>';
+        }).join('')
+      + '</div></div>';
+    bot(html);
+  };
+
+  window.ffAddPricedOptionV6 = function(group, index, color){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item || !window.state) return;
+
+    state.cartItems = state.cartItems || [];
+    state.cartItems.push({
+      product: item.name,
+      category: item.category,
+      code: item.code,
+      detail: item.detail,
+      color: color || '-',
+      size: '-',
+      price: item.price,
+      finalPrice: item.price,
+      optionPrice: item.price,
+      customTopRate: !!item.customTopRate,
+      note: item.note || '',
+      sessionId: state._sessionId || 0,
+      isAdditionalOption: true
+    });
+
+    user(item.name + (color && color !== '-' ? ' / ' + color : ''));
+    bot('<div class="tip-box">선택한 옵션이 추가되었습니다.<br><b>' + item.name + '</b>'
+      + (color && color !== '-' ? '<br>색상: <b>' + color + '</b>' : '')
+      + '</div>');
+
+    safe(updatePreview);
+    safe(updateCurrent);
+  };
+
+  // if old function name is called elsewhere, route it to new one.
+})();
+</script>
+
+
+
+<!-- === FF PATCH: multiple additional options + color buttons + quantity selector === -->
+<style id="ff-additional-multi-qty-style">
+.ff-option-worklist{
+  margin-top:12px;
+  padding:12px;
+  border-radius:16px;
+  border:1px solid rgba(45,242,203,.22);
+  background:rgba(3,12,24,.55);
+}
+.ff-option-worklist-title{
+  font-weight:900;
+  color:#fff;
+  margin-bottom:8px;
+  font-size:13px;
+}
+.ff-option-workitem{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:9px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.ff-option-workitem:first-of-type{border-top:0;}
+.ff-option-workitem b{font-size:12px;color:#fff;}
+.ff-option-workitem small{display:block;font-size:11px;color:#9fb1c8;margin-top:2px;}
+.ff-qty-control{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  background:#0b1220;
+  border:1px solid rgba(45,242,203,.2);
+  border-radius:999px;
+  padding:4px;
+}
+.ff-qty-control button{
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  border:0;
+  background:#172338;
+  color:#fff;
+  cursor:pointer;
+  font-weight:900;
+}
+.ff-qty-control span{
+  min-width:28px;
+  text-align:center;
+  color:#fff;
+  font-weight:900;
+  font-size:12px;
+}
+.ff-final-option-card.selected{
+  border-color:#2df2cb!important;
+  background:rgba(13,60,54,.92)!important;
+  box-shadow:0 0 0 2px rgba(45,242,203,.16),0 12px 26px rgba(0,0,0,.25);
+}
+.ff-final-option-card.selected::after{
+  content:'선택됨';
+  float:right;
+  font-size:10px;
+  color:#2df2cb;
+  font-weight:900;
+}
+</style>
+
+<script id="ff-additional-multi-qty-flow">
+(function(){
+  function bot(html){
+    if(typeof addBot === 'function') return addBot(html);
+    if(typeof addMsg === 'function') return addMsg('bot', html);
+  }
+  function user(text){
+    if(typeof addUser === 'function') return addUser(text);
+    if(typeof addMsg === 'function') return addMsg('user', text);
+  }
+  function safe(fn){ try{ if(typeof fn === 'function') return fn(); }catch(e){ console.warn(e); } }
+
+  window.__ffPendingOptions = window.__ffPendingOptions || [];
+
+  function getOption(group, index){
+    return (window.ADDITIONAL_OPTIONS && ADDITIONAL_OPTIONS[group] || [])[index];
+  }
+
+  function optionButtonMulti(group, index, item){
+    var key = group + ':' + index;
+    var selected = window.__ffPendingOptions.some(function(o){ return o.key === key; });
+    return '<button class="ff-final-option-card ' + (selected ? 'selected' : '') + '" onclick="ffOpenOptionColorQtyV7(\'' + group + '\',' + index + ')">'
+      + '<b>' + item.name + '</b>'
+      + '<span class="ff-final-user-detail">' + (item.detail || '') + '</span>'
+      + '</button>';
+  }
+
+  function renderPendingList(){
+    if(!window.__ffPendingOptions.length){
+      return '<div class="ff-option-worklist"><div class="ff-option-worklist-title">선택된 추가 옵션</div><small style="color:#8fa1bb;">아직 선택된 옵션이 없습니다.</small></div>';
+    }
+
+    return '<div class="ff-option-worklist"><div class="ff-option-worklist-title">선택된 추가 옵션</div>'
+      + window.__ffPendingOptions.map(function(o, i){
+        return '<div class="ff-option-workitem">'
+          + '<div><b>' + o.name + '</b><small>색상: ' + o.color + ' / 수량: ' + o.qty + '</small></div>'
+          + '<button class="back-btn" onclick="ffRemovePendingOptionV7(' + i + ')">삭제</button>'
+          + '</div>';
+      }).join('')
+      + '</div>';
+  }
+
+  window.ffShowOptionChoicesV4 = function(){
+    user('예');
+    window.__ffPendingOptions = [];
+    ffRenderOptionSelectionV7();
+  };
+
+  window.ffRenderOptionSelectionV7 = function(){
+    var h = '<div class="ff-cat-box"><div class="ff-cat-title">추가 옵션을 선택해주세요.</div>'
+      + '<div class="ff-cat-help">여러 개를 선택할 수 있습니다. 옵션을 누른 뒤 색상과 수량을 선택해주세요.</div>'
+      + '<div class="ff-cat-section"><b>멀티탭</b>'
+      + ADDITIONAL_OPTIONS.power.map(function(item,i){ return optionButtonMulti('power', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-section"><b>PC홀더</b>'
+      + ADDITIONAL_OPTIONS.pcHolder.map(function(item,i){ return optionButtonMulti('pcHolder', i, item); }).join('')
+      + '</div>'
+      + '<div class="ff-cat-section"><b>기타</b>'
+      + ADDITIONAL_OPTIONS.etc.map(function(item,i){ return optionButtonMulti('etc', i, item); }).join('')
+      + '</div>'
+      + renderPendingList()
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffCommitPendingOptionsV7()">선택 완료</button><button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button></div></div>';
+    bot(h);
+  };
+
+  window.ffOpenOptionColorQtyV7 = function(group, index){
+    var item = getOption(group, index);
+    if(!item) return;
+    var colors = item.colors && item.colors.length ? item.colors : ['-'];
+    var defaultColor = colors[0];
+    bot('<div class="ff-cat-box">'
+      + '<div class="ff-cat-title">' + item.name + '</div>'
+      + '<div class="ff-cat-help">색상과 수량을 선택해주세요.</div>'
+      + '<div class="ff-cat-section"><b>색상</b><div class="ff-color-choice-wrap">'
+      + colors.map(function(c, idx){
+          return '<button id="ff-color-btn-' + group + '-' + index + '-' + idx + '" class="ff-color-choice-btn' + (idx===0 ? ' selected' : '') + '" onclick="ffSetTempOptionColorV7(\'' + c + '\', this)">' + c + '</button>';
+        }).join('')
+      + '</div></div>'
+      + '<div class="ff-cat-section"><b>수량</b>'
+      + '<div class="ff-qty-control"><button onclick="ffChangeTempQtyV7(-1)">−</button><span id="ff-temp-option-qty">1</span><button onclick="ffChangeTempQtyV7(1)">+</button></div>'
+      + '</div>'
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffAddPendingOptionV7(\'' + group + '\',' + index + ')">이 옵션 추가</button><button onclick="ffRenderOptionSelectionV7()">이전</button></div>'
+      + '</div>');
+    window.__ffTempOption = { color: defaultColor, qty: 1 };
+  };
+
+  window.ffSetTempOptionColorV7 = function(color, el){
+    window.__ffTempOption = window.__ffTempOption || { color: color, qty: 1 };
+    window.__ffTempOption.color = color;
+    if(el && el.parentElement){
+      el.parentElement.querySelectorAll('.ff-color-choice-btn').forEach(function(btn){ btn.classList.remove('selected'); });
+      el.classList.add('selected');
+    }
+  };
+
+  window.ffChangeTempQtyV7 = function(delta){
+    window.__ffTempOption = window.__ffTempOption || { color: '-', qty: 1 };
+    window.__ffTempOption.qty = Math.max(1, Math.min(99, (window.__ffTempOption.qty || 1) + delta));
+    var el = document.getElementById('ff-temp-option-qty');
+    if(el) el.textContent = window.__ffTempOption.qty;
+  };
+
+  window.ffAddPendingOptionV7 = function(group, index){
+    var item = getOption(group, index);
+    if(!item) return;
+    var temp = window.__ffTempOption || {};
+    var color = temp.color || (item.colors && item.colors[0]) || '-';
+    var qty = Math.max(1, Number(temp.qty || 1));
+    var key = group + ':' + index;
+
+    var existing = window.__ffPendingOptions.find(function(o){ return o.key === key && o.color === color; });
+    if(existing){
+      existing.qty += qty;
+    }else{
+      window.__ffPendingOptions.push({
+        key: key,
+        group: group,
+        index: index,
+        name: item.name,
+        category: item.category,
+        code: item.code,
+        detail: item.detail,
+        color: color,
+        qty: qty,
+        price: item.price,
+        customTopRate: !!item.customTopRate,
+        note: item.note || ''
+      });
+    }
+
+    user(item.name + ' / ' + color + ' / ' + qty + '개');
+    bot('<div class="tip-box">선택 목록에 추가되었습니다.<br><b>' + item.name + '</b><br>색상: <b>' + color + '</b> / 수량: <b>' + qty + '개</b></div>');
+    ffRenderOptionSelectionV7();
+  };
+
+  window.ffRemovePendingOptionV7 = function(index){
+    window.__ffPendingOptions.splice(index, 1);
+    ffRenderOptionSelectionV7();
+  };
+
+  window.ffCommitPendingOptionsV7 = function(){
+    if(!window.state) return;
+    state.cartItems = state.cartItems || [];
+
+    if(!window.__ffPendingOptions.length){
+      bot('<div class="warning-box">선택된 추가 옵션이 없습니다. 옵션을 선택하거나 “옵션 없이 견적서 보기”를 눌러주세요.</div>');
+      return;
+    }
+
+    window.__ffPendingOptions.forEach(function(o){
+      state.cartItems.push({
+        product: o.name,
+        category: o.category,
+        code: o.code,
+        detail: o.detail,
+        color: o.color,
+        size: '-',
+        qty: o.qty,
+        quantity: o.qty,
+        price: o.price,
+        unitPrice: o.price,
+        finalPrice: o.price * o.qty,
+        optionPrice: o.price * o.qty,
+        customTopRate: !!o.customTopRate,
+        note: o.note || '',
+        sessionId: state._sessionId || 0,
+        isAdditionalOption: true
+      });
+    });
+
+    user('추가 옵션 선택 완료');
+    bot('<div class="tip-box">추가 옵션이 견적에 반영되었습니다.</div>');
+    safe(updatePreview);
+    safe(updateCurrent);
+
+    if(typeof showFinalQuote === 'function') showFinalQuote();
+    else if(typeof askContinue === 'function') askContinue();
+  };
+})();
+</script>
+
+
+
+<!-- === FF PATCH FINAL: additional option cards with title/color/qty + multi select + right summary update === -->
+<style id="ff-additional-option-card-final-style">
+.ff-addopt-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.ff-addopt-card{
+  border:1px solid rgba(45,242,203,.25);
+  background:rgba(8,18,33,.94);
+  border-radius:16px;
+  padding:13px;
+  color:#fff;
+}
+.ff-addopt-card-title{
+  font-size:14px;
+  font-weight:900;
+  color:#fff;
+  margin-bottom:5px;
+}
+.ff-addopt-card-detail{
+  font-size:11px;
+  color:#9fb1c8;
+  line-height:1.45;
+  margin-bottom:10px;
+}
+.ff-addopt-row{
+  margin-top:10px;
+}
+.ff-addopt-label{
+  display:block;
+  font-size:11px;
+  color:#9fb1c8;
+  font-weight:800;
+  margin-bottom:6px;
+}
+.ff-addopt-color-buttons{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.ff-addopt-color-btn{
+  border:1px solid rgba(255,255,255,.18);
+  background:#101827;
+  color:#fff;
+  border-radius:999px;
+  padding:7px 12px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:900;
+}
+.ff-addopt-color-btn.active{
+  border-color:#2df2cb;
+  color:#2df2cb;
+  background:#102c2a;
+  box-shadow:0 0 0 2px rgba(45,242,203,.12);
+}
+.ff-addopt-qty{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:#0b1220;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:999px;
+  padding:5px;
+}
+.ff-addopt-qty button{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:0;
+  background:#233044;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.ff-addopt-qty span{
+  min-width:32px;
+  text-align:center;
+  font-size:13px;
+  font-weight:900;
+  color:#fff;
+}
+.ff-addopt-add-btn{
+  margin-top:12px;
+  width:100%;
+  min-height:38px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ff6b1a,#ff8a1d);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.ff-addopt-selected-list{
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(45,242,203,.22);
+  background:rgba(3,12,24,.55);
+}
+.ff-addopt-selected-list b{
+  display:block;
+  margin-bottom:8px;
+  font-size:13px;
+  color:#fff;
+}
+.ff-addopt-selected-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:center;
+  padding:8px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.ff-addopt-selected-item:first-of-type{border-top:0;}
+.ff-addopt-selected-item span{
+  font-size:12px;
+  color:#fff;
+  font-weight:800;
+}
+.ff-addopt-selected-item small{
+  display:block;
+  font-size:11px;
+  color:#9fb1c8;
+  margin-top:2px;
+}
+.ff-addopt-remove{
+  border:1px solid rgba(255,255,255,.18);
+  background:#111827;
+  color:#fff;
+  border-radius:999px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-size:11px;
+}
+</style>
+
+<script id="ff-additional-option-card-final-flow">
+(function(){
+  function bot(html){
+    if(typeof addBot === 'function') return addBot(html);
+    if(typeof addMsg === 'function') return addMsg('bot', html);
+  }
+  function user(text){
+    if(typeof addUser === 'function') return addUser(text);
+    if(typeof addMsg === 'function') return addMsg('user', text);
+  }
+  function safe(fn){ try{ if(typeof fn === 'function') return fn(); }catch(e){ console.warn(e); } }
+
+  window.__ffOptionDrafts = {};
+
+  function optionGroups(){
+    return [
+      ["power", "멀티탭", ADDITIONAL_OPTIONS.power || []],
+      ["pcHolder", "PC홀더", ADDITIONAL_OPTIONS.pcHolder || []],
+      ["etc", "기타", ADDITIONAL_OPTIONS.etc || []]
+    ];
+  }
+
+  function ensureDraft(key, item){
+    if(!window.__ffOptionDrafts[key]){
+      window.__ffOptionDrafts[key] = {
+        color: item.colors && item.colors[0] ? item.colors[0] : "-",
+        qty: 1
+      };
+    }
+    return window.__ffOptionDrafts[key];
+  }
+
+  function renderOptionCard(group, index, item){
+    var key = group + "_" + index;
+    var draft = ensureDraft(key, item);
+    var colors = item.colors && item.colors.length ? item.colors : ["-"];
+
+    return `
+      <div class="ff-addopt-card" data-option-key="${key}">
+        <div class="ff-addopt-card-title">${item.name}</div>
+        <div class="ff-addopt-card-detail">${item.detail || ""}</div>
+
+        <div class="ff-addopt-row">
+          <span class="ff-addopt-label">색상</span>
+          <div class="ff-addopt-color-buttons">
+            ${colors.map(c => `
+              <button type="button"
+                class="ff-addopt-color-btn ${draft.color === c ? "active" : ""}"
+                onclick="ffSetOptionCardColorFinal('${group}', ${index}, '${c}')">${c}</button>
+            `).join("")}
+          </div>
+        </div>
+
+        <div class="ff-addopt-row">
+          <span class="ff-addopt-label">수량</span>
+          <div class="ff-addopt-qty">
+            <button type="button" onclick="ffChangeOptionCardQtyFinal('${group}', ${index}, -1)">−</button>
+            <span id="ff-addopt-qty-${key}">${draft.qty}</span>
+            <button type="button" onclick="ffChangeOptionCardQtyFinal('${group}', ${index}, 1)">+</button>
+          </div>
+        </div>
+
+        <button type="button" class="ff-addopt-add-btn" onclick="ffAddOptionCardToQuoteFinal('${group}', ${index})">
+          선택내역에 추가
+        </button>
+      </div>
+    `;
+  }
+
+  function renderSelectedList(){
+    var items = (window.state && state.cartItems ? state.cartItems : []).filter(x => x.isAdditionalOption);
+    if(!items.length){
+      return `
+        <div class="ff-addopt-selected-list">
+          <b>선택된 추가 옵션</b>
+          <small style="color:#9fb1c8;">아직 추가된 옵션이 없습니다.</small>
+        </div>
+      `;
+    }
+    return `
+      <div class="ff-addopt-selected-list">
+        <b>선택된 추가 옵션</b>
+        ${items.map((item, idx) => `
+          <div class="ff-addopt-selected-item">
+            <div>
+              <span>${item.product}</span>
+              <small>색상: ${item.color || "-"} / 수량: ${item.qty || item.quantity || 1}개</small>
+            </div>
+            <button type="button" class="ff-addopt-remove" onclick="ffRemoveAdditionalOptionFromQuoteFinal(${idx})">삭제</button>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+
+  window.ffShowOptionChoicesV4 = function(){
+    user("예");
+    window.__ffOptionDrafts = {};
+    window.ffRenderAdditionalOptionCardsFinal();
+  };
+
+  window.ffRenderAdditionalOptionCardsFinal = function(){
+    var html = `
+      <div class="ff-cat-box">
+        <div class="ff-cat-title">추가 옵션을 선택해주세요.</div>
+        <div class="ff-cat-help">복수 선택이 가능합니다. 각 옵션에서 색상과 수량을 고른 뒤 “선택내역에 추가”를 눌러주세요.</div>
+
+        ${optionGroups().map(([group, title, arr]) => `
+          <div class="ff-cat-section">
+            <b>${title}</b>
+            <div class="ff-addopt-grid">
+              ${arr.map((item, index) => renderOptionCard(group, index, item)).join("")}
+            </div>
+          </div>
+        `).join("")}
+
+        ${renderSelectedList()}
+
+        <div class="ff-cat-actions">
+          <button class="primary" onclick="ffFinishOptionsV4()">옵션 선택 완료</button>
+          <button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button>
+        </div>
+      </div>
+    `;
+    bot(html);
+  };
+
+  window.ffSetOptionCardColorFinal = function(group, index, color){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item) return;
+    var key = group + "_" + index;
+    ensureDraft(key, item).color = color;
+
+    var card = document.querySelector(`[data-option-key="${key}"]`);
+    if(card){
+      card.querySelectorAll(".ff-addopt-color-btn").forEach(btn => btn.classList.remove("active"));
+      Array.from(card.querySelectorAll(".ff-addopt-color-btn")).forEach(btn => {
+        if(btn.textContent.trim() === color) btn.classList.add("active");
+      });
+    }
+  };
+
+  window.ffChangeOptionCardQtyFinal = function(group, index, delta){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item) return;
+    var key = group + "_" + index;
+    var draft = ensureDraft(key, item);
+    draft.qty = Math.max(1, Math.min(99, Number(draft.qty || 1) + delta));
+
+    var el = document.getElementById("ff-addopt-qty-" + key);
+    if(el) el.textContent = draft.qty;
+  };
+
+  window.ffAddOptionCardToQuoteFinal = function(group, index){
+    var item = (ADDITIONAL_OPTIONS[group] || [])[index];
+    if(!item || !window.state) return;
+
+    var key = group + "_" + index;
+    var draft = ensureDraft(key, item);
+    var color = draft.color || (item.colors && item.colors[0]) || "-";
+    var qty = Math.max(1, Number(draft.qty || 1));
+
+    state.cartItems = state.cartItems || [];
+
+    var existing = state.cartItems.find(x =>
+      x.isAdditionalOption &&
+      x.code === item.code &&
+      x.color === color
+    );
+
+    if(existing){
+      existing.qty = Number(existing.qty || existing.quantity || 1) + qty;
+      existing.quantity = existing.qty;
+      existing.finalPrice = Number(item.price || 0) * existing.qty;
+      existing.optionPrice = existing.finalPrice;
+    }else{
+      state.cartItems.push({
+        product: item.name,
+        category: item.category,
+        code: item.code,
+        detail: item.detail,
+        color: color,
+        size: "-",
+        qty: qty,
+        quantity: qty,
+        price: item.price,
+        unitPrice: item.price,
+        finalPrice: Number(item.price || 0) * qty,
+        optionPrice: Number(item.price || 0) * qty,
+        customTopRate: !!item.customTopRate,
+        note: item.note || "",
+        sessionId: state._sessionId || 0,
+        isAdditionalOption: true
+      });
+    }
+
+    user(item.name + " / " + color + " / " + qty + "개");
+    bot(`<div class="tip-box"><b>${item.name}</b>이 선택내역에 추가되었습니다.<br>색상: <b>${color}</b> / 수량: <b>${qty}개</b></div>`);
+
+    safe(updatePreview);
+    safe(updateCurrent);
+    window.ffRenderAdditionalOptionCardsFinal();
+  };
+
+  window.ffRemoveAdditionalOptionFromQuoteFinal = function(additionalIndex){
+    if(!window.state || !Array.isArray(state.cartItems)) return;
+    var seen = -1;
+    var removeAt = -1;
+    for(var i=0; i<state.cartItems.length; i++){
+      if(state.cartItems[i].isAdditionalOption){
+        seen++;
+        if(seen === additionalIndex){
+          removeAt = i;
+          break;
+        }
+      }
+    }
+    if(removeAt >= 0){
+      state.cartItems.splice(removeAt, 1);
+      safe(updatePreview);
+      safe(updateCurrent);
+      window.ffRenderAdditionalOptionCardsFinal();
+    }
+  };
+
+  window.ffCommitPendingOptionsV7 = function(){
+    if(typeof showFinalQuote === "function") showFinalQuote();
+    else if(typeof askContinue === "function") askContinue();
+  };
+
+  window.ffFinishOptionsV4 = function(){
+    if(typeof showFinalQuote === "function") showFinalQuote();
+    else if(typeof askContinue === "function") askContinue();
+  };
+})();
+</script>
+
+
+
+<!-- === FF PATCH: compact horizontal option buttons + inline color/qty panel === -->
+<style id="ff-additional-compact-style">
+.ff-addopt-compact-wrap{
+  margin-top:10px;
+}
+.ff-addopt-category{
+  margin-top:14px;
+}
+.ff-addopt-category-title{
+  display:block;
+  margin-bottom:8px;
+  font-size:12px;
+  font-weight:900;
+  color:#fff;
+}
+.ff-addopt-button-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.ff-addopt-pill{
+  border:1px solid rgba(45,242,203,.26);
+  background:#101827;
+  color:#fff;
+  border-radius:999px;
+  padding:9px 13px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+  transition:.16s;
+}
+.ff-addopt-pill:hover,
+.ff-addopt-pill.active{
+  border-color:#2df2cb;
+  color:#2df2cb;
+  background:#102c2a;
+  box-shadow:0 0 0 2px rgba(45,242,203,.12);
+}
+.ff-addopt-inline-panel{
+  margin-top:12px;
+  padding:13px;
+  border-radius:16px;
+  border:1px solid rgba(45,242,203,.24);
+  background:rgba(7,21,35,.94);
+}
+.ff-addopt-inline-title{
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+  margin-bottom:4px;
+}
+.ff-addopt-inline-detail{
+  color:#9fb1c8;
+  font-size:11px;
+  margin-bottom:12px;
+}
+.ff-addopt-inline-grid{
+  display:grid;
+  grid-template-columns:1fr auto auto;
+  gap:12px;
+  align-items:end;
+}
+.ff-addopt-field label{
+  display:block;
+  color:#9fb1c8;
+  font-size:11px;
+  font-weight:900;
+  margin-bottom:6px;
+}
+.ff-addopt-color-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+}
+.ff-addopt-color-btn{
+  border:1px solid rgba(255,255,255,.18);
+  background:#0b1220;
+  color:#fff;
+  border-radius:999px;
+  padding:8px 12px;
+  cursor:pointer;
+  font-size:12px;
+  font-weight:900;
+}
+.ff-addopt-color-btn.active{
+  border-color:#2df2cb;
+  color:#2df2cb;
+  background:#102c2a;
+}
+.ff-addopt-qty{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  background:#0b1220;
+  border:1px solid rgba(255,255,255,.13);
+  border-radius:999px;
+  padding:5px;
+}
+.ff-addopt-qty button{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:0;
+  background:#233044;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.ff-addopt-qty span{
+  min-width:32px;
+  text-align:center;
+  font-size:13px;
+  font-weight:900;
+  color:#fff;
+}
+.ff-addopt-add-btn{
+  min-height:40px;
+  border:0;
+  border-radius:12px;
+  padding:0 16px;
+  background:linear-gradient(135deg,#ff6b1a,#ff8a1d);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
+}
+.ff-addopt-selected-list{
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(45,242,203,.20);
+  background:rgba(3,12,24,.50);
+}
+.ff-addopt-selected-list b{
+  display:block;
+  margin-bottom:8px;
+  font-size:13px;
+  color:#fff;
+}
+.ff-addopt-selected-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:center;
+  padding:8px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.ff-addopt-selected-item:first-of-type{border-top:0;}
+.ff-addopt-selected-item span{
+  font-size:12px;
+  color:#fff;
+  font-weight:800;
+}
+.ff-addopt-selected-item small{
+  display:block;
+  font-size:11px;
+  color:#9fb1c8;
+  margin-top:2px;
+}
+.ff-addopt-remove{
+  border:1px solid rgba(255,255,255,.18);
+  background:#111827;
+  color:#fff;
+  border-radius:999px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-size:11px;
+}
+@media(max-width:760px){
+  .ff-addopt-inline-grid{
+    grid-template-columns:1fr;
+    align-items:stretch;
+  }
+  .ff-addopt-add-btn{
+    width:100%;
+  }
+}
+</style>
+
+<script id="ff-additional-compact-flow">
+(function(){
+  function bot(html){
+    if(typeof addBot === 'function') return addBot(html);
+    if(typeof addMsg === 'function') return addMsg('bot', html);
+  }
+  function user(text){
+    if(typeof addUser === 'function') return addUser(text);
+    if(typeof addMsg === 'function') return addMsg('user', text);
+  }
+  function safe(fn){ try{ if(typeof fn === 'function') return fn(); }catch(e){ console.warn(e); } }
+
+  window.__ffCompactSelected = null;
+  window.__ffCompactDraft = { color:"-", qty:1 };
+
+  function groups(){
+    return [
+      ["power", "멀티탭", ADDITIONAL_OPTIONS.power || []],
+      ["pcHolder", "PC홀더", ADDITIONAL_OPTIONS.pcHolder || []],
+      ["etc", "기타", ADDITIONAL_OPTIONS.etc || []]
+    ];
+  }
+
+  function getItem(group, index){
+    return (ADDITIONAL_OPTIONS[group] || [])[index];
+  }
+
+  function selectedListHTML(){
+    var items = (window.state && state.cartItems ? state.cartItems : []).filter(x => x.isAdditionalOption);
+    if(!items.length){
+      return '<div class="ff-addopt-selected-list"><b>선택된 추가 옵션</b><small style="color:#9fb1c8;">아직 추가된 옵션이 없습니다.</small></div>';
+    }
+
+    return '<div class="ff-addopt-selected-list"><b>선택된 추가 옵션</b>'
+      + items.map(function(item, idx){
+        return '<div class="ff-addopt-selected-item">'
+          + '<div><span>' + item.product + '</span><small>색상: ' + (item.color || '-') + ' / 수량: ' + (item.qty || item.quantity || 1) + '개</small></div>'
+          + '<button type="button" class="ff-addopt-remove" onclick="ffRemoveAdditionalOptionCompact(' + idx + ')">삭제</button>'
+          + '</div>';
+      }).join('')
+      + '</div>';
+  }
+
+  function inlinePanelHTML(){
+    if(!window.__ffCompactSelected){
+      return '<div class="ff-addopt-inline-panel"><div class="ff-addopt-inline-title">옵션을 선택해주세요</div><div class="ff-addopt-inline-detail">위 버튼을 누르면 색상과 수량 선택창이 여기에 표시됩니다.</div></div>';
+    }
+
+    var group = window.__ffCompactSelected.group;
+    var index = window.__ffCompactSelected.index;
+    var item = getItem(group, index);
+    if(!item) return '';
+
+    var colors = item.colors && item.colors.length ? item.colors : ['-'];
+    var color = window.__ffCompactDraft.color || colors[0] || '-';
+    var qty = window.__ffCompactDraft.qty || 1;
+
+    return '<div class="ff-addopt-inline-panel">'
+      + '<div class="ff-addopt-inline-title">' + item.name + '</div>'
+      + '<div class="ff-addopt-inline-detail">' + (item.detail || '') + '</div>'
+      + '<div class="ff-addopt-inline-grid">'
+      + '<div class="ff-addopt-field"><label>색상</label><div class="ff-addopt-color-row">'
+      + colors.map(function(c){
+          return '<button type="button" class="ff-addopt-color-btn ' + (c === color ? 'active' : '') + '" onclick="ffSetCompactOptionColor(\'' + c + '\')">' + c + '</button>';
+        }).join('')
+      + '</div></div>'
+      + '<div class="ff-addopt-field"><label>수량</label><div class="ff-addopt-qty">'
+      + '<button type="button" onclick="ffChangeCompactOptionQty(-1)">−</button>'
+      + '<span>' + qty + '</span>'
+      + '<button type="button" onclick="ffChangeCompactOptionQty(1)">+</button>'
+      + '</div></div>'
+      + '<button type="button" class="ff-addopt-add-btn" onclick="ffAddCompactOptionToQuote()">선택내역에 추가</button>'
+      + '</div></div>';
+  }
+
+  window.ffShowOptionChoicesV4 = function(){
+    user('예');
+    window.__ffCompactSelected = null;
+    window.__ffCompactDraft = { color:'-', qty:1 };
+    ffRenderCompactAdditionalOptions();
+  };
+
+  window.ffRenderCompactAdditionalOptions = function(){
+    var body = '<div class="ff-cat-box">'
+      + '<div class="ff-cat-title">추가 옵션을 선택해주세요.</div>'
+      + '<div class="ff-cat-help">옵션 버튼을 누르면 색상과 수량 선택창이 동시에 표시됩니다. 여러 옵션을 계속 추가할 수 있습니다.</div>'
+      + '<div class="ff-addopt-compact-wrap">'
+      + groups().map(function(g){
+          var group = g[0], title = g[1], arr = g[2];
+          return '<div class="ff-addopt-category"><span class="ff-addopt-category-title">' + title + '</span>'
+            + '<div class="ff-addopt-button-row">'
+            + arr.map(function(item, index){
+                var active = window.__ffCompactSelected && window.__ffCompactSelected.group === group && window.__ffCompactSelected.index === index;
+                return '<button type="button" class="ff-addopt-pill ' + (active ? 'active' : '') + '" onclick="ffSelectCompactOption(\'' + group + '\',' + index + ')">' + item.name + '</button>';
+              }).join('')
+            + '</div></div>';
+        }).join('')
+      + '</div>'
+      + inlinePanelHTML()
+      + selectedListHTML()
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffFinishOptionsV4()">옵션 선택 완료</button><button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button></div>'
+      + '</div>';
+    bot(body);
+  };
+
+  window.ffSelectCompactOption = function(group, index){
+    var item = getItem(group, index);
+    if(!item) return;
+    window.__ffCompactSelected = { group:group, index:index };
+    window.__ffCompactDraft = {
+      color: item.colors && item.colors[0] ? item.colors[0] : '-',
+      qty: 1
+    };
+    ffRenderCompactAdditionalOptions();
+  };
+
+  window.ffSetCompactOptionColor = function(color){
+    window.__ffCompactDraft = window.__ffCompactDraft || { color:color, qty:1 };
+    window.__ffCompactDraft.color = color;
+    ffRenderCompactAdditionalOptions();
+  };
+
+  window.ffChangeCompactOptionQty = function(delta){
+    window.__ffCompactDraft = window.__ffCompactDraft || { color:'-', qty:1 };
+    window.__ffCompactDraft.qty = Math.max(1, Math.min(99, Number(window.__ffCompactDraft.qty || 1) + delta));
+    ffRenderCompactAdditionalOptions();
+  };
+
+  window.ffAddCompactOptionToQuote = function(){
+    if(!window.__ffCompactSelected || !window.state) return;
+    var group = window.__ffCompactSelected.group;
+    var index = window.__ffCompactSelected.index;
+    var item = getItem(group, index);
+    if(!item) return;
+
+    var color = window.__ffCompactDraft.color || (item.colors && item.colors[0]) || '-';
+    var qty = Math.max(1, Number(window.__ffCompactDraft.qty || 1));
+
+    state.cartItems = state.cartItems || [];
+    var existing = state.cartItems.find(function(x){
+      return x.isAdditionalOption && x.code === item.code && x.color === color;
+    });
+
+    if(existing){
+      existing.qty = Number(existing.qty || existing.quantity || 1) + qty;
+      existing.quantity = existing.qty;
+      existing.finalPrice = Number(item.price || 0) * existing.qty;
+      existing.optionPrice = existing.finalPrice;
+    }else{
+      state.cartItems.push({
+        product: item.name,
+        category: item.category,
+        code: item.code,
+        detail: item.detail,
+        color: color,
+        size: '-',
+        qty: qty,
+        quantity: qty,
+        price: item.price,
+        unitPrice: item.price,
+        finalPrice: Number(item.price || 0) * qty,
+        optionPrice: Number(item.price || 0) * qty,
+        customTopRate: !!item.customTopRate,
+        note: item.note || '',
+        sessionId: state._sessionId || 0,
+        isAdditionalOption: true
+      });
+    }
+
+    user(item.name + ' / ' + color + ' / ' + qty + '개');
+    bot('<div class="tip-box"><b>' + item.name + '</b>이 선택내역에 추가되었습니다.<br>색상: <b>' + color + '</b> / 수량: <b>' + qty + '개</b></div>');
+
+    safe(updatePreview);
+    safe(updateCurrent);
+    ffRenderCompactAdditionalOptions();
+  };
+
+  window.ffRemoveAdditionalOptionCompact = function(additionalIndex){
+    if(!window.state || !Array.isArray(state.cartItems)) return;
+    var count = -1;
+    var target = -1;
+    for(var i=0; i<state.cartItems.length; i++){
+      if(state.cartItems[i].isAdditionalOption){
+        count++;
+        if(count === additionalIndex){
+          target = i;
+          break;
+        }
+      }
+    }
+    if(target >= 0){
+      state.cartItems.splice(target, 1);
+      safe(updatePreview);
+      safe(updateCurrent);
+      ffRenderCompactAdditionalOptions();
+    }
+  };
+
+  window.ffFinishOptionsV4 = function(){
+    if(typeof showFinalQuote === 'function') showFinalQuote();
+    else if(typeof askContinue === 'function') askContinue();
+  };
+})();
+</script>
+
+
+
+<!-- === FF PATCH: option button expands inline; quantity per color; price reflected in quote === -->
+<style id="ff-additional-color-qty-style">
+.ff-colorqty-panel{
+  margin-top:12px;
+  padding:14px;
+  border-radius:16px;
+  border:1px solid rgba(45,242,203,.24);
+  background:rgba(7,21,35,.94);
+}
+.ff-colorqty-title{
+  color:#fff;
+  font-size:14px;
+  font-weight:900;
+  margin-bottom:4px;
+}
+.ff-colorqty-detail{
+  color:#9fb1c8;
+  font-size:11px;
+  margin-bottom:12px;
+}
+.ff-colorqty-list{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:9px;
+}
+.ff-colorqty-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.10);
+  background:#0b1220;
+}
+.ff-colorqty-row b{
+  color:#fff;
+  font-size:13px;
+}
+.ff-colorqty-control{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:999px;
+  padding:5px;
+  background:#101827;
+  border:1px solid rgba(255,255,255,.12);
+}
+.ff-colorqty-control button{
+  width:28px;
+  height:28px;
+  border-radius:50%;
+  border:0;
+  background:#233044;
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.ff-colorqty-control span{
+  min-width:32px;
+  text-align:center;
+  color:#fff;
+  font-size:13px;
+  font-weight:900;
+}
+.ff-colorqty-add{
+  margin-top:12px;
+  width:100%;
+  min-height:40px;
+  border:0;
+  border-radius:12px;
+  background:linear-gradient(135deg,#ff6b1a,#ff8a1d);
+  color:#fff;
+  font-weight:900;
+  cursor:pointer;
+}
+.ff-addopt-pill.active{
+  border-color:#2df2cb!important;
+  color:#2df2cb!important;
+  background:#102c2a!important;
+}
+.ff-addopt-selected-list{
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid rgba(45,242,203,.20);
+  background:rgba(3,12,24,.50);
+}
+.ff-addopt-selected-list b{
+  display:block;
+  margin-bottom:8px;
+  font-size:13px;
+  color:#fff;
+}
+.ff-addopt-selected-item{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:8px;
+  align-items:center;
+  padding:8px 0;
+  border-top:1px solid rgba(255,255,255,.08);
+}
+.ff-addopt-selected-item:first-of-type{border-top:0;}
+.ff-addopt-selected-item span{
+  font-size:12px;
+  color:#fff;
+  font-weight:800;
+}
+.ff-addopt-selected-item small{
+  display:block;
+  font-size:11px;
+  color:#9fb1c8;
+  margin-top:2px;
+}
+.ff-addopt-remove{
+  border:1px solid rgba(255,255,255,.18);
+  background:#111827;
+  color:#fff;
+  border-radius:999px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-size:11px;
+}
+</style>
+
+<script id="ff-additional-color-qty-flow">
+(function(){
+  function bot(html){
+    if(typeof addBot === 'function') return addBot(html);
+    if(typeof addMsg === 'function') return addMsg('bot', html);
+  }
+  function user(text){
+    if(typeof addUser === 'function') return addUser(text);
+    if(typeof addMsg === 'function') return addMsg('user', text);
+  }
+  function safe(fn){ try{ if(typeof fn === 'function') return fn(); }catch(e){ console.warn(e); } }
+
+  window.__ffColorQtySelected = null;
+  window.__ffColorQtyDraft = {};
+
+  function groups(){
+    return [
+      ["power", "멀티탭", ADDITIONAL_OPTIONS.power || []],
+      ["pcHolder", "PC홀더", ADDITIONAL_OPTIONS.pcHolder || []],
+      ["etc", "기타", ADDITIONAL_OPTIONS.etc || []]
+    ];
+  }
+
+  function getItem(group, index){
+    return (ADDITIONAL_OPTIONS[group] || [])[index];
+  }
+
+  function selectedListHTML(){
+    var items = (window.state && state.cartItems ? state.cartItems : []).filter(function(x){ return x.isAdditionalOption; });
+    if(!items.length){
+      return '<div class="ff-addopt-selected-list"><b>선택된 추가 옵션</b><small style="color:#9fb1c8;">아직 추가된 옵션이 없습니다.</small></div>';
+    }
+
+    return '<div class="ff-addopt-selected-list"><b>선택된 추가 옵션</b>'
+      + items.map(function(item, idx){
+        return '<div class="ff-addopt-selected-item">'
+          + '<div><span>' + item.product + '</span><small>색상: ' + (item.color || '-') + ' / 수량: ' + (item.qty || item.quantity || 1) + '개</small></div>'
+          + '<button type="button" class="ff-addopt-remove" onclick="ffRemoveAdditionalOptionColorQty(' + idx + ')">삭제</button>'
+          + '</div>';
+      }).join('')
+      + '</div>';
+  }
+
+  function panelHTML(){
+    if(!window.__ffColorQtySelected){
+      return '<div class="ff-colorqty-panel"><div class="ff-colorqty-title">옵션을 선택해주세요</div><div class="ff-colorqty-detail">위 옵션 버튼을 누르면 바로 아래에 색상별 수량 선택창이 열립니다.</div></div>';
+    }
+
+    var group = window.__ffColorQtySelected.group;
+    var index = window.__ffColorQtySelected.index;
+    var item = getItem(group, index);
+    if(!item) return '';
+
+    var colors = item.colors && item.colors.length ? item.colors : ['-'];
+    var key = group + '_' + index;
+    window.__ffColorQtyDraft[key] = window.__ffColorQtyDraft[key] || {};
+    colors.forEach(function(c){
+      if(window.__ffColorQtyDraft[key][c] == null) window.__ffColorQtyDraft[key][c] = 0;
+    });
+
+    return '<div class="ff-colorqty-panel">'
+      + '<div class="ff-colorqty-title">' + item.name + '</div>'
+      + '<div class="ff-colorqty-detail">' + (item.detail || '') + '</div>'
+      + '<div class="ff-colorqty-list">'
+      + colors.map(function(c){
+        var qty = window.__ffColorQtyDraft[key][c] || 0;
+        return '<div class="ff-colorqty-row">'
+          + '<b>' + c + '</b>'
+          + '<div class="ff-colorqty-control">'
+          + '<button type="button" onclick="ffChangeColorQty(\'' + group + '\',' + index + ',\'' + c + '\',-1)">−</button>'
+          + '<span>' + qty + '</span>'
+          + '<button type="button" onclick="ffChangeColorQty(\'' + group + '\',' + index + ',\'' + c + '\',1)">+</button>'
+          + '</div>'
+          + '</div>';
+      }).join('')
+      + '</div>'
+      + '<button type="button" class="ff-colorqty-add" onclick="ffAddColorQtyOptionToQuote()">선택내역에 추가</button>'
+      + '</div>';
+  }
+
+  window.ffShowOptionChoicesV4 = function(){
+    user('예');
+    window.__ffColorQtySelected = null;
+    window.__ffColorQtyDraft = {};
+    ffRenderColorQtyOptions();
+  };
+
+  window.ffRenderColorQtyOptions = function(){
+    var body = '<div class="ff-cat-box">'
+      + '<div class="ff-cat-title">추가 옵션을 선택해주세요.</div>'
+      + '<div class="ff-cat-help">옵션을 누르면 아래에 색상별 수량 선택창이 열립니다. 필요한 색상 수량만 + 버튼으로 올려주세요.</div>'
+      + '<div class="ff-addopt-compact-wrap">'
+      + groups().map(function(g){
+          var group = g[0], title = g[1], arr = g[2];
+          return '<div class="ff-addopt-category"><span class="ff-addopt-category-title">' + title + '</span>'
+            + '<div class="ff-addopt-button-row">'
+            + arr.map(function(item, index){
+                var active = window.__ffColorQtySelected && window.__ffColorQtySelected.group === group && window.__ffColorQtySelected.index === index;
+                return '<button type="button" class="ff-addopt-pill ' + (active ? 'active' : '') + '" onclick="ffSelectColorQtyOption(\'' + group + '\',' + index + ')">' + item.name + '</button>';
+              }).join('')
+            + '</div></div>';
+        }).join('')
+      + '</div>'
+      + panelHTML()
+      + selectedListHTML()
+      + '<div class="ff-cat-actions"><button class="primary" onclick="ffFinishOptionsV4()">옵션 선택 완료</button><button onclick="ffSkipOptionsToFinalV4()">옵션 없이 견적서 보기</button></div>'
+      + '</div>';
+    bot(body);
+  };
+
+  window.ffSelectColorQtyOption = function(group, index){
+    var item = getItem(group, index);
+    if(!item) return;
+    window.__ffColorQtySelected = { group:group, index:index };
+    var key = group + '_' + index;
+    window.__ffColorQtyDraft[key] = window.__ffColorQtyDraft[key] || {};
+    (item.colors && item.colors.length ? item.colors : ['-']).forEach(function(c){
+      if(window.__ffColorQtyDraft[key][c] == null) window.__ffColorQtyDraft[key][c] = 0;
+    });
+    ffRenderColorQtyOptions();
+  };
+
+  window.ffChangeColorQty = function(group, index, color, delta){
+    var item = getItem(group, index);
+    if(!item) return;
+    var key = group + '_' + index;
+    window.__ffColorQtyDraft[key] = window.__ffColorQtyDraft[key] || {};
+    var current = Number(window.__ffColorQtyDraft[key][color] || 0);
+    window.__ffColorQtyDraft[key][color] = Math.max(0, Math.min(99, current + delta));
+    ffRenderColorQtyOptions();
+  };
+
+  window.ffAddColorQtyOptionToQuote = function(){
+    if(!window.__ffColorQtySelected || !window.state) return;
+    var group = window.__ffColorQtySelected.group;
+    var index = window.__ffColorQtySelected.index;
+    var item = getItem(group, index);
+    if(!item) return;
+
+    var key = group + '_' + index;
+    var draft = window.__ffColorQtyDraft[key] || {};
+    var entries = Object.keys(draft).filter(function(color){ return Number(draft[color] || 0) > 0; });
+
+    if(!entries.length){
+      bot('<div class="warning-box">수량을 1개 이상 선택해주세요.</div>');
+      return;
+    }
+
+    state.cartItems = state.cartItems || [];
+    entries.forEach(function(color){
+      var qty = Number(draft[color] || 0);
+      var existing = state.cartItems.find(function(x){
+        return x.isAdditionalOption && x.code === item.code && x.color === color;
+      });
+
+      if(existing){
+        existing.qty = Number(existing.qty || existing.quantity || 1) + qty;
+        existing.quantity = existing.qty;
+        existing.finalPrice = Number(item.price || 0) * existing.qty;
+        existing.optionPrice = existing.finalPrice;
+      }else{
+        state.cartItems.push({
+          product: item.name,
+          category: item.category,
+          code: item.code,
+          detail: item.detail,
+          color: color,
+          size: '-',
+          qty: qty,
+          quantity: qty,
+          price: item.price,
+          unitPrice: item.price,
+          finalPrice: Number(item.price || 0) * qty,
+          optionPrice: Number(item.price || 0) * qty,
+          customTopRate: !!item.customTopRate,
+          note: item.note || '',
+          sessionId: state._sessionId || 0,
+          isAdditionalOption: true
+        });
+      }
+    });
+
+    var summary = entries.map(function(color){ return color + ' ' + draft[color] + '개'; }).join(', ');
+    user(item.name + ' / ' + summary);
+    bot('<div class="tip-box"><b>' + item.name + '</b>이 선택내역에 추가되었습니다.<br>' + summary + '</div>');
+
+    // 추가 후 현재 옵션의 수량을 0으로 초기화
+    Object.keys(draft).forEach(function(color){ draft[color] = 0; });
+
+    safe(updatePreview);
+    safe(updateCurrent);
+    ffRenderColorQtyOptions();
+  };
+
+  window.ffRemoveAdditionalOptionColorQty = function(additionalIndex){
+    if(!window.state || !Array.isArray(state.cartItems)) return;
+    var count = -1;
+    var target = -1;
+    for(var i=0; i<state.cartItems.length; i++){
+      if(state.cartItems[i].isAdditionalOption){
+        count++;
+        if(count === additionalIndex){
+          target = i;
+          break;
+        }
+      }
+    }
+    if(target >= 0){
+      state.cartItems.splice(target, 1);
+      safe(updatePreview);
+      safe(updateCurrent);
+      ffRenderColorQtyOptions();
+    }
+  };
+
+  // 최종 견적서 생성 시 추가옵션 가격 누락 방지용 보정
+  window.ffGetAdditionalOptionsTotal = function(){
+    if(!window.state || !Array.isArray(state.cartItems)) return 0;
+    return state.cartItems
+      .filter(function(x){ return x.isAdditionalOption; })
+      .reduce(function(sum, x){
+        return sum + Number(x.finalPrice || x.optionPrice || (Number(x.price || 0) * Number(x.qty || x.quantity || 1)) || 0);
+      }, 0);
+  };
+
+  // 기존 showFinalQuote가 item.finalPrice를 합산하지 않는 경우를 대비해 cart item 값 보정
+  var oldShowFinalQuote = window.showFinalQuote;
+  if(typeof oldShowFinalQuote === 'function'){
+    window.showFinalQuote = function(){
+      if(window.state && Array.isArray(state.cartItems)){
+        state.cartItems.forEach(function(x){
+          if(x.isAdditionalOption){
+            var qty = Number(x.qty || x.quantity || 1);
+            x.quantity = qty;
+            x.qty = qty;
+            x.finalPrice = Number(x.price || x.unitPrice || 0) * qty;
+            x.optionPrice = x.finalPrice;
+          }
+        });
+      }
+      return oldShowFinalQuote.apply(this, arguments);
+    };
+  }
+
+  window.ffFinishOptionsV4 = function(){
+    if(typeof showFinalQuote === 'function') showFinalQuote();
+    else if(typeof askContinue === 'function') askContinue();
+  };
+})();
+</script>
+
