@@ -11431,3 +11431,317 @@ setTimeout(()=>{
 
 </script>
 
+
+
+<!-- === FF FINAL PATCH: Canvas-only preview + option image preview cards === -->
+<style id="ff-canvas-option-preview-final-style">
+#ff-live-preview-wrap{
+  width:100%;
+  margin:12px 0;
+  border-radius:20px;
+  overflow:hidden;
+  background:#08131f;
+  border:1px solid rgba(45,242,203,.22);
+  box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+#ff-live-preview-title{
+  padding:12px 14px;
+  background:#0b1b2b;
+  color:#2df2cb;
+  font-size:13px;
+  font-weight:900;
+  border-bottom:1px solid rgba(45,242,203,.14);
+}
+#ff-hero-canvas{
+  width:100%;
+  display:block;
+  background:#fff;
+  border-radius:0 0 18px 18px;
+}
+#ff-option-image-preview{
+  margin-top:12px;
+  padding:12px;
+  border-radius:18px;
+  background:#0b1b2b;
+  border:1px solid rgba(45,242,203,.22);
+}
+#ff-option-image-preview h3{
+  margin:0 0 10px;
+  color:#2df2cb;
+  font-size:13px;
+  font-weight:900;
+}
+.ff-option-preview-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+.ff-option-preview-card{
+  background:#08131f;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:14px;
+  padding:8px;
+  min-height:100px;
+}
+.ff-option-preview-card b{
+  display:block;
+  color:#fff;
+  font-size:11px;
+  margin-bottom:6px;
+}
+.ff-option-preview-card img{
+  width:100%;
+  height:82px;
+  object-fit:contain;
+  background:#fff;
+  border-radius:10px;
+  display:block;
+}
+.ff-option-preview-card small{
+  display:block;
+  color:#9fb1c8;
+  margin-top:5px;
+  font-size:10px;
+}
+@media(max-width:760px){
+  .ff-option-preview-grid{grid-template-columns:1fr;}
+}
+</style>
+
+<script id="ff-canvas-option-preview-final-script">
+(function(){
+  function ensureCanvasUI(){
+    var panel = document.getElementById('preview-panel') || document.body;
+
+    if(!document.getElementById('ff-live-preview-wrap')){
+      var wrap = document.createElement('div');
+      wrap.id = 'ff-live-preview-wrap';
+      wrap.innerHTML =
+        '<div id="ff-live-preview-title">실시간 Canvas 미리보기</div>' +
+        '<canvas id="ff-hero-canvas"></canvas>';
+      panel.insertBefore(wrap, panel.firstChild);
+    }
+
+    if(!document.getElementById('ff-option-image-preview')){
+      var opt = document.createElement('div');
+      opt.id = 'ff-option-image-preview';
+      opt.innerHTML =
+        '<h3>옵션별 미리보기</h3>' +
+        '<div class="ff-option-preview-grid">' +
+          '<div class="ff-option-preview-card"><b>다리형태</b><img id="ff-leg-type-img" alt=""><small id="ff-leg-type-label">선택 전</small></div>' +
+          '<div class="ff-option-preview-card"><b>이동방식</b><img id="ff-move-type-img" alt=""><small id="ff-move-type-label">선택 전</small></div>' +
+          '<div class="ff-option-preview-card"><b>상판형태</b><img id="ff-top-shape-img" alt=""><small id="ff-top-shape-label">선택 전</small></div>' +
+        '</div>';
+      var anchor = document.getElementById('ff-live-preview-wrap');
+      if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(opt, anchor.nextSibling);
+      else panel.insertBefore(opt, panel.firstChild);
+    }
+  }
+
+  function loadImg(src){
+    return new Promise(function(resolve,reject){
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function(){ resolve(img); };
+      img.onerror = function(){ reject(src); };
+      img.src = src;
+    });
+  }
+
+  async function applyTextureByMask(ctx, canvas, textureSrc, maskSrc){
+    var texture = await loadImg(textureSrc);
+    var mask = await loadImg(maskSrc);
+
+    var temp = document.createElement('canvas');
+    temp.width = canvas.width;
+    temp.height = canvas.height;
+    var tctx = temp.getContext('2d');
+
+    var pattern = tctx.createPattern(texture, 'repeat');
+    tctx.fillStyle = pattern;
+    tctx.fillRect(0,0,temp.width,temp.height);
+
+    tctx.globalCompositeOperation = 'destination-in';
+    tctx.drawImage(mask,0,0,temp.width,temp.height);
+
+    ctx.drawImage(temp,0,0);
+  }
+
+  window.ffRealtimePreviewState = window.ffRealtimePreviewState || {
+    base:'products/desk_standard/base/base.png',
+    topMask:'products/desk_standard/masks/top_mask.png',
+    legMask:'products/desk_standard/masks/leg_mask.png',
+    screenMask:'',
+    topTexture:'textures/desktop/standard/HW.png',
+    legTexture:'textures/leg/standard/DCR.png',
+    screenTexture:''
+  };
+
+  window.renderLivePreview = async function(state){
+    ensureCanvasUI();
+    state = state || window.ffRealtimePreviewState;
+
+    var canvas = document.getElementById('ff-hero-canvas');
+    if(!canvas) return;
+
+    try{
+      var ctx = canvas.getContext('2d');
+      var baseImg = await loadImg(state.base);
+      canvas.width = baseImg.width;
+      canvas.height = baseImg.height;
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(baseImg,0,0);
+
+      if(state.topMask && state.topTexture) await applyTextureByMask(ctx, canvas, state.topTexture, state.topMask);
+      if(state.legMask && state.legTexture) await applyTextureByMask(ctx, canvas, state.legTexture, state.legMask);
+      if(state.screenMask && state.screenTexture) await applyTextureByMask(ctx, canvas, state.screenTexture, state.screenMask);
+    }catch(e){
+      console.warn('Canvas preview fallback:', e);
+      var ctx2 = canvas.getContext('2d');
+      canvas.width = 900;
+      canvas.height = 520;
+      ctx2.fillStyle = '#ffffff';
+      ctx2.fillRect(0,0,canvas.width,canvas.height);
+      ctx2.fillStyle = '#0b1b2b';
+      ctx2.font = '24px sans-serif';
+      ctx2.fillText('미리보기 이미지를 불러오는 중입니다.', 40, 80);
+    }
+  };
+
+  window.updateRealtimePreview = function(){
+    return window.renderLivePreview(window.ffRealtimePreviewState);
+  };
+
+  window.setTopTexture = function(src){
+    window.ffRealtimePreviewState.topTexture = src;
+    window.updateRealtimePreview();
+  };
+  window.setLegTexture = function(src){
+    window.ffRealtimePreviewState.legTexture = src;
+    window.updateRealtimePreview();
+  };
+  window.setScreenTexture = function(src){
+    window.ffRealtimePreviewState.screenTexture = src;
+    window.updateRealtimePreview();
+  };
+
+  /* GitHub에 넣어둔 이미지 경로만 여기서 바꾸면 됨 */
+  window.FF_OPTION_PREVIEW_IMAGES = window.FF_OPTION_PREVIEW_IMAGES || {
+    leg: {
+      '사다리형':'images/options/leg/ladder.png',
+      '원형':'images/options/leg/round.png',
+      'A자형':'images/options/leg/a_type.png',
+      'A형':'images/options/leg/a_type.png'
+    },
+    move: {
+      '고정형':'images/options/move/fixed.png',
+      '글라이드':'images/options/move/glide.png',
+      '캐스터':'images/options/move/caster.png',
+      '이동형':'images/options/move/caster.png'
+    },
+    top: {
+      '직사각':'images/options/top/rectangle.png',
+      '라운드':'images/options/top/round.png',
+      '상판 라운드':'images/options/top/round.png',
+      '사각':'images/options/top/rectangle.png'
+    }
+  };
+
+  function setPreviewCard(kind, label){
+    ensureCanvasUI();
+
+    var map = window.FF_OPTION_PREVIEW_IMAGES[kind] || {};
+    var src = map[label] || '';
+    var imgId = kind === 'leg' ? 'ff-leg-type-img' : kind === 'move' ? 'ff-move-type-img' : 'ff-top-shape-img';
+    var labelId = kind === 'leg' ? 'ff-leg-type-label' : kind === 'move' ? 'ff-move-type-label' : 'ff-top-shape-label';
+
+    var img = document.getElementById(imgId);
+    var text = document.getElementById(labelId);
+
+    if(text) text.textContent = label || '선택 전';
+    if(img){
+      if(src){
+        img.src = src;
+        img.style.display = 'block';
+      }else{
+        img.removeAttribute('src');
+        img.style.display = 'none';
+      }
+    }
+  }
+
+  window.setLegTypePreview = function(label){ setPreviewCard('leg', label); };
+  window.setMoveTypePreview = function(label){ setPreviewCard('move', label); };
+  window.setTopShapePreview = function(label){ setPreviewCard('top', label); };
+
+  /* 기존 버튼을 자동 감지해서 미리보기 연결 */
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest('button,.choice-btn,.material-btn');
+    if(!btn) return;
+
+    var t = (btn.textContent || '').trim();
+
+    if(/사다리|원형|A자|A형/.test(t)) window.setLegTypePreview(t.replace(/\s+/g,' '));
+    if(/고정|글라이드|캐스터|이동/.test(t)) window.setMoveTypePreview(t.replace(/\s+/g,' '));
+    if(/직사각|라운드|상판|사각/.test(t)) window.setTopShapePreview(t.replace(/\s+/g,' '));
+  }, true);
+
+  /* Nano Banana 버튼을 Canvas 버튼으로 전환 */
+  function disableNanoButtons(){
+    ['quick-ai-preview-btn','ai-render-btn','screen-ai-btn'].forEach(function(id){
+      var btn = document.getElementById(id);
+      if(btn){
+        btn.textContent = '실시간 미리보기 업데이트';
+        btn.onclick = function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          window.updateRealtimePreview();
+          return false;
+        };
+      }
+    });
+
+    document.querySelectorAll('button').forEach(function(btn){
+      var txt = (btn.textContent || '').trim();
+      if(/실사|AI|Nano|나노/.test(txt)){
+        btn.textContent = '실시간 미리보기 업데이트';
+        btn.onclick = function(ev){
+          ev.preventDefault();
+          ev.stopPropagation();
+          window.updateRealtimePreview();
+          return false;
+        };
+      }
+    });
+  }
+
+  /* fetch 자체도 generate-preview는 차단하고 canvas 갱신 */
+  var oldFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = typeof input === 'string' ? input : (input && input.url) || '';
+    if(url.indexOf('/api/generate-preview') !== -1){
+      window.updateRealtimePreview();
+      return Promise.resolve(new Response(JSON.stringify({
+        imageUrl:'',
+        canvasPreview:true,
+        message:'Canvas preview updated'
+      }), {status:200, headers:{'Content-Type':'application/json'}}));
+    }
+    return oldFetch.apply(this, arguments);
+  };
+
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureCanvasUI();
+    disableNanoButtons();
+    setTimeout(window.updateRealtimePreview, 300);
+    setTimeout(disableNanoButtons, 800);
+    setTimeout(disableNanoButtons, 1600);
+  });
+
+  setTimeout(function(){
+    ensureCanvasUI();
+    disableNanoButtons();
+    window.updateRealtimePreview();
+  }, 500);
+})();
+</script>
