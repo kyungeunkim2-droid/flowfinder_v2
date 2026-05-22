@@ -8900,3 +8900,133 @@ button.material-btn{
   obs.observe(document.documentElement, {childList:true, subtree:true});
 })();
 </script>
+
+function askAdditionalOptions() {
+  addBotMessage(`
+    <div style="font-size:16px; font-weight:800; margin-bottom:8px;">
+      옵션을 추가하시겠습니까?
+    </div>
+
+    <div class="hint" style="margin-bottom:14px;">
+      필요한 옵션을 선택해주세요. (복수 선택 가능)
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="color:#4ade80; font-weight:800; margin-bottom:8px;">
+        멀티탭
+      </div>
+
+      <div class="btn-group">
+        <button class="choice-btn multi-option"
+          data-option="외장 3구 멀티탭 (USB A타입 2포트)">
+          외장 3구 멀티탭
+        </button>
+
+        <button class="choice-btn multi-option"
+          data-option="매립형 3구 슬라이딩 멀티탭 (USB A 1포트 + C 1포트)">
+          매립형 3구 슬라이딩
+        </button>
+
+        <button class="choice-btn multi-option"
+          data-option="매립형 2구 멀티탭 (USB C타입 2포트)">
+          매립형 2구 멀티탭
+        </button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:14px;">
+      <div style="color:#60a5fa; font-weight:800; margin-bottom:8px;">
+        PC홀더
+      </div>
+
+      <div class="btn-group">
+        <button class="choice-btn multi-option"
+          data-option="행잉 PC홀더">
+          행잉 PC홀더
+        </button>
+
+        <button class="choice-btn multi-option"
+          data-option="스트랩 PC홀더">
+          스트랩 PC홀더
+        </button>
+
+        <button class="choice-btn multi-option"
+          data-option="보급형 행잉 PC홀더">
+          보급형 행잉 PC홀더
+        </button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div style="color:#fbbf24; font-weight:800; margin-bottom:8px;">
+        기타
+      </div>
+
+      <div class="btn-group">
+        <button class="choice-btn multi-option"
+          data-option="가방걸이">
+          가방걸이
+        </button>
+
+        <button class="choice-btn multi-option"
+          data-option="탑 마운트 모니터 암">
+          탑 마운트 모니터 암
+        </button>
+      </div>
+    </div>
+
+    <div class="btn-group">
+      <button class="confirm-btn" onclick="confirmAdditionalOptions()">
+        선택 완료
+      </button>
+
+      <button class="back-btn" onclick="skipAdditionalOptions()">
+        옵션 추가 안함
+      </button>
+    </div>
+  `);
+
+  setupMultiOptionButtons();
+}
+let selectedAdditionalOptions = [];
+
+function setupMultiOptionButtons() {
+  document.querySelectorAll('.multi-option').forEach(btn => {
+
+    btn.addEventListener('click', () => {
+
+      btn.classList.toggle('multi-selected');
+
+      const value = btn.dataset.option;
+
+      if (selectedAdditionalOptions.includes(value)) {
+        selectedAdditionalOptions =
+          selectedAdditionalOptions.filter(v => v !== value);
+      } else {
+        selectedAdditionalOptions.push(value);
+      }
+    });
+  });
+}
+
+function confirmAdditionalOptions() {
+
+  if (selectedAdditionalOptions.length > 0) {
+
+    addUserMessage(
+      selectedAdditionalOptions.join(', ')
+    );
+
+    currentQuote.options = selectedAdditionalOptions;
+  }
+
+  generateFinalQuote();
+}
+
+function skipAdditionalOptions() {
+
+  addUserMessage('옵션 추가 안함');
+
+  currentQuote.options = [];
+
+askAdditionalOptions();
