@@ -8904,16 +8904,15 @@ button.material-btn{
   var obs = new MutationObserver(function(){ applyMaterialGrid(); });
   obs.observe(document.documentElement, {childList:true, subtree:true});
 })();
-
 <script>
 function askAdditionalOptions() {
   addBotMessage(`
-    <div style="font-size:16px; font-weight:800; margin-bottom:8px;">
-      옵션을 추가하시겠습니까?
-      `);
+    옵션을 추가하시겠습니까?
+    ...
+  `);
 }
 </script>
-    </div>
+
 
     <div class="hint" style="margin-bottom:14px;">
       필요한 옵션을 선택해주세요. (복수 선택 가능)
