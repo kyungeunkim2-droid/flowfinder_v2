@@ -10976,3 +10976,458 @@ button.material-btn{
 })();
 </script>
 
+
+
+<!-- === FF UI THEME PATCH: dark navy + vivid mint + white === -->
+<style id="ff-theme-mint-navy">
+:root{
+  --ff-bg:#071521;
+  --ff-panel:#0b1b2b;
+  --ff-panel-2:#102235;
+  --ff-mint:#2df2cb;
+  --ff-mint-soft:#7fffe6;
+  --ff-white:#ffffff;
+  --ff-text:#dbe7f3;
+  --ff-line:rgba(45,242,203,.18);
+}
+
+body,
+.chat-wrap,
+.app,
+.main-wrap{
+  background:linear-gradient(180deg,#071521 0%,#0b1b2b 100%) !important;
+  color:var(--ff-text)!important;
+}
+
+.ff-cat-box,
+.ff-colorqty-panel,
+.ff-addopt-selected-list,
+.tip-box,
+.quote-box,
+.preview-card,
+.option-panel{
+  background:var(--ff-panel)!important;
+  border:1px solid var(--ff-line)!important;
+  color:var(--ff-white)!important;
+  border-radius:18px!important;
+}
+
+.ff-cat-title,
+.ff-colorqty-title,
+.section-title,
+.quote-title{
+  color:var(--ff-mint)!important;
+  font-weight:900!important;
+}
+
+.ff-cat-help,
+.ff-colorqty-detail,
+small{
+  color:#9fb1c8!important;
+}
+
+button,
+.primary,
+.choice-btn,
+.ff-addopt-pill,
+.ff-colorqty-add,
+.ff-colorqty-control button{
+  transition:.16s ease;
+}
+
+.primary,
+.ff-colorqty-add{
+  background:linear-gradient(135deg,var(--ff-mint),#15d6ff)!important;
+  color:#031018!important;
+  border:0!important;
+  font-weight:900!important;
+  box-shadow:0 10px 24px rgba(45,242,203,.22);
+}
+
+.primary:hover,
+.ff-colorqty-add:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.03);
+}
+
+.ff-addopt-pill,
+.choice-btn{
+  background:var(--ff-panel-2)!important;
+  border:1px solid var(--ff-line)!important;
+  color:var(--ff-white)!important;
+}
+
+.ff-addopt-pill.active,
+.choice-btn.selected,
+.choice-btn.active{
+  background:rgba(45,242,203,.14)!important;
+  border-color:var(--ff-mint)!important;
+  color:var(--ff-mint)!important;
+  box-shadow:0 0 0 2px rgba(45,242,203,.14);
+}
+
+.ff-colorqty-control{
+  background:#08131f!important;
+}
+
+.ff-colorqty-control button{
+  background:rgba(45,242,203,.14)!important;
+  color:var(--ff-mint)!important;
+}
+
+.ff-colorqty-row{
+  background:#08131f!important;
+}
+
+.ff-addopt-remove{
+  background:#0f1f31!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  color:#fff!important;
+}
+
+::-webkit-scrollbar{
+  width:10px;
+  height:10px;
+}
+::-webkit-scrollbar-thumb{
+  background:rgba(45,242,203,.32);
+  border-radius:999px;
+}
+::-webkit-scrollbar-track{
+  background:#071521;
+}
+
+/* 선택내역 전체 스크롤 */
+.ff-addopt-selected-list{
+  max-height:340px;
+  overflow-y:auto;
+  overflow-x:hidden;
+  padding-right:6px;
+}
+
+/* 추천구성 가로 버튼형 */
+.recommend-wrap,
+.recommend-row,
+.recommend-buttons{
+  display:flex!important;
+  flex-wrap:nowrap!important;
+  gap:10px!important;
+  overflow-x:auto!important;
+  padding-bottom:6px!important;
+}
+
+.recommend-wrap button,
+.recommend-row button,
+.recommend-buttons button{
+  flex:0 0 auto!important;
+  min-width:160px!important;
+  border-radius:999px!important;
+  background:var(--ff-panel-2)!important;
+  border:1px solid var(--ff-line)!important;
+  color:#fff!important;
+  font-weight:900!important;
+}
+
+.recommend-wrap button:hover,
+.recommend-row button:hover,
+.recommend-buttons button:hover{
+  border-color:var(--ff-mint)!important;
+  color:var(--ff-mint)!important;
+}
+</style>
+
+
+<!-- === FF LIVE CANVAS MAPPING PATCH === -->
+
+<style id="ff-live-canvas-style">
+#ff-live-preview-wrap{
+  width:100%;
+  margin-top:12px;
+  border-radius:20px;
+  overflow:hidden;
+  background:#08131f;
+  border:1px solid rgba(45,242,203,.18);
+  box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+
+#ff-hero-canvas{
+  width:100%;
+  display:block;
+  background:#fff;
+}
+
+.ff-live-preview-title{
+  padding:12px 14px;
+  background:#0b1b2b;
+  color:#2df2cb;
+  font-size:13px;
+  font-weight:900;
+  border-bottom:1px solid rgba(45,242,203,.14);
+}
+</style>
+
+<div id="ff-live-preview-wrap">
+  <div class="ff-live-preview-title">
+    실시간 미리보기
+  </div>
+  <canvas id="ff-hero-canvas"></canvas>
+</div>
+
+<script id="ff-live-canvas-script">
+
+async function renderLivePreview({
+  base,
+  topMask,
+  legMask,
+  screenMask,
+  topTexture,
+  legTexture,
+  screenTexture
+}) {
+
+  try{
+
+    const canvas =
+      document.getElementById(
+        "ff-hero-canvas"
+      );
+
+    if(!canvas) return;
+
+    const ctx =
+      canvas.getContext("2d");
+
+    const baseImg =
+      await loadPreviewImage(base);
+
+    canvas.width =
+      baseImg.width;
+
+    canvas.height =
+      baseImg.height;
+
+    ctx.clearRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    // 원본 이미지
+    ctx.drawImage(baseImg,0,0);
+
+    // 상판 재질
+    if(topMask && topTexture){
+
+      await applyTextureByMask(
+        ctx,
+        canvas,
+        topTexture,
+        topMask
+      );
+    }
+
+    // 다리 재질
+    if(legMask && legTexture){
+
+      await applyTextureByMask(
+        ctx,
+        canvas,
+        legTexture,
+        legMask
+      );
+    }
+
+    // 스크린 재질
+    if(screenMask && screenTexture){
+
+      await applyTextureByMask(
+        ctx,
+        canvas,
+        screenTexture,
+        screenMask
+      );
+    }
+
+  }catch(err){
+
+    console.error(
+      "실시간 미리보기 오류",
+      err
+    );
+  }
+}
+
+function loadPreviewImage(src){
+
+  return new Promise(
+    (resolve,reject)=>{
+
+      const img = new Image();
+
+      img.crossOrigin =
+        "anonymous";
+
+      img.onload =
+        ()=>resolve(img);
+
+      img.onerror =
+        ()=>{
+
+          console.error(
+            "이미지 로드 실패:",
+            src
+          );
+
+          reject(src);
+        };
+
+      img.src = src;
+    }
+  );
+}
+
+async function applyTextureByMask(
+  ctx,
+  canvas,
+  textureSrc,
+  maskSrc
+){
+
+  const texture =
+    await loadPreviewImage(
+      textureSrc
+    );
+
+  const mask =
+    await loadPreviewImage(
+      maskSrc
+    );
+
+  const temp =
+    document.createElement(
+      "canvas"
+    );
+
+  temp.width =
+    canvas.width;
+
+  temp.height =
+    canvas.height;
+
+  const tctx =
+    temp.getContext("2d");
+
+  const pattern =
+    tctx.createPattern(
+      texture,
+      "repeat"
+    );
+
+  tctx.fillStyle =
+    pattern;
+
+  tctx.fillRect(
+    0,
+    0,
+    temp.width,
+    temp.height
+  );
+
+  tctx.globalCompositeOperation =
+    "destination-in";
+
+  tctx.drawImage(
+    mask,
+    0,
+    0,
+    temp.width,
+    temp.height
+  );
+
+  ctx.drawImage(
+    temp,
+    0,
+    0
+  );
+}
+
+/* =========================
+   실시간 자동 연결
+========================= */
+
+window.ffRealtimePreviewState = {
+
+  base:
+    "products/desk_standard/base/base.png",
+
+  topMask:
+    "products/desk_standard/masks/top_mask.png",
+
+  legMask:
+    "products/desk_standard/masks/leg_mask.png",
+
+  screenMask:
+    "products/screen_standard/masks/screen_mask.png",
+
+  topTexture:
+    "textures/desktop/standard/HW.png",
+
+  legTexture:
+    "textures/leg/standard/DCR.png",
+
+  screenTexture:
+    "textures/screen/front/standard/WW.png"
+};
+
+window.updateRealtimePreview =
+  function(){
+
+    renderLivePreview(
+      window.ffRealtimePreviewState
+    );
+  };
+
+/* =========================
+   재질 변경 시 자동 반영
+========================= */
+
+window.setTopTexture =
+  function(src){
+
+    window.ffRealtimePreviewState
+      .topTexture = src;
+
+    updateRealtimePreview();
+  };
+
+window.setLegTexture =
+  function(src){
+
+    window.ffRealtimePreviewState
+      .legTexture = src;
+
+    updateRealtimePreview();
+  };
+
+window.setScreenTexture =
+  function(src){
+
+    window.ffRealtimePreviewState
+      .screenTexture = src;
+
+    updateRealtimePreview();
+  };
+
+/* =========================
+   첫 렌더
+========================= */
+
+setTimeout(()=>{
+
+  updateRealtimePreview();
+
+},500);
+
+</script>
+
