@@ -210,6 +210,81 @@ app.post('/api/generate-preview', async (req, res) => {
   }
 });
 
+app.post('/api/generate-screen-preview', async (req, res) => {
+  try {
+    const baseUrl = `${req.protocol}://${req.get('host')}/`;
+
+    const {
+      deskAiImage,
+      screenImage,
+      screenTexture
+    } = req.body || {};
+
+    const parts = [];
+
+    parts.push({
+      text: [
+        'Use the provided AI-generated desk image as the exact base image.',
+        'Add the provided screen product naturally to the desk.',
+        'Apply the provided screen material only to the screen panel.',
+        'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
+        'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
+        'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
+        'Create one photorealistic office furniture catalog render.'
+      ].join('\n')
+    });
+
+    const imageInputs = [
+      ['generated desk image', deskAiImage],
+      ['screen product image', screenImage],
+      ['screen material texture reference', screenTexture],
+    ];
+
+    for (const [label, src] of imageInputs) {
+      if (!src) continue;
+
+      const part = await loadImagePart(src, label, baseUrl).catch((err) => {
+        console.warn(err.message);
+        return null;
+      });
+
+      if (part) parts.push(part);
+    }
+
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.5-flash-image-preview',
+      contents: [{ role: 'user', parts }]
+    });
+
+    const partsOut =
+      result?.candidates?.[0]?.content?.parts ||
+      result?.response?.candidates?.[0]?.content?.parts ||
+      [];
+
+    const inlinePart = partsOut.find(
+      p => p.inlineData?.data || p.inline_data?.data
+    );
+
+    const inline = inlinePart?.inlineData || inlinePart?.inline_data || null;
+
+    if (!inline?.data) {
+      return res.status(502).json({
+        error: '스크린 이미지 결과를 받지 못했습니다.'
+      });
+    }
+
+    res.json({
+      imageUrl: `data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: error.message || '스크린 생성 실패'
+    });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`FlowFinder preview server running: http://localhost:${PORT}`);
 });
