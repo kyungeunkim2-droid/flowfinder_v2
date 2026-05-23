@@ -9220,7 +9220,7 @@ button.material-btn{
       var health=await fetch('/api/health',{cache:'no-store'}).catch(function(){return null;});
       if(!health || !health.ok) throw new Error('서버 /api/health 연결 실패');
       var controller = new AbortController();
-      var timer = setTimeout(function(){ controller.abort(); }, 65000);
+      var timer = setTimeout(() => controller.abort(), 180000);
       var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
       clearTimeout(timer);
       var data=await res.json().catch(function(){return {};});
