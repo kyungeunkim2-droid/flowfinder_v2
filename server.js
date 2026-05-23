@@ -130,7 +130,11 @@ app.post('/api/generate-preview', async (req, res) => {
         'Use the base furniture product image as the exact reference.',
         'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
         'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
-        'Apply the provided leg material color naturally only to the desk legs and frame.',
+        'Apply the provided leg material naturally only to the vertical desk legs.',
+
+'Keep the cable duct / cable tray area under the desktop matte white.',
+
+'Do not recolor the duct/tray section.',
         'Do not redraw the product.',
         'Do not add a screen panel.',
         'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
