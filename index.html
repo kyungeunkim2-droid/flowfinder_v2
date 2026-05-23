@@ -1242,6 +1242,123 @@ body.ff-dashboard-preview #ff-right-summary-panel{display:flex!important;}
   [src*="bkm.jpg"], [src*="dsg.jpg"], [src*="wew.jpg"], [src*="screen_mask.png"], [src*="BKM.png"] { display:none !important; }
   #pegboard-ref-panel, [id*="pegboard"], [class*="pegboard"], [data-option*="pegboard"], [data-code="BKM"], [data-code="DSG"], [data-code="WEW"] { display:none !important; }
 </style>
+
+
+<style id="ff-final-dashboard-redesign-v60">
+/* v60: 2-column professional dashboard. Left = chat/options, Right = live preview. */
+html, body { width:100%; height:100%; }
+body.ff-dashboard-preview,
+body.ff-pro-dashboard{
+  display:grid!important;
+  grid-template-columns:minmax(360px,420px) minmax(560px,1fr)!important;
+  grid-template-areas:"chat preview"!important;
+  gap:16px!important;
+  padding:16px!important;
+  height:100vh!important;
+  overflow:hidden!important;
+  background:radial-gradient(circle at 10% 0%,#18304f 0,#06111f 42%,#020713 100%)!important;
+  color:#fff!important;
+}
+body.ff-dashboard-preview #chat-panel,
+body.ff-pro-dashboard #chat-panel{
+  grid-area:chat!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:calc(100vh - 32px)!important;
+  margin:0!important;
+  border-radius:28px!important;
+  overflow:hidden!important;
+  background:linear-gradient(180deg,#0e1d31,#06101e)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 26px 72px rgba(0,0,0,.36)!important;
+}
+body.ff-dashboard-preview #preview-panel,
+body.ff-pro-dashboard #preview-panel{
+  grid-area:preview!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:none!important;
+  height:calc(100vh - 32px)!important;
+  margin:0!important;
+  border-radius:28px!important;
+  padding:18px!important;
+  overflow-y:auto!important;
+  background:linear-gradient(180deg,#0a1728,#040c17)!important;
+  border:1px solid rgba(255,255,255,.10)!important;
+  box-shadow:0 26px 72px rgba(0,0,0,.34)!important;
+}
+#ff-right-summary-panel,#ff-right-summary{display:none!important;}
+#chat-header{padding:18px 20px 14px!important;background:#0b1627!important;border-bottom:1px solid rgba(255,255,255,.08)!important;}
+#chat-header:before{width:44px!important;height:44px!important;border-radius:15px!important;font-size:22px!important;margin-right:12px!important;background:linear-gradient(135deg,#2ef2c9,#ffffff)!important;box-shadow:0 12px 26px rgba(46,242,201,.22)!important;}
+#chat-header:after{content:'LIVE PREVIEW'!important;right:20px!important;top:28px!important;color:#2ef2c9!important;font-size:10px!important;}
+#chat-header .logo{font-size:19px!important;}
+#chat-header .subtitle{font-size:11px!important;color:#9fb1c8!important;}
+#flow-bar{grid-template-columns:repeat(5,minmax(0,1fr))!important;padding:6px!important;margin-top:14px!important;border-radius:14px!important;background:#071120!important;border:1px solid rgba(46,242,201,.24)!important;}
+.flow-step{height:42px!important;font-size:11px!important;padding:6px 13px 6px 18px!important;background:#18253a!important;color:#91a2ba!important;}
+.flow-step.active{background:linear-gradient(135deg,#2ef2c9,#11d8b1)!important;color:#031313!important;box-shadow:0 0 0 3px rgba(46,242,201,.18),0 10px 26px rgba(46,242,201,.22)!important;}
+.flow-step.done{background:#11372f!important;color:#cffff6!important;}
+#messages{padding:20px!important;background:linear-gradient(180deg,#0c1829,#081120)!important;gap:14px!important;}
+.bubble{max-width:92%!important;font-size:14px!important;padding:14px 16px!important;border-radius:18px!important;box-shadow:none!important;}
+.msg.bot .bubble{background:#172338!important;border:1px solid rgba(255,255,255,.08)!important;color:#f8fafc!important;}
+.msg.user .bubble{background:linear-gradient(135deg,#2ef2c9,#17cfa9)!important;color:#031313!important;}
+#input-area{padding:14px 16px!important;background:#071120!important;border-top:1px solid rgba(255,255,255,.08)!important;}
+#user-input{background:#0d1b2d!important;color:#fff!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:18px!important;box-shadow:none!important;}
+#send-btn,.confirm-btn,#quick-ai-preview-btn,#ai-render-btn,#screen-ai-btn,#product-preview-confirm{background:linear-gradient(135deg,#2ef2c9,#13d6af)!important;color:#031313!important;border:0!important;box-shadow:0 14px 28px rgba(46,242,201,.20)!important;}
+.choice-btn,.material-btn{background:#f8fafc!important;color:#0f172a!important;border:1px solid rgba(255,255,255,.9)!important;box-shadow:0 8px 18px rgba(0,0,0,.14)!important;}
+.choice-btn:hover,.choice-btn.selected,.choice-btn.multi-selected,.material-btn:hover,.material-btn.active,.material-btn.selected{border-color:#2ef2c9!important;box-shadow:0 0 0 3px rgba(46,242,201,.20),0 12px 22px rgba(0,0,0,.20)!important;}
+#preview-panel>h2{font-size:18px!important;margin:0 0 14px!important;color:#fff!important;letter-spacing:-.2px!important;text-transform:none!important;}
+#preview-panel>h2::after{content:'  · 오른쪽 실시간 이미지 맵핑';font-size:12px;color:#2ef2c9;font-weight:800;}
+#ff-dashboard-hero{display:block!important;margin:0 0 14px!important;padding:18px!important;border-radius:26px!important;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035))!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 22px 64px rgba(0,0,0,.25)!important;}
+.ff-hero-grid{display:grid!important;grid-template-columns:minmax(0,1.55fr) minmax(240px,.75fr)!important;gap:16px!important;align-items:stretch!important;}
+.ff-hero-image-card{height:clamp(410px,60vh,720px)!important;max-height:none!important;min-height:410px!important;border-radius:24px!important;background:linear-gradient(135deg,#f8fafc,#dfe7f1)!important;padding:16px!important;}
+#ff-hero-img,#ff-hero-canvas{width:100%!important;height:100%!important;max-height:none!important;object-fit:contain!important;display:block;}
+.ff-hero-title b{font-size:20px!important;}
+.ff-hero-title span{color:#9fb1c8!important;}
+.ff-hero-price strong{color:#2ef2c9!important;font-size:32px!important;}
+.ff-hero-info,.ff-hero-swatch{background:rgba(7,17,32,.82)!important;border:1px solid rgba(255,255,255,.10)!important;}
+.ff-hero-row b,.ff-hero-swatch b{color:#fff!important;}
+.ff-hero-row span,.ff-hero-swatch span{color:#9fb1c8!important;}
+#texture-preview.quick-preview-panel,#set-product-selector,#product-preview-box,#screen-composite-preview,#recommend-panel,#preview-items,#total-box{background:rgba(255,255,255,.045)!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:22px!important;padding:14px!important;margin-bottom:12px!important;box-shadow:none!important;}
+#recommend-panel{display:flex!important;gap:10px!important;overflow-x:auto!important;align-items:stretch!important;}
+#recommend-panel h3{min-width:86px!important;margin:0!important;color:#2ef2c9!important;align-self:center!important;}
+.rec-card{min-width:150px!important;margin:0!important;border-radius:16px!important;background:#0e1b2c!important;color:#fff!important;border:1px solid rgba(255,255,255,.10)!important;box-shadow:none!important;}
+.rec-card-title{color:#fff!important;}
+#preview-items{max-height:260px!important;overflow-y:auto!important;}
+.preview-item{background:#0e1b2c!important;color:#fff!important;border:1px solid rgba(255,255,255,.10)!important;border-radius:16px!important;box-shadow:none!important;}
+.preview-item .item-name{color:#fff!important;}.preview-item .item-detail{color:#9fb1c8!important;}.preview-item .item-price{color:#2ef2c9!important;}
+#total-box .total-price,#ff-hero-total{color:#2ef2c9!important;}
+#quick-ai-preview-note.ai-loading,#quick-ai-preview-note.ai-result,#quick-ai-preview-note{border-radius:16px!important;background:#071120!important;border:1px solid rgba(46,242,201,.26)!important;color:#dffef8!important;}
+@media(max-width:1180px){body.ff-dashboard-preview,body.ff-pro-dashboard{display:flex!important;flex-direction:column!important;height:auto!important;min-height:100vh!important;overflow:auto!important;padding:10px!important;}body.ff-dashboard-preview #chat-panel,body.ff-dashboard-preview #preview-panel,body.ff-pro-dashboard #chat-panel,body.ff-pro-dashboard #preview-panel{height:auto!important;min-height:0!important;width:auto!important;}.ff-hero-grid{grid-template-columns:1fr!important;}.ff-hero-image-card{height:360px!important;min-height:300px!important;}}
+</style>
+<script id="ff-nano-diagnostic-v60">
+(function(){
+  function $(id){return document.getElementById(id)}
+  async function pingNano(){
+    var note=$('quick-ai-preview-note');
+    try{
+      var r=await fetch('/api/health',{cache:'no-store'});
+      var d=await r.json().catch(function(){return{}});
+      return {ok:r.ok, data:d};
+    }catch(e){
+      if(note){note.style.display='block';note.innerHTML='<b style="color:#fca5a5">Nano Banana 서버 연결 실패</b><br><span>이 HTML을 파일로 직접 열었거나 Render/localhost 서버가 꺼져 있습니다. <b>npm run dev</b> 실행 후 <b>http://localhost:3000</b>에서 열어야 /api/generate-preview가 작동합니다.</span>';}
+      return {ok:false,error:e};
+    }
+  }
+  var old=window.prepareNanoBananaPreview;
+  window.prepareNanoBananaPreview=async function(){
+    var check=await pingNano();
+    var note=$('quick-ai-preview-note');
+    if(!check.ok){return;}
+    if(check.data && check.data.hasGeminiKey===false){
+      if(note){note.style.display='block';note.innerHTML='<b style="color:#fca5a5">GEMINI_API_KEY 없음</b><br><span>Render 환경변수 또는 로컬 .env에 GEMINI_API_KEY를 넣어야 합니다. 현재 서버는 켜져 있지만 키가 없습니다.</span>';}
+      return;
+    }
+    if(typeof old==='function') return old.apply(this,arguments);
+  };
+})();
+</script>
+
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -1271,7 +1388,7 @@ body.ff-dashboard-preview #ff-right-summary-panel{display:flex!important;}
 })();
 </script>
 
-<body>
+<body class="ff-dashboard-preview">
 <div id="material-hover-preview"><div class="mh-label" id="mh-label"></div><div class="mh-thumb" id="mh-thumb"></div><div class="mh-caption">재질 확대 미리보기</div></div>
 
 <div id="preview-panel">
