@@ -5233,13 +5233,21 @@ function setPreviewGlow(part) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      var data = await res.json();
-      if (!res.ok) throw new Error(data.error || '실사 미리보기 생성 실패');
-      if (note) {
-        note.innerHTML = '<div style="font-weight:800;color:#fff;margin-bottom:8px;">AI 실사 미리보기</div>' +
-          '<img src="'+data.imageUrl+'" alt="AI 실사 미리보기" style="width:100%;border-radius:12px;border:1px solid #2a1e48;background:#fff;display:block;" />' +
-          '<div style="margin-top:8px;color:#888;font-size:10px;">Nano Banana 생성 결과입니다. 필요하면 다시 생성할 수 있습니다.</div>';
-      }
+     var data = await res.json();
+if (!res.ok) throw new Error(data.error || '실사 미리보기 생성 실패');
+
+var imageSrc = data.imageUrl || data.image || data.url;
+
+if (!imageSrc) {
+  throw new Error('이미지 응답은 성공했지만 imageUrl/image/url 값이 없습니다.');
+}
+
+if (note) {
+  note.innerHTML =
+    '<div style="font-weight:800;color:#fff;margin-bottom:8px;">AI 실사 미리보기</div>' +
+    '<img src="' + imageSrc + '" alt="AI 실사 미리보기" style="width:100%;border-radius:12px;border:1px solid rgba(52,240,203,.35);">' +
+    '<div style="margin-top:8px;color:#888;font-size:10px;">Nano Banana 생성 결과입니다.</div>';
+}
     } catch (err) {
       if (note) {
         note.innerHTML = '<b style="color:#fca5a5;">실사 미리보기 생성 실패</b><br><span style="color:#aaa;">'+(err.message || err)+'</span><br><span style="color:#666;">서버 실행 여부와 .env의 GEMINI_API_KEY를 확인해주세요.</span>';
