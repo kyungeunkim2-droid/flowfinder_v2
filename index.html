@@ -9114,6 +9114,26 @@ button.material-btn{
 .ff64-material-modal-row{border:1px solid rgba(46,242,201,.22);border-radius:14px;padding:12px;background:#071120;color:#eafffb;}
 .ff64-material-modal-row b{display:block;margin-bottom:8px;font-size:13px;}
 .ff64-material-modal-swatch{height:180px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#fff center/cover no-repeat;}
+  #quick-ai-preview-note{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  min-height:420px !important;
+  overflow:visible !important;
+  position:relative !important;
+  z-index:9999 !important;
+  background:#08131f !important;
+  padding:16px !important;
+  border-radius:18px !important;
+}
+
+#quick-ai-preview-note img{
+  width:100% !important;
+  max-height:none !important;
+  display:block !important;
+  object-fit:contain !important;
+  border-radius:16px !important;
+}
 </style>
 <script id="ff64-true-remap-material-only-js">
 (function(){
@@ -9212,7 +9232,11 @@ button.material-btn{
     if(note){
       note.classList.remove('ai-result'); note.classList.add('ai-loading');
       note.style.display='block';
-      note.innerHTML='<b>AI 실사 미리보기 생성 중...</b><br><span style="color:#aaa;">원본 제품사진 + 선택 재질만 보내서 빠르게 자동 매핑합니다. 마스크/펜툴/추가 제품사진은 보내지 않습니다.</span>';
+      note.style.display = 'block';
+note.style.visibility = 'visible';
+note.style.opacity = '1';
+note.style.minHeight = '420px';
+note.style.overflow = 'visible';
     }
     if(btn){btn.disabled=true;btn.textContent='생성 중...';}
     window.__nanoBananaBusy=true;
@@ -9237,7 +9261,11 @@ button.material-btn{
     }catch(err){
       if(note){
         note.classList.remove('ai-result'); note.classList.add('ai-loading'); note.style.display='block';
-        note.innerHTML='<b style="color:#fca5a5;">실사 미리보기 생성 실패</b><br><span style="color:#ddd;">'+((err.name==="AbortError")?"생성이 65초를 넘어서 중단되었습니다. 선택 이미지를 줄이거나 다시 시도하세요.":(err.message||err))+'</span>';
+       note.style.display = 'block';
+note.style.visibility = 'visible';
+note.style.opacity = '1';
+note.style.minHeight = '420px';
+note.style.overflow = 'visible';
       }
     }finally{
       window.__nanoBananaBusy=false;
