@@ -5214,15 +5214,11 @@ function setPreviewGlow(part) {
     try {
       var payload = {
         deskImage: getBase(PREVIEW.deskKey),
-        screenImage: PREVIEW.screenKey ? getBase(PREVIEW.screenKey) : '',
         topTexture: PREVIEW.topTex || '',
         legTexture: PREVIEW.legTex || '',
-        screenTexture: PREVIEW.screenTex || '',
         topCode: PREVIEW.top || '',
         legCode: PREVIEW.leg || '',
-        screenCode: PREVIEW.screen || '',
         deskLabel: productLabel(PREVIEW.deskKey),
-        screenLabel: PREVIEW.screenKey ? productLabel(PREVIEW.screenKey) : '',
         legType: (state.legType || ''),
         casterType: (state.casterType || ''),
         topShape: (state.topShape || ''),
@@ -6164,15 +6160,11 @@ body.ff-dashboard-preview #preview-panel{
       var payload={
         mode:'preserve-original-product-photo',
         deskImage:PRODUCT_IMAGES_ORIGINAL[deskKey] || '',
-        screenImage:screenKey ? PRODUCT_IMAGES_ORIGINAL[screenKey] : '',
         topTexture:s.topTex || '',
         legTexture:s.legTex || '',
-        screenTexture:s.screenTex || '',
         topCode:s.top || '',
         legCode:s.leg || '',
-        screenCode:s.screen || '',
         deskLabel:labelFor(deskKey),
-        screenLabel:screenKey ? labelFor(screenKey) : ''
       };
       var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
       var data=await res.json();
@@ -6271,23 +6263,11 @@ body.ff-dashboard-preview #preview-panel{
       // Local product photos are used for Nano Banana reference editing.
       // CDN photos are still used by the live UI when needed, but AI preview should use the assets inside this project.
       deskImage:localProductImage(deskKey),
-      screenImage:screenKey ? localProductImage(screenKey) : '',
-      // Optional mask hints exported from Figma. These are not rendered in canvas; they are sent to the model as region guidance.
-      deskTopMask:localMaskPath(deskKey, 'top_mask'),
-      deskLegMask:localMaskPath(deskKey, 'leg_mask'),
-      screenTopMask:screenKey ? localMaskPath(screenKey, 'top_mask') : '',
-      screenLegMask:screenKey ? localMaskPath(screenKey, 'leg_mask') : '',
-      screenMask:screenKey ? localMaskPath(screenKey, 'screen_mask') : '',
-      frontScreenMask:screenKey ? localMaskPath(screenKey, 'front_screen_mask') : '',
-      sideScreenMask:screenKey ? localMaskPath(screenKey, 'side_screen_mask') : '',
       topTexture:existingTexture(s.topTex),
       legTexture:existingTexture(s.legTex),
-      screenTexture:existingTexture(s.screenTex),
       topCode:s.top || '',
       legCode:s.leg || '',
-      screenCode:s.screen || '',
       deskLabel:labelFor(deskKey),
-      screenLabel:screenKey ? labelFor(screenKey) : '',
       legType:s.legType || s.legShape || '',
       casterType:s.casterType || s.mobility || '',
       topShape:s.topShape || '',
@@ -9219,20 +9199,15 @@ button.material-btn{
     var payload={
       mode:'semantic-material-remap-no-mask',
       deskImage:localProductImage(deskKey),
-      screenImage:'',
       topTexture:cleanUrl(s.topTex),
       legTexture:cleanUrl(s.legTex),
-      screenTexture:cleanUrl(s.screenTex),
       topCode:s.top || '',
       legCode:s.leg || '',
-      screenCode:s.screen || '',
       deskLabel:productLabel(deskKey),
-      screenLabel:screenKey ? productLabel(screenKey) : '',
       legType:s.legType || s.legShape || '',
       casterType:s.casterType || s.mobility || '',
       topShape:s.topShape || '',
       size:s.size || {w:s.w||'', d:s.d||'', h:s.h||''},
-      useMasks:false
     };
     if(note){
       note.classList.remove('ai-result'); note.classList.add('ai-loading');
