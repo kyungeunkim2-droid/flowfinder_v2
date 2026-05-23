@@ -110,49 +110,57 @@ app.post('/api/generate-preview', async (req, res) => {
 
     const baseUrl = `${req.protocol}://${req.get('host')}/`;
 
- const {
-  deskImage,
-  topTexture,
-  legTexture,
-  topCode,
-  legCode,
-  deskLabel,
-  legType,
-  casterType,
-  topShape,
-  size,
-} = req.body || {};
+    const {
+      deskImage,
+      topTexture,
+      legTexture,
+      topCode,
+      legCode,
+      deskLabel,
+      legType,
+      casterType,
+      topShape,
+      size,
+    } = req.body || {};
 
     const parts = [];
-   parts.push({
-  text: [
-    'Use the base furniture product image as the exact reference.',
-    'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
-    'Apply the provided top material texture naturally only to the desktop surface.',
-    'Apply the provided leg material color naturally only to the desk legs and frame.',
-    'Do not redraw the product.',
-    'Do not add a screen panel.',
-    'Do not show masks, outlines, guide lines, pen-tool paths, or overlay marks.',
-    'Create a photorealistic office furniture catalog render.'
-  ].join('\n')
-});
 
- const imageInputs = [
-  ['base furniture product image', deskImage],
-  ['desktop material texture reference', topTexture],
-  ['legs and frame material color reference', legTexture],
-];
+    parts.push({
+      text: [
+        'Use the base furniture product image as the exact reference.',
+        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
+        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
+        'Apply the provided leg material color naturally only to the desk legs and frame.',
+        'Do not redraw the product.',
+        'Do not add a screen panel.',
+        'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
+        topCode ? `Top material code: ${topCode}.` : '',
+        legCode ? `Leg/frame material code: ${legCode}.` : '',
+        deskLabel ? `Desk product: ${deskLabel}.` : '',
+        legType ? `Selected leg shape: ${legType}. Preserve it if visible.` : '',
+        casterType ? `Selected bottom support: ${casterType}. Preserve it if visible.` : '',
+        topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
+        size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
+        'Create one photorealistic office furniture catalog render.'
+      ].filter(Boolean).join('\n'),
+    });
 
-for (const [label, src] of imageInputs) {
-  const part = await loadImagePart(src, label, baseUrl).catch((err) => {
-    console.warn(err.message);
-    return null;
-  });
+    const imageInputs = [
+      ['base furniture product image', deskImage],
+      ['desktop material texture reference', topTexture],
+      ['legs and frame material color reference', legTexture],
+    ];
 
-  if (part) {
-    parts.push(part);
-  }
-}
+    for (const [label, src] of imageInputs) {
+      const part = await loadImagePart(src, label, baseUrl).catch((err) => {
+        console.warn(err.message);
+        return null;
+      });
+      if (part) {
+        parts.push({ text: `Reference image provided: ${label}. Use this according to the instructions.` });
+        parts.push(part);
+      }
+    }
 
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
     const modelCandidates = Array.from(new Set([
