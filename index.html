@@ -5244,20 +5244,6 @@ function setPreviewGlow(part) {
         note.innerHTML = '<div style="font-weight:800;color:#fff;margin-bottom:8px;">AI 실사 미리보기</div>' +
           '<img src="'+imageSrc+'" alt="AI 실사 미리보기" style="width:100%;border-radius:12px;border:1px solid #2a1e48;background:#fff;display:block;" />' +
           '<div style="margin-top:8px;color:#888;font-size:10px;">Nano Banana 생성 결과입니다. 필요하면 다시 생성할 수 있습니다.</div>';
-        const hero = document.querySelector('#ff-hero-img');
-if (hero) {
-  hero.style.display = 'none';
-}
-
-const canvas = document.querySelector('#ff-hero-canvas');
-if (canvas) {
-  canvas.style.display = 'none';
-}
-
-note.style.display = 'block';
-note.style.visibility = 'visible';
-note.style.opacity = '1';
-note.style.height = 'auto';
       }
     } catch (err) {
       if (note) {
@@ -7945,6 +7931,86 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
 })();
 </script>
 
+
+<!-- === Fixed63: material preview only, remove original/Figma-looking reference images from material panel === -->
+<style id="ff63-material-only-preview-fix">
+/* 재질 선택 시 우측 패널에는 원본 제품사진/외부 캡처 이미지를 표시하지 않고 재질 선택값만 보여줍니다. */
+#texture-preview .quick-preview-grid,
+#texture-preview #quick-desk-card,
+#texture-preview #quick-screen-card,
+#texture-preview #quick-desk-img,
+#texture-preview #quick-screen-img{
+  display:none!important;
+  visibility:hidden!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:0!important;
+  overflow:hidden!important;
+  opacity:0!important;
+}
+#texture-preview.quick-preview-panel{
+  max-height:none!important;
+  overflow:visible!important;
+}
+#texture-preview .texture-label span:first-child{
+  font-size:0!important;
+}
+#texture-preview .texture-label span:first-child::after{
+  content:'👁 재질 선택값';
+  font-size:12px!important;
+}
+#texture-preview .quick-materials{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:8px!important;
+}
+#texture-preview .material-chip-row{
+  grid-template-columns:72px 1fr 54px!important;
+  min-height:42px!important;
+}
+#texture-preview .material-chip-row em{
+  width:48px!important;
+  height:30px!important;
+  background-size:cover!important;
+  background-position:center!important;
+}
+</style>
+<script id="ff63-material-only-preview-fix-js">
+(function(){
+  function removeOriginalCards(){
+    var grid=document.querySelector('#texture-preview .quick-preview-grid');
+    if(grid){ grid.style.display='none'; grid.setAttribute('aria-hidden','true'); }
+    ['quick-desk-card','quick-screen-card','quick-desk-img','quick-screen-img'].forEach(function(id){
+      var el=document.getElementById(id);
+      if(el){
+        if(el.tagName==='IMG') el.removeAttribute('src');
+        el.style.display='none';
+        el.style.visibility='hidden';
+        el.style.opacity='0';
+      }
+    });
+  }
+  var oldShowTexturePreview = window.showTexturePreview;
+  if(typeof oldShowTexturePreview === 'function'){
+    window.showTexturePreview = function(){
+      var r = oldShowTexturePreview.apply(this, arguments);
+      setTimeout(removeOriginalCards, 0);
+      return r;
+    };
+  }
+  var oldFast = window.FlowFinderFastPreview && window.FlowFinderFastPreview.render;
+  if(window.FlowFinderFastPreview && typeof oldFast === 'function'){
+    window.FlowFinderFastPreview.render = function(){
+      var r = oldFast.apply(this, arguments);
+      setTimeout(removeOriginalCards, 0);
+      return r;
+    };
+  }
+  window.addEventListener('load', function(){ setTimeout(removeOriginalCards, 80); });
+  document.addEventListener('click', function(){ setTimeout(removeOriginalCards, 0); }, true);
+})();
+</script>
+
 </body>
 
 
@@ -9037,5 +9103,180 @@ button.material-btn{
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(applyMaterialGrid, 50); setTimeout(applyMaterialGrid, 400); });
   var obs = new MutationObserver(function(){ applyMaterialGrid(); });
   obs.observe(document.documentElement, {childList:true, subtree:true});
+})();
+</script>
+<!-- === Fixed64: true Nano Banana material remap + material-only selector preview === -->
+<style id="ff64-true-remap-material-only-css">
+/* 재질 선택 패널은 원본/마스크/펜툴 이미지가 아니라 재질칩만 보여줍니다. */
+#texture-preview .quick-preview-grid,
+#texture-preview #quick-desk-card,
+#texture-preview #quick-screen-card,
+#texture-preview #quick-desk-img,
+#texture-preview #quick-screen-img,
+#texture-preview canvas,
+#texture-preview img:not(#quick-ai-preview-note img){
+  display:none!important;
+  visibility:hidden!important;
+  width:0!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:0!important;
+  opacity:0!important;
+  overflow:hidden!important;
+}
+#texture-preview .quick-materials{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;}
+#texture-preview .material-chip-row{display:grid!important;grid-template-columns:80px 1fr 64px!important;align-items:center!important;min-height:48px!important;}
+#texture-preview .material-chip-row em{width:58px!important;height:34px!important;border-radius:10px!important;background-size:cover!important;background-position:center!important;}
+#texture-preview .texture-label span:first-child{font-size:0!important;}
+#texture-preview .texture-label span:first-child::after{content:'재질 선택값';font-size:13px!important;font-weight:900!important;color:#dffef8!important;}
+#preview-modal.ff64-material-modal #preview-modal-card{max-width:min(92vw,520px)!important;}
+.ff64-material-modal-grid{display:grid;grid-template-columns:1fr;gap:12px;min-width:320px;}
+.ff64-material-modal-row{border:1px solid rgba(46,242,201,.22);border-radius:14px;padding:12px;background:#071120;color:#eafffb;}
+.ff64-material-modal-row b{display:block;margin-bottom:8px;font-size:13px;}
+.ff64-material-modal-swatch{height:180px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:#fff center/cover no-repeat;}
+</style>
+<script id="ff64-true-remap-material-only-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function pv(){return (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};}
+  function productLabel(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key] || '-';}
+  function localProductImage(key){return key ? ('products/' + key + '/base/base.png') : '';}
+  function cleanUrl(url){return url || '';}
+  function hideMaterialProductImages(){
+    var root=$('texture-preview');
+    if(!root) return;
+    var grid=root.querySelector('.quick-preview-grid');
+    if(grid){grid.style.display='none';grid.setAttribute('aria-hidden','true');}
+    ['quick-desk-card','quick-screen-card','quick-desk-img','quick-screen-img'].forEach(function(id){
+      var el=$(id);
+      if(el){
+        if(el.tagName==='IMG') el.removeAttribute('src');
+        el.style.display='none'; el.style.visibility='hidden'; el.style.opacity='0'; el.style.height='0';
+      }
+    });
+    root.querySelectorAll('canvas').forEach(function(el){el.style.display='none';});
+  }
+  function materialRowsHtml(){
+    var s=pv();
+    var rows=[];
+    function row(label, code, tex, fallback){
+      if(!code && !tex) return;
+      var bg = tex ? 'background-image:url(&quot;'+tex+'&quot;);' : ('background:'+fallback+';');
+      rows.push('<div class="ff64-material-modal-row"><b>'+label+' · '+(code||'-')+'</b><div class="ff64-material-modal-swatch" style="'+bg+'"></div></div>');
+    }
+    row('상판 재질', s.top || '', cleanUrl(s.topTex), '#ddd');
+    row('다리 재질', s.leg || '', cleanUrl(s.legTex), '#888');
+    row('스크린 재질', s.screen || '', cleanUrl(s.screenTex), '#ddd');
+    return rows.length ? '<div class="ff64-material-modal-grid">'+rows.join('')+'</div>' : '<div style="color:#ddd;padding:20px;">선택된 재질이 없습니다.</div>';
+  }
+
+  // 재질 패널 확대 클릭 시 제품/마스크 이미지 대신 재질칩만 확대합니다.
+  var oldOpen = window.openPreviewModalFromElement;
+  window.openPreviewModalFromElement = function(el){
+    if(el && (el.id==='texture-preview' || (el.closest && el.closest('#texture-preview')))){
+      var modal=$('preview-modal'), cont=$('preview-modal-content'), title=$('preview-modal-title');
+      if(modal && cont){
+        cont.innerHTML=materialRowsHtml();
+        if(title) title.textContent='선택 재질 확대 미리보기';
+        modal.classList.add('open','ff64-material-modal');
+        return;
+      }
+    }
+    if(typeof oldOpen==='function') return oldOpen.apply(this, arguments);
+  };
+  var oldClose = window.closePreviewModal;
+  window.closePreviewModal = function(e){
+    if(!e || e.target.id==='preview-modal' || e.target.id==='preview-modal-close'){
+      var modal=$('preview-modal'); if(modal) modal.classList.remove('ff64-material-modal');
+    }
+    if(typeof oldClose==='function') return oldClose.apply(this, arguments);
+  };
+
+  // 기존 showTexturePreview 뒤에 항상 원본/펜툴 이미지를 제거합니다.
+  var oldShow = window.showTexturePreview;
+  if(typeof oldShow==='function'){
+    window.showTexturePreview=function(){
+      var r=oldShow.apply(this, arguments);
+      setTimeout(hideMaterialProductImages,0);
+      setTimeout(hideMaterialProductImages,80);
+      return r;
+    };
+  }
+  document.addEventListener('click', function(){setTimeout(hideMaterialProductImages,0);}, true);
+  window.addEventListener('load', function(){setTimeout(hideMaterialProductImages,100);});
+  if(window.MutationObserver){
+    new MutationObserver(function(){hideMaterialProductImages();}).observe(document.documentElement,{childList:true,subtree:true});
+  }
+
+  // Nano Banana는 이제 base 제품사진 + 선택 재질 이미지들만 보냅니다. 마스크는 보내지 않습니다.
+  window.prepareNanoBananaPreview = async function(){
+    if(window.__nanoBananaBusy) return;
+    var note=$('quick-ai-preview-note');
+    var btn=$('quick-ai-preview-btn');
+    var s=pv();
+    var deskKey=s.deskKey || 'desk_standard';
+    var screenKey=s.screenKey || '';
+    var payload={
+      mode:'semantic-material-remap-no-mask',
+      deskImage:localProductImage(deskKey),
+      screenImage:screenKey ? localProductImage(screenKey) : '',
+      topTexture:cleanUrl(s.topTex),
+      legTexture:cleanUrl(s.legTex),
+      screenTexture:cleanUrl(s.screenTex),
+      topCode:s.top || '',
+      legCode:s.leg || '',
+      screenCode:s.screen || '',
+      deskLabel:productLabel(deskKey),
+      screenLabel:screenKey ? productLabel(screenKey) : '',
+      legType:s.legType || s.legShape || '',
+      casterType:s.casterType || s.mobility || '',
+      topShape:s.topShape || '',
+      size:s.size || {w:s.w||'', d:s.d||'', h:s.h||''},
+      useMasks:false
+    };
+    if(note){
+      note.classList.remove('ai-result'); note.classList.add('ai-loading');
+      note.style.display='block';
+      note.innerHTML='<b>AI 실사 미리보기 생성 중...</b><br><span style="color:#aaa;">원본 제품사진 + 선택 재질만 Nano Banana로 보내서 자동 매핑합니다. 마스크/펜툴 이미지는 보내지 않습니다.</span>';
+    }
+    if(btn){btn.disabled=true;btn.textContent='생성 중...';}
+    window.__nanoBananaBusy=true;
+    try{
+      var health=await fetch('/api/health',{cache:'no-store'}).catch(function(){return null;});
+      if(!health || !health.ok) throw new Error('서버 /api/health 연결 실패');
+      var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      var data=await res.json().catch(function(){return {};});
+      if(!res.ok) throw new Error(data.error || data.detail || '실사 미리보기 생성 실패');
+      var imageSrc=(typeof data==='string') ? data : (data.imageUrl || data.image || data.url || '');
+      if(!imageSrc) throw new Error('이미지 결과 URL을 받지 못했습니다.');
+      if(note){
+        note.classList.remove('ai-loading'); note.classList.add('ai-result');
+        note.style.display='block'; note.style.visibility='visible'; note.style.opacity='1'; note.style.height='auto';
+        note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">AI 실사 미리보기</div>'+ 
+          '<img src="'+imageSrc+'" alt="AI 실사 미리보기" style="width:100%;border-radius:16px;border:1px solid #2a1e48;background:#fff;display:block;max-height:560px;object-fit:contain;" />'+
+          '<div style="margin-top:8px;color:#888;font-size:11px;line-height:1.45;">원본 제품사진 + 선택 재질 기반 Nano Banana 자동 매핑 결과입니다.</div>';
+      }
+    }catch(err){
+      if(note){
+        note.classList.remove('ai-result'); note.classList.add('ai-loading'); note.style.display='block';
+        note.innerHTML='<b style="color:#fca5a5;">실사 미리보기 생성 실패</b><br><span style="color:#ddd;">'+(err.message||err)+'</span>';
+      }
+    }finally{
+      window.__nanoBananaBusy=false;
+      if(btn){btn.disabled=false;btn.textContent='✨ 실사 미리보기 생성';}
+      hideMaterialProductImages();
+    }
+  };
+
+  // 버튼의 기존 중복 이벤트를 onclick 방식으로 다시 고정합니다.
+  function bind(){
+    var btn=$('quick-ai-preview-btn');
+    if(btn){
+      btn.onclick=function(e){e.preventDefault(); window.prepareNanoBananaPreview(); return false;};
+    }
+  }
+  bind();
+  window.addEventListener('load',bind);
+  setTimeout(bind,300);
 })();
 </script>
