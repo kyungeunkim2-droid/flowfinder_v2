@@ -1,16 +1,12 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<link rel="icon" href="data:,">
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://planning-cdn.fursys.com" crossorigin>
 <link rel="dns-prefetch" href="https://planning-cdn.fursys.com">
 
 <title>FlowFinder AI 견적상담</title>
-
-
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #1a1a1a; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; display: flex; height: 100vh; overflow: hidden; }
@@ -1217,60 +1213,7 @@ body.ff-dashboard-preview #preview-panel{
 .ff-num-control input, input[type="number"]{color:#fff!important;background:#0b1220!important;border:1px solid #475569!important;font-weight:900!important;}
 </style>
 
-
-<style id="ff-dashboard-three-col-no-pegboard">
-body.ff-dashboard-preview{display:grid!important;grid-template-columns:minmax(360px,0.9fr) minmax(520px,1.2fr) minmax(300px,0.75fr)!important;gap:18px!important;align-items:stretch!important;background:radial-gradient(circle at 12% 0%,#12243b 0,#07111f 38%,#030814 100%)!important;padding:18px!important;overflow:hidden!important;}
-body.ff-dashboard-preview #chat-panel{grid-column:1!important;min-width:0!important;max-width:none!important;width:auto!important;height:calc(100vh - 36px)!important;margin:0!important;border-radius:28px!important;}
-body.ff-dashboard-preview #preview-panel{grid-column:2!important;min-width:0!important;max-width:none!important;width:auto!important;height:calc(100vh - 36px)!important;margin:0!important;border-radius:28px!important;overflow-y:auto!important;}
-body.ff-dashboard-preview #ff-right-summary-panel{display:flex!important;}
-#ff-right-summary-panel{display:none;grid-column:3;height:calc(100vh - 36px);border:1px solid rgba(255,255,255,.10);background:linear-gradient(180deg,#0d1828,#07111f);border-radius:28px;padding:24px;color:#fff;box-shadow:0 24px 70px rgba(0,0,0,.28);flex-direction:column;gap:18px;overflow:auto;}
-.ff-summary-card{border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.035);border-radius:20px;padding:18px;}
-.ff-summary-title{font-weight:1000;font-size:18px;margin-bottom:14px;color:#fff;}
-.ff-summary-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px;color:#aebbd0;}
-.ff-summary-row:last-child{border-bottom:0;}
-.ff-summary-row b{color:#fff;font-size:14px;text-align:right;}
-.ff-summary-total{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;border-top:1px solid rgba(255,255,255,.18);padding-top:16px;margin-top:12px;}
-.ff-summary-total span{color:#cbd5e1;font-weight:900;}
-.ff-summary-total b{color:#2ee6c3;font-size:28px;line-height:1;}
-.ff-summary-btn{height:54px;border-radius:16px;border:0;background:linear-gradient(135deg,#2ee6c3,#20d6a8);color:#061018;font-weight:1000;font-size:16px;cursor:pointer;box-shadow:0 18px 36px rgba(46,230,195,.22);}
-.ff-summary-btn.secondary{background:#101b2d;color:#e5edf7;border:1px solid rgba(255,255,255,.14);box-shadow:none;}
-[id*="pegboard"], [class*="pegboard"], img[src*="pegboard"]{display:none!important;}
-@media(max-width:1180px){body.ff-dashboard-preview{display:flex!important;flex-direction:column!important;height:auto!important;overflow:auto!important;}body.ff-dashboard-preview #chat-panel,body.ff-dashboard-preview #preview-panel,#ff-right-summary-panel{height:auto!important;min-height:0!important;width:auto!important;}}
-</style>
-
-<style id="ff-hotfix-remove-broken-assets">
-  [src*="bkm.jpg"], [src*="dsg.jpg"], [src*="wew.jpg"], [src*="screen_mask.png"], [src*="BKM.png"] { display:none !important; }
-  #pegboard-ref-panel, [id*="pegboard"], [class*="pegboard"], [data-option*="pegboard"], [data-code="BKM"], [data-code="DSG"], [data-code="WEW"] { display:none !important; }
-</style>
 </head>
-
-<script id="ff-hotfix-block-broken-assets">
-(function(){
-  const BLANK = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1' height='1'%3E%3C/svg%3E";
-  const BAD = ['bkm.jpg','dsg.jpg','wew.jpg','screen_mask.png','BKM.png'];
-  function isBad(v){ return typeof v === 'string' && BAD.some(x => v.includes(x)); }
-  const origSetAttribute = Element.prototype.setAttribute;
-  Element.prototype.setAttribute = function(name, value){
-    if (name && String(name).toLowerCase() === 'src' && isBad(String(value))) value = BLANK;
-    return origSetAttribute.call(this, name, value);
-  };
-  const imgSrc = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-  if (imgSrc && imgSrc.set) {
-    Object.defineProperty(HTMLImageElement.prototype, 'src', {
-      get: imgSrc.get,
-      set: function(v){ imgSrc.set.call(this, isBad(String(v)) ? BLANK : v); }
-    });
-  }
-  window.addEventListener('error', function(e){
-    const t = e.target;
-    if (t && t.tagName === 'IMG' && isBad(t.getAttribute('src') || t.src)) {
-      t.src = BLANK;
-      t.style.display = 'none';
-    }
-  }, true);
-})();
-</script>
-
 <body>
 <div id="material-hover-preview"><div class="mh-label" id="mh-label"></div><div class="mh-thumb" id="mh-thumb"></div><div class="mh-caption">재질 확대 미리보기</div></div>
 
@@ -1457,50 +1400,47 @@ var STD_COLORS = {"일반형 데스크": ["HWBKM", "OCYDSG", "OCYWW", "WWDSG", "
 var GITHUB_RAW = 'https://raw.githubusercontent.com/kyungeunkim2-droid/flowfinder-quote/main/textures/';
 var TEXTURE_MAP = {
   // 표준 데스크
-  'HW': 'textures/desktop/standard/HW.png', 'OSG': 'textures/desktop/standard/OSG.jpg', 'OCY': 'textures/desktop/standard/OSG.jpg', 'WW': 'textures/desktop/standard/WW.jpg', 'WWK': 'textures/desktop/standard/WW.jpg',
-  'HWBKM': 'textures/desktop/standard/HW.png', 'WWWW': 'textures/desktop/standard/WW.jpg', 'WWDSG': 'textures/desktop/standard/WW.jpg', 'WWKBKM': 'textures/desktop/standard/WW.jpg',
-  'OCYWW': 'textures/desktop/standard/OSG.jpg', 'OCYDSG': 'textures/desktop/standard/OSG.jpg',
-
-  // 표준 스크린 기본값: 일자형 기준. 전면/사이드는 _ffLocalTextureForCode에서 세부 경로로 보정됨.
-  '1P1': 'textures/screen/straight/standard/1P1.jpg', '1P2': 'textures/screen/straight/standard/1P2.jpg',
-  '1P4': 'textures/screen/straight/standard/1P4.jpg', '1P4A': 'textures/screen/straight/standard/1P4.jpg',
-  '1P7': 'textures/screen/straight/standard/1P7.jpg', '1P6': 'textures/screen/straight/standard/1P7.jpg',
-  '3F1': 'textures/screen/front/standard/3F1.jpg', '3F2': 'textures/screen/front/standard/3F2.jpg',
-  '061': 'textures/screen/front/standard/061.jpg', '064': 'textures/screen/front/standard/064.jpg', '067': 'textures/screen/front/standard/067.jpg',
-
+  'HW': 'desk/standard/HW.png', 'OSG': 'desk/standard/OSG.jpg', 'OCY': 'desk/standard/OSG.jpg', 'WW': 'desk/standard/WW.jpg', 'WWK': 'desk/standard/WW.jpg',
+  'HWBKM': 'desk/standard/HW.png', 'WWWW': 'desk/standard/WW.jpg', 'WWDSG': 'desk/standard/WW.jpg',
+  'WWKBKM': 'desk/standard/WW.jpg',
+  'OCY': 'desk/standard/OSG.jpg', 'WWK': 'desk/standard/WW.jpg',
+  'OCYWW': 'desk/standard/OSG.jpg', 'OCYDSG': 'desk/standard/OSG.jpg',
+  // 표준 스크린
+  '1P1': 'screen/standard/1P1.jpg', '1P2': 'screen/standard/1P2.jpg',
+  '1P4': 'screen/standard/1P4.jpg', '1P4A': 'screen/standard/1P4.jpg',
+  '1P7': 'screen/standard/1P7.jpg', '1P6': 'screen/standard/1P7.jpg',
+  '3F1': 'screen/standard/3F1.jpg', '3F2': 'screen/standard/3F2.jpg',
+  '061': 'screen/standard/061.jpg', '064': 'screen/standard/064.jpg', '067': 'screen/standard/067.jpg',
   // 주문 데스크
-  'BGM': 'textures/desktop/laminate/BGM.jpg', 'BKA': 'textures/desktop/laminate/BKA.jpg', 'CC': 'textures/desktop/laminate/CC.jpg',
-  'CGY': 'textures/desktop/laminate/CGY.jpg', 'FIV': 'textures/desktop/laminate/FIV.jpg', 'FK': 'textures/desktop/laminate/FK.jpg',
-  'GG': 'textures/desktop/laminate/GG.jpg', 'IO': 'textures/desktop/laminate/IO.jpg', 'KAP': 'textures/desktop/laminate/KAP.jpg',
-  'LD': 'textures/desktop/laminate/LD.jpg', 'LL': 'textures/desktop/laminate/LL.jpg', 'LT': 'textures/desktop/laminate/LT.jpg',
-  'MDB': 'textures/desktop/laminate/MDB.png', 'NBK': 'textures/desktop/laminate/NBK.jpg', 'NSS': 'textures/desktop/laminate/NSS.jpg',
-  'OHN': 'textures/desktop/laminate/OHN.jpg', 'RCN': 'textures/desktop/laminate/RCN.jpg', 'TL': 'textures/desktop/laminate/TL.jpg',
-  'TRZ': 'textures/desktop/laminate/TRZ.jpg', 'UA': 'textures/desktop/laminate/UA.jpg', 'WP': 'textures/desktop/laminate/WP.jpg',
-  'DBL': 'textures/desktop/veneer/DBL.jpg', 'NCE': 'textures/desktop/veneer/NCE.jpg', 'NMOK': 'textures/desktop/veneer/NMOK.jpg',
-  'OB': 'textures/desktop/veneer/OB.jpg', 'OGG': 'textures/desktop/veneer/OGG.jpg',
-
-  // 주문 스크린 기본값: 전면 기준. 사이드 선택 시 _ffLocalTextureForCode에서 side로 보정됨.
-  '001': 'textures/screen/front/custom/001.jpg', '001A': 'textures/screen/front/custom/001A.jpg', '001B': 'textures/screen/front/custom/001B.jpg',
-  '004': 'textures/screen/front/custom/004.jpg', '004B': 'textures/screen/front/custom/004B.jpg',
-  '007': 'textures/screen/front/custom/007.jpg', '007B': 'textures/screen/front/custom/007B.jpg',
-  '014': 'textures/screen/front/custom/014.jpg', '014A': 'textures/screen/front/custom/014A.jpg',
-  '061K': 'textures/screen/front/custom/061.jpg', '064K': 'textures/screen/front/custom/064.jpg', '067K': 'textures/screen/front/custom/067.jpg',
-  '3F1K': 'textures/screen/front/custom/3F1.jpg', '3F2K': 'textures/screen/front/custom/3F2.jpg',
-  '071': 'textures/screen/front/custom/071.jpg', '071A': 'textures/screen/front/custom/071A.jpg',
-  '072': 'textures/screen/front/custom/072.jpg', '074': 'textures/screen/front/custom/074.jpg',
-  '2M4A': 'textures/screen/front/custom/2M4A.jpg', '371': 'textures/screen/front/custom/371.jpg',
-  '451': 'textures/screen/front/custom/451.jpg', '452A': 'textures/screen/front/custom/452A.png', '452N': 'textures/screen/front/custom/452N.jpg',
-  '457': 'textures/screen/front/custom/457.jpg', '457L': 'textures/screen/front/custom/457L.jpg', '458': 'textures/screen/front/custom/458.jpg',
-
+  'BGM': 'desk/custom/bgm.jpg', 'BKA': 'desk/custom/bka.jpg', 'CC': 'desk/custom/cc.jpg',
+  'CGY': 'desk/custom/cgy.jpg', 'DBL': 'desk/custom/dbl.jpg', 'FIV': 'desk/custom/fiv.jpg',
+  'FK': 'desk/custom/fk.jpg', 'GG': 'desk/custom/gg.jpg', 'IO': 'desk/custom/io.jpg',
+  'KAP': 'desk/custom/kap.jpg', 'LD': 'desk/custom/ld.jpg', 'LL': 'desk/custom/ll.jpg',
+  'LT': 'desk/custom/lt.jpg', 'MDB': 'desk/custom/mdb.jpg', 'NBK': 'desk/custom/nbk.jpg',
+  'NCE': 'desk/custom/nce.jpg', 'NMOK': 'desk/custom/nmok.jpg', 'NSS': 'desk/custom/nss.jpg',
+  'OB': 'desk/custom/ob.jpg', 'OGG': 'desk/custom/ogg.jpg', 'OHN': 'desk/custom/ohn.jpg',
+  'RCN': 'desk/custom/rcn.jpg', 'TL': 'desk/custom/tl.jpg', 'TRZ': 'desk/custom/trz.jpg',
+  'UA': 'desk/custom/ua.jpg', 'WP': 'desk/custom/wp.jpg',
+  // 주문 스크린
+  '001': 'screen/custom/001.jpg', '001A': 'screen/custom/001A.jpg', '001B': 'screen/custom/001B.jpg',
+  '004': 'screen/custom/004.jpg', '004B': 'screen/custom/004B.jpg',
+  '007': 'screen/custom/007.jpg', '007B': 'screen/custom/007B.jpg',
+  '014': 'screen/custom/014.jpg', '014A': 'screen/custom/014A.jpg',
+  '061K': 'screen/custom/061K.jpg', '064K': 'screen/custom/064.jpg', '067K': 'screen/custom/067.jpg',
+  '3F1K': 'screen/custom/3F1.jpg', '3F2K': 'screen/custom/3F2.jpg',
+  '071': 'screen/custom/071.jpg', '071A': 'screen/custom/071A.jpg',
+  '072': 'screen/custom/072.jpg', '074': 'screen/custom/074.jpg',
+  '2M4A': 'screen/custom/2M4A.jpg', '371': 'screen/custom/371.jpg',
+  '451': 'screen/custom/451.jpg', '452A': 'screen/custom/452A.jpg', '452N': 'screen/custom/452N.jpg',
+  '457': 'screen/custom/457.jpg', '457L': 'screen/custom/457L.jpg', '458': 'screen/custom/458.jpg',
   // 페그보드
-  'BKM': '', 'DSG': '', 'WEW': '',
-
+  'BKM': 'pegboard/bkm.jpg', 'DSG': 'pegboard/dsg.jpg', 'WEW': 'pegboard/wew.jpg',
   // 다리 전용
-  'LEG_WW': 'textures/leg/standard/WW.png',
-  'LEG_BKM': '',
+  'LEG_WW':  'legs/WW.jpg',
+  'LEG_BKM': 'legs/BKM.jpg',
   'LEG_DSG': 'textures/leg/standard/DSG.png',
   'LEG_DCR': 'textures/leg/standard/DCR.png',
-  'LEG_TS': 'textures/leg/standard/TS.png'
+  'LEG_TS':  'textures/leg/standard/TS.png',
 };
 // 로컬 ZIP 폴더 구조 기준 재질 경로 보정
 (function(){
@@ -1509,7 +1449,7 @@ var TEXTURE_MAP = {
     HWBKM:'textures/desktop/standard/HW.png', WWWW:'textures/desktop/standard/WW.jpg', WWDSG:'textures/desktop/standard/WW.jpg', WWKBKM:'textures/desktop/standard/WW.jpg', WWK:'textures/desktop/standard/WW.jpg', OCY:'textures/desktop/standard/OSG.jpg', OCYWW:'textures/desktop/standard/OSG.jpg', OCYDSG:'textures/desktop/standard/OSG.jpg',
     BGM:'textures/desktop/laminate/BGM.jpg', BKA:'textures/desktop/laminate/BKA.jpg', CC:'textures/desktop/laminate/CC.jpg', CGY:'textures/desktop/laminate/CGY.jpg', FIV:'textures/desktop/laminate/FIV.jpg', FK:'textures/desktop/laminate/FK.jpg', GG:'textures/desktop/laminate/GG.jpg', IO:'textures/desktop/laminate/IO.jpg', KAP:'textures/desktop/laminate/KAP.jpg', LD:'textures/desktop/laminate/LD.jpg', LL:'textures/desktop/laminate/LL.jpg', LT:'textures/desktop/laminate/LT.jpg', MDB:'textures/desktop/laminate/MDB.png', NBK:'textures/desktop/laminate/NBK.jpg', NSS:'textures/desktop/laminate/NSS.jpg', OHN:'textures/desktop/laminate/OHN.jpg', RCN:'textures/desktop/laminate/RCN.jpg', TL:'textures/desktop/laminate/TL.jpg', TRZ:'textures/desktop/laminate/TRZ.jpg', UA:'textures/desktop/laminate/UA.jpg', WP:'textures/desktop/laminate/WP.jpg', WW_LAM:'textures/desktop/laminate/WW.jpg',
     DBL:'textures/desktop/veneer/DBL.jpg', NCE:'textures/desktop/veneer/NCE.jpg', NMOK:'textures/desktop/veneer/NMOK.jpg', OB:'textures/desktop/veneer/OB.jpg', OGG:'textures/desktop/veneer/OGG.jpg',
-    LEG_WW:'textures/leg/standard/WW.png', LEG_BKM:'', LEG_DSG:'textures/leg/standard/DSG.png', LEG_DCR:'textures/leg/standard/DCR.png', LEG_TS:'textures/leg/standard/TS.png',
+    LEG_WW:'textures/leg/standard/WW.png', LEG_BKM:'textures/leg/standard/BKM.png', LEG_DSG:'textures/leg/standard/DSG.png', LEG_DCR:'textures/leg/standard/DCR.png', LEG_TS:'textures/leg/standard/TS.png',
     '1P1':'textures/screen/straight/standard/1P1.jpg', '1P2':'textures/screen/straight/standard/1P2.jpg', '1P4':'textures/screen/straight/standard/1P4.jpg', '1P4A':'textures/screen/straight/standard/1P4.jpg', '1P4B':'textures/screen/straight/standard/1P4.jpg', '1P5':'textures/screen/straight/custom/1P5.jpg', '1P7':'textures/screen/straight/standard/1P7.jpg', MBE:'textures/screen/straight/custom/MBE.jpg', MGR:'textures/screen/straight/custom/MGR.jpg'
   };
   Object.keys(localMap).forEach(function(k){ TEXTURE_MAP[k] = localMap[k]; });
@@ -1538,7 +1478,7 @@ function getProductTypeFromState() {
 
 /* ── 제품 배경 이미지 (base64 내장) ── */
 var PRODUCT_BG = {
-  '일반형 데스크': 'data:image/png;base64,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',
+  '일반형 데스크': 'data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAJ4BKIDASIAAhEBAxEB/8QAHAABAAEFAQEAAAAAAAAAAAAAAAYBAgMFBwQI/8QATBABAAECAwMHBwoCCAUDBQAAAAECAwQFEQYxcRIhMzVBgbEHEzJRc4KRFCJCUlNhcqGywZLRCBUjJDRDYqJEY5PC4RY2VBcYRYPS/8QAFwEBAQEBAAAAAAAAAAAAAAAAAAECA//EAB8RAQEAAwEAAwEBAQAAAAAAAAABAhESEwMhUTEyQf/aAAwDAQACEQMRAD8A+ywAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1j1wsqu26fSuURxkF489WOwdPpYuxHG5DFVm2V078wwv/AFYB7RrK8/yejfj7PdOrFVtPklP/ABsTwoq/km4uq3A0Ne1uTU7r1yrhQw1bZ5RG6nEVcKY/mdQ5qSCLV7a4D6GHvTx0YKttqPoYGZ41f+E6i81MBDY21uT/APj6f+pP8nqwm2OGrnTE4W7b++nSo6ic1KBrsJneV4no8XbifVX82fzbCmqKo1pmJie2GkVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1gAUqrppjWqqI4yxV4vC0enibNPGuAZh46s0y2n0sfhY/wD2wxV57lFO/H2Z4VamxsRqK9pMlp342O6iqf2Yq9q8lp3X66uFuU3F1W8Ecq2yymN1OIq4UR/NZO2eXfRw2Jnup/mnUOakwiV/bexRRyreX37k+rl0w8n/ANQsPMxT/V9duud0XbnJ/PTT8zvFeanAhNW2uJmNaMBbjXdrXqxVbY5pPoYXDRx1n907hxU7HPrm12cT/wDGo4UvPc2qzif+PsUcKaf3g9IvFdJHLrm0+a1b83j3Ypjwee5tDjqvSzjEe7VP7J6Q866yax64cfrzjEVb8yxtfvVSwV46qqrWqrG1zwqT1i+bstVy3T6VdMcZYa8dgqPTxdinjchxz5TMzzWMTM/fGn7qxeuzTE/J6on1VVx/M9V83Xa83yunfmGG/wCrDDXn+T0b8fanhrLlHnLs/wCVRHG5By7s/RtRxmf5J6nm6jXtPklP/Ga8KKv5MNe1uT07rl2rhQ5prd+va/NTlXO27THCk9KecdHr2zyuPRtYmr3Y/mwXNt8FHoYS/PGYhz7l3PtNfdVia5+lKelXziaYrb2uj/D5PXep7Z89ETHdo8lXlAxdVfJoy+xbq+rdrmJReqi5P0644Strw9yumaaoqrp9VUyneSzDFKq9s88mebB4SmNNd1U/uxztZn1f2NHC3/OUXwODqwVnzOFp81bmqapp1meed888y9E28TO+9McDqnMbyvaTaOqdYxVuI9nT/JgnOdoq5mbmbTEfVpoiGp8zc7b9X8Sk2Ke29P8AEdU1GyrzPOZ9LNcT3XNGKrG4+rpMyxE8bsvH5i123Ne+VIsYf60/BN1dRmrv1Vc1zGXKuNbFNdnTnvVz3nmcPG+avgaYaN/K+KfZ9LZrw87665+K3l4b6tyWSK8PH0Kp7yb1iN1mRVnnLMbrVUqxdt6c1mO+V3yi32Yf8j5TP0cN+QLYvT2WaV0Xq53Wqfgr8ovz6OG07iL+L7LVMcQV85f7LVPwV5WKmOaiIU87jZ7Lcd6vLxcxz1247xCKMXPbEHmcTPpXI+Cv95nffog0uduIjupU2pGHvb/PzHCHqwl3H4WdcPj8Ra/DVpEvJNFX/wAiruU83/zKp7yfR/UmwW1ObYeNL1drEx/rpiJ/JucJtjhKubFWK7U+uiqKo/ZAYpp7ate9WPNxHPpLUzsY5jqeDzzKcVpFnHWeVP0aquTP5tjExMaxMTH3OORXRTup/J6cJmWLw0/3a/et/dTVOnwbnyfqXD8daHPcJthmtnSLtFF+P9VOk/k3OC20wlyIjFYS9Zn10/Oj9mpnKzcKlI8GEzrK8VEeZxlrWeyqeTPwl74mJjWJiYaZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR25trs3TmF/L6cxorxViuaLlqI0mKo3xz7+5Wva/K6d9GI19XIj+biHlD2bzaxtJmOKqw3n7FzE13aarc8qaYqqmY5t8b2my3aHN8DHIs4mb9unm81fjlxH3RPpQ4X5bLqx2nxSzcr6Cr2zy+PRw2JnjFMfuxV7a2I9DA3J41afs5Hgds8LdiKcbh7mEr7ao+fR8d8d6QWMTVibUXcNVTetz9KiuJg9NnnpN69tqvo5b8bn/hir20xc+hgbccZmUQ1xE/R09+CmMRrvjvrO6cRKa9sc0n0cNhqeMT/ADYa9rM6q3eZp4UI9Nu9pvp/ilbFm99aPzO6cxva9pc9q3YqmnhRT/JguZ7nde/H1xwmI8Gp81d156te5XzM9tU/knVXUe25mmbV+lmV/wD6k/zYLmKxlfNcx1yeNerD5mO2uZ74PNW4nf8A703TUVnlTz1YiZ71Jpo7b9c96nJs9tVPfUt5OHjtt/GUVWYtR/mVz3yprY9dRrh47aPhMreVZjdMd1Iq/lWfVE8VfOWY+ispqtxuifguiv6tFcm00u85b7KCLkfUlSKrk7rFxWPPT/kT8VFJr1jmta+6pNVfJ5MWqdJ7JpjT4L+TiOyzTHGTkYn1W4PsYKbfJpmmm1TREzrMRzc5NnXfRE8apZ4tYj7S3HcRZva8+Ip7oTVNvP5iPsra6LM/Z2/4GfzFWnzsVPdCnyentv3JNU2xebriOaIiPupJ87H0p+LL8ntdty5PerNnDxviqe81TcYZ++qe+VsxH1+96PN4f7KZ4yrEWInmsx8TRt5NI+vPxXRFMRvn4vTyqI3WaFeX/wAuiOMGjbw3qKLvNNVUfhmY8F9vkUxpyeXxiZl6/OTG6KI4Qp5yvsmPgah1Xn5VO+MPM8IldEz2Yer+Fl5d2e2VJqu+uV0bWxN76NmY7tF2mIn6GnfCk+c9f5qaV9tcQC7k3+3SPeORdnfVT8WPk/8ANp+KsUU/bfAF3m6+25T8TzenP5z4LfN2+27Uciz9aue8FdLevPd/JWJtRHSa9yyYw8b6apWzVYjda14oMmtiJ3yecs/6pWRXb7LH5LvORH/DRoGleXb7I/NTlUT2LYu3InoI0ZIuVzuo04gtjkfU/JWPut/ku5V2fUR57tqj4AprXE81ufga3Z3UzHFWYr156vhBFEac9UqKf2mmkxHxW6V69kd6+q3b7Z/NZFOHid9M8agNKu2ulTWPrx8F2tiOfk0Kxco15qfyNG1Iimd9VXdC+KKPXVPeti76rc/BWLtW6KJ+C6v4m4rNunsprnvIo9VuJ4ypNy5O6j4ra67kRrNHMc38TqfrJ5uqY5rdEd6tOsc3mo+DxV46qmdIoqnvUpxldW+iae9eb+HUbDWvTmt0/HRTlXvs6Y954flFfZTMnnrmnos7a092t6d9NuOf1nz9ee5TDwecvdkKcq/6tO42abGNO27D04XMMVhOgx1yiPVTM6NJM4j60LZqvRvvRHedWHKaYTa/H2oiL1Vu/Hrqp0n8m3wu2WBr0jEWblqfXHzocx5dfbiafisqq1n/ABFU8NWp8mTNwjtWDzjLMXMRYxlqqqd1MzpPwl7nCsJh7169b81Tiq/nRz0UVS7na6KjX6sOmGVyYyx0uAbYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc62n1jOL2k9qNZnk+W5hTM4rCW6q9Okpjk1fGEl2n64vcWrmOaUs2sukJzDY69EcvA4mm9H2d75tXdVHMjt/CY/KMTy4+U4C9E81XPTE98c0u87P7PYfMsBN+u/XRMVzTpEfdD2XtirFy3NurFzVRO+mu1FUT+bnl8Uv8dJ8tn9cQwW2eaYaKacww9vFW+25RHJr/lKRZZtJl2YzTRYxtNq5Vut3aeRV3a80pVmvkgy/E61YPH1YOv8A0W9aP4ZlBdpfJhtJlVNdyjC0Zlh45+VhueqI++ief4audxzxdJlhkk0+f056571ml2d9czLmuCzLNcsueasYu7biidJsX4mqnhpPPCQ5fthYq0ozPC3cPPbds/Po743wz1F5sSeq1XVvu6K+ZiN96e5ZgL+Dx1rzuCxVrE0euiuJ07t8PRyLcc2rWmdsE2cP9K7M8alfM4b1a97LNq1O+mmrjTqRatxutxHClNG2OKMN9ku/so9G1Heu5OnPyJ7oVimuY5qJU2sivT0bVMKxdufZ0xHFWLdyZ57enGV3ma57KYNU+lsXLmuvIo1XTdvdmnwIs19tVJFrn+dcpPtPpb5y99Y5V2fp/mycijtrg5Fv6/5LqizSueflwaVfafkycmx65lSYs69vxBZyfXWRp9eV+tr1R3ycuzHZRBo2s1oj6Uycu365X+dtRu5PwU8/TpzRHdSuqm4s5dv11KxNM7qZlXz/ADbqvgeeq+pJzTqGkzutycmv7NTztzX0J+Kk3bnbFMd68VOou5N36kfGFOTd9VEe8tm9VG+u3HesnERG/EW474OKdxl5N3smiO9SaL3rp+DBOKtduJpWzirH29U8Ik86dx6fN3PtIjuUm3Vr867Lyzi8Pr6VyruUnE2Z3Wrs9y+dTt6ptU6896r4nIsR9PXveaL0z6GEu1dy25iarfNVhuR+KdDzPR6pjD9upE4fTTSdODwVZjTTvnDU8bkMNzOrFHpYvB0+/E/uvnD0rba2YnmtT8D+y+yloq9osFTvzLCxwjVgubUZfTvzGJ/Dbmf2POJ3UmprimNKLWkLZqrmdfNx8USu7YZZTPJ+V4uqf9NmXlq21y+qqaaLeZXZj/Rp+68RO6nHKu6ejQpyrnbNuEGnaymro8ozG56taohOMPs9i71mi5OIw1HLpirSYqmY1jU4h3TzkxvvUR8Fs3qY34iiO+EkynYGjE4Ki/fzDk1Va81Frm01++Wyt+T3LYn5+MxUx93Jj9l4h1UH+UWdOfE/BScTh/ta54RLoNvYPJadNa8VXxrj9oei3sXs/Tvwtyvjdq/aV5n4nVc0+VYf/mVdyk4qz9lXLqlGymQURERl1E6euqqfGXot5BklG7K8J32onxNQ3XIvldEbsPPfMHyurdTh6fi7JRlmW29ORgMLTpu0tUx+z0UWbNHoWqKeFMQqOL0V425p5vBzVru0pmWOb2M5U0+ZmJidJjzc8zt2keqHOs1mf6yxMaz0tXiCOYaxm+KvRasYW7XXVuiLeni2NrZrae7GvyO5Rxroj9262b63tcJ8E7w/Q0g5jRsdtHXPzuTRxux+zNTsJnVcf2mJw0R6pu1T+zpYDnVPk/x/JnXHYeJ7I0mdWuxmx+d4eZmaLdyn12omr8t7qwDjVWXYm1Vyb1y5bn1Tb08V0YHXnqvXZ4REOw10UVxpXRTVHqmNWCvL8DXOtWDw9U/fbhjiNd1yf5Ba7a78+/8A+FfkWH7aa6uNcupVZRllWuuCsxr6qdGKrIMpq34SO6qqP3XmHVcyjBYX7CmeMzP7r6cLh43WLf8AC6LXs1lM7rFVPCuf3YqtlssndN+nhVH8l1E3UAm1biadLVuPndlMM9NMRuiI4Qk+ebOYTBZddxVq7emq3MTEVTGnPMR6vvRpUSDZiqqLMxyp6SO1MrfR08IQvZnop9pCaW+jp4QCoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOdbTdcXuLVzubTafri9xaydwJzsL1PX7WfCG/aHYbqiv2s+EN8AADUZ/szkee2pozPLrF6qY0i5ydK44VRzua7SeRyYiq9kGYazHPFjE7+6uP3h2EZywxy/rWOdx/j5VznZzP9n8Ty8fl+JwldM81+jmjurp5p73syva3N8LyacTNrH2/VdiKLn8Uc0976bvWrV61VavW6LluqNKqao1iY4IXtH5Mdms1iu5h7E5diKufl2PRmfvo3fDRyvxWf5rrPll/1HPMt2rwWPuxZpt3MNfmJnzd2nfwmOaWw/rGJ3Vx3Q8mI8n2cbPZ5h5tTRjsPciuKZtTpVHN20zu7pl768kzi3Ty68vqppmdNaq6f5s6zW3D/AIxzj9fpV91CycbM7qbs/fpov/q3H82ti3T69bsK/wBVY2r6Vij3pn9jnI3ixTjK/srk+9Ck4u7O618a26yDZbE5lfuW6sdZtcinXWm3VVrz8Yb2jyfUxpy80qn8NnT95XjJO8UGnEXvqURxqknEX4j/AC47plIMTsvThb9di9jr9VVM6c1umNWOMhwcelexVXCuI8IPPI9MWh+UYjsqpjhRKk3r8/5lXdTEJBGSZf204ir8V6WmzLI8bVjrnyO3FOH5uTrcn1c6+VT0jzzXfmJnl3Ob74UpxV6n6VM8aYlfTs3mdW+5bp96ZbbZvAZpk2LrxFurBYjl0cibd6iaqePF0ww5Yyy6ar5den5vm7Uz91Oi+3OY3JmLWErrn1U26qp/JNKc4z2I0o/quzHqow883+5SrNNoK9Y/rS1RE/Uw1Ov56tsOV4rbjZnDTNOI2s2ftTG+JxtudPhLWYjyqbB2aZm5t1k3N9nXNXhEtnb8gvkvi/cvV7M4e5Xcrmuqaq65iZmdZ0jlaRHPuhssN5HPJnh9Jt7H5VrH1rEVeOoINivLb5OLEzFW2FNyf+ThrtX/AGtde8vvk6pifN5pnGIn1W8DVz/GYdgwnk/2KwunmNl8oo03aYO3/Js7Gz+R2OhyjBW9Pq2KY8IBwKvy8bMVzpg8g2txvq5GEiNf9y2PLLfxEf3DyYbYYmqd3Kt6R+VMvoy3g8Lb9CxRTwhk81b+pT8AfOUeUfb/ABE/3DyL5vVE7pv35p/7IX07VeWrExphfJJg8Pr238XP/wDUPouKKI3UU/BWIiN0R8AfO9N/+kPip/sdldlcFE7vOXOVp/vlkpyX+kfitIqx+yeCj10WIqmP9svoUB8/U7A+X3FTrf8AKRl2Eieyxg45v9kL48kXlZxWkY/yw5jTHbFizNP/AHQ78aA4F/8Ab/n2KnlZl5VtqL0zv5N2aY/VKS7NeRfDZLgvks7RZpjta5qquYm7yqpmf2dY0NAQSz5NMsp9PFXq+L2WfJ7klG+btXemGisUgjFvYjIaI57FVXGp6bWyOQUbsBbnjCQRQvptg01rZ3Jbfo5dY/hh67WU5fR6GCsxwphsqbcMlNMA11zA4am3P93taafVevC2o8xbn/THgyYin+xq4MmDp1sWo/0x4AlOX0xRgbNMfUhnW2qeRapp9URC4AAAAAACXOc06zxPtavF0aXOs16yxPtavEGfZvre1wnwTvD9DSguznW9rhPgnWH6GkF4AAAAAAAAANXtX1Bifd/VCAJ/tX1Bifd/VCAA32zPRT7SE0t9HTwhDNmein2kJnb6OnhAKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA51tP1xe4tZO6Wz2n65v8AFq+wE72G6nq9rPhDfNDsP1RV7WfCG+AAAAAABoNpusMD73gUW6bmFmmqNec2m6wwPveDJheexPEGju4K7OIqoptaxPozHPM9z0YbZ7F3ueuKbVPrq3/BKcHRRTYpmmmImeeZ03swNfk+VWcuiqaKpruVRpNU8zYADR7U4XlUUYuiOen5tfDsR2U8vW6btqq1XGtNUaShWNsVYbFXLFW+md/rgHlneoumOc0BQV0NPuBQXRTM9kqxbq+rPwBYaMvmbn1J+C6nDXqt1uQYDR7KcvxdW6xX/DLJTlWNn/Jq76ZBr9DRtKclxs/5WnfDLTkWLnfpGv3wDT6GjeU5BfnfXRHf/wCGSnZ6r6V2niCP6K6JJTs/b7b3H5v/AJZKchw8b65n1cwIvoroldOSYON/Ln4MlOU4ON9Ez3giMUzPYuiiqfoymFOXYON1mPjLJTgsLGn9hROnrjUEOps1zPoTz/cvpsV/VTCMNh4iYixbiJ/0wvpoop9GimOEAiFGHrndTqzUYO/O61XPuylekeoBGKcBiZ00tV8+7WmYZKctxc8/mp+MJGAjt7KcXVaqiKNZ03awyYHLMTRVapu0RFNOms6x2N8AAAAAAAAAS51mnWWJ9rV4y6LLnWadZYn2tXiD0bOdb2uE+CdYfoaUF2c62tcJ8E6w/Q0gvAAAAAAAAABq9q+oMT7v6oQFPtq+oMT7v6oQEG+2a6KfaQmdvo6eEIZs10U+0hM7fR08IBUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHOdqOub/ABaydzabUddXuLVgnmxMaZTV7WfCG9aPYvqqr2s+EN4AAAAAADQbTdYYH3vBlwfQTxYtpusMD73gy4PoJ4g22G6CjgyMeG6CjgyAAAPBmmWWsdMVzVNFyI0idNY74e8BHaMgvc/Lqt798VTz/k9lvIsJTTHLqrmrt000bYBr6cmwMb7dU8ZZKcrwNO6xHfMvYA81OBwkbsPR3wyU4bD0zrFi3HCmGUBbTbt06cmimNN2kLtI9QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS53mnWWJ9rV4uiS53mnWWJ9rV4gz7Odb2uE+CdYfoaUG2d63tcJ8E5w/Q0gvAAAAAAAAABq9q+oMT7v6oQFPtq+oMT7v6oQIG92a6OfaQmdvo6eEIZs10c+0hM7fR08IBUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHOtqeur3Fq+1tNqeur/Fq43wCf7HRpldXtJ8IbpptkOq6vaT4Q3IAAAAAANBtN1hgfe8GXB9BPFi2m6wwPveDNguh7wbXD9BRwZGPD9BRwZAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAJc7zTrLE+1q8XRJc7zTrLE+1q8QejZ3re1wnwTnD9DSg2zvW1rhPgnOH6GkF4AAAAAAAAANXtX1Difd/VCAp9tX1Difd/VCBA3uzXRz7SEzt9HTwhDNmujn2kJnb6OnhAKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA51tV13e4tXTvhtNq+u7zVU+lAOhbJ9WVe0nwhuGo2U5stq9pPhDbgAAAAAA0G03WGB97wZsF0M8WHabrDA+94M2C6GeINrh+go4MizD9DRwXgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS53mnWWJ9rV4uiS53mnWWJ9rV4g9GzvW1rhPgnOH6GlBtnetrXCfBOcP0NILwAAAAAAAAAavavqHE+7+qECT3avqHE+7+qECBvdmujn2kJnb6OnhCGbNdHPtITO30dPCAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABzrazru81VPpRxbXazry/3NVT6UcQdE2W6uq9pPhDbNXszGmX1fjnwhtAAAAAAAaDafrDA+94M2C6GeLDtN1hgfe8GbBdBPEG2w/Q0cF6zD9DTwXgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAS53mnWWJ9rV4uiS53mnWWJ9rV4g9GzvW1rhPgnOH6GlBtnet7XCfBOcP0NILwAAAAAAAAAavavqHE+7+qECT3arqHE+7+qECBvdmujn2kJnb6OnhCGbN9HPtITO30dPCAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABzrazry/3NVR6ccW12t68v93g1VHp08YB0fZyNMBP458IbNrtn40wU/jnwhsQAAAAAAaDabrDA+94M2C6CeLDtN1hgfe8GbBdBPEG2sdDTwXrLHQ08F4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEud5p1lifa1eLokud5p1lifa1eIPRs71ta4T4Jzh+hpQbZ3ra1wnwTnD9DSC8AAAAAAAAAGr2q6hxPu/qhAk92q6hxPu/qhAgb3Zro59pCZ2+jp4QhmzfRz7SEzt9HTwgFQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAc62u69vd3g1Vufn08YbTa7r2/3eDVW+kp4wDpmRxpg5/H+0Pe8OS/4SfxPcAAAAAADQbT9YYH3/BmwXQzxYdp+scD7zNgehniDbWOhp4L1ljoaeC8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACXO806yxPtavF0SXO806yxPtavEHo2d62tcJ8E5w/Q0oNs51ta4T4Jzh+hpBeAAAAAAAAADV7VdQ4n3f1QgSe7VdQ4n3f1QgQN7s30c+0hM7fR08IQzZvo59pCZ2+jp4QCoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOc7YdfX+7waq30lPGG02x6+v93g1VrpKeMA6fk3+Fn8X7Q9rx5R/hp/E9gAAAAAANBtP1jgPf8GbA9DPFg2n6xwHv+DPgehniDbYfoaeC9jw/QU8GQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACXO806yxPtavF0RC88yjG2ZxmPm3Ny1Ry7sxbjlVzTGs81O+Z+6AefZ3ra1wnwTnD9DS5TsVtjs1mWfUYbBZnTXiKaapmzXbqorjSOeNJjf9zqeDqqrw1FVVE0TMa8md4MwAAAAAAAAANXtV1Difd/VCBp5tV1Difd/VCBQDe7N9HPtITO30dPCEM2b6OfaQmdvo6eEAqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADnG2PNn9/u8GptdJRxhtds/8A3Bf7vBqbXS0figHUsp/w0/iex5Mq/wAPP4nrAAAAAABH9p+scB7/AIM+B6GeLBtP1jgPf8GfAdDPEG1w/QU8GRjw/QU8GQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB5szxdOCwVzE1RyuTHNHrnselqNr9f6kuVRupqpmfiDnWIxXyLbmc/v5dl9drERETVRhoi5TpprMzvmrxjXdom2JzzEYHN8J5+5buZfi/mxVpETbq7J17YnXxcv8pOd05Ds3Tmnye5iZov00RaonSataatI17OeIabKvKnkm1OzuBwVq55jEYS5TF23ETVXarppqp83PZumfgqPo8YMuqqry/D11zM1VWqZq19ejOigAAAAAAANXtV1Difd/VCBQnu1XUOJ939UIFAN7s30c+0hM7fR08IQzZvo5/HCZ2+jp4QCoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOb7a/+4b/AAp8Iaiz0tH4obXbbm2ivx91PhDUWJ/tqPxR4g6tlf8Ah5/E9byZX/h5/E9YAAAAAAI/tP1lgPf8GfAdDPF59qOssB7/AIPRgOhniDa4foKeDIx4foaeDIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAw47DW8XhLuGuejcpmmfu+9mAci2v8nG0efV4LLacTl9jLqcR5zFX5uVTd5MRpEUUcnSZ553zCO7Ef0dP/AE7ntyq5tFTisonF1YjzU2Ji/d1nXSuqJ0155jWI7Zd/DYREREREaRAAAAAAAAAANXtV1Difd/VCBJ7tV1Difd/VCBA3uzfRz7SEzt9HTwhDNmujn2kJnb6OnhAKgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA4x5bcTtns/mF/PMv2Xw+d5NyIqruWLtcX7GkRE8qiInWOaZ1jvc72R8q1zPsysYTA7F5tjL1VcRpg7kXOTz75+bzd7v/lGzTM8NltzBZJiLVjMLtmqbddy3y4ir6OsTzaTOsOY+QvaDH4/KcZlmMxUxibU+dpu26KbVddFeu+IjTWme374B27KIxEYXXEWYs1VVaxRytZiPv7NXsci8jO1eeX9q802Xz/HXMbXZm55q5diOVFVurk1RzaaxMc/d97roAAAAAAI9tR1ngOFb0YDoZ/E8+1HWeA4VvRgOhn8QNth+hp4L1mH6GngvAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABq9q+oMT7v6oQJPdrOoMT7v6oQGJBvtmujn2kJnb6OnhCGbNdHPtITO30dPCAVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABA/KBVNOdWvvsxp8ZfMuzflRwGyHlCzfD3cPRaos138LTXiK5pouaXN0abp+bGnr531ht5lOJx+FtYnBWJv37GutqiaYquU+qJqmI119cxvfNmW/0ZtotqstzbOdrMRRk2fVYucTltim9TdtcqZqqr87ydeaZqiImmdY0mefcCQ+SLaOxn/ltsZhaqt27mKquzcsW4nk25ixMTGs751p5/v1fTDgv9H3yKbQbEbU3toNqMzy7EXabddOGs4OquuOXcnWuuqqqmn1zGmnbLvQAAAAAAI9tR1ngOFb0YDoJ4vPtR1ngOFb0YDoZ/EDbYfoaeC9Zh+hp4LwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAana6dNnsVP4f1Q5/TU6FtXl+NzXIcTgMux1rA4q7yeRfu2PPU0aVRM60axrrETG/tcJ2tteWnZ3OrmGwOzGV7R4CmKZt4uzbqtzXMxEzHIiuZp0nWO7UHVtmein2kJnb6OnhDnvk5sbY4rJbWLzvJcvym9cucqcPN6uq5TT98c8RPe6FTGlMR6oBUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEe2o6zwHCt6MD0M8Xn2n6zwHCt6MD0M/iBtsP0NPBesw/Q08F4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAI9tP1pgOFb0YHoZ4vPtR1pl/Ct6MD0M8QbbD9DTwXrLHQ0rwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAR3ajrXL+Ffg9WAiZsz287xbY5Zn+LxuBxuR38DPmIrpvYfFRMU1xMc1UVxEzTMTG7SYmJ+5q8vyrbjF5hhbecXcrwWXWrvnb8YHE3Krl+IidLc60U6U66TM68+mgJth+hpXrbVui1bpt0RpTTGkQuAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB//2Q==',
   '덕트형 데스크': GITHUB_RAW + 'desk/product/duct_bg.png',
 };
 
@@ -1909,7 +1849,7 @@ function clearScreenComposite() {
 function _ffNormalizeTextureUrl(url) {
   if (!url) return '';
   url = String(url);
-  var marker = 'textures/';
+  var marker = '/textures/';
   var i = url.indexOf(marker);
   if (i !== -1) return 'textures/' + url.slice(i + marker.length);
   return url;
@@ -3536,7 +3476,7 @@ function ffMaterialBtnHtml(code, inputId, part, catName) {
 }
 function ffMaterialTextureUrl(code, part) {
   // hover 확대 썸네일은 반드시 ZIP 안의 로컬 textures/ 경로를 우선 사용한다.
-  // 기존 TEXTURE_MAP에는 예전 GitHub 경로(desk/custom/..., textures/screen/front/custom/...)가 섞여 있어서
+  // 기존 TEXTURE_MAP에는 예전 GitHub 경로(desk/custom/..., screen/custom/...)가 섞여 있어서
   // 로컬에 넣은 재질이 hover에서 안 뜨는 문제가 있었다.
   var path = ffTextureUrlForChoice(code, part, state._currentCatName || '');
   var previewCode = part === 'leg' ? ('LEG_' + code) : code;
@@ -4704,7 +4644,7 @@ startFlow();
 
 /* ── FlowFinder local mask renderer injected ── */
 (function() {
-  var FF_MANIFEST = {"products": {"desk_duct": {"label": "덕트형 데스크", "type": "desk", "base": "products/desk_duct/base/base.png", "masks": {"leg_mask": "products/desk_duct/masks/leg_mask.png", "top_mask": "products/desk_duct/masks/top_mask.png"}}, "desk_standard": {"label": "일반형 데스크", "type": "desk", "base": "products/desk_standard/base/base.png", "masks": {"leg_mask": "products/desk_standard/masks/leg_mask.png", "top_mask": "products/desk_standard/masks/top_mask.png"}}, "screen_front": {"label": "전면 스크린", "type": "screen", "base": "products/screen_front/base/base.png", "masks": {"leg_mask": "products/screen_front/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_front/masks/top_mask.png"}}, "screen_lshape": {"label": "L형 스크린", "type": "screen", "base": "products/screen_lshape/base/base.png", "masks": {"leg_mask": "products/screen_lshape/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_lshape/masks/top_mask.png"}}, "screen_side": {"label": "사이드 스크린", "type": "screen", "base": "products/screen_side/base/base.png", "masks": {"leg_mask": "products/screen_side/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_side/masks/top_mask.png"}}, "screen_straight": {"label": "일자형 스크린", "type": "screen", "base": "products/screen_straight/base/base.png", "masks": {"leg_mask": "products/screen_straight/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_straight/masks/top_mask.png"}}}, "textures": {"desktop": {"standard": [{"code": "HW", "file": "textures/desktop/standard/HW.png"}, {"code": "OSG", "file": "textures/desktop/standard/OSG.jpg"}, {"code": "WW", "file": "textures/desktop/standard/WW.jpg"}], "veneer": [{"code": "DBL", "file": "textures/desktop/veneer/DBL.jpg"}, {"code": "NCE", "file": "textures/desktop/veneer/NCE.jpg"}, {"code": "NMOK", "file": "textures/desktop/veneer/NMOK.jpg"}, {"code": "OB", "file": "textures/desktop/veneer/OB.jpg"}, {"code": "OGG", "file": "textures/desktop/veneer/OGG.jpg"}], "laminate": [{"code": "BGM", "file": "textures/desktop/laminate/BGM.jpg"}, {"code": "BKA", "file": "textures/desktop/laminate/BKA.jpg"}, {"code": "CC", "file": "textures/desktop/laminate/CC.jpg"}, {"code": "CGY", "file": "textures/desktop/laminate/CGY.jpg"}, {"code": "FIV", "file": "textures/desktop/laminate/FIV.jpg"}, {"code": "FK", "file": "textures/desktop/laminate/FK.jpg"}, {"code": "GG", "file": "textures/desktop/laminate/GG.jpg"}, {"code": "IO", "file": "textures/desktop/laminate/IO.jpg"}, {"code": "KAP", "file": "textures/desktop/laminate/KAP.jpg"}, {"code": "LD", "file": "textures/desktop/laminate/LD.jpg"}, {"code": "LL", "file": "textures/desktop/laminate/LL.jpg"}, {"code": "LT", "file": "textures/desktop/laminate/LT.jpg"}, {"code": "MDB", "file": "textures/desktop/laminate/MDB.png"}, {"code": "NBK", "file": "textures/desktop/laminate/NBK.jpg"}, {"code": "NSS", "file": "textures/desktop/laminate/NSS.jpg"}, {"code": "OHN", "file": "textures/desktop/laminate/OHN.jpg"}, {"code": "RCN", "file": "textures/desktop/laminate/RCN.jpg"}, {"code": "TL", "file": "textures/desktop/laminate/TL.jpg"}, {"code": "TRZ", "file": "textures/desktop/laminate/TRZ.jpg"}, {"code": "UA", "file": "textures/desktop/laminate/UA.jpg"}, {"code": "WP", "file": "textures/desktop/laminate/WP.jpg"}, {"code": "WW", "file": "textures/desktop/laminate/WW.jpg"}]}, "screen": {"front": {"standard": [{"code": "061", "file": "textures/screen/front/standard/061.jpg"}, {"code": "064", "file": "textures/screen/front/standard/064.jpg"}, {"code": "067", "file": "textures/screen/front/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/front/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/front/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/front/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/front/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/front/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/front/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/front/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/front/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/front/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/front/custom/067.jpg"}, {"code": "071", "file": "textures/screen/front/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/front/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/front/custom/072.jpg"}, {"code": "074", "file": "textures/screen/front/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/front/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/front/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/front/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/front/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/front/custom/452A.png"}, {"code": "452N", "file": "textures/screen/front/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/front/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/front/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/front/custom/458.jpg"}]}, "side": {"standard": [{"code": "061", "file": "textures/screen/side/standard/061.jpg"}, {"code": "064", "file": "textures/screen/side/standard/064.jpg"}, {"code": "067", "file": "textures/screen/side/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/side/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/side/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/side/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/side/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/side/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/side/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/side/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/side/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/side/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/side/custom/067.jpg"}, {"code": "071", "file": "textures/screen/side/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/side/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/side/custom/072.jpg"}, {"code": "074", "file": "textures/screen/side/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/side/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/side/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/side/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/side/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/side/custom/452A.png"}, {"code": "452N", "file": "textures/screen/side/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/side/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/side/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/side/custom/458.jpg"}]}, "straight": {"standard": [{"code": "1P1", "file": "textures/screen/straight/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/straight/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/straight/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/straight/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/straight/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/straight/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/straight/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/straight/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/straight/custom/MGR.jpg"}]}, "lshape": {"standard": [{"code": "1P1", "file": "textures/screen/lshape/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/lshape/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/lshape/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/lshape/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/lshape/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/lshape/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/lshape/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/lshape/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/lshape/custom/MGR.jpg"}]}}, "leg": {"standard": [{"code": "WW", "file": "textures/leg/standard/WW.png"}, {"code": "BKM", "file": ""}, {"code": "DCR", "file": "textures/leg/standard/DCR.png"}, {"code": "TS", "file": "textures/leg/standard/TS.png"}], "custom": []}}};
+  var FF_MANIFEST = {"products": {"desk_duct": {"label": "덕트형 데스크", "type": "desk", "base": "products/desk_duct/base/base.png", "masks": {"leg_mask": "products/desk_duct/masks/leg_mask.png", "top_mask": "products/desk_duct/masks/top_mask.png"}}, "desk_standard": {"label": "일반형 데스크", "type": "desk", "base": "products/desk_standard/base/base.png", "masks": {"leg_mask": "products/desk_standard/masks/leg_mask.png", "top_mask": "products/desk_standard/masks/top_mask.png"}}, "screen_front": {"label": "전면 스크린", "type": "screen", "base": "products/screen_front/base/base.png", "masks": {"leg_mask": "products/screen_front/masks/leg_mask.png", "screen_mask": "products/screen_front/masks/screen_mask.png", "top_mask": "products/screen_front/masks/top_mask.png"}}, "screen_lshape": {"label": "L형 스크린", "type": "screen", "base": "products/screen_lshape/base/base.png", "masks": {"leg_mask": "products/screen_lshape/masks/leg_mask.png", "screen_mask": "products/screen_lshape/masks/screen_mask.png", "top_mask": "products/screen_lshape/masks/top_mask.png"}}, "screen_side": {"label": "사이드 스크린", "type": "screen", "base": "products/screen_side/base/base.png", "masks": {"leg_mask": "products/screen_side/masks/leg_mask.png", "screen_mask": "products/screen_side/masks/screen_mask.png", "top_mask": "products/screen_side/masks/top_mask.png"}}, "screen_straight": {"label": "일자형 스크린", "type": "screen", "base": "products/screen_straight/base/base.png", "masks": {"leg_mask": "products/screen_straight/masks/leg_mask.png", "screen_mask": "products/screen_straight/masks/screen_mask.png", "top_mask": "products/screen_straight/masks/top_mask.png"}}}, "textures": {"desktop": {"standard": [{"code": "HW", "file": "textures/desktop/standard/HW.png"}, {"code": "OSG", "file": "textures/desktop/standard/OSG.jpg"}, {"code": "WW", "file": "textures/desktop/standard/WW.jpg"}], "veneer": [{"code": "DBL", "file": "textures/desktop/veneer/DBL.jpg"}, {"code": "NCE", "file": "textures/desktop/veneer/NCE.jpg"}, {"code": "NMOK", "file": "textures/desktop/veneer/NMOK.jpg"}, {"code": "OB", "file": "textures/desktop/veneer/OB.jpg"}, {"code": "OGG", "file": "textures/desktop/veneer/OGG.jpg"}], "laminate": [{"code": "BGM", "file": "textures/desktop/laminate/BGM.jpg"}, {"code": "BKA", "file": "textures/desktop/laminate/BKA.jpg"}, {"code": "CC", "file": "textures/desktop/laminate/CC.jpg"}, {"code": "CGY", "file": "textures/desktop/laminate/CGY.jpg"}, {"code": "FIV", "file": "textures/desktop/laminate/FIV.jpg"}, {"code": "FK", "file": "textures/desktop/laminate/FK.jpg"}, {"code": "GG", "file": "textures/desktop/laminate/GG.jpg"}, {"code": "IO", "file": "textures/desktop/laminate/IO.jpg"}, {"code": "KAP", "file": "textures/desktop/laminate/KAP.jpg"}, {"code": "LD", "file": "textures/desktop/laminate/LD.jpg"}, {"code": "LL", "file": "textures/desktop/laminate/LL.jpg"}, {"code": "LT", "file": "textures/desktop/laminate/LT.jpg"}, {"code": "MDB", "file": "textures/desktop/laminate/MDB.png"}, {"code": "NBK", "file": "textures/desktop/laminate/NBK.jpg"}, {"code": "NSS", "file": "textures/desktop/laminate/NSS.jpg"}, {"code": "OHN", "file": "textures/desktop/laminate/OHN.jpg"}, {"code": "RCN", "file": "textures/desktop/laminate/RCN.jpg"}, {"code": "TL", "file": "textures/desktop/laminate/TL.jpg"}, {"code": "TRZ", "file": "textures/desktop/laminate/TRZ.jpg"}, {"code": "UA", "file": "textures/desktop/laminate/UA.jpg"}, {"code": "WP", "file": "textures/desktop/laminate/WP.jpg"}, {"code": "WW", "file": "textures/desktop/laminate/WW.jpg"}]}, "screen": {"front": {"standard": [{"code": "061", "file": "textures/screen/front/standard/061.jpg"}, {"code": "064", "file": "textures/screen/front/standard/064.jpg"}, {"code": "067", "file": "textures/screen/front/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/front/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/front/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/front/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/front/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/front/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/front/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/front/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/front/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/front/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/front/custom/067.jpg"}, {"code": "071", "file": "textures/screen/front/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/front/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/front/custom/072.jpg"}, {"code": "074", "file": "textures/screen/front/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/front/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/front/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/front/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/front/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/front/custom/452A.png"}, {"code": "452N", "file": "textures/screen/front/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/front/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/front/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/front/custom/458.jpg"}]}, "side": {"standard": [{"code": "061", "file": "textures/screen/side/standard/061.jpg"}, {"code": "064", "file": "textures/screen/side/standard/064.jpg"}, {"code": "067", "file": "textures/screen/side/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/side/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/side/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/side/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/side/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/side/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/side/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/side/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/side/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/side/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/side/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/side/custom/061.jpg"}, {"code": "064", "file": "textures/screen/side/custom/064.jpg"}, {"code": "067", "file": "textures/screen/side/custom/067.jpg"}, {"code": "071", "file": "textures/screen/side/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/side/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/side/custom/072.jpg"}, {"code": "074", "file": "textures/screen/side/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/side/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/side/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/side/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/side/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/side/custom/452A.png"}, {"code": "452N", "file": "textures/screen/side/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/side/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/side/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/side/custom/458.jpg"}]}, "straight": {"standard": [{"code": "1P1", "file": "textures/screen/straight/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/straight/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/straight/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/straight/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/straight/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/straight/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/straight/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/straight/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/straight/custom/MGR.jpg"}]}, "lshape": {"standard": [{"code": "1P1", "file": "textures/screen/lshape/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/lshape/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/lshape/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/lshape/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/lshape/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/lshape/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/lshape/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/lshape/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/lshape/custom/MGR.jpg"}]}}, "leg": {"standard": [{"code": "WW", "file": "textures/leg/standard/WW.png"}, {"code": "BKM", "file": "textures/leg/standard/BKM.png"}, {"code": "DCR", "file": "textures/leg/standard/DCR.png"}, {"code": "TS", "file": "textures/leg/standard/TS.png"}], "custom": []}}};
   var FF_LABELS = {
     standard:'표준품', veneer:'무늬목', laminate:'라미네이트', custom:'주문품',
     front:'전면 스크린', side:'사이드 스크린', straight:'일자형 스크린', lshape:'L형 스크린'
@@ -7449,361 +7389,7 @@ button.material-btn{
 })();
 </script>
 
-
-<style id="ff60-static-option-preview-css">
-/* === Fixed60: static exact image + option image preview === */
-#ff-static-option-preview{
-  margin-top:10px;
-  border:1px solid rgba(38,245,201,.28);
-  background:rgba(5,18,20,.92);
-  border-radius:16px;
-  padding:10px;
-}
-#ff-static-option-preview .ff-static-title{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:8px;
-  color:#effffb;
-  font-size:12px;
-  font-weight:900;
-  margin-bottom:8px;
-}
-#ff-static-option-preview .ff-static-title small{
-  color:#26f5c9;
-  font-size:10px;
-  font-weight:800;
-}
-#ff-static-option-preview .ff-static-image{
-  width:100%;
-  min-height:96px;
-  max-height:190px;
-  object-fit:contain;
-  display:block;
-  background:#fff;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.12);
-}
-#ff-static-option-preview .ff-option-grid{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:8px;
-  margin-top:10px;
-}
-#ff-static-option-preview .ff-option-card{
-  min-width:0;
-  border:1px solid rgba(38,245,201,.20);
-  border-radius:12px;
-  background:#061615;
-  overflow:hidden;
-}
-#ff-static-option-preview .ff-option-card img{
-  width:100%;
-  height:72px;
-  object-fit:contain;
-  display:block;
-  background:#061615;
-}
-#ff-static-option-preview .ff-option-card b{
-  display:block;
-  color:#fff;
-  font-size:11px;
-  line-height:1.25;
-  padding:7px 6px;
-  text-align:center;
-  white-space:normal;
-  word-break:keep-all;
-}
-#ff-static-option-preview .ff-option-card.is-empty{
-  display:none;
-}
-#texture-preview .quick-materials{
-  display:grid!important;
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;
-  gap:8px!important;
-}
-#texture-preview .quick-option-row{
-  grid-template-columns:1fr!important;
-  min-height:52px!important;
-  padding:8px!important;
-}
-#texture-preview .quick-option-row span{
-  font-size:10px!important;
-  color:#26f5c9!important;
-}
-#texture-preview .quick-option-row b{
-  font-size:12px!important;
-  white-space:normal!important;
-  word-break:keep-all!important;
-}
-@media (max-width: 980px){
-  #ff-static-option-preview .ff-option-grid{ grid-template-columns:1fr; }
-  #texture-preview .quick-materials{ grid-template-columns:1fr!important; }
-}
-</style>
-<script id="ff60-static-option-preview-js">
-(function(){
-  var COMBO_MAP = {
-    "W1200_직사각_고정형_사다리형_D700_HW_BKM": "images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_스퀘어_글라이드_사다리형_D700_HW_BKM": "images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_직각_글라이드_사다리형_D700_HW_BKM": "images/previews/W1200_rect_fixed_ladder_D700_HW_"
-  };
-
-  var OPTION_IMAGES = {
-    leg: {
-      "사다리": "images/options/leg_ladder.svg",
-      "원형": "images/options/leg_round.svg",
-      "A자": "images/options/leg_a.svg"
-    },
-    caster: {
-      "글라이드": "images/options/mobility_glide.svg",
-      "고정": "images/options/mobility_glide.svg",
-      "캐스터": "images/options/mobility_caster.svg",
-      "바퀴": "images/options/mobility_caster.svg"
-    },
-    top: {
-      "직각": "images/options/top_rect.svg",
-      "직사각": "images/options/top_rect.svg",
-      "스퀘어": "images/options/top_rect.svg",
-      "라운드": "images/options/top_round.svg"
-    }
-  };
-
-  function normLeg(v){
-    v = String(v||'');
-    if(/A자|a자|에이/.test(v)) return 'A자형';
-    if(/원형/.test(v)) return '원형';
-    if(/사다리/.test(v)) return '사다리형';
-    return v || '';
-  }
-  function normCaster(v){
-    v = String(v||'');
-    if(/캐스터|바퀴/.test(v)) return '캐스터';
-    if(/글라이드|고정/.test(v)) return '글라이드';
-    return v || '';
-  }
-  function normTop(v){
-    v = String(v||'');
-    if(/라운드/.test(v)) return '라운드';
-    if(/직각|직사각|스퀘어|스퀘어/.test(v)) return '직사각';
-    return v || '';
-  }
-  function pickImage(kind, value){
-    var map = OPTION_IMAGES[kind] || {};
-    value = String(value||'');
-    for(var k in map){ if(value.indexOf(k) > -1) return map[k]; }
-    return '';
-  }
-  function buildComboKey(){
-    var w = state && (state.w || (state.size && String(state.size).match(/W(\d+)/)||[])[1]) || '';
-    var d = state && (state.d || (state.size && String(state.size).match(/D(\d+)/)||[])[1]) || '';
-    var top = state && (state._deskTopColor || state.topColor || state.color || '');
-    var legColor = state && (state._deskLegColor || state.legColor || '');
-    var topShape = normTop(state && state.topShape) || '직사각';
-    var caster = normCaster(state && state.casterType) || '글라이드';
-    var leg = normLeg(state && state.legType) || '';
-    if(!w || !d || !top || !legColor || !leg) return '';
-    var casterLabel = caster === '글라이드' ? '고정형' : caster;
-    return ['W'+w, topShape, casterLabel, leg, 'D'+d, top, legColor].join('_');
-  }
-  function ensureStaticPanel(){
-    var texture = document.getElementById('texture-preview');
-    if(!texture) return null;
-    var panel = document.getElementById('ff-static-option-preview');
-    if(panel) return panel;
-    panel = document.createElement('div');
-    panel.id = 'ff-static-option-preview';
-    panel.innerHTML =
-      '<div class="ff-static-title"><span>🖼 선택 조합 이미지</span><small id="ff-static-badge">자동 매칭</small></div>'+
-      '<img id="ff-static-main-img" class="ff-static-image" alt="선택 조합 이미지" style="display:none;">'+
-      '<div class="ff-option-grid">'+
-        '<div class="ff-option-card is-empty" id="ff-option-leg-card"><img id="ff-option-leg-img" alt="다리형태"><b id="ff-option-leg-label">다리형태</b></div>'+
-        '<div class="ff-option-card is-empty" id="ff-option-caster-card"><img id="ff-option-caster-img" alt="이동방식"><b id="ff-option-caster-label">이동 방식</b></div>'+
-        '<div class="ff-option-card is-empty" id="ff-option-top-card"><img id="ff-option-top-img" alt="상판형태"><b id="ff-option-top-label">상판형태</b></div>'+
-      '</div>';
-    var btn = document.getElementById('quick-ai-preview-btn');
-    if(btn && btn.parentElement === texture) texture.insertBefore(panel, btn);
-    else texture.appendChild(panel);
-    return panel;
-  }
-  function setCard(id, imgId, labelId, value, url){
-    var card=document.getElementById(id), img=document.getElementById(imgId), lab=document.getElementById(labelId);
-    if(!card || !img || !lab) return;
-    if(value && url){
-      card.classList.remove('is-empty');
-      img.src = url;
-      lab.textContent = value;
-    }else{
-      card.classList.add('is-empty');
-      img.removeAttribute('src');
-      lab.textContent = '-';
-    }
-  }
-  function refreshStaticOptionPreview(){
-    var panel = ensureStaticPanel();
-    if(!panel) return;
-    var main = document.getElementById('ff-static-main-img');
-    var badge = document.getElementById('ff-static-badge');
-    var key = buildComboKey();
-    var combo = key && COMBO_MAP[key];
-    if(main){
-      if(combo){
-        main.style.display = 'block';
-        main.src = combo;
-        main.alt = key;
-        if(badge) badge.textContent = key.replace(/_/g,' · ');
-        /* 정확 매칭 이미지가 있으면 기본 데스크 카드도 같이 교체 */
-        var desk = document.getElementById('quick-desk-img');
-        var deskLab = document.getElementById('quick-desk-label');
-        if(desk){ desk.src = combo; desk.alt = key; }
-        if(deskLab){ deskLab.textContent = '정확 매칭 이미지'; }
-      }else{
-        main.style.display = 'none';
-        main.removeAttribute('src');
-        if(badge) badge.textContent = '옵션별 미리보기';
-      }
-    }
-    var leg = normLeg(state && state.legType);
-    var caster = normCaster(state && state.casterType);
-    var top = normTop(state && state.topShape);
-    setCard('ff-option-leg-card','ff-option-leg-img','ff-option-leg-label', leg, pickImage('leg', leg));
-    setCard('ff-option-caster-card','ff-option-caster-img','ff-option-caster-label', caster ? (caster==='글라이드'?'고정형 / 글라이드':caster) : '', pickImage('caster', caster));
-    setCard('ff-option-top-card','ff-option-top-img','ff-option-top-label', top ? (top==='직사각'?'직사각 / 스퀘어 상판':top+' 상판') : '', pickImage('top', top));
-  }
-
-  var oldUpdateCurrent = window.updateCurrent;
-  if(typeof oldUpdateCurrent === 'function' && !oldUpdateCurrent.__ff60Wrapped){
-    var wrapped = function(){
-      var r = oldUpdateCurrent.apply(this, arguments);
-      setTimeout(refreshStaticOptionPreview, 20);
-      return r;
-    };
-    wrapped.__ff60Wrapped = true;
-    window.updateCurrent = wrapped;
-  }
-
-  var oldUpdatePreview = window.updatePreview;
-  if(typeof oldUpdatePreview === 'function' && !oldUpdatePreview.__ff60Wrapped){
-    var wrappedPrev = function(){
-      var r = oldUpdatePreview.apply(this, arguments);
-      setTimeout(refreshStaticOptionPreview, 20);
-      return r;
-    };
-    wrappedPrev.__ff60Wrapped = true;
-    window.updatePreview = wrappedPrev;
-  }
-
-  document.addEventListener('click', function(e){
-    setTimeout(refreshStaticOptionPreview, 40);
-  }, true);
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(refreshStaticOptionPreview, 300);
-  });
-})();
-</script>
-
-
-
-
-
-
-<style id="ff-dashboard-three-column-no-pegboard">
-html, body { width:100%; min-height:100%; }
-body.ff-pro-dashboard{
-  display:grid!important; grid-template-columns:minmax(360px,38vw) minmax(460px,1fr) minmax(280px,320px)!important;
-  gap:0!important; height:100vh!important; overflow:hidden!important; padding:0!important;
-  background:radial-gradient(circle at 8% 0%,#12253b 0,#06101e 42%,#020713 100%)!important; color:#f8fafc!important;
-}
-body.ff-pro-dashboard #chat-panel{order:1!important;width:auto!important;max-width:none!important;min-width:0!important;height:100vh!important;border-radius:0!important;border-right:1px solid rgba(255,255,255,.10)!important;box-shadow:none!important;background:linear-gradient(180deg,#0d1b2b,#061120)!important;}
-body.ff-pro-dashboard #preview-panel{order:2!important;width:auto!important;min-width:0!important;max-width:none!important;height:100vh!important;border-radius:0!important;border-left:0!important;border-right:1px solid rgba(255,255,255,.10)!important;padding:20px 24px!important;background:linear-gradient(180deg,#081523,#040c17)!important;overflow-y:auto!important;}
-body.ff-pro-dashboard #preview-panel h2{font-size:18px!important;color:#fff!important;text-transform:none!important;letter-spacing:-.2px!important;margin-bottom:16px!important;}
-#ff-right-summary{order:3;height:100vh;overflow-y:auto;padding:26px 24px;background:linear-gradient(180deg,#091421,#030914);border-left:1px solid rgba(255,255,255,.08);box-shadow:-18px 0 60px rgba(0,0,0,.22);}
-#ff-right-summary .ff-rs-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}#ff-right-summary h2{font-size:18px;margin:0;color:#fff;letter-spacing:-.4px;}#ff-right-summary .ff-rs-close{border:0;background:transparent;color:#94a3b8;font-size:24px;line-height:1;cursor:pointer;}
-.ff-rs-section{padding:18px 0;border-bottom:1px solid rgba(255,255,255,.12);}.ff-rs-section:first-of-type{padding-top:0}.ff-rs-label{font-size:13px;color:#a8b3c7;margin-bottom:8px;font-weight:800}.ff-rs-main{font-size:19px;color:#fff;font-weight:950;line-height:1.35;margin-bottom:5px}.ff-rs-sub{font-size:13px;color:#d6deea;line-height:1.7}.ff-rs-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:13px 0;font-size:14px;color:#cbd5e1}.ff-rs-swatch{width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.20);background:#222 center/cover no-repeat;display:inline-block;vertical-align:middle;margin-right:8px}.ff-rs-price-row{display:flex;justify-content:space-between;align-items:flex-end;margin:14px 0;color:#cbd5e1;font-size:14px}.ff-rs-price-row strong{font-size:22px;color:#31e6c4;letter-spacing:-.6px}.ff-rs-total{border-top:1px solid rgba(255,255,255,.18);margin-top:15px;padding-top:18px}.ff-rs-total strong{font-size:26px;color:#31e6c4}.ff-rs-btn{width:100%;height:50px;margin-top:24px;border-radius:999px;border:1px solid #24e8c7;background:transparent;color:#31e6c4;font-size:16px;font-weight:950;cursor:pointer}.ff-rs-btn:hover{background:rgba(36,232,199,.12)}
-body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template-columns:1fr!important;gap:14px!important;background:rgba(255,255,255,.035)!important;border:1px solid rgba(45,242,203,.25)!important;border-radius:20px!important;padding:18px!important;}body.ff-pro-dashboard #desk-grid,body.ff-pro-dashboard #screen-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important;}body.ff-pro-dashboard #set-product-selector [data-set-name]{min-height:132px!important;border-radius:18px!important;background:#0c1725!important;border:1px solid rgba(255,255,255,.12)!important;box-shadow:0 16px 38px rgba(0,0,0,.25)!important;}body.ff-pro-dashboard #set-product-selector [data-set-name] img{height:96px!important;background:#f7f7f5!important;object-fit:contain!important;border-radius:12px 12px 0 0!important;}body.ff-pro-dashboard #set-confirm-btn{height:52px!important;border-radius:15px!important;background:linear-gradient(135deg,#8247ff,#7d2df2)!important;color:#fff!important;font-weight:950!important;}body.ff-pro-dashboard #quick-ai-preview-btn,body.ff-pro-dashboard #ai-render-btn,body.ff-pro-dashboard #screen-ai-btn{background:linear-gradient(135deg,#2df2cb,#23dfbd)!important;color:#001713!important;border:0!important;border-radius:16px!important;min-height:52px!important;font-size:16px!important;font-weight:1000!important;}
-#pegboard-ref-panel,#set-pegboard-note,[id*="pegboard"],[class*="pegboard"]{display:none!important;visibility:hidden!important;}img.ff-broken-hidden{visibility:hidden!important;}
-@media(max-width:1180px){body.ff-pro-dashboard{grid-template-columns:1fr!important;height:auto!important;min-height:100vh!important;overflow:auto!important;}body.ff-pro-dashboard #chat-panel,body.ff-pro-dashboard #preview-panel,#ff-right-summary{height:auto!important;min-height:auto!important;border-radius:0!important;}#ff-right-summary{order:3;}}
-  
-<script id="ff-dashboard-three-column-no-peg
-
-
-(function(){
-  
-  const BLANK='';
-  const LEG_TEXTURES={WW:'/textures/leg/standard/WW.png',DSG:'/textures/leg/standard/DSG.png',BKM:'',DCR:'/textures/leg/standard/DCR.png',TS:'/textures/leg/standard/TS.png'};
-  const DESK_TEXTURES={WW:'/textures/desktop/standard/WW.jpg',WWK:'/textures/desktop/standard/WW.jpg',OCY:'/textures/desktop/standard/OSG.jpg',HW:'/textures/desktop/standard/HW.png'};
-  function fixUrl(u){if(!u||typeof u!=='string')return u;if(u.startsWith('data:')||u.startsWith('blob:')||/^https?:/.test(u))return u;const clean=u.split(/[?#]/)[0];const base=clean.split('/').pop();if(['','','','','',''].includes(base))return BLANK;if(base==='')return '';if(base==='')return '';if(clean.startsWith('pegboard/')||clean.includes('/pegboard/'))return BLANK;if(clean.startsWith('screen/custom/'))return u.replace(/^screen\/custom\//,'/textures/screen/front/custom/');if(clean.startsWith('screen/standard/'))return u.replace(/^screen\/standard\//,'/textures/screen/front/standard/');if(clean.startsWith('leg/'))return '/textures/'+clean;return u;}
-  function patchImages(){document.querySelectorAll('img').forEach(function(img){const src=img.getAttribute('src')||'';const fixed=fixUrl(src);if(fixed&&fixed!==src)img.setAttribute('src',fixed);if(!img.dataset.ffBrokenHandler){img.dataset.ffBrokenHandler='1';img.addEventListener('error',function(){const now=img.getAttribute('src')||'';const next=fixUrl(now);if(next&&next!==now){img.src=next;return;}img.classList.add('ff-broken-hidden');img.src=BLANK;});}});document.querySelectorAll('#pegboard-ref-panel,#set-pegboard-note,[id*="pegboard"],[class*="pegboard"]').forEach(function(el){el.remove();});}
-  function textFrom(sel,fallback){const el=document.querySelector(sel);return(el&&el.textContent.trim())||fallback||'-';}
-  function activeMaterialFromLabels(label){const groups=Array.from(document.querySelectorAll('.material-button-section,.btn-group,.color-pair-grid,#messages'));let best='';groups.forEach(function(g){const t=g.textContent||'';if(label&&!t.includes(label))return;const active=g.querySelector('.material-btn.active,.material-btn.selected,.choice-btn.selected,.choice-btn.multi-selected');if(active)best=active.textContent.replace('선택','').trim().split(/\s+/).pop()||best;});return best;}
-  function ensureSummary(){let panel=document.getElementById('ff-right-summary');if(panel)return panel;panel=document.createElement('aside');panel.id='ff-right-summary';panel.innerHTML='<div class="ff-rs-top"><h2>현재 선택</h2><button class="ff-rs-close" type="button">×</button></div><section class="ff-rs-section"><div class="ff-rs-label">데스크</div><div class="ff-rs-main" id="ff-rs-desk">일반형 데스크</div><div class="ff-rs-sub" id="ff-rs-desk-sub">다리: -<br>상판 모서리: - <span style="float:right">1개</span></div></section><section class="ff-rs-section"><div class="ff-rs-label">스크린</div><div class="ff-rs-main" id="ff-rs-screen">선택 없음</div><div class="ff-rs-sub"><span style="float:right">1개</span></div></section><section class="ff-rs-section"><div class="ff-rs-label">옵션</div><div class="ff-rs-row"><span>다리 색상</span><b><span class="ff-rs-swatch" id="ff-rs-leg-swatch"></span><span id="ff-rs-leg">-</span></b></div><div class="ff-rs-row"><span>상판 색상</span><b><span class="ff-rs-swatch" id="ff-rs-top-swatch"></span><span id="ff-rs-top">-</span></b></div><div class="ff-rs-row"><span>하부 형태</span><b id="ff-rs-caster">-</b></div></section><section class="ff-rs-section"><div class="ff-rs-label" style="font-size:18px;color:#fff;margin-bottom:18px;">견적 요약</div><div class="ff-rs-price-row"><span>공급가</span><strong id="ff-rs-supply">-</strong></div><div class="ff-rs-price-row"><span>부가세 (10%)</span><b id="ff-rs-vat">-</b></div><div class="ff-rs-price-row ff-rs-total"><span>합계<br><small>(VAT 포함)</small></span><strong id="ff-rs-total">-</strong></div></section><button class="ff-rs-btn" type="button" id="ff-rs-download">↧ 견적서 다운로드</button>';document.body.appendChild(panel);panel.querySelector('.ff-rs-close').onclick=function(){panel.style.display='none'};panel.querySelector('#ff-rs-download').onclick=function(){const btn=Array.from(document.querySelectorAll('button')).find(b=>/다운로드|견적서/.test(b.textContent));if(btn)btn.click();};return panel;}
-  function won(n){return Number(n||0).toLocaleString('ko-KR')+'원';}
-  function updateSummary(){const panel=ensureSummary();const currentText=textFrom('#current-box','')+' '+textFrom('#preview-items','')+' '+textFrom('#messages','');const desk=/덕트형/.test(currentText)?'덕트형 데스크':'일반형 데스크';const screen=/L형/.test(currentText)?'L형 스크린':(/사이드/.test(currentText)?'사이드 스크린':(/전면/.test(currentText)?'전면 스크린':(/일자/.test(currentText)?'일자형 스크린':'선택 없음')));const legType=/일자형/.test(currentText)?'일자형':(/사다리/.test(currentText)?'사다리형':'-');const topShape=/라운드/.test(currentText)?'라운드':(/사각|직각|스퀘어/.test(currentText)?'사각':'-');const caster=/캐스터/.test(currentText)?'캐스터':(/글라이드|고정형/.test(currentText)?'글라이드':'-');const topCode=activeMaterialFromLabels('상판')||(currentText.match(/상판\s*([A-Z0-9]+)/)||[])[1]||'HW';const legCode=activeMaterialFromLabels('다리')||(currentText.match(/다리\s*([A-Z0-9]+)/)||[])[1]||'WW';panel.querySelector('#ff-rs-desk').textContent=desk;panel.querySelector('#ff-rs-desk-sub').innerHTML='다리: '+legType+'<br>상판 모서리: '+topShape+' <span style="float:right">1개</span>';panel.querySelector('#ff-rs-screen').textContent=screen;panel.querySelector('#ff-rs-leg').textContent=legCode;panel.querySelector('#ff-rs-top').textContent=topCode;panel.querySelector('#ff-rs-caster').textContent=caster;panel.querySelector('#ff-rs-leg-swatch').style.backgroundImage='url('+(LEG_TEXTURES[legCode]||'')+')';panel.querySelector('#ff-rs-top-swatch').style.backgroundImage='url('+(DESK_TEXTURES[topCode]||'')+')';let totalText=textFrom('.total-price','')||textFrom('.qr-total','');let totalNum=0;const nums=totalText.match(/[\d,]+/g);if(nums&&nums.length)totalNum=parseInt(nums[nums.length-1].replace(/,/g,''),10);if(!totalNum)totalNum=1474000;const supply=Math.round(totalNum/1.1);const vat=totalNum-supply;panel.querySelector('#ff-rs-supply').textContent=won(supply);panel.querySelector('#ff-rs-vat').textContent=won(vat);panel.querySelector('#ff-rs-total').textContent=won(totalNum);}
-  function init(){document.body.classList.add('ff-pro-dashboard');patchImages();ensureSummary();updateSummary();setInterval(function(){patchImages();updateSummary();},900);new MutationObserver(function(){patchImages();updateSummary();}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['src','class','style']});}
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
-
-
-<aside id="ff-right-summary-panel" aria-label="현재 선택 및 견적 요약">
-  <div class="ff-summary-card">
-    <div class="ff-summary-title">현재 선택</div>
-    <div class="ff-summary-row"><span>데스크</span><b id="ff-rs-desk">일반형 데스크</b></div>
-    <div class="ff-summary-row"><span>스크린</span><b id="ff-rs-screen">일자형 스크린</b></div>
-    <div class="ff-summary-row"><span>상판 색상</span><b id="ff-rs-top">HW</b></div>
-    <div class="ff-summary-row"><span>다리 색상</span><b id="ff-rs-leg">WW</b></div>
-    <div class="ff-summary-row"><span>하부 형태</span><b id="ff-rs-caster">글라이드</b></div>
-  </div>
-  <div class="ff-summary-card">
-    <div class="ff-summary-title">견적 요약</div>
-    <div class="ff-summary-row"><span>공급가</span><b id="ff-rs-supply">1,340,000원</b></div>
-    <div class="ff-summary-row"><span>부가세 (10%)</span><b id="ff-rs-vat">134,000원</b></div>
-    <div class="ff-summary-total"><span>합계</span><b id="ff-rs-total">1,474,000원</b></div>
-  </div>
-  <button class="ff-summary-btn" onclick="window.print && window.print()">견적서 다운로드</button>
-  <button class="ff-summary-btn secondary" onclick="location.reload()">새로 시작하기</button>
-</aside>
-<script id="ff-right-summary-sync">
-(function(){
-  function txt(sel){const el=document.querySelector(sel);return el?el.textContent.trim():'';}
-  function sync(){
-    const top = txt('.msg.user .bubble') || '';
-    const item = [...document.querySelectorAll('.preview-item .item-name,.item-chip .chip-name')].map(e=>e.textContent.trim()).join(' / ');
-    if(item){document.getElementById('ff-rs-desk').textContent = item.includes('덕트')?'덕트형 데스크':'일반형 데스크';document.getElementById('ff-rs-screen').textContent = item.includes('스크린')?'선택된 스크린':'일자형 스크린';}
-    const total = txt('#total-box .total-price') || txt('.final-total-box b');
-    if(total) document.getElementById('ff-rs-total').textContent = total;
-    const speech=[...document.querySelectorAll('.msg.user .bubble')].map(e=>e.textContent).join(' ');
-    ['HW','WW','DCR','DSG','BKM','TS','OCY','WWK'].forEach(code=>{if(speech.includes(code)){if(['HW','OCY','WWK'].includes(code))document.getElementById('ff-rs-top').textContent=code; else document.getElementById('ff-rs-leg').textContent=code;}});
-  }
-  new MutationObserver(sync).observe(document.body,{childList:true,subtree:true,characterData:true});
-  window.addEventListener('load',sync); setInterval(sync,1500);
-})();
-</script>
-
-
-<!-- CLEAN PATCH: pegboard removed -->
-<style>
-  [id*="pegboard"], [class*="pegboard"], [data-type*="pegboard"], [data-set-name*="pegboard"], [data-name*="pegboard"] { display:none !important; }
-</style>
-<script>
-(function(){
-  const BLANK = '';
-  function clean(){
-    document.querySelectorAll('*').forEach(el=>{
-      const txt = ((el.id||'')+' '+(el.className||'')+' '+(el.dataset?.type||'')+' '+(el.dataset?.name||'')+' '+(el.dataset?.setName||'')).toLowerCase();
-      if (txt.includes('pegboard')) el.style.display='none';
-    });
-  }
-  window.addEventListener('DOMContentLoaded', clean);
-  window.addEventListener('load', clean);
-  setInterval(clean, 800);
-})();
-</script>
-
 </body>
-
-
-
 </html>
 <style id="ff-fixed40-portrait-chat-preview">
 /* === Fixed40: fixed38 base, no dashboard, chat:preview = 9:16 === */
