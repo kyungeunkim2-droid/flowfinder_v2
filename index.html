@@ -10441,6 +10441,111 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+
+<!-- === FF126: 16:9 source-scale material mapping preview + screen material binding === -->
+<style id="ff126-preview-scale-material-fix">
+  /* 실사/재질 미리보기는 정방형이 아니라 제품 원본 비율에 맞는 가로형으로 고정 */
+  #quick-ai-preview-note.ai-result,
+  #quick-ai-preview-note.ai-loading,
+  #quick-ai-preview-note.ai-error{
+    width:100%!important;
+    box-sizing:border-box!important;
+  }
+  #quick-ai-preview-note.ai-result img{
+    width:100%!important;
+    aspect-ratio:16/9!important;
+    height:auto!important;
+    max-height:none!important;
+    object-fit:contain!important;
+    object-position:center center!important;
+    border-radius:16px!important;
+    background:
+      linear-gradient(45deg, rgba(255,255,255,.95) 25%, rgba(242,245,248,.95) 25%, rgba(242,245,248,.95) 50%, rgba(255,255,255,.95) 50%, rgba(255,255,255,.95) 75%, rgba(242,245,248,.95) 75%)!important;
+    background-size:28px 28px!important;
+    display:block!important;
+  }
+</style>
+<script id="ff126-material-mapping-payload-fix">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function state(){return window.state||window.appState||{};}
+  function fast(){return (window.FlowFinderFastPreview&&window.FlowFinderFastPreview.state)||{};}
+  function merged(){var o={}, a=state(), f=fast(); [a,f].forEach(function(src){for(var k in src){if(src[k]!==undefined&&src[k]!==null&&src[k]!=='') o[k]=src[k];}}); return o;}
+  function text(id){var el=$(id); return el ? (el.textContent||'').trim() : '';}
+  function bgUrl(id){var el=$(id); if(!el) return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
+  function clean(v){v=String(v||'').trim(); return (v==='-'||v==='none')?'':v;}
+  function productImage(key){return key?'products/'+key+'/base/base.png':'';}
+  function deskKey(s){return s.deskKey||s.selectedDeskKey||s.productKey||(String(s.deskLabel||s.product||'').indexOf('덕트')>=0?'desk_duct':'desk_standard');}
+  function screenKey(s){var label=String(s.screenLabel||s.screen||s.product||''); if(s.screenKey) return s.screenKey; if(s.selectedScreenKey) return s.selectedScreenKey; if(label.indexOf('사이드')>=0)return 'screen_side'; if(label.indexOf('일자')>=0)return 'screen_straight'; if(label.indexOf('L형')>=0||label.indexOf('l형')>=0)return 'screen_lshape'; return 'screen_front';}
+  function inferTarget(s){ if(window.__ffNanoTarget==='screen'||window.__ffNanoTarget==='desk') return window.__ffNanoTarget; var cat=String(s._currentCatName||s.currentCatName||s.product||''); return cat.indexOf('스크린')>=0?'screen':'desk'; }
+  function ensureNote(){var texture=$('texture-preview'), btn=$('quick-ai-preview-btn'), note=$('quick-ai-preview-note'); if(texture&&btn&&btn.parentElement!==texture) texture.appendChild(btn); if(texture&&note&&note.parentElement!==texture) texture.appendChild(note); return {btn:btn,note:note};}
+  async function timeoutFetch(url,opt,ms){var c=new AbortController(); var t=setTimeout(function(){c.abort();},ms||45000); try{opt=opt||{}; opt.signal=c.signal; return await fetch(url,opt);} finally{clearTimeout(t);} }
+  function materialPayload(){var s=merged(); return {
+    topCode:clean(text('quick-top-code')||s.top||s.topCode||s.topColor),
+    legCode:clean(text('quick-leg-code')||s.leg||s.legCode||s.legColor),
+    screenCode:clean(text('quick-screen-code')||s.screen||s.screenCode||s.screenColor),
+    topTexture:clean(bgUrl('quick-top-chip')||s.topTex||s.topTexture||s.topMaterialImg),
+    legTexture:clean(bgUrl('quick-leg-chip')||s.legTex||s.legTexture||s.legMaterialImg),
+    screenTexture:clean(bgUrl('quick-screen-chip')||s.screenTex||s.screenTexture||s.screenMaterialImg)
+  };}
+  document.addEventListener('click',function(e){var b=e.target&&e.target.closest&&e.target.closest('.material-btn'); if(!b)return; var part=b.getAttribute('data-part')||''; if(part==='screen')window.__ffNanoTarget='screen'; if(part==='top'||part==='leg')window.__ffNanoTarget='desk';},true);
+
+  window.prepareNanoBananaPreview = async function(targetType){
+    if(window.__ff126NanoBusy) return;
+    var ui=ensureNote(), note=ui.note, btn=ui.btn;
+    var s=merged(), m=materialPayload();
+    var target=(targetType==='screen'||targetType==='desk')?targetType:inferTarget(s);
+    var isScreen=target==='screen';
+    var dkey=deskKey(s), skey=screenKey(s);
+    var base=isScreen?productImage(skey):productImage(dkey);
+    var payload={
+      mode:isScreen?'strict-screen-material-mapping-v126':'strict-desk-material-mapping-v126',
+      materialEditOnly:true,
+      preserveSourceImage:true,
+      preserveTransparentBackground:true,
+      canvasAspect:'16:9',
+      targetType:target,
+      productType:target,
+      deskImage:base,
+      fallbackDeskImage:base,
+      composedPreview:'',
+      deskLabel:isScreen?'':(s.deskLabel||s.product||''),
+      screenSelected:!!(isScreen || s.screenLabel || s.screen || s.screenKey || s.selectedScreenKey),
+      screenLabel:isScreen?(s.screenLabel||s.screen||'스크린'):(s.screenLabel||s.screen||''),
+      screenImage:isScreen?base:(s.screenImage||productImage(skey)),
+      topTexture:isScreen?'':m.topTexture,
+      legTexture:isScreen?'':m.legTexture,
+      screenTexture:m.screenTexture,
+      topCode:isScreen?'':m.topCode,
+      legCode:isScreen?'':m.legCode,
+      screenCode:m.screenCode,
+      legType:isScreen?'':(s.legType||s.legShape||''),
+      casterType:isScreen?'':(s.casterType||s.mobility||''),
+      topShape:isScreen?'':(s.topShape||''),
+      size:isScreen?{screenH:s.screenH||'',screenTopGap:s.screenTopGap||''}:(s.size||{w:s.w||'',d:s.d||'',h:s.h||''})
+    };
+    if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b>재질 미리보기 생성 중...</b><br><span style="color:#9fb3bd;">원본 이미지의 16:9 비율·구도·배경을 유지하고 선택 재질만 맵핑합니다.</span>';}
+    if(btn){btn.disabled=true;btn.textContent='생성 중...';}
+    window.__ff126NanoBusy=true;
+    try{
+      var h=await timeoutFetch('/api/health',{cache:'no-store'},6000).catch(function(){return null;});
+      if(!h||!h.ok) throw new Error('서버 연결 실패: Render 배포 또는 npm run dev 상태를 확인해주세요.');
+      var res=await timeoutFetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},45000);
+      var data=await res.json().catch(function(){return {};});
+      if(!res.ok) throw new Error(data.error||data.detail||'재질 미리보기 생성 실패');
+      var src=(typeof data==='string')?data:(data.imageUrl||data.image||data.url||'');
+      if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 미리보기 · '+(isScreen?'스크린':'데스크')+'</div><img src="'+esc(src)+'" alt="재질 미리보기"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">원본 제품 이미지에 선택 재질만 맵핑한 결과입니다.</div>';}
+    }catch(err){var msg=(err&&err.name==='AbortError')?'45초 동안 응답이 없어 자동 중단했습니다.':(err.message||String(err)); if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5;">재질 미리보기 실패</b><br><span style="color:#ddd;">'+esc(msg)+'</span>';}}
+    finally{window.__ff126NanoBusy=false; if(btn){btn.disabled=false;btn.textContent='✨ 실사 미리보기 생성';}}
+  };
+  setTimeout(function(){var ui=ensureNote(); if(ui.btn){ui.btn.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false;};}},100);
+  setTimeout(function(){var ui=ensureNote(); if(ui.btn){ui.btn.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false;};}},900);
+})();
+</script>
+
 </body>
 
 
