@@ -10546,6 +10546,171 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+
+<!-- === FF127: final fixes - option images, product selection, custom top tabs, local material preview fallback === -->
+<style id="ff127-final-fixes-css">
+  #ff90-option-summary{display:block!important;border:1px solid rgba(46,242,201,.28)!important;background:#071722!important;border-radius:18px!important;padding:14px!important;margin:14px 0!important;}
+  #ff90-option-summary .ff90-title{display:flex!important;align-items:center!important;justify-content:space-between!important;color:#2ef2c9!important;font-weight:950!important;margin-bottom:12px!important;}
+  #ff90-option-summary .ff90-title small{color:#91b9b2!important;font-size:11px!important;}
+  #ff90-option-summary .ff90-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;}
+  #ff90-option-summary .ff90-card{border:1px solid rgba(46,242,201,.35)!important;border-radius:16px!important;background:#0b1a29!important;overflow:hidden!important;min-height:168px!important;display:flex!important;flex-direction:column!important;justify-content:space-between!important;}
+  #ff90-option-summary .ff90-card-title{display:block!important;color:#2ef2c9!important;font-size:12px!important;font-weight:900!important;padding:10px 10px 0!important;}
+  #ff90-option-summary .ff90-card img{width:100%!important;height:104px!important;object-fit:contain!important;background:#fff!important;display:block!important;margin-top:6px!important;}
+  #ff90-option-summary .ff90-card b{display:block!important;color:#fff!important;font-size:12px!important;text-align:center!important;padding:10px!important;background:rgba(46,242,201,.08)!important;}
+  #ff90-option-summary .ff90-empty{border:1px dashed rgba(255,255,255,.18)!important;border-radius:14px!important;padding:16px!important;text-align:center!important;color:#7f9da6!important;font-size:12px!important;}
+  #ff-static-option-preview{display:none!important;}
+  .ff127-tabs{display:flex;gap:8px;margin:8px 0 10px;}
+  .ff127-tab{border:1px solid rgba(46,242,201,.35);background:#071722;color:#dffff7;border-radius:999px;padding:8px 14px;font-weight:900;cursor:pointer;font-size:12px;}
+  .ff127-tab.active{background:#2ef2c9;color:#04131c;border-color:#2ef2c9;}
+  .ff127-top-group{display:none;}
+  .ff127-top-group.active{display:block;}
+  #quick-ai-preview-note.ai-result canvas{width:100%!important;aspect-ratio:16/9!important;height:auto!important;display:block!important;border-radius:16px!important;border:1px solid rgba(46,242,201,.22)!important;background:linear-gradient(45deg,#fff 25%,#f2f5f8 25%,#f2f5f8 50%,#fff 50%,#fff 75%,#f2f5f8 75%)!important;background-size:28px 28px!important;}
+</style>
+<script id="ff127-final-fixes-js">
+(function(){
+  function $(id){return document.getElementById(id);} 
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function S(){return window.state||{};}
+  function has(arr,v){return arr.indexOf(v)>-1;}
+  var DESKS=['일반형 데스크','덕트형 데스크'];
+  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+  var FRONT_SIDE=['전면 스크린','사이드 스크린'];
+  var SINGLE=['일자형 스크린','L형 스크린'];
+  function normLeg(v){v=String(v||''); if(v.indexOf('원형')>-1)return 'round'; if(v.indexOf('A')>-1||v.indexOf('에이')>-1)return 'aframe'; return 'ladder';}
+  function normMove(v){v=String(v||''); return v.indexOf('캐스터')>-1?'caster':'glide';}
+  function normDesk(){var s=S(); var p=String((s.current&&s.current.product)||s.product||s.deskLabel||''); return p.indexOf('덕트')>-1?'desk_duct':'desk_standard';}
+  function combo(){return normLeg(S().legType||S().legShape)+'_'+normMove(S().casterType||S().mobility);}
+  function comboSrc(){return 'images/options/desk_combo/'+combo()+'.png';}
+  function fullDeskSrc(){return 'images/previews/'+normDesk()+'/'+combo()+'.png';}
+  function topSrc(){var v=String(S().topShape||''); return v.indexOf('라운드')>-1?'images/options/top_round.png':'images/options/top_rect.svg';}
+  function labelLeg(){return S().legType||S().legShape||'다리형태';}
+  function labelMove(){return S().casterType||S().mobility||'이동방식';}
+  function labelTop(){return S().topShape||'상판형태';}
+
+  window.ff90RefreshOptionSummary=function(){
+    var panel=$('preview-panel'); if(!panel) return;
+    var box=$('ff90-option-summary');
+    if(!box){box=document.createElement('div');box.id='ff90-option-summary';var before=$('texture-preview')||$('preview-items')||panel.firstChild;panel.insertBefore(box,before||null);}
+    var rows=[];
+    if(S().legType||S().legShape) rows.push(['다리형태',labelLeg(),comboSrc()]);
+    if(S().casterType||S().mobility) rows.push(['이동방식',labelMove(),comboSrc()]);
+    if(S().topShape) rows.push(['상판형태',labelTop(),topSrc()]);
+    box.innerHTML='<div class="ff90-title"><span>데스크 옵션 이미지</span><small>선택값 기준</small></div>'+(rows.length?'<div class="ff90-grid">'+rows.map(function(r){return '<div class="ff90-card"><span class="ff90-card-title">'+esc(r[0])+'</span><img src="'+esc(r[2])+'" alt="'+esc(r[0])+'" loading="eager"><b>'+esc(r[1])+'</b></div>';}).join('')+'</div>':'<div class="ff90-empty">데스크 옵션을 선택하면 다리형태, 이동방식, 상판형태 이미지가 표시됩니다.</div>');
+    // 기존 깨진 고정 패널이 남아 있으면 실제 경로를 주입한다.
+    var li=$('ff-option-leg-img'), mi=$('ff-option-caster-img'), ti=$('ff-option-top-img');
+    if(li){li.src=comboSrc(); li.style.display='block';}
+    if(mi){mi.src=comboSrc(); mi.style.display='block';}
+    if(ti){ti.src=topSrc(); ti.style.display='block';}
+    var ll=$('ff-option-leg-label'), ml=$('ff-option-caster-label'), tl=$('ff-option-top-label');
+    if(ll)ll.textContent=labelLeg(); if(ml)ml.textContent=labelMove(); if(tl)tl.textContent=labelTop();
+  };
+
+  // 제품 선택: 데스크만 / 스크린만 / 데스크+스크린 모두 다음 단계 가능. 데스크끼리는 택1, 스크린은 전면+사이드만 복수.
+  function orderSelection(a){return DESKS.concat(SCREENS).filter(function(n){return has(a,n);});}
+  function setSel(a){
+    window._setSelected=orderSelection(a||[]);
+    try{ if(typeof _syncSetCards==='function') _syncSetCards(); }catch(e){}
+    try{ if(typeof updateSetConfirmBtn==='function') updateSetConfirmBtn(); }catch(e){}
+    try{ if(typeof updateSetComposite==='function') updateSetComposite(); }catch(e){}
+    if(S().current){ if(window._setSelected.length) S().current.product=window._setSelected.join(' + '); else delete S().current.product; try{if(typeof updateCurrent==='function') updateCurrent();}catch(e){} }
+    refreshLeftProductButtons();
+  }
+  window.ff90ToggleProduct=function(name){
+    if(typeof window.showSetProductSelector==='function') window.showSetProductSelector();
+    var cur=(window._setSelected||[]).slice();
+    if(has(cur,name)) cur=cur.filter(function(x){return x!==name;});
+    else if(has(DESKS,name)){cur=cur.filter(function(x){return !has(DESKS,x);});cur.push(name);}
+    else if(has(FRONT_SIDE,name)){cur=cur.filter(function(x){return !has(SINGLE,x);});cur.push(name);}
+    else if(has(SINGLE,name)){cur=cur.filter(function(x){return !has(SCREENS,x);});cur.push(name);}
+    setSel(cur);
+  };
+  window.ff71PickProduct=window.ff90ToggleProduct;
+  window.ff71ConfirmProducts=function(){ if((window._setSelected||[]).length && typeof window.confirmSetSelection==='function') window.confirmSetSelection(); };
+  function refreshLeftProductButtons(){
+    var sel=window._setSelected||[];
+    document.querySelectorAll('.ff71-choice-btn[data-name]').forEach(function(btn){btn.classList.toggle('active',has(sel,btn.getAttribute('data-name')));});
+    var ok=$('ff71-confirm-btn')||$('set-confirm-btn'); if(ok){ok.disabled=!sel.length; ok.textContent=sel.length?'선택 완료 ('+sel.length+'개) ✓':'선택 완료';}
+  }
+
+  // 주문품 상판 색상: 무늬목/라미네이트 탭 양자택일
+  window.askDeskTopColorDrop=function(catName,dataType,items,productKey){ window.askDeskColorPairDrop(catName,dataType,items,productKey); };
+  window.askDeskColorPairDrop=function(catName,dataType,items,productKey){
+    S().step='choose_color'; S()._deskTopItems=items; S()._deskLegItems=items;
+    var isCustom=S().colorType==='주문';
+    var topColors=isCustom ? (window.CUSTOM_VENEER_COLORS_DESK||[]) : ((window.DESK_TOP_COLORS&&DESK_TOP_COLORS[catName])||['WW','WWK','OCY','HW']);
+    var legColors=isCustom ? (window.CUSTOM_LEG_COLORS||[]) : ((window.DESK_LEG_COLORS&&DESK_LEG_COLORS[catName])||['WW','DSG','BKM','DCR','TS']);
+    var uid=Date.now(), topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
+    function btnGroup(arr,inputId,part){var h='<div class="material-button-group">';(arr||[]).forEach(function(c){h+=window.ffMaterialBtnHtml?ffMaterialBtnHtml(c,inputId,part,catName):'<button type="button" class="material-btn" onclick="document.getElementById(\''+inputId+'\').value=\''+c+'\'">'+c+'</button>';});return h+'</div>';}
+    var topHtml='';
+    if(isCustom){
+      topHtml+='<div class="ff127-tabs"><button type="button" class="ff127-tab active" onclick="ff127TopTab(\''+uid+'\',\'veneer\')">무늬목</button><button type="button" class="ff127-tab" onclick="ff127TopTab(\''+uid+'\',\'laminate\')">라미네이트</button></div>';
+      topHtml+='<div id="ff127-top-veneer-'+uid+'" class="ff127-top-group active">'+btnGroup(window.CUSTOM_VENEER_COLORS_DESK||[],topId,'top')+'</div>';
+      topHtml+='<div id="ff127-top-laminate-'+uid+'" class="ff127-top-group">'+btnGroup(window.CUSTOM_LAMINATE_COLORS_DESK||[],topId,'top')+'</div>';
+    } else { topHtml=btnGroup(topColors,topId,'top'); }
+    var html='📌 <b>색상 조합</b>을 선택해주세요'
+      +'<input class="material-hidden-input" id="'+topId+'" data-peer="'+legId+'" value="">'
+      +'<input class="material-hidden-input" id="'+legId+'" data-peer="'+topId+'" value="">'
+      +'<div class="color-pair-grid"><div><label>상판 색상'+(isCustom?' <span style="color:#a78bfa;font-size:11px;">무늬목 또는 라미네이트 중 1개</span>':'')+'</label>'+topHtml+'</div>'
+      +'<div><label>다리 색상</label>'+btnGroup(legColors,legId,'leg')+'</div></div>'
+      +'<div id="desk-color-combo-'+uid+'" class="color-combo-preview">상판은 무늬목/라미네이트 중 한 그룹만 선택됩니다.</div>'
+      +'<button class="confirm-btn" style="margin-top:10px;" onclick="confirmDeskColorPairDrop(\''+catName+'\',\''+dataType+'\',\''+productKey+'\',\''+topId+'\',\''+legId+'\')">색상 조합 확인 ✓</button>';
+    if(typeof addMsg==='function') addMsg('bot',html);
+    var b=typeof getLastBubble==='function'?getLastBubble():null; if(b){var bb=document.createElement('button');bb.className='back-btn';bb.textContent='← 이전 단계로';bb.onclick=function(){bb.disabled=true; if(typeof goBack==='function')goBack();};b.appendChild(bb);}
+    try{if(typeof updateFlowBar==='function')updateFlowBar();}catch(e){}
+  };
+  window.ff127TopTab=function(uid,type){
+    var ven=$('ff127-top-veneer-'+uid), lam=$('ff127-top-laminate-'+uid);
+    if(ven)ven.classList.toggle('active',type==='veneer'); if(lam)lam.classList.toggle('active',type==='laminate');
+    document.querySelectorAll('.ff127-tab').forEach(function(b){if(b.getAttribute('onclick')&&b.getAttribute('onclick').indexOf("'"+uid+"'")>-1)b.classList.toggle('active',b.getAttribute('onclick').indexOf("'"+type+"'")>-1);});
+  };
+
+  // AI 실패 방지: 서버 실패 시 원본+마스크+재질 로컬 canvas로 즉시 대체 표시
+  function loadImg(src){return new Promise(function(resolve,reject){if(!src)return resolve(null);var img=new Image();img.crossOrigin='anonymous';img.onload=function(){resolve(img);};img.onerror=function(){resolve(null);};img.src=src;});}
+  function bgUrl(id){var el=$(id); if(!el)return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
+  function text(id){var el=$(id);return el?(el.textContent||'').trim():'';}
+  function texturePath(code,part,cat){try{return window._ffLocalTextureForCode? _ffLocalTextureForCode(part==='leg'?'LEG_'+code:code,cat||'') : '';}catch(e){return '';}}
+  function productKey(target){var s=S(); var cat=String(s._currentCatName||s.currentCatName||s.product||''); if(target==='screen'||cat.indexOf('스크린')>-1){if(cat.indexOf('사이드')>-1)return 'screen_side'; if(cat.indexOf('일자')>-1)return 'screen_straight'; if(cat.indexOf('L형')>-1)return 'screen_lshape'; return 'screen_front';} return normDesk();}
+  function productSrc(key){return 'products/'+key+'/base/base.png';}
+  function masks(key){var base='products/'+key+'/masks/'; if(key==='screen_side')return {top:base+'top_mask.png',leg:base+'leg_mask.png',screenFront:base+'front_screen_mask.png',screenSide:base+'side_screen_mask.png'}; return {top:base+'top_mask.png',leg:base+'leg_mask.png',screen:base+'screen_mask.png'};}
+  async function localPreview(target){
+    var key=productKey(target), base=await loadImg(productSrc(key)); if(!base)throw new Error('원본 이미지 로드 실패: '+productSrc(key));
+    var c=document.createElement('canvas'); c.width=1280; c.height=720; var ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+    var scale=Math.min((c.width-40)/base.width,(c.height-40)/base.height); var dw=base.width*scale, dh=base.height*scale, dx=(c.width-dw)/2, dy=(c.height-dh)/2;
+    ctx.drawImage(base,dx,dy,dw,dh);
+    var m=masks(key); var cat=String(S()._currentCatName||S().currentCatName||'');
+    var topCode=text('quick-top-code')||S().topCode||S().topColor||S().top||'';
+    var legCode=text('quick-leg-code')||S().legCode||S().legColor||S().leg||'';
+    var screenCode=text('quick-screen-code')||S().screenCode||S().screenColor||'';
+    var topTex=bgUrl('quick-top-chip')||texturePath(topCode,'top','데스크');
+    var legTex=bgUrl('quick-leg-chip')||texturePath(legCode,'leg','데스크');
+    var screenTex=bgUrl('quick-screen-chip')||texturePath(screenCode,'screen',cat||'전면 스크린');
+    async function apply(maskSrc,texSrc,colorCode){
+      var mask=await loadImg(maskSrc); if(!mask)return;
+      var layer=document.createElement('canvas'); layer.width=c.width; layer.height=c.height; var l=layer.getContext('2d');
+      var tex=await loadImg(texSrc);
+      if(tex){var pat=l.createPattern(tex,'repeat'); l.fillStyle=pat; l.fillRect(0,0,c.width,c.height);} else {l.fillStyle=(typeof colorFallback==='function'?colorFallback(colorCode):'#999'); l.fillRect(0,0,c.width,c.height);}
+      l.globalCompositeOperation='destination-in'; l.drawImage(mask,dx,dy,dw,dh);
+      ctx.save(); ctx.globalAlpha=.92; ctx.drawImage(layer,0,0); ctx.restore();
+    }
+    if(key.indexOf('screen')===0){await apply(m.screen||m.screenFront,screenTex,screenCode); if(m.screenSide)await apply(m.screenSide,screenTex,screenCode);} else {await apply(m.top,topTex,topCode); await apply(m.leg,legTex,legCode);}
+    return c;
+  }
+  window.prepareNanoBananaPreview=async function(targetType){
+    var btn=$('quick-ai-preview-btn'), note=$('quick-ai-preview-note'), texture=$('texture-preview'); if(texture&&btn&&btn.parentElement!==texture)texture.appendChild(btn); if(texture&&note&&note.parentElement!==texture)texture.appendChild(note);
+    var target=targetType || ((String(S()._currentCatName||'').indexOf('스크린')>-1)?'screen':'desk');
+    if(btn){btn.disabled=true;btn.textContent='생성 중...';}
+    if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b>재질 미리보기 적용 중...</b><br><span style="color:#9fb3bd;">AI 생성이 아니라 원본 이미지에 선택 재질을 직접 맵핑합니다.</span>';}
+    try{var canvas=await localPreview(target); if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 미리보기 · '+(target==='screen'?'스크린':'데스크')+'</div>';note.appendChild(canvas); var d=document.createElement('div');d.style.cssText='margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;';d.textContent='원본 제품 이미지의 구도와 크기를 유지하고 선택 재질만 맵핑했습니다.';note.appendChild(d);}}
+    catch(err){if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5;">재질 미리보기 실패</b><br><span style="color:#ddd;">'+esc(err.message||err)+'</span>';}}
+    finally{if(btn){btn.disabled=false;btn.textContent='✨ 실사 미리보기 생성';}}
+  };
+
+  ['click','change'].forEach(function(ev){document.addEventListener(ev,function(){setTimeout(function(){try{ff90RefreshOptionSummary();refreshLeftProductButtons();}catch(e){}},100);},true);});
+  setTimeout(function(){try{ff90RefreshOptionSummary();refreshLeftProductButtons();}catch(e){}},500);
+  setInterval(function(){try{ff90RefreshOptionSummary();}catch(e){}},1200);
+})();
+</script>
 </body>
 
 
