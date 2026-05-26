@@ -1687,24 +1687,6 @@ body.ff-dashboard-preview #messages::-webkit-scrollbar-track,
 </div>
 
 
-<aside id="ff-ai-live-panel" aria-label="AI 실시간 생성 미리보기">
-  <div class="ff-ai-live-head">
-    <div>
-      <b>AI 실사 미리보기</b>
-      <span>Nano Banana 생성 결과 전용 영역</span>
-    </div>
-    <em id="ff-ai-live-status">대기 중</em>
-  </div>
-  <div id="ff-ai-live-stage">
-    <div id="ff-ai-live-empty">
-      ✨ 실사 미리보기 생성 버튼을 누르면<br>이 영역에 결과 이미지가 표시됩니다.
-    </div>
-    <img id="ff-ai-live-img" alt="AI 실사 미리보기 결과" />
-  </div>
-  <div class="ff-ai-live-note">
-    데스크 실사 생성 결과를 고정해서 보여주는 패널입니다. 왼쪽 옵션/선택 내역과 독립적으로 스크롤됩니다.
-  </div>
-</aside>
 
 
 <script id="ff68-ai-live-panel-sync">
@@ -13003,5 +12985,105 @@ button.material-btn{
   window.addEventListener('load', bind);
   setTimeout(bind,300);
   setTimeout(bind,1000);
+})();
+</script>
+
+
+<!-- === FF113: remove right AI panel, show normal-size AI preview under material rows === -->
+<style id="ff113-ai-under-material-normal-final">
+  body.ff-dashboard-preview{
+    display:grid !important;
+    grid-template-columns:minmax(390px, 42%) minmax(460px, 58%) !important;
+    gap:14px !important;
+    align-items:stretch !important;
+  }
+  body.ff-dashboard-preview #chat-panel{grid-column:1 !important;min-width:0 !important;max-width:none !important;}
+  body.ff-dashboard-preview #preview-panel{grid-column:2 !important;min-width:0 !important;max-width:none !important;width:auto !important;}
+  #ff-ai-live-panel{display:none !important;visibility:hidden !important;width:0 !important;min-width:0 !important;max-width:0 !important;height:0 !important;overflow:hidden !important;position:absolute !important;left:-99999px !important;}
+
+  /* 재질 선택값: 상판/다리/스크린 가로 일렬 */
+  #texture-preview{display:flex !important;flex-direction:column !important;gap:12px !important;overflow:visible !important;max-height:none !important;}
+  #texture-preview .quick-materials{
+    display:grid !important;
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    gap:10px !important;
+    width:100% !important;
+  }
+  #texture-preview .material-chip-row{
+    display:grid !important;
+    grid-template-columns:44px 1fr auto !important;
+    gap:10px !important;
+    align-items:center !important;
+    min-height:72px !important;
+    padding:12px !important;
+    border-radius:16px !important;
+  }
+  #texture-preview .material-chip-row span{font-size:12px !important;color:#2ef2c9 !important;font-weight:1000 !important;}
+  #texture-preview .material-chip-row i{font-size:13px !important;color:#fff !important;font-weight:1000 !important;text-align:right !important;}
+  #texture-preview .material-chip-row em{width:42px !important;height:32px !important;border-radius:10px !important;background-size:cover !important;background-position:center !important;}
+
+  /* 실사 미리보기: 재질 선택값 아래, 보통 크기 */
+  #quick-ai-preview-btn{
+    display:block !important;
+    width:100% !important;
+    min-height:52px !important;
+    margin:4px 0 0 !important;
+    border-radius:16px !important;
+    font-size:15px !important;
+    font-weight:1000 !important;
+    background:linear-gradient(135deg,#34f0cb,#7c3aed) !important;
+    color:#04131c !important;
+  }
+  #quick-ai-preview-note{
+    display:none;
+    margin-top:0 !important;
+    padding:14px !important;
+    border-radius:18px !important;
+    border:1px solid rgba(46,242,201,.28) !important;
+    background:#071722 !important;
+    color:#eafffb !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  #quick-ai-preview-note.ai-loading,
+  #quick-ai-preview-note.ai-result,
+  #quick-ai-preview-note.ai-error{display:block !important;}
+  #quick-ai-preview-note.ai-result img,
+  #quick-ai-preview-note img{
+    display:block !important;
+    width:100% !important;
+    max-height:560px !important;
+    min-height:300px !important;
+    object-fit:contain !important;
+    background:#fff !important;
+    border-radius:16px !important;
+    border:1px solid rgba(255,255,255,.16) !important;
+  }
+  @media(max-width:1100px){
+    body.ff-dashboard-preview{display:block !important;overflow:auto !important;height:auto !important;}
+    body.ff-dashboard-preview #chat-panel,
+    body.ff-dashboard-preview #preview-panel{width:auto !important;max-width:none !important;min-width:0 !important;}
+    #texture-preview .quick-materials{grid-template-columns:1fr !important;}
+  }
+</style>
+<script id="ff113-ai-panel-dom-fix">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function placeAiUnderMaterial(){
+    var old=$('ff-ai-live-panel');
+    if(old && old.parentElement) old.parentElement.removeChild(old);
+    var texture=$('texture-preview');
+    var btn=$('quick-ai-preview-btn');
+    var note=$('quick-ai-preview-note');
+    if(texture){
+      if(btn && btn.parentElement!==texture) texture.appendChild(btn);
+      if(note && note.parentElement!==texture) texture.appendChild(note);
+    }
+  }
+  placeAiUnderMaterial();
+  window.addEventListener('DOMContentLoaded',placeAiUnderMaterial);
+  window.addEventListener('load',placeAiUnderMaterial);
+  setTimeout(placeAiUnderMaterial,300);
+  setTimeout(placeAiUnderMaterial,1000);
 })();
 </script>
