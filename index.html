@@ -10711,6 +10711,89 @@ ${map.move[move] || move}
   setInterval(function(){try{ff90RefreshOptionSummary();}catch(e){}},1200);
 })();
 </script>
+
+
+<!-- v128: 주문품 상판 색상 무늬목/라미네이트 완전 양자택일 패치 -->
+<script id="ff128-custom-top-exclusive-patch">
+(function(){
+  function qsa(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function escSel(v){ return String(v||'').replace(/\\/g,'\\\\').replace(/"/g,'\\"'); }
+  function clearAllTopButtonsForInput(inputId){
+    if(!inputId) return;
+    qsa('.material-btn[data-input="'+escSel(inputId)+'"][data-part="top"]').forEach(function(b){
+      b.classList.remove('active','selected');
+    });
+  }
+  function clearInactiveTabButtons(uid, activeType){
+    var inactive = activeType === 'veneer' ? 'laminate' : 'veneer';
+    var inactiveBox = document.getElementById('ff127-top-' + inactive + '-' + uid);
+    if(inactiveBox){
+      qsa('.material-btn', inactiveBox).forEach(function(b){ b.classList.remove('active','selected'); });
+    }
+  }
+
+  var oldSelect = window.ffSelectMaterialButton;
+  window.ffSelectMaterialButton = function(inputId, code, part, btn){
+    if(part === 'top'){
+      clearAllTopButtonsForInput(inputId);
+    }
+    if(typeof oldSelect === 'function'){
+      oldSelect(inputId, code, part, btn);
+    } else {
+      var input = document.getElementById(inputId);
+      if(input) input.value = code;
+      if(btn) btn.classList.add('active');
+    }
+    if(part === 'top'){
+      clearAllTopButtonsForInput(inputId);
+      if(btn) btn.classList.add('active');
+      var input = document.getElementById(inputId);
+      if(input) input.value = code;
+    }
+  };
+
+  var oldTab = window.ff127TopTab;
+  window.ff127TopTab = function(uid, type){
+    if(typeof oldTab === 'function') oldTab(uid, type);
+    var ven = document.getElementById('ff127-top-veneer-' + uid);
+    var lam = document.getElementById('ff127-top-laminate-' + uid);
+    if(ven) ven.classList.toggle('active', type === 'veneer');
+    if(lam) lam.classList.toggle('active', type === 'laminate');
+    qsa('.ff127-tab').forEach(function(b){
+      var oc = b.getAttribute('onclick') || '';
+      if(oc.indexOf("'"+uid+"'") > -1){
+        b.classList.toggle('active', oc.indexOf("'"+type+"'") > -1);
+      }
+    });
+    clearInactiveTabButtons(uid, type);
+
+    // 탭을 바꾸면 숨겨진 그룹의 선택값은 유지하지 않도록 상판 input도 초기화한다.
+    var activeBox = document.getElementById('ff127-top-' + type + '-' + uid);
+    if(activeBox){
+      var anyBtn = activeBox.querySelector('.material-btn[data-input]');
+      if(anyBtn){
+        var inputId = anyBtn.getAttribute('data-input');
+        var input = document.getElementById(inputId);
+        if(input) input.value = '';
+        clearAllTopButtonsForInput(inputId);
+      }
+    }
+  };
+
+  // 혹시 기존 active가 양쪽에 남은 상태라면 마지막 클릭한 하나만 남기도록 정리
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('.material-btn[data-part="top"][data-input]');
+    if(!btn) return;
+    setTimeout(function(){
+      var inputId = btn.getAttribute('data-input');
+      clearAllTopButtonsForInput(inputId);
+      btn.classList.add('active');
+      var input = document.getElementById(inputId);
+      if(input) input.value = btn.getAttribute('data-code') || '';
+    }, 0);
+  }, true);
+})();
+</script>
 </body>
 
 
