@@ -10842,6 +10842,81 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+
+<!-- === FF130: single AI preview result + single click binding safety === -->
+<script id="ff130-single-preview-result-fix">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function note(){return $('quick-ai-preview-note');}
+  window.ff130RenderAiResult=function(imageSrc,label){
+    var n=note();
+    if(!n) return;
+    n.className='ai-result';
+    n.style.display='block';
+    n.innerHTML='';
+    var title=document.createElement('div');
+    title.style.cssText='font-weight:900;color:#fff;margin-bottom:8px;';
+    title.textContent=label||'AI 실사 미리보기';
+    var img=document.createElement('img');
+    img.src=imageSrc;
+    img.alt=label||'AI 실사 미리보기';
+    img.style.cssText='width:100%;border-radius:16px;border:1px solid rgba(46,242,201,.22);background:#fff;display:block;max-height:560px;object-fit:contain;';
+    var cap=document.createElement('div');
+    cap.style.cssText='margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;';
+    cap.textContent='원본 제품 이미지를 기준으로 선택 재질만 반영한 단일 미리보기입니다.';
+    n.appendChild(title);
+    n.appendChild(img);
+    n.appendChild(cap);
+  };
+  var oldFetch=window.fetch;
+  if(!window.__ff130FetchWrapped){
+    window.__ff130FetchWrapped=true;
+    window.fetch=function(){
+      return oldFetch.apply(this,arguments).then(function(res){
+        try{
+          var url=String(arguments[0]||'');
+        }catch(e){}
+        return res;
+      });
+    };
+  }
+  function bindOnce(){
+    var btn=$('quick-ai-preview-btn');
+    if(!btn) return;
+    var old=window.prepareNanoBananaPreview;
+    if(typeof old==='function' && !old.__ff130Wrapped){
+      var wrapped=async function(e){
+        if(e&&e.preventDefault)e.preventDefault();
+        if(window.__ff130Busy) return false;
+        window.__ff130Busy=true;
+        var n=note();
+        if(n){ n.innerHTML=''; n.className='ai-loading'; n.style.display='block'; }
+        try{ return await old.apply(this,arguments); }
+        finally{ window.__ff130Busy=false; }
+      };
+      wrapped.__ff130Wrapped=true;
+      window.prepareNanoBananaPreview=wrapped;
+    }
+    btn.onclick=function(e){ if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false; };
+  }
+  // Monitor AI result and force single img node if older scripts append more than one.
+  function cleanup(){
+    var n=note(); if(!n) return;
+    var imgs=n.querySelectorAll('img');
+    if(imgs.length>1){
+      var src=imgs[imgs.length-1].src;
+      window.ff130RenderAiResult(src,'AI 실사 미리보기');
+    }
+  }
+  bindOnce(); cleanup();
+  window.addEventListener('load',function(){bindOnce();cleanup();});
+  document.addEventListener('click',function(){setTimeout(function(){bindOnce();cleanup();},50);},true);
+  setInterval(function(){bindOnce();cleanup();},800);
+})();
+</script>
+
 </body>
 
 
