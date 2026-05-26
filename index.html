@@ -9706,6 +9706,173 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
 })();
 </script>
 
+
+
+<!-- === FF112: material values in one row + normal-size AI preview under material === -->
+<style id="ff112-material-row-ai-normal-css">
+  /* 재질 선택값: 상판 / 다리 / 스크린을 가로 3열로 고정 */
+  #texture-preview{
+    overflow:visible !important;
+    max-height:none !important;
+  }
+  #texture-preview .quick-materials,
+  .quick-materials{
+    display:grid !important;
+    grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
+    gap:10px !important;
+    width:100% !important;
+    align-items:stretch !important;
+  }
+  #texture-preview .material-chip-row,
+  .quick-materials .material-chip-row{
+    display:grid !important;
+    grid-template-columns:52px minmax(0,1fr) !important;
+    grid-template-rows:auto auto !important;
+    gap:6px 8px !important;
+    min-height:82px !important;
+    height:auto !important;
+    padding:9px 10px !important;
+    border-radius:14px !important;
+    align-items:center !important;
+    overflow:visible !important;
+  }
+  #texture-preview .material-chip-row span,
+  .quick-materials .material-chip-row span{
+    grid-column:1 / -1 !important;
+    display:block !important;
+    font-size:11px !important;
+    line-height:1.2 !important;
+    white-space:nowrap !important;
+    overflow:visible !important;
+    text-overflow:unset !important;
+  }
+  #texture-preview .material-chip-row em,
+  .quick-materials .material-chip-row em{
+    grid-column:1 !important;
+    grid-row:2 !important;
+    width:52px !important;
+    height:38px !important;
+    border-radius:10px !important;
+    background-size:cover !important;
+    background-position:center !important;
+    justify-self:start !important;
+  }
+  #texture-preview .material-chip-row i,
+  .quick-materials .material-chip-row i{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    display:block !important;
+    font-size:13px !important;
+    line-height:1.25 !important;
+    font-weight:900 !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:unset !important;
+    word-break:keep-all !important;
+  }
+
+  /* 실사 미리보기: 별도 오른쪽 큰 패널은 계속 숨기고, 재질 선택값 아래에 보통 크기로 표시 */
+  #ff-ai-live-panel{
+    display:none !important;
+    visibility:hidden !important;
+    width:0 !important;
+    min-width:0 !important;
+  }
+  #quick-ai-preview-btn{
+    order:98 !important;
+    width:100% !important;
+    min-height:48px !important;
+    margin-top:14px !important;
+    border-radius:16px !important;
+    font-size:14px !important;
+    font-weight:1000 !important;
+  }
+  #quick-ai-preview-note{
+    order:99 !important;
+    display:none;
+    width:100% !important;
+    margin-top:12px !important;
+    padding:14px !important;
+    border-radius:18px !important;
+    border:1px solid rgba(46,242,201,.28) !important;
+    background:#071722 !important;
+    color:#eafffb !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  #quick-ai-preview-note.ai-loading,
+  #quick-ai-preview-note.ai-result,
+  #quick-ai-preview-note.ai-error{
+    display:block !important;
+  }
+  #quick-ai-preview-note.ai-result img{
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-height:560px !important;
+    min-height:320px !important;
+    object-fit:contain !important;
+    background:#fff !important;
+    border-radius:16px !important;
+    border:1px solid rgba(255,255,255,.16) !important;
+  }
+  .ff112-ai-title{
+    font-weight:1000 !important;
+    color:#fff !important;
+    margin-bottom:10px !important;
+    font-size:15px !important;
+  }
+  .ff112-ai-caption{
+    margin-top:9px !important;
+    color:#9fb3bd !important;
+    font-size:11px !important;
+    line-height:1.45 !important;
+  }
+  @media(max-width:760px){
+    #texture-preview .quick-materials,
+    .quick-materials{
+      grid-template-columns:1fr !important;
+    }
+    #quick-ai-preview-note.ai-result img{
+      min-height:240px !important;
+      max-height:420px !important;
+    }
+  }
+</style>
+<script id="ff112-ai-normal-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function ensureUnderMaterial(){
+    var texture=$('texture-preview');
+    var btn=$('quick-ai-preview-btn');
+    var note=$('quick-ai-preview-note');
+    if(texture && btn && btn.parentElement!==texture) texture.appendChild(btn);
+    if(texture && note && note.parentElement!==texture) texture.appendChild(note);
+  }
+  var oldPrepare=window.prepareNanoBananaPreview;
+  if(typeof oldPrepare==='function' && !window.__ff112WrappedNano){
+    window.__ff112WrappedNano=true;
+    window.prepareNanoBananaPreview=async function(){
+      ensureUnderMaterial();
+      return oldPrepare.apply(this, arguments);
+    };
+  }
+  function polishResult(){
+    var note=$('quick-ai-preview-note');
+    if(note && note.classList.contains('ai-result')){
+      var title=note.querySelector('div');
+      if(title) title.className='ff112-ai-title';
+      var caps=note.querySelectorAll('div');
+      if(caps.length>1) caps[caps.length-1].className='ff112-ai-caption';
+    }
+  }
+  function bind(){ ensureUnderMaterial(); polishResult(); }
+  bind();
+  window.addEventListener('load', bind);
+  setInterval(bind, 1200);
+})();
+</script>
+
 </body>
 
 
@@ -12620,5 +12787,221 @@ button.material-btn{
     html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
     bot(html); scrollLatest();
   };
+})();
+</script>
+
+<!-- === FF111: AI result under material preview + lightweight Nano payload === -->
+<style id="ff111-ai-under-material-css">
+  body.ff-dashboard-preview{
+    display:grid !important;
+    grid-template-columns:minmax(390px, 42%) minmax(420px, 58%) !important;
+    gap:12px !important;
+  }
+  body.ff-dashboard-preview #chat-panel{grid-column:1 !important;min-width:0 !important;}
+  body.ff-dashboard-preview #preview-panel{grid-column:2 !important;min-width:0 !important;}
+  #ff-ai-live-panel{display:none !important;visibility:hidden !important;width:0 !important;min-width:0 !important;}
+  #texture-preview{overflow:visible !important;max-height:none !important;}
+  #quick-ai-preview-btn{
+    order:98 !important;
+    width:100% !important;
+    min-height:44px !important;
+    margin-top:10px !important;
+    border-radius:14px !important;
+    font-size:14px !important;
+  }
+  #quick-ai-preview-note{
+    order:99 !important;
+    display:none;
+    margin-top:10px !important;
+    padding:12px !important;
+    border-radius:16px !important;
+    border:1px solid rgba(46,242,201,.25) !important;
+    background:#071722 !important;
+    color:#eafffb !important;
+    max-height:none !important;
+    overflow:visible !important;
+  }
+  #quick-ai-preview-note.ai-loading,
+  #quick-ai-preview-note.ai-result,
+  #quick-ai-preview-note.ai-error{display:block !important;}
+  #quick-ai-preview-note.ai-result img{
+    display:block !important;
+    width:100% !important;
+    max-height:320px !important;
+    object-fit:contain !important;
+    background:#fff !important;
+    border-radius:14px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+  }
+  @media(max-width:1100px){
+    body.ff-dashboard-preview{display:block !important;overflow:auto !important;height:auto !important;}
+    body.ff-dashboard-preview #chat-panel,
+    body.ff-dashboard-preview #preview-panel{width:auto !important;max-width:none !important;}
+  }
+</style>
+<script id="ff111-nano-lightweight-under-material-js">
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function getState(){ return (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || window.state || {}; }
+  function timeoutController(ms){
+    var controller = new AbortController();
+    var timer = setTimeout(function(){ controller.abort(); }, ms);
+    return { controller: controller, clear: function(){ clearTimeout(timer); } };
+  }
+  function tryRenderPreview(){
+    try{ if(window.FlowFinderFastPreview && typeof window.FlowFinderFastPreview.render === 'function') window.FlowFinderFastPreview.render(''); }catch(e){}
+    try{ if(window.FlowFinderMaskPreview && typeof window.FlowFinderMaskPreview.render === 'function') window.FlowFinderMaskPreview.render(); }catch(e){}
+    try{ if(window.FlowFinderHeroComposer && typeof window.FlowFinderHeroComposer.render === 'function') window.FlowFinderHeroComposer.render(); }catch(e){}
+  }
+  function pickSourceCanvas(){
+    tryRenderPreview();
+    var ids = ['ff-render-canvas','ff-hero-canvas','set-composite-canvas','screen-composite-canvas','product-3d-canvas'];
+    for(var i=0;i<ids.length;i++){
+      var c = $(ids[i]);
+      if(c && c.tagName && c.tagName.toLowerCase() === 'canvas' && c.width > 10 && c.height > 10){
+        return c;
+      }
+    }
+    return null;
+  }
+  function canvasToSafeJpegDataUrl(sourceCanvas){
+    return new Promise(function(resolve, reject){
+      try{
+        var maxW = 1280;
+        var maxH = 720;
+        var scale = Math.min(maxW / sourceCanvas.width, maxH / sourceCanvas.height, 1);
+        var w = Math.max(1, Math.round(sourceCanvas.width * scale));
+        var h = Math.max(1, Math.round(sourceCanvas.height * scale));
+        var safe = document.createElement('canvas');
+        safe.width = w;
+        safe.height = h;
+        var ctx = safe.getContext('2d', { alpha:false });
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0,0,w,h);
+        ctx.drawImage(sourceCanvas, 0, 0, w, h);
+        safe.toBlob(function(blob){
+          if(!blob) return reject(new Error('미리보기 이미지를 JPEG Blob으로 변환하지 못했습니다.'));
+          var reader = new FileReader();
+          reader.onload = function(){ resolve(reader.result); };
+          reader.onerror = function(){ reject(new Error('JPEG Blob 읽기에 실패했습니다.')); };
+          reader.readAsDataURL(blob);
+        }, 'image/jpeg', 0.82);
+      }catch(err){ reject(err); }
+    });
+  }
+  function firstVisibleImageSrc(){
+    var ids=['ff-hero-img','quick-desk-img','product-preview-img','ff-static-main-img'];
+    for(var i=0;i<ids.length;i++){
+      var img=$(ids[i]);
+      if(img && img.src && img.complete !== false && img.naturalWidth !== 0){
+        return img.getAttribute('src') || img.src;
+      }
+    }
+    return '';
+  }
+  function productImage(key){ return key ? ('products/'+key+'/base/base.png') : ''; }
+  function labelForKey(key){
+    var map={desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'};
+    return map[key] || key || '';
+  }
+  function ensureNoteUnderMaterial(){
+    var texture=$('texture-preview');
+    var btn=$('quick-ai-preview-btn');
+    var note=$('quick-ai-preview-note');
+    if(texture && btn && btn.parentElement !== texture) texture.appendChild(btn);
+    if(texture && note && note.parentElement !== texture) texture.appendChild(note);
+  }
+  async function fetchJsonWithTimeout(url, options, ms){
+    var t=timeoutController(ms);
+    try{
+      options = options || {};
+      options.signal = t.controller.signal;
+      var res = await fetch(url, options);
+      var data = await res.json().catch(function(){ return {}; });
+      return { res:res, data:data };
+    }finally{ t.clear(); }
+  }
+  window.prepareNanoBananaPreview = async function(){
+    if(window.__ff111NanoBusy) return;
+    window.__ff111NanoBusy = true;
+    ensureNoteUnderMaterial();
+    var note=$('quick-ai-preview-note');
+    var btn=$('quick-ai-preview-btn');
+    if(note){
+      note.className='ai-loading';
+      note.style.display='block';
+      note.innerHTML='<b>AI 실사 미리보기 생성 중...</b><br><span style="color:#9fb3bd;">작은 JPEG 미리보기로 전송합니다. 오른쪽 별도 큰 창은 사용하지 않습니다.</span>';
+    }
+    if(btn){ btn.disabled=true; btn.textContent='생성 중...'; }
+    try{
+      var health=await fetchJsonWithTimeout('/api/health', { cache:'no-store' }, 6000);
+      if(!health.res || !health.res.ok) throw new Error('서버 연결 실패: npm run dev 실행 후 http://localhost:3000에서 열어주세요.');
+      if(health.data && health.data.hasGeminiKey === false) throw new Error('GEMINI_API_KEY가 서버 환경변수 또는 .env에 없습니다.');
+
+      var s=getState();
+      var deskKey=s.deskKey || s.productKey || s.selectedDeskKey || 'desk_standard';
+      var screenKey=s.screenKey || s.selectedScreenKey || '';
+      var sourceCanvas=pickSourceCanvas();
+      var composed = sourceCanvas ? await canvasToSafeJpegDataUrl(sourceCanvas) : '';
+      var fallback=firstVisibleImageSrc() || productImage(deskKey);
+      var payload={
+        mode:'nano-banana-small-jpeg-under-material-v111',
+        composedPreview: composed || '',
+        deskImage: composed || fallback,
+        fallbackDeskImage: fallback,
+        topTexture: s.topTex || s.topTexture || s.topMaterialImg || '',
+        legTexture: s.legTex || s.legTexture || s.legMaterialImg || '',
+        screenTexture: s.screenTex || s.screenTexture || '',
+        topCode: s.top || s.topCode || s.topColor || '',
+        legCode: s.leg || s.legCode || s.legColor || '',
+        screenCode: s.screenColor || s.screenCode || '',
+        deskLabel: s.deskLabel || labelForKey(deskKey),
+        screenSelected: !!screenKey,
+        screenLabel: s.screenLabel || labelForKey(screenKey),
+        screenImage: screenKey ? productImage(screenKey) : '',
+        legType: s.legType || s.legShape || '',
+        casterType: s.casterType || s.mobility || '',
+        topShape: s.topShape || '',
+        size: s.size || { w:s.w||'', d:s.d||'', h:s.h||'', screenH:s.screenH||'', screenTopGap:s.screenTopGap||'' }
+      };
+      var out=await fetchJsonWithTimeout('/api/generate-preview', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      }, 45000);
+      if(!out.res.ok) throw new Error(out.data.error || out.data.detail || '실사 미리보기 생성 실패');
+      var imageSrc=(typeof out.data === 'string') ? out.data : (out.data.imageUrl || out.data.image || out.data.url || '');
+      if(!imageSrc) throw new Error('이미지 결과를 받지 못했습니다.');
+      if(note){
+        note.className='ai-result';
+        note.style.display='block';
+        note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">AI 실사 미리보기</div>'+
+          '<img src="'+imageSrc+'" alt="AI 실사 미리보기">'+
+          '<div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">재질 선택값 아래에 표시되는 축소 미리보기입니다.</div>';
+      }
+    }catch(err){
+      var msg=(err && err.name === 'AbortError') ? '45초 동안 응답이 없어 자동 중단했습니다.' : (err.message || String(err));
+      console.error('[FF111 Nano]', err);
+      if(note){
+        note.className='ai-error';
+        note.style.display='block';
+        note.innerHTML='<b style="color:#fca5a5;">실사 미리보기 생성 실패</b><br><span style="color:#ddd;">'+msg+'</span><br><span style="color:#888;">버튼은 자동 복구됩니다.</span>';
+      }
+    }finally{
+      window.__ff111NanoBusy=false;
+      if(btn){ btn.disabled=false; btn.textContent='✨ 실사 미리보기 생성'; }
+    }
+  };
+  function bind(){
+    ensureNoteUnderMaterial();
+    var btn=$('quick-ai-preview-btn');
+    if(btn){
+      btn.onclick=function(e){ if(e) e.preventDefault(); window.prepareNanoBananaPreview(); return false; };
+    }
+  }
+  bind();
+  window.addEventListener('load', bind);
+  setTimeout(bind,300);
+  setTimeout(bind,1000);
 })();
 </script>
