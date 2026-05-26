@@ -13087,3 +13087,189 @@ button.material-btn{
   setTimeout(placeAiUnderMaterial,1000);
 })();
 </script>
+
+<!-- === FF114 FINAL: remove right AI panel completely and keep AI preview under material values === -->
+<style id="ff114-remove-right-ai-panel-final">
+  html, body { height:100% !important; }
+  body.ff-dashboard-preview{
+    display:grid !important;
+    grid-template-columns:minmax(390px, 40%) minmax(520px, 60%) !important;
+    gap:14px !important;
+    height:100vh !important;
+    max-height:100vh !important;
+    overflow:hidden !important;
+    padding:12px !important;
+    box-sizing:border-box !important;
+  }
+  body.ff-dashboard-preview #chat-panel{
+    grid-column:1 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:calc(100vh - 24px) !important;
+    max-height:calc(100vh - 24px) !important;
+    overflow:hidden !important;
+  }
+  body.ff-dashboard-preview #preview-panel{
+    grid-column:2 !important;
+    width:auto !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:calc(100vh - 24px) !important;
+    max-height:calc(100vh - 24px) !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+  }
+  #ff-ai-live-panel,
+  .ff-ai-live-panel,
+  [id="ff-ai-live-panel"]{
+    display:none !important;
+    visibility:hidden !important;
+    opacity:0 !important;
+    width:0 !important;
+    min-width:0 !important;
+    max-width:0 !important;
+    height:0 !important;
+    min-height:0 !important;
+    max-height:0 !important;
+    overflow:hidden !important;
+    position:absolute !important;
+    left:-999999px !important;
+    top:-999999px !important;
+    pointer-events:none !important;
+  }
+  #texture-preview{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:12px !important;
+    overflow:visible !important;
+    max-height:none !important;
+  }
+  #texture-preview .quick-materials{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:10px !important;
+    width:100% !important;
+  }
+  #texture-preview .material-chip-row{
+    display:grid !important;
+    grid-template-columns:48px 1fr auto !important;
+    gap:10px !important;
+    align-items:center !important;
+    min-height:76px !important;
+    height:auto !important;
+    padding:12px !important;
+    border-radius:16px !important;
+    overflow:visible !important;
+  }
+  #texture-preview .material-chip-row span{
+    color:#2ef2c9 !important;
+    font-size:12px !important;
+    font-weight:1000 !important;
+    white-space:nowrap !important;
+  }
+  #texture-preview .material-chip-row i{
+    color:#fff !important;
+    font-size:13px !important;
+    font-weight:1000 !important;
+    text-align:right !important;
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:unset !important;
+  }
+  #texture-preview .material-chip-row em{
+    width:46px !important;
+    height:34px !important;
+    border-radius:10px !important;
+    background-size:cover !important;
+    background-position:center !important;
+  }
+  #quick-ai-preview-btn{
+    display:block !important;
+    width:100% !important;
+    min-height:52px !important;
+    margin:2px 0 0 !important;
+    border:0 !important;
+    border-radius:16px !important;
+    background:linear-gradient(135deg,#34f0cb,#7c3aed) !important;
+    color:#04131c !important;
+    font-weight:1000 !important;
+    font-size:15px !important;
+    cursor:pointer !important;
+  }
+  #quick-ai-preview-note{
+    display:none;
+    width:100% !important;
+    margin-top:0 !important;
+    padding:14px !important;
+    border-radius:18px !important;
+    border:1px solid rgba(46,242,201,.28) !important;
+    background:#071722 !important;
+    color:#eafffb !important;
+    max-height:none !important;
+    overflow:visible !important;
+    box-sizing:border-box !important;
+  }
+  #quick-ai-preview-note.ai-loading,
+  #quick-ai-preview-note.ai-result,
+  #quick-ai-preview-note.ai-error{
+    display:block !important;
+  }
+  #quick-ai-preview-note img,
+  #quick-ai-preview-note.ai-result img{
+    display:block !important;
+    width:100% !important;
+    min-height:300px !important;
+    max-height:560px !important;
+    object-fit:contain !important;
+    background:#fff !important;
+    border-radius:16px !important;
+    border:1px solid rgba(255,255,255,.16) !important;
+  }
+  @media(max-width:1100px){
+    body.ff-dashboard-preview{display:block !important;height:auto !important;max-height:none !important;overflow:auto !important;}
+    body.ff-dashboard-preview #chat-panel,
+    body.ff-dashboard-preview #preview-panel{width:auto !important;max-width:none !important;min-width:0 !important;height:auto !important;max-height:none !important;margin-bottom:12px !important;}
+    #texture-preview .quick-materials{grid-template-columns:1fr !important;}
+  }
+</style>
+<script id="ff114-remove-right-ai-panel-final-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function moveAiUnderMaterial(){
+    var texture=$('texture-preview');
+    var btn=$('quick-ai-preview-btn');
+    var note=$('quick-ai-preview-note');
+    if(texture){
+      if(btn && btn.parentElement!==texture) texture.appendChild(btn);
+      if(note && note.parentElement!==texture) texture.appendChild(note);
+    }
+  }
+  function removeRightPanel(){
+    document.querySelectorAll('#ff-ai-live-panel,.ff-ai-live-panel').forEach(function(el){
+      if(el && el.parentElement) el.parentElement.removeChild(el);
+    });
+  }
+  function enforceTwoColumns(){
+    if(document.body && document.body.classList.contains('ff-dashboard-preview')){
+      document.body.style.gridTemplateColumns='minmax(390px,40%) minmax(520px,60%)';
+      document.body.style.gap='14px';
+    }
+    var chat=$('chat-panel');
+    var prev=$('preview-panel');
+    if(chat){chat.style.gridColumn='1';}
+    if(prev){prev.style.gridColumn='2';prev.style.width='auto';prev.style.maxWidth='none';}
+  }
+  function apply(){
+    removeRightPanel();
+    moveAiUnderMaterial();
+    enforceTwoColumns();
+  }
+  apply();
+  window.addEventListener('DOMContentLoaded',apply);
+  window.addEventListener('load',apply);
+  var mo=new MutationObserver(apply);
+  mo.observe(document.documentElement,{childList:true,subtree:true});
+  setInterval(apply,500);
+})();
+</script>
