@@ -10157,6 +10157,59 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
 })();
 </script>
 
+
+<script id="ff119-nano-round-fix">
+(function(){
+  window.__ffNanoPromptMap = {
+    leg: {
+      "원형 4레그":"cylindrical round-tube four legs, not a circular tabletop",
+      "사다리형 4레그":"ladder-style four legs",
+      "A자 4레그":"A-frame four legs"
+    },
+    top: {
+      "라운드 상판":"rectangular desktop with rounded corners, not a circular tabletop",
+      "스퀘어 상판":"rectangular desktop with square corners"
+    },
+    move: {
+      "글라이드":"fixed glides",
+      "캐스터":"small caster wheels"
+    }
+  };
+
+  var old = window.prepareNanoBananaPreview;
+
+  window.prepareNanoBananaPreview = async function(){
+    window.__ffNanoExtraPrompt = '';
+    try{
+      var leg = (window.selectedLegType || window.currentLegType || '').trim();
+      var top = (window.selectedTopShape || window.currentTopShape || '').trim();
+      var move = (window.selectedMoveType || window.currentMoveType || '').trim();
+
+      var map = window.__ffNanoPromptMap;
+
+      window.__ffNanoExtraPrompt = `
+Keep the tabletop rectangular.
+Do NOT create a round table.
+Do NOT create a circular tabletop.
+
+Leg style:
+${map.leg[leg] || leg}
+
+Top style:
+${map.top[top] || top}
+
+Movement:
+${map.move[move] || move}
+`;
+    }catch(e){ console.log(e); }
+
+    if(typeof old === 'function'){
+      return old.apply(this, arguments);
+    }
+  };
+})();
+</script>
+
 </body>
 
 
