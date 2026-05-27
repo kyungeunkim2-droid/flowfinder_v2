@@ -624,7 +624,7 @@ body.ff-dashboard-preview #preview-panel {
 }
 #texture-preview .material-chip-row span { color:#9fb1c8 !important; }
 #texture-preview .material-chip-row i { color:#fff !important; }
-
+#quick-ai-preview-note { display:none !important; }
 #quick-ai-preview-btn {
   background:linear-gradient(135deg,#ff6b1a,#ff8a1d) !important;
   color:#fff !important;
@@ -8623,6 +8623,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     line-height:1.25!important;
   }
 
+  #texture-preview .quick-materials,
   .quick-materials{
     display:grid!important;
     grid-template-columns:repeat(3,minmax(0,1fr))!important;
@@ -8668,6 +8669,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
   @media(max-width:980px){
     body.ff-dashboard-preview #preview-panel{height:auto!important;max-height:none!important;}
     #ff90-option-summary .ff90-grid,
+    #texture-preview .quick-materials,
     .quick-materials{grid-template-columns:1fr!important;}
   }
 </style>
@@ -9605,6 +9607,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     overflow:visible !important;
     max-height:none !important;
   }
+  #texture-preview .quick-materials,
   .quick-materials{
     display:grid !important;
     grid-template-columns:repeat(3, minmax(0, 1fr)) !important;
@@ -9718,6 +9721,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     line-height:1.45 !important;
   }
   @media(max-width:760px){
+    #texture-preview .quick-materials,
     .quick-materials{
       grid-template-columns:1fr !important;
     }
@@ -13118,76 +13122,6 @@ setInterval(function(){
 
 
 
-<style id="ff160-texture-preview-single-panel-css">
-/* 새로 추가했던 중복 패널은 전부 숨김 */
-#rightPreviewPanel {
-  display: none !important;
-}
-
-/* 기존 오른쪽 영역 하나만 사용 */
-#texture-preview {
-  display: block !important;
-  margin-top: 14px !important;
-  padding: 14px !important;
-  border: 1px solid rgba(46,242,201,.28) !important;
-  border-radius: 18px !important;
-  background: rgba(255,255,255,.035) !important;
-  overflow: hidden !important;
-}
-
-/* 예전 quick-options/칩/버튼/생성중 UI 숨김 */
-#ff-quick-options,
-#texture-preview .quick-preview-grid,
-#texture-preview #product-3d-canvas,
-#texture-preview #texture-strip {
-  display: none !important;
-}
-
-.ff160-preview-title {
-  display:flex !important;
-  align-items:center !important;
-  justify-content:space-between !important;
-  color:#2ef2c9 !important;
-  font-size:13px !important;
-  font-weight:900 !important;
-  margin-bottom:10px !important;
-}
-
-.ff160-preview-card {
-  margin-top: 12px !important;
-  padding: 12px !important;
-  border: 1px solid rgba(46,242,201,.22) !important;
-  border-radius: 16px !important;
-  background: #071827 !important;
-}
-
-.ff160-preview-card h3 {
-  margin: 0 0 8px 0 !important;
-  color: #fff !important;
-  font-size: 13px !important;
-  font-weight: 900 !important;
-}
-
-.ff160-preview-card img {
-  width: 100% !important;
-  height: 220px !important;
-  object-fit: contain !important;
-  background: #fff !important;
-  border-radius: 12px !important;
-  display: block !important;
-}
-
-.ff160-empty {
-  height: 120px !important;
-  border-radius: 12px !important;
-  border: 1px dashed rgba(46,242,201,.25) !important;
-  display:flex !important;
-  align-items:center !important;
-  justify-content:center !important;
-  color:#9fb1c8 !important;
-  font-size:12px !important;
-}
-</style>
 <script>
 function setDeskOptionImage(path) {
   const img =
@@ -13274,77 +13208,293 @@ function showMoveImage(text) {
 </script>
 
 
-<style id="ff162-restore-ai-button-hide-only-overlap">
-/* 겹치는 3개 카드만 숨김 */
+<style id="ff163-final-no-overlap-preview-css">
+/* old duplicated desk-option summary panel */
+#ff90-option-summary,
+#ff-static-option-preview,
 #ff-quick-options,
 #quick-legtype-row,
 #quick-caster-row,
 #quick-topshape-row,
 .quick-option-row,
-.quick-option-box,
-.quick-option-card {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  min-height: 0 !important;
-  max-height: 0 !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  border: 0 !important;
-  overflow: hidden !important;
+.quick-option-card,
+.quick-option-box {
+  display:none!important;
+  visibility:hidden!important;
+  height:0!important;
+  min-height:0!important;
+  max-height:0!important;
+  margin:0!important;
+  padding:0!important;
+  border:0!important;
+  overflow:hidden!important;
 }
 
-/* 실사 미리보기 생성 버튼은 다시 표시 */
-#quick-ai-preview-btn,
-button[onclick*="renderFastPreview"],
-button[onclick*="generateDeskTexturePreview"],
-button[onclick*="generate"],
-.ai-generate-btn,
-.generate-preview-btn {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  height: auto !important;
-  min-height: 44px !important;
-  margin-top: 12px !important;
-  padding: 12px 16px !important;
+/* texture-preview becomes the single right-side preview area */
+#texture-preview {
+  display:block!important;
+  margin:14px 0!important;
+  padding:12px!important;
+  border:1px solid rgba(46,242,201,.34)!important;
+  border-radius:18px!important;
+  background:#061a25!important;
+  color:#fff!important;
+  cursor:default!important;
+  overflow:hidden!important;
 }
 
-/* 재질 요약 칩은 필요하면 유지 */
-.quick-materials,
-.material-chip-row {
-  display: flex !important;
-  visibility: visible !important;
+#texture-preview .quick-materials,
+#texture-preview .material-chip-row,
+#texture-preview .quick-preview-grid,
+#texture-preview #product-3d-canvas,
+#texture-preview #texture-strip {
+  display:none!important;
+}
+
+.ff163-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  color:#2ef2c9;
+  font-size:13px;
+  font-weight:950;
+  margin:0 0 10px;
+}
+
+.ff163-preview-img{
+  width:100%;
+  height:190px;
+  display:block;
+  object-fit:contain;
+  background:#fff;
+  border-radius:12px;
+  padding:8px;
+  border:1px solid rgba(255,255,255,.12);
+}
+
+.ff163-empty{
+  height:150px;
+  border:1px dashed rgba(46,242,201,.35);
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#91a3b8;
+  font-size:12px;
+  text-align:center;
+  padding:12px;
+}
+
+.ff163-actions{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:12px;
+}
+
+.ff163-btn{
+  width:100%;
+  min-height:44px;
+  border:0;
+  border-radius:14px;
+  background:linear-gradient(135deg,#2ef2c9,#7c3aed);
+  color:#fff;
+  font-weight:950;
+  cursor:pointer;
+}
+
+.ff163-result{
+  margin-top:12px;
+  padding:10px;
+  border-radius:14px;
+  background:#071827;
+  border:1px solid rgba(255,255,255,.12);
+  color:#cbd5e1;
+  font-size:12px;
+}
+
+.ff163-result img{
+  width:100%;
+  max-height:260px;
+  object-fit:contain;
+  background:#fff;
+  display:block;
+  border-radius:12px;
+  margin-top:8px;
 }
 </style>
 
-<script id="ff162-restore-ai-button-js">
+<script id="ff163-final-no-overlap-preview-js">
 (function(){
-  function removeOnlyOverlap(){
-    [
-      "#ff-quick-options",
-      "#quick-legtype-row",
-      "#quick-caster-row",
-      "#quick-topshape-row"
-    ].forEach(function(sel){
-      document.querySelectorAll(sel).forEach(function(el){ el.remove(); });
-    });
+  var lastOptionPath = "";
 
-    var aiBtn = document.getElementById("quick-ai-preview-btn");
-    if(aiBtn){
-      aiBtn.style.display = "block";
-      aiBtn.style.visibility = "visible";
-      aiBtn.style.opacity = "1";
-      aiBtn.style.height = "auto";
-      aiBtn.style.minHeight = "44px";
+  function $(id){ return document.getElementById(id); }
+
+  function ensurePanel(){
+    var panel = $("texture-preview");
+    if(!panel) return null;
+
+    if(panel.getAttribute("data-ff163") !== "1"){
+      panel.setAttribute("data-ff163","1");
+      panel.innerHTML = ''
+        + '<div class="ff163-title"><span>데스크 옵션 이미지</span><small>options 폴더 기준</small></div>'
+        + '<img id="ff163-option-img" class="ff163-preview-img" style="display:none;" alt="데스크 옵션 이미지">'
+        + '<div id="ff163-option-empty" class="ff163-empty">상판형태 / 다리형태 / 이동방식을 선택하면 여기에 표시됩니다.</div>'
+        + '<div class="ff163-actions">'
+        + '  <button id="quick-ai-preview-btn" class="ff163-btn" type="button" onclick="window.prepareNanoBananaPreview && window.prepareNanoBananaPreview()">✨ 데스크 실사 미리보기 생성</button>'
+        + '  <button id="screen-ai-btn" class="ff163-btn" type="button" onclick="window.prepareNanoBananaScreenPreview && window.prepareNanoBananaScreenPreview()">✨ 스크린 실사 미리보기 생성</button>'
+        + '</div>'
+        + '<div id="quick-ai-preview-note" class="ff163-result" style="display:none;"></div>'
+        + '<div id="screen-ai-preview-note" class="ff163-result" style="display:none;"></div>';
     }
+
+    panel.style.display = "block";
+    return panel;
   }
 
+  function setOptionImage(path){
+    ensurePanel();
+    if(!path) return;
+    lastOptionPath = path;
+    var img = $("ff163-option-img");
+    var empty = $("ff163-option-empty");
+    if(img){
+      img.src = path;
+      img.style.display = "block";
+    }
+    if(empty) empty.style.display = "none";
+  }
+
+  function normLeg(text){
+    text = String(text || "");
+    if(/A자|a자|에이/.test(text)) return "aframe";
+    if(/원형/.test(text)) return "round";
+    return "ladder";
+  }
+
+  function normMove(text){
+    text = String(text || "");
+    return /캐스터|바퀴/.test(text) ? "caster" : "glide";
+  }
+
+  function topPath(text){
+    text = String(text || "");
+    return /라운드/.test(text) ? "images/options/top/round.png" : "images/options/top/rect.png";
+  }
+
+  function legPath(text){
+    var k = normLeg(text);
+    return "images/options/leg/" + k + ".png";
+  }
+
+  function movePath(text){
+    var st = window.state || {};
+    var legText = st.legType || (st.current && st.current.legType) || "";
+    var leg = normLeg(legText);
+    return "images/options/mobility/" + leg + "_" + normMove(text) + ".png";
+  }
+
+  // kill the old 3-card desk-option summary permanently
+  window.ff90RefreshOptionSummary = function(){
+    var old = $("ff90-option-summary");
+    if(old) old.remove();
+    return;
+  };
   window.ensureQuickOptions = function(){ return; };
   window.syncQuickOptions = function(){ return; };
 
-  removeOnlyOverlap();
-  setInterval(removeOnlyOverlap, 500);
+  function removeOldPanels(){
+    ["ff90-option-summary","ff-static-option-preview","ff-quick-options","quick-legtype-row","quick-caster-row","quick-topshape-row"].forEach(function(id){
+      var el = $(id);
+      if(el) el.remove();
+    });
+    document.querySelectorAll(".quick-option-row,.quick-option-card,.quick-option-box").forEach(function(el){ el.remove(); });
+  }
+
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest && e.target.closest("button");
+    if(!btn) return;
+    var text = (btn.textContent || "").replace(/\s+/g," ").trim();
+
+    setTimeout(function(){
+      removeOldPanels();
+
+      if(/직사각|스퀘어|라운드/.test(text)){
+        if(window.state){
+          state.topShape = text;
+          state.current = state.current || {};
+          state.current.topShape = text;
+        }
+        setOptionImage(topPath(text));
+        return;
+      }
+
+      if(/사다리형|원형 4레그|A자형|a자형/.test(text)){
+        if(window.state){
+          state.legType = text;
+          state.current = state.current || {};
+          state.current.legType = text;
+        }
+        setOptionImage(legPath(text));
+        return;
+      }
+
+      if(/글라이드|캐스터|바퀴/.test(text)){
+        if(window.state){
+          state.mobility = text;
+          state.casterType = text;
+          state.current = state.current || {};
+          state.current.mobility = text;
+          state.current.casterType = text;
+        }
+        setOptionImage(movePath(text));
+        return;
+      }
+    },30);
+  }, true);
+
+  // Keep the old Nano Banana function but direct result into our single result box.
+  var oldPrepareDesk = window.prepareNanoBananaPreview;
+  if(typeof oldPrepareDesk === "function"){
+    window.prepareNanoBananaPreview = async function(){
+      ensurePanel();
+      var note = $("quick-ai-preview-note");
+      if(note){
+        note.style.display = "block";
+        note.innerHTML = "데스크 실사 미리보기 생성 중...";
+      }
+      return oldPrepareDesk.apply(this, arguments);
+    };
+  }
+
+  window.prepareNanoBananaScreenPreview = async function(){
+    ensurePanel();
+    var note = $("screen-ai-preview-note");
+    if(note){
+      note.style.display = "block";
+      note.innerHTML = "스크린 실사 미리보기 생성 준비 중입니다. 스크린용 API payload 연결이 필요합니다.";
+    }
+  };
+
+  window.showOptionImage = setOptionImage;
+
+  function boot(){
+    ensurePanel();
+    removeOldPanels();
+    if(lastOptionPath) setOptionImage(lastOptionPath);
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    setTimeout(boot,100);
+    setTimeout(boot,800);
+  });
+  window.addEventListener("load", function(){
+    setTimeout(boot,100);
+    setTimeout(boot,800);
+    setTimeout(boot,1800);
+  });
+  setInterval(removeOldPanels, 700);
 })();
 </script>
 
