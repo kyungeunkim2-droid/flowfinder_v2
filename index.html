@@ -12967,6 +12967,114 @@ window.addEventListener('load',function(){
 })();
 </script>
 
+
+<style id="ff155-stable-material-preview-css">
+/* 재질 버튼 썸네일 흔들림 방지 */
+.material-button-group,
+.ff-mat-grid{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:flex-start!important;
+  gap:8px!important;
+}
+.material-btn{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:7px!important;
+  min-width:78px!important;
+  height:42px!important;
+  padding:6px 9px!important;
+  box-sizing:border-box!important;
+  vertical-align:top!important;
+  line-height:1!important;
+  transform:none!important;
+  transition:border-color .12s ease, background-color .12s ease!important;
+  contain:layout paint!important;
+}
+.material-btn:hover,
+.material-btn.active,
+.material-btn.selected,
+.material-btn.is-hovering{
+  transform:none!important;
+}
+.material-btn .mat-thumb,
+.material-btn .material-thumb,
+.material-btn .color-swatch,
+.material-btn em{
+  width:26px!important;
+  height:26px!important;
+  min-width:26px!important;
+  max-width:26px!important;
+  flex:0 0 26px!important;
+  border-radius:7px!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  transform:none!important;
+  transition:none!important;
+  box-sizing:border-box!important;
+}
+.material-btn.active .mat-thumb,
+.material-btn.selected .mat-thumb,
+.material-btn:hover .mat-thumb{
+  transform:none!important;
+}
+.material-btn .mat-code{
+  display:inline-block!important;
+  min-width:30px!important;
+  white-space:nowrap!important;
+  line-height:1!important;
+}
+/* 마우스를 따라다니는 hover popup 고정/비활성화 */
+#material-hover-preview,
+.material-hover-preview{
+  pointer-events:none!important;
+  transform:none!important;
+  transition:opacity .12s ease!important;
+}
+</style>
+
+<script id="ff155-stable-material-preview-js">
+(function(){
+  // 재질 버튼 hover 때마다 큰 preview가 마우스를 따라다니며 떨리는 현상 방지
+  window.ffMoveMaterialPreview = function(){ return false; };
+
+  var oldHover = window.ffHoverMaterial;
+  window.ffHoverMaterial = function(inputId, code, part, ev, btn){
+    try{
+      if (btn) btn.classList.add('is-hovering');
+      // 오른쪽 큰 미리보기만 바꾸고, 마우스 따라다니는 팝업 위치 변경은 하지 않음
+      var previewCode = part === 'leg' ? ('LEG_' + code) : code;
+      if (typeof window.showTexturePreview === 'function') window.showTexturePreview(previewCode);
+      if (typeof window.setPreviewGlow === 'function') window.setPreviewGlow(part === 'screen' ? 'screen' : part === 'leg' ? 'leg' : 'top');
+    } catch(e){
+      if (oldHover) try { oldHover(inputId, code, part, null, btn); } catch(_) {}
+    }
+    return false;
+  };
+
+  window.ffHideMaterialHover = function(btn){
+    var pop = document.getElementById('material-hover-preview');
+    if (pop) pop.classList.remove('show');
+    if (btn) btn.classList.remove('is-hovering');
+  };
+
+  function stabilizeThumbs(){
+    document.querySelectorAll('.material-btn .mat-thumb').forEach(function(t){
+      t.style.width='26px';
+      t.style.height='26px';
+      t.style.minWidth='26px';
+      t.style.flexBasis='26px';
+      t.style.transform='none';
+    });
+  }
+  document.addEventListener('DOMContentLoaded', stabilizeThumbs);
+  setTimeout(stabilizeThumbs, 300);
+  setTimeout(stabilizeThumbs, 1000);
+})();
+</script>
+
 </body>
 
 
