@@ -12638,7 +12638,121 @@ setInterval(function(){
   }catch(e){}
 })();
 </script>
+<script id="ff-final-desk-flow-fix">
+(function () {
+  function S(){ return window.state || {}; }
+  function isDesk(cat){ return /데스크/.test(cat || ""); }
 
+  function btn(label, onclick, disabled){
+    return `
+      <button
+        class="option-btn"
+        ${disabled ? "disabled" : ""}
+        onclick="${onclick}"
+        style="margin:6px;padding:12px 16px;border-radius:12px;"
+      >${label}</button>`;
+  }
+
+  function askDeskOptions(catName){
+    var s = S();
+    catName = catName || s._currentCatName || "일반형 데스크";
+    s._currentCatName = catName;
+    s.step = "desk_options";
+
+    s.topShape = "";
+    s.legType = "";
+    s.casterType = "";
+
+    var html = `
+      <div class="option-box">
+        <b>데스크 옵션을 선택해주세요.</b>
+
+        <div style="margin-top:14px;"><b>1. 상판형태</b></div>
+        ${btn("직사각 상판", "ffPickTop('직사각 상판')")}
+        ${btn("라운드 상판", "ffPickTop('라운드 상판')")}
+
+        <div id="ff-leg-area"></div>
+        <div id="ff-move-area"></div>
+      </div>
+    `;
+
+    addMsg("bot", html);
+  }
+
+  window.ffPickTop = function(top){
+    var s = S();
+    s.topShape = top;
+    s.current = s.current || {};
+    s.current.topShape = top;
+
+    var legArea = document.getElementById("ff-leg-area");
+    var moveArea = document.getElementById("ff-move-area");
+
+    if (!legArea) return;
+
+    if (top === "직사각 상판") {
+      legArea.innerHTML = `
+        <div style="margin-top:14px;"><b>2. 다리형태</b></div>
+        ${btn("사다리형 4레그", "ffPickLeg('사다리형 4레그')")}
+      `;
+    } else {
+      legArea.innerHTML = `
+        <div style="margin-top:14px;"><b>2. 다리형태</b></div>
+        ${btn("원형 4레그", "ffPickLeg('원형 4레그')")}
+        ${btn("A자형 4레그", "ffPickLeg('A자형 4레그')")}
+      `;
+    }
+
+    if (moveArea) moveArea.innerHTML = "";
+  };
+
+  window.ffPickLeg = function(leg){
+    var s = S();
+    s.legType = leg;
+    s.current = s.current || {};
+    s.current.legType = leg;
+
+    var moveArea = document.getElementById("ff-move-area");
+    if (!moveArea) return;
+
+    moveArea.innerHTML = `
+      <div style="margin-top:14px;"><b>3. 이동방식</b></div>
+      ${btn("글라이드", "ffPickMove('글라이드')")}
+      ${btn("캐스터", "ffPickMove('캐스터')")}
+    `;
+  };
+
+  window.ffPickMove = function(move){
+    var s = S();
+    s.casterType = move;
+    s.mobility = move;
+    s.current = s.current || {};
+    s.current.casterType = move;
+    s.current.mobility = move;
+    s.current.legLabel = (s.legType || "") + " / " + move;
+
+    addMsg("user", `${s.topShape} / ${s.legType} / ${move}`);
+
+    if (typeof askSizeInput === "function") {
+      askSizeInput(s._currentCatName || "일반형 데스크");
+    }
+  };
+
+  var oldStartCategoryFlow = window.startCategoryFlow;
+
+  window.startCategoryFlow = function(catName){
+    if (isDesk(catName)) {
+      askDeskOptions(catName);
+      return;
+    }
+    if (oldStartCategoryFlow) {
+      return oldStartCategoryFlow.apply(this, arguments);
+    }
+  };
+
+  window.askDeskOptions = askDeskOptions;
+})();
+</script>
 </body>
 
 
