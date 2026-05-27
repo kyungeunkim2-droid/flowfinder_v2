@@ -13355,7 +13355,41 @@ window.addEventListener('load',function(){
   document.addEventListener('click',function(){ setTimeout(ensureSinglePreviewPanel,80); },true);
 })();
 </script>
+<style id="ff-hide-old-option-preview-panel">
+  #static-option-preview,
+  #texture-preview,
+  .static-option-preview,
+  .option-preview-card.old,
+  .ff-old-preview,
+  .desk-option-image-panel:not(#rightPreviewPanel):not(#optionPreviewBox) {
+    display: none !important;
+  }
 
+  #optionPreviewBox {
+    position: relative !important;
+    display: block !important;
+    width: 100% !important;
+    margin-top: 14px !important;
+    clear: both !important;
+    z-index: 1 !important;
+  }
+
+  #optionPreviewImage {
+    width: 100% !important;
+    max-height: 260px !important;
+    object-fit: contain !important;
+    display: block !important;
+  }
+
+  .ai-generate-btn,
+  .generate-preview-btn,
+  button[onclick*="generate"] {
+    position: relative !important;
+    z-index: 2 !important;
+    margin-top: 14px !important;
+    clear: both !important;
+  }
+</style>
 </body>
 
 
