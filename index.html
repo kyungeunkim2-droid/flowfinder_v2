@@ -13434,6 +13434,15 @@ function showDeskLoading() {
   `;
 }
 </script>
+  <style>
+#texture-preview,
+#ff-quick-options,
+.ff-static-option-preview,
+.static-option-preview,
+.quick-option-card {
+  display: none !important;
+}
+</style>
 </body>
 
 
@@ -13890,7 +13899,9 @@ body{
     else if(oldConfirm) oldConfirm.apply(this,arguments);
   };
   // 5. 바퀴형태 → 이동 방식, 옵션 3개를 선택 미리보기 안에 보장
-  function ensureQuickOptions(){
+ function ensureQuickOptions(){
+  return;
+},
     var panel=document.getElementById('texture-preview');
     if(!panel) return;
     var box=document.getElementById('ff-quick-options');
