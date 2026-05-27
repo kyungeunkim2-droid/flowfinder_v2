@@ -11755,6 +11755,197 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+<!-- === v137 FINAL OVERRIDE: desk option sequence top -> leg -> mobility with allowed combinations === -->
+<style id="ff137-desk-option-final-css">
+.ff137-option-note{font-size:12px;color:#9ccfc7;margin:8px 0 4px;line-height:1.45}
+.ff137-option-note b{color:#26f5c9}
+</style>
+<script id="ff137-desk-option-final-js">
+(function(){
+  function st(){
+    window.state = window.state || {};
+    state.current = state.current || {};
+    return state;
+  }
+  function isDesk(catName){
+    var info = (window.USER_CATEGORIES && USER_CATEGORIES[catName]) || {};
+    return !!info.isDesk || /데스크/.test(String(catName||''));
+  }
+  function normalizeTop(v){
+    v = String(v||'').trim();
+    if(/스퀘어|square|직각/i.test(v)) return '직사각 상판';
+    if(/라운드|round/i.test(v)) return '라운드 상판';
+    return v || '직사각 상판';
+  }
+  function normalizeState(){
+    var s = st();
+    s.topShape = normalizeTop(s.topShape);
+    if(s.current) s.current.topShape = normalizeTop(s.current.topShape || s.topShape);
+    if(s.topShape === '직사각 상판' && s.legType && !/사다리/.test(s.legType)){
+      s.legType = null; s.casterType = null; s._legLabel = null; s.current.legLabel = null;
+    }
+    if(s.topShape === '라운드 상판' && s.legType && /사다리/.test(s.legType)){
+      s.legType = null; s.casterType = null; s._legLabel = null; s.current.legLabel = null;
+    }
+  }
+  function updateAllPreview(part){
+    try{ if(typeof window.updateCurrent === 'function') updateCurrent(); }catch(e){}
+    try{ if(typeof window.updateOptionRows === 'function') updateOptionRows(); }catch(e){}
+    try{
+      if(window.FlowFinderFastPreview && FlowFinderFastPreview.state){
+        FlowFinderFastPreview.state.topShape = state.topShape;
+        FlowFinderFastPreview.state.legType = state.legType;
+        FlowFinderFastPreview.state.casterType = state.casterType;
+        FlowFinderFastPreview.state.caster = state.casterType;
+        if(typeof FlowFinderFastPreview.render === 'function') FlowFinderFastPreview.render(part || 'top');
+      }
+    }catch(e){}
+    try{ if(typeof window.updateHeroPreview === 'function') updateHeroPreview(); }catch(e){}
+  }
+  function addChoiceButtons(choices, backFn, pickFn){
+    if(typeof window.addButtons === 'function'){
+      addButtons(choices, backFn || function(){}, pickFn);
+      return;
+    }
+    var bubble = typeof window.getLastBubble === 'function' ? getLastBubble() : document.querySelector('.bubble:last-child');
+    if(!bubble) return;
+    var group = document.createElement('div');
+    group.className = 'btn-group';
+    choices.forEach(function(v){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'choice-btn';
+      b.textContent = v;
+      b.onclick = function(){ pickFn(v); };
+      group.appendChild(b);
+    });
+    bubble.appendChild(group);
+  }
+  function bot(html){ if(typeof window.addMsg === 'function') addMsg('bot', html); }
+  function finishDeskOptions(catName){
+    var s = st();
+    s._legLabel = (s.legType || '') + ' · ' + (s.casterType || '');
+    s.current.legLabel = s._legLabel;
+    s.current.topShape = s.topShape;
+    updateAllPreview('leg');
+    if(typeof window.calcAndFinish === 'function' && (s.w || s.d || s.h || (s.current && s.current.size))){
+      calcAndFinish(catName || s._currentCatName || '일반형 데스크');
+    }else if(typeof window.askSizeInput === 'function'){
+      askSizeInput(catName || s._currentCatName || '일반형 데스크');
+    }
+  }
+
+  window.askTopShape = function(catName){
+    var s = st();
+    s.step = 'choose_top';
+    s._currentCatName = catName || s._currentCatName || '일반형 데스크';
+    bot('<b>상판 형태를 선택해주세요</b><div class="ff137-option-note">먼저 상판을 선택하면, 가능한 다리형태가 자동으로 제한됩니다.</div>');
+    addChoiceButtons(['직사각 상판','라운드 상판'], function(){
+      if(typeof window.goBack === 'function') goBack();
+    }, function(v){
+      s.topShape = normalizeTop(v);
+      s.current.topShape = s.topShape;
+      if(s.topShape === '직사각 상판' && s.legType && !/사다리/.test(s.legType)){
+        s.legType = null; s.casterType = null; s._legLabel = null; s.current.legLabel = null;
+      }
+      if(s.topShape === '라운드 상판' && s.legType && /사다리/.test(s.legType)){
+        s.legType = null; s.casterType = null; s._legLabel = null; s.current.legLabel = null;
+      }
+      updateAllPreview('top');
+      askLegType(s._currentCatName);
+    });
+  };
+
+  window.askLegType = function(catName){
+    var s = st();
+    s._currentCatName = catName || s._currentCatName || '일반형 데스크';
+    normalizeState();
+    if(!s.topShape){
+      return askTopShape(s._currentCatName);
+    }
+    s.step = 'choose_leg';
+    var choices = s.topShape === '라운드 상판' ? ['원형 4레그','A자 4레그'] : ['사다리형 4레그'];
+    var note = s.topShape === '라운드 상판'
+      ? '라운드 상판 선택 시 <b>원형 4레그</b>, <b>A자 4레그</b>만 선택 가능합니다.'
+      : '직사각 상판 선택 시 <b>사다리형 4레그</b>만 선택 가능합니다.';
+    bot('<b>다리 형태를 선택해주세요</b><div class="ff137-option-note">'+note+'</div>');
+    addChoiceButtons(choices, function(){ askTopShape(s._currentCatName); }, function(v){
+      s.legType = v;
+      s.casterType = null;
+      s._legLabel = null;
+      s.current.legLabel = v;
+      updateAllPreview('leg');
+      askCasterType(s._currentCatName);
+    });
+  };
+
+  window.askCasterType = function(catName){
+    var s = st();
+    s._currentCatName = catName || s._currentCatName || '일반형 데스크';
+    if(!s.topShape) return askTopShape(s._currentCatName);
+    if(!s.legType) return askLegType(s._currentCatName);
+    s.step = 'choose_caster';
+    bot('<b>이동 방식을 선택해주세요</b><div class="ff137-option-note">'+s.legType+' 기준으로 <b>글라이드</b> 또는 <b>캐스터</b>를 선택할 수 있습니다.</div>');
+    addChoiceButtons(['글라이드','캐스터'], function(){ askLegType(s._currentCatName); }, function(v){
+      s.casterType = v;
+      s._legLabel = s.legType + ' · ' + v;
+      s.current.legLabel = s._legLabel;
+      updateAllPreview('leg');
+      finishDeskOptions(s._currentCatName);
+    });
+  };
+
+  // combined-option UI from older patches must follow the same order/restrictions if it is called.
+  window.ffPickDeskOption69 = function(type, value){
+    var s = st();
+    if(type === 'top'){
+      s.topShape = normalizeTop(value);
+      s.current.topShape = s.topShape;
+      s.legType = null; s.casterType = null; s._legLabel = null; s.current.legLabel = null;
+      updateAllPreview('top');
+      askLegType(s._currentCatName);
+      return;
+    }
+    if(type === 'leg'){
+      if(!s.topShape) return askTopShape(s._currentCatName);
+      var ok = s.topShape === '라운드 상판' ? /원형|A자/.test(value) : /사다리/.test(value);
+      if(!ok){ alert(s.topShape + '에서 선택할 수 없는 다리형태입니다.'); return; }
+      s.legType = value; s.casterType = null; s.current.legLabel = value;
+      updateAllPreview('leg');
+      askCasterType(s._currentCatName);
+      return;
+    }
+    if(type === 'caster'){
+      if(!s.legType) return askLegType(s._currentCatName);
+      s.casterType = value; s.current.legLabel = s.legType + ' · ' + value;
+      finishDeskOptions(s._currentCatName);
+    }
+  };
+  window.ffConfirmDeskOptions69 = function(catName){
+    var s = st();
+    if(!s.topShape) return askTopShape(catName || s._currentCatName);
+    if(!s.legType) return askLegType(catName || s._currentCatName);
+    if(!s.casterType) return askCasterType(catName || s._currentCatName);
+    finishDeskOptions(catName || s._currentCatName);
+  };
+
+  // Replace any visible old label if it appears from older cached UI/data.
+  function replaceSquareLabels(root){
+    (root || document).querySelectorAll('button,span,div,b,label').forEach(function(el){
+      if(el.childNodes.length === 1 && el.firstChild.nodeType === 3){
+        el.textContent = el.textContent.replace(/스퀘어\s*상판|Square\s*Top|square\s*top/gi, '직사각 상판');
+      }
+    });
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ replaceSquareLabels(document); });
+  else replaceSquareLabels(document);
+  try{
+    new MutationObserver(function(muts){ muts.forEach(function(m){ m.addedNodes && m.addedNodes.forEach(function(n){ if(n.nodeType===1) replaceSquareLabels(n); }); }); }).observe(document.documentElement,{childList:true,subtree:true});
+  }catch(e){}
+})();
+</script>
+
 </body>
 
 
