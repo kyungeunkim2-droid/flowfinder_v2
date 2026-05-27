@@ -7986,21 +7986,21 @@ button.material-btn{
 
   var OPTION_IMAGES = {
     leg: {
-      "사다리": "./images/options/leg/ladder.png",
-      "원형": "./images/options/leg/round.png",
-      "A자": "./images/options/leg/a_type.png"
+      "사다리": "./images/options/leg_ladder.svg",
+      "원형": "./images/options/leg_round.svg",
+      "A자": "./images/options/leg_a.svg"
     },
     caster: {
-      "글라이드": "./images/options/moving/ladder_glide.png",
-      "고정": "./images/options/moving/ladder_glide.png",
-      "캐스터": "./images/options/moving/ladder_caster.png",
-      "바퀴": "./images/options/moving/ladder_caster.png"
+      "글라이드": "./images/options/mobility_glide.svg",
+      "고정": "./images/options/mobility_glide.svg",
+      "캐스터": "./images/options/mobility_caster.svg",
+      "바퀴": "./images/options/mobility_caster.svg"
     },
     top: {
-      "직각": "./images/options/tops/square.png",
-      "직사각": "./images/options/tops/square.png",
-      "스퀘어": "./images/options/tops/square.png",
-      "라운드": "./images/options/tops/round.png"
+      "직각": "./images/options/top_rect.svg",
+      "직사각": "./images/options/top_rect.svg",
+      "스퀘어": "./images/options/top_rect.svg",
+      "라운드": "./images/options/top_round.svg"
     }
   };
 
@@ -8502,9 +8502,9 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     '일반형 데스크':'products/desk_standard/base/base.png','덕트형 데스크':'products/desk_duct/base/base.png','전면 스크린':'products/screen_front/base/base.png','사이드 스크린':'products/screen_side/base/base.png','일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
   };
   var OPTION_IMG={
-    leg:{'사다리형':'./images/options/leg/ladder.png','사다리형 4레그':'./images/options/leg/ladder.png','원형':'./images/options/leg/round.png','원형 4레그':'./images/options/leg/round.png','A자형':'./images/options/leg/a_type.png','A자 4레그':'./images/options/leg/a_type.png'},
-    caster:{'글라이드':'./images/options/moving/ladder_glide.png','고정형':'./images/options/moving/ladder_glide.png','캐스터':'./images/options/moving/ladder_caster.png'},
-    top:{'스퀘어 상판':'./images/options/tops/square.png','직사각':'./images/options/tops/square.png','직사각 / 스퀘어 상판':'./images/options/tops/square.png','라운드 상판':'./images/options/tops/round.png','라운드':'./images/options/tops/round.png'}
+    leg:{'사다리형':'./images/options/leg_ladder.svg','사다리형 4레그':'./images/options/leg_ladder.svg','원형':'./images/options/leg_round.svg','원형 4레그':'./images/options/leg_round.svg','A자형':'./images/options/leg_a.svg','A자 4레그':'./images/options/leg_a.svg'},
+    caster:{'글라이드':'./images/options/mobility_glide.svg','고정형':'./images/options/mobility_glide.svg','캐스터':'./images/options/mobility_caster.svg'},
+    top:{'스퀘어 상판':'./images/options/top_rect.svg','직사각':'./images/options/top_rect.svg','직사각 / 스퀘어 상판':'./images/options/top_rect.svg','라운드 상판':'./images/options/top_round.svg','라운드':'./images/options/top_round.svg'}
   };
   function selectedNames(){return Array.from(document.querySelectorAll('[data-set-name].selected-set-card')).map(function(el){return el.getAttribute('data-set-name');});}
   function refreshChatButtons(){
@@ -10402,7 +10402,7 @@ ${map.move[move] || move}
   function norm124(v){return String(v||'').replace(/\s+/g,' ').trim();}
   function legKey124(v){v=norm124(v); if(v.indexOf('사다리')>-1) return 'ladder'; if(v.indexOf('원형')>-1) return 'round'; if(v.indexOf('A')>-1 || v.indexOf('에이')>-1) return 'aframe'; return 'ladder';}
   function moveKey124(v){v=norm124(v); if(v.indexOf('캐스터')>-1 || v.indexOf('바퀴')>-1) return 'caster'; return 'glide';}
-  function topImg124(v){v=norm124(v); if(v.indexOf('라운드')>-1) return './images/options/tops/round.png'; return './images/options/tops/square.png';}
+  function topImg124(v){v=norm124(v); if(v.indexOf('라운드')>-1) return './images/options/top_round.png'; return './images/options/top_rect.svg';}
   function comboImg124(){
     var st=window.state||{};
     return './images/options/desk_combo/'+legKey124(st.legType)+'_'+moveKey124(st.casterType)+'.png';
@@ -10429,7 +10429,7 @@ ${map.move[move] || move}
     var rows=[];
     function add(title,val,src){
       if(!val) return;
-      rows.push('<div class="ff90-card"><span class="ff90-card-title">'+esc124(title)+'</span><img src="'+esc124(src)+'" alt="'+esc124(title)+'" loading="eager" onerror="this.onerror=null;this.src=\'./images/options/tops/square.png';"><b>'+esc124(val)+'</b></div>');
+      rows.push('<div class="ff90-card"><span class="ff90-card-title">'+esc124(title)+'</span><img src="'+esc124(src)+'" alt="'+esc124(title)+'" loading="eager" onerror="this.onerror=null;this.src=\'./images/options/top_rect.svg\';"><b>'+esc124(val)+'</b></div>');
     }
     add('다리형태',st.legType,window.ff124DeskOptionImage('leg'));
     add('이동방식',st.casterType,window.ff124DeskOptionImage('move'));
@@ -10583,7 +10583,7 @@ ${map.move[move] || move}
   function combo(){return normLeg(S().legType||S().legShape)+'_'+normMove(S().casterType||S().mobility);}
   function comboSrc(){return './images/options/desk_combo/'+combo()+'.png';}
   function fullDeskSrc(){return './images/previews/'+normDesk()+'/'+combo()+'.png';}
-  function topSrc(){var v=String(S().topShape||''); return v.indexOf('라운드')>-1?'./images/options/tops/round.png':'./images/options/tops/square.png';}
+  function topSrc(){var v=String(S().topShape||''); return v.indexOf('라운드')>-1?'./images/options/top_round.png':'./images/options/top_rect.svg';}
   function labelLeg(){return S().legType||S().legShape||'다리형태';}
   function labelMove(){return S().casterType||S().mobility||'이동방식';}
   function labelTop(){return S().topShape||'상판형태';}
@@ -10799,13 +10799,13 @@ ${map.move[move] || move}
 /* v129 asset-path fallback: fixes desk option image paths on Render/GitHub */
 (function(){
   const ALT = {
-    'leg_ladder.svg':['./images/options/leg/ladder.png','./images/options/desk_combo/ladder_glide.png'],
-    'leg_round.svg':['./images/options/leg/round.png','./images/options/desk_combo/round_glide.png'],
-    'leg_a.svg':['./images/options/leg/a_type.png','./images/options/desk_combo/aframe_glide.png'],
-    'mobility_glide.svg':['./images/options/moving/ladder_glide.png','./images/options/desk_combo/ladder_glide.png'],
-    'mobility_caster.svg':['./images/options/moving/ladder_caster.png','./images/options/desk_combo/ladder_caster.png'],
-    'top_rect.svg':['./images/options/tops/square.png','./images/options/tops/round.png'],
-    'top_round.svg':['./images/options/tops/round.png'],
+    'leg_ladder.svg':['./images/options/leg_ladder.png','./images/options/desk_combo/ladder_glide.png'],
+    'leg_round.svg':['./images/options/leg_round.png','./images/options/desk_combo/round_glide.png'],
+    'leg_a.svg':['./images/options/leg_a.png','./images/options/desk_combo/aframe_glide.png'],
+    'mobility_glide.svg':['./images/options/mobility_glide.png','./images/options/desk_combo/ladder_glide.png'],
+    'mobility_caster.svg':['./images/options/mobility_caster.png','./images/options/desk_combo/ladder_caster.png'],
+    'top_rect.svg':['./images/options/top_rect.png','./images/options/top_round.png'],
+    'top_round.svg':['./images/options/top_round.png'],
     'desk_combo/ladder_glide.png':['./images/options/desk_combo/ladder_glide.png','./images/previews/desk_standard/ladder_glide.png'],
     'desk_combo/ladder_caster.png':['./images/options/desk_combo/ladder_caster.png','./images/previews/desk_standard/ladder_caster.png'],
     'desk_combo/round_glide.png':['./images/options/desk_combo/round_glide.png','./images/previews/desk_standard/round_glide.png'],
@@ -11192,6 +11192,154 @@ ${map.move[move] || move}
   window.ff90RefreshOptionSummary=function(){
     var box=$('ff90-option-summary'); if(box){box.innerHTML=''; box.style.display='none';}
   };
+})();
+</script>
+
+
+
+<!-- FF PATCH: robust material hover preview using current images/textures folder -->
+<style id="ff-material-hover-visible-fix-css">
+#material-hover-preview{
+  position:fixed!important;
+  display:none;
+  z-index:2147483647!important;
+  width:260px!important;
+  padding:10px!important;
+  border-radius:16px!important;
+  border:1px solid #2ef2c9!important;
+  background:#071827!important;
+  box-shadow:0 18px 60px rgba(0,0,0,.62),0 0 26px rgba(46,242,201,.22)!important;
+  pointer-events:none!important;
+}
+#material-hover-preview.show{display:block!important;}
+#material-hover-preview .mh-thumb{
+  width:100%!important;
+  height:170px!important;
+  border-radius:12px!important;
+  border:1px solid rgba(255,255,255,.16)!important;
+  background:#111827 center/cover no-repeat!important;
+}
+#material-hover-preview .mh-label{color:#fff!important;font-weight:900!important;font-size:12px!important;margin-bottom:8px!important;}
+#material-hover-preview .mh-caption{color:#9fb1c8!important;font-size:10px!important;margin-top:6px!important;}
+.material-btn.is-hovering{outline:2px solid #2ef2c9!important;outline-offset:2px!important;}
+</style>
+<script id="ff-material-hover-visible-fix-js">
+(function(){
+  function normCode(code){ return String(code||'').trim().toUpperCase(); }
+  function screenFolder(catName){
+    catName = String(catName || (window.state && state._currentCatName) || '');
+    if(catName.indexOf('전면') !== -1) return 'screen_front';
+    if(catName.indexOf('사이드') !== -1) return 'screen_side';
+    if(catName.indexOf('일자') !== -1) return 'screen_straight';
+    if(catName.indexOf('L형') !== -1 || catName.indexOf('l형') !== -1) return 'screen_lshape';
+    if(window.state && state.selectedScreens && state.selectedScreens.length){
+      var s=String(state.selectedScreens[0]||'');
+      if(s.indexOf('전면')!==-1) return 'screen_front';
+      if(s.indexOf('사이드')!==-1) return 'screen_side';
+      if(s.indexOf('일자')!==-1) return 'screen_straight';
+      if(s.indexOf('L형')!==-1 || s.indexOf('l형')!==-1) return 'screen_lshape';
+    }
+    return 'screen_front';
+  }
+  function extCandidates(code){
+    code = normCode(code);
+    if(code === '452A' || code === 'COB' || code === 'MDB') return ['.png','.jpg','.jpeg'];
+    return ['.jpg','.png','.jpeg'];
+  }
+  function firstCandidate(paths){ return paths && paths.length ? paths[0] : ''; }
+  function localTextureCandidates(code, part, catName){
+    code = normCode(code);
+    part = part || 'top';
+    if(!code) return [];
+    var exts = extCandidates(code), out=[];
+    function push(base){ exts.forEach(function(ext){ out.push('./images/textures/' + base + '/' + code + ext); }); }
+    if(part === 'leg'){
+      push('leg/standard');
+      push('leg/custom');
+      return out;
+    }
+    if(part === 'screen'){
+      var sf = screenFolder(catName);
+      push('screen/' + sf + '/standard');
+      push('screen/' + sf + '/custom');
+      ['screen_front','screen_side','screen_straight','screen_lshape'].forEach(function(k){
+        if(k!==sf){ push('screen/' + k + '/standard'); push('screen/' + k + '/custom'); }
+      });
+      return out;
+    }
+    push('top/standard');
+    push('top/veneer');
+    push('top/laminate');
+    return out;
+  }
+  function setBg(el, url){
+    if(!el) return;
+    if(url){
+      el.style.backgroundImage = 'url("' + String(url).replace(/"/g,'%22') + '")';
+      el.style.backgroundColor = '#111827';
+    }
+  }
+  function placePop(ev){
+    var pop=document.getElementById('material-hover-preview');
+    if(!pop || !ev) return;
+    var w=280, h=230;
+    var x=ev.clientX+18, y=ev.clientY+18;
+    if(x+w>window.innerWidth) x=ev.clientX-w-18;
+    if(y+h>window.innerHeight) y=ev.clientY-h-18;
+    pop.style.left=Math.max(10,x)+'px';
+    pop.style.top=Math.max(10,y)+'px';
+  }
+  window.ffTextureUrlForChoice = function(code, part, catName){
+    return firstCandidate(localTextureCandidates(code, part, catName));
+  };
+  window.ffMaterialTextureUrl = function(code, part){
+    return window.ffTextureUrlForChoice(code, part, (window.state && state._currentCatName) || '');
+  };
+  window.ffShowMaterialHover = function(code, part, ev, btn){
+    code = normCode(code);
+    var pop=document.getElementById('material-hover-preview');
+    var label=document.getElementById('mh-label');
+    var thumb=document.getElementById('mh-thumb');
+    var caption=pop && pop.querySelector('.mh-caption');
+    var url=window.ffMaterialTextureUrl(code, part);
+    if(label) label.textContent=(part==='leg'?'다리 ':part==='screen'?'스크린 ':'상판 ') + code;
+    setBg(thumb, url);
+    if(caption) caption.textContent='재질 확대 미리보기';
+    if(pop){ pop.classList.add('show'); placePop(ev); }
+    if(btn) btn.classList.add('is-hovering');
+  };
+  window.ffMoveMaterialPreview = placePop;
+  window.ffHideMaterialHover = function(btn){
+    var pop=document.getElementById('material-hover-preview');
+    if(pop) pop.classList.remove('show');
+    if(btn) btn.classList.remove('is-hovering');
+  };
+  window.ffHoverMaterial = function(inputId, code, part, ev, btn){
+    window.ffShowMaterialHover(code, part, ev, btn);
+    if(typeof setPreviewGlow === 'function') setPreviewGlow(part === 'screen' ? 'screen' : part === 'leg' ? 'leg' : 'top');
+  };
+  window.ffRepairMaterialThumbnails = function(){
+    document.querySelectorAll('.material-btn').forEach(function(btn){
+      var code=btn.getAttribute('data-code')||'';
+      var part=btn.getAttribute('data-part')||'top';
+      setBg(btn.querySelector('.mat-thumb'), window.ffTextureUrlForChoice(code, part, (window.state && state._currentCatName) || ''));
+    });
+  };
+  document.addEventListener('mouseover', function(e){
+    var btn=e.target.closest && e.target.closest('.material-btn');
+    if(!btn) return;
+    window.ffRepairMaterialThumbnails();
+    window.ffShowMaterialHover(btn.getAttribute('data-code'), btn.getAttribute('data-part')||'top', e, btn);
+  }, true);
+  document.addEventListener('mousemove', function(e){
+    if(e.target.closest && e.target.closest('.material-btn')) placePop(e);
+  }, true);
+  document.addEventListener('mouseout', function(e){
+    var btn=e.target.closest && e.target.closest('.material-btn');
+    if(btn) window.ffHideMaterialHover(btn);
+  }, true);
+  setTimeout(window.ffRepairMaterialThumbnails, 300);
+  setTimeout(window.ffRepairMaterialThumbnails, 1200);
 })();
 </script>
 
@@ -12782,9 +12930,9 @@ button.material-btn{
     '일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
   };
   var OPTION_IMG={
-    leg:{'사다리형 4레그':'./images/options/leg/ladder.png','사다리형':'./images/options/leg/ladder.png','원형 4레그':'./images/options/leg/round.png','원형':'./images/options/leg/round.png','A자 4레그':'./images/options/leg/a_type.png','A자형':'./images/options/leg/a_type.png'},
-    caster:{'글라이드':'./images/options/moving/ladder_glide.png','고정형':'./images/options/moving/ladder_glide.png','캐스터':'./images/options/moving/ladder_caster.png'},
-    top:{'스퀘어 상판':'./images/options/tops/square.png','직사각':'./images/options/tops/square.png','라운드 상판':'./images/options/tops/round.png','라운드':'./images/options/tops/round.png'}
+    leg:{'사다리형 4레그':'./images/options/leg_ladder.svg','사다리형':'./images/options/leg_ladder.svg','원형 4레그':'./images/options/leg_round.svg','원형':'./images/options/leg_round.svg','A자 4레그':'./images/options/leg_a.svg','A자형':'./images/options/leg_a.svg'},
+    caster:{'글라이드':'./images/options/mobility_glide.svg','고정형':'./images/options/mobility_glide.svg','캐스터':'./images/options/mobility_caster.svg'},
+    top:{'스퀘어 상판':'./images/options/top_rect.svg','직사각':'./images/options/top_rect.svg','라운드 상판':'./images/options/top_round.svg','라운드':'./images/options/top_round.svg'}
   };
   function has(a,v){return a.indexOf(v)>-1;}
   function orderSelection(a){return DESKS.concat(SCREENS).filter(function(n){return has(a,n);});}
@@ -13038,9 +13186,9 @@ button.material-btn{
     'L형 스크린':'products/screen_lshape/base/base.png'
   };
   var OPTION_IMG={
-    leg:{'사다리형 4레그':'./images/options/leg/ladder.png','사다리형':'./images/options/leg/ladder.png','원형 4레그':'./images/options/leg/round.png','원형':'./images/options/leg/round.png','A자 4레그':'./images/options/leg/a_type.png','A자형':'./images/options/leg/a_type.png'},
-    caster:{'글라이드':'./images/options/moving/ladder_glide.png','고정형':'./images/options/moving/ladder_glide.png','캐스터':'./images/options/moving/ladder_caster.png'},
-    top:{'스퀘어 상판':'./images/options/tops/square.png','직사각':'./images/options/tops/square.png','라운드 상판':'./images/options/tops/round.png','라운드':'./images/options/tops/round.png'}
+    leg:{'사다리형 4레그':'./images/options/leg_ladder.svg','사다리형':'./images/options/leg_ladder.svg','원형 4레그':'./images/options/leg_round.svg','원형':'./images/options/leg_round.svg','A자 4레그':'./images/options/leg_a.svg','A자형':'./images/options/leg_a.svg'},
+    caster:{'글라이드':'./images/options/mobility_glide.svg','고정형':'./images/options/mobility_glide.svg','캐스터':'./images/options/mobility_caster.svg'},
+    top:{'스퀘어 상판':'./images/options/top_rect.svg','직사각':'./images/options/top_rect.svg','라운드 상판':'./images/options/top_round.svg','라운드':'./images/options/top_round.svg'}
   };
   function $(id){return document.getElementById(id);} 
   function has(a,v){return (a||[]).indexOf(v)>-1;}
@@ -14650,8 +14798,8 @@ button.material-btn{
   function fullDeskSrc(){return './images/previews/'+normDeskType()+'/'+comboName()+'.png';}
   function topSrc(){
     var v=String(st().topShape||'');
-    if(v.indexOf('라운드')>-1) return './images/options/tops/round.png';
-    return './images/options/tops/square.png';
+    if(v.indexOf('라운드')>-1) return './images/options/top_round.png';
+    return './images/options/top_rect.svg';
   }
   function labelLeg(){return st().legType || st().legShape || '다리형태';}
   function labelMove(){return st().casterType || st().mobility || '이동방식';}
