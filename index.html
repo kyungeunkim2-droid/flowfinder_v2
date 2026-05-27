@@ -8027,7 +8027,7 @@ button.material-btn{
   #texture-preview .quick-materials{ grid-template-columns:1fr!important; }
 }
 </style>
-<script id="ff60-static-option-preview-js-disabled">/* disabled: legacy duplicate option preview panel */</script>
+
 
 
 
@@ -13190,274 +13190,157 @@ window.addEventListener('load',function(){
 </script>
 
 
-<style id="ff158-clean-right-option-preview-css">
-/* Legacy duplicated option-preview panels: never show them */
-#ff-static-option-preview,
+
+
+
+
+
+<style id="ff159-single-preview-clean">
+#texture-preview,
 #ff-quick-options,
 .ff-static-option-preview,
 .static-option-preview,
 .quick-option-card,
-#texture-preview #ff-static-option-preview,
-#texture-preview #ff-quick-options {
-  display: none !important;
+#ff-static-option-preview{
+  display:none !important;
 }
 
-/* Keep one stable right-side preview panel */
-#rightPreviewPanel {
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 14px !important;
-  width: 100% !important;
-  box-sizing: border-box !important;
+#rightPreviewPanel{
+  position:sticky;
+  top:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  width:100%;
 }
 
-#rightPreviewPanel .ff-preview-card {
-  display: block !important;
-  border: 1px solid rgba(46,242,201,.25) !important;
-  border-radius: 18px !important;
-  padding: 14px !important;
-  background: rgba(255,255,255,.035) !important;
-  overflow: hidden !important;
+.ff-preview-card{
+  border:1px solid rgba(46,242,201,.25);
+  border-radius:18px;
+  padding:14px;
+  background:rgba(255,255,255,.03);
 }
 
-#rightPreviewPanel .ff-preview-card h3 {
-  color: #2ef2c9 !important;
-  font-size: 14px !important;
-  margin: 0 0 10px 0 !important;
-  font-weight: 900 !important;
+.ff-preview-card h3{
+  color:#2ef2c9;
+  margin:0 0 10px;
+  font-size:14px;
 }
 
-#rightPreviewPanel .ff-preview-card img {
-  width: 100% !important;
-  height: 220px !important;
-  max-height: 220px !important;
-  display: block !important;
-  object-fit: contain !important;
-  border-radius: 12px !important;
-  background: #fff !important;
-}
-
-#optionPreviewImage:not([src]),
-#optionPreviewImage[src=""],
-#deskRenderImage:not([src]),
-#deskRenderImage[src=""],
-#screenRenderImage:not([src]),
-#screenRenderImage[src=""] {
-  display: none !important;
+.ff-preview-card img{
+  width:100%;
+  height:240px;
+  object-fit:contain;
+  border-radius:12px;
+  background:#fff;
+  display:block;
 }
 </style>
 
-<script id="ff158-clean-right-option-preview-js">
+<script id="ff159-single-preview-clean-js">
 (function(){
-  function first(selectors){
-    for(var i=0;i<selectors.length;i++){
-      var el = document.querySelector(selectors[i]);
-      if(el) return el;
-    }
-    return null;
+
+window.ensureQuickOptions=function(){ return; };
+
+function ensurePanel(){
+  let panel=document.getElementById('rightPreviewPanel');
+
+  if(!panel){
+    panel=document.createElement('div');
+    panel.id='rightPreviewPanel';
+
+    const host=
+      document.querySelector('.preview-panel') ||
+      document.querySelector('.preview-stage') ||
+      document.querySelector('.right-panel') ||
+      document.body;
+
+    host.appendChild(panel);
   }
 
-  function ensureRightPreviewPanel(){
-    var panels = Array.prototype.slice.call(document.querySelectorAll('#rightPreviewPanel'));
-    var panel = panels[0];
+  panel.innerHTML=`
+    <section class="ff-preview-card">
+      <h3>데스크 옵션 이미지</h3>
+      <img id="optionPreviewImage">
+    </section>
 
-    panels.slice(1).forEach(function(p){ p.remove(); });
+    <section class="ff-preview-card">
+      <h3>AI 실사 미리보기 - 데스크</h3>
+      <img id="deskRenderImage">
+    </section>
 
-    var host = first([
-      '.preview-panel',
-      '.right-panel',
-      '#previewArea',
-      '#previewStage',
-      '.preview-stage',
-      '.product-preview',
-      '.stage'
-    ]) || document.body;
+    <section class="ff-preview-card">
+      <h3>AI 실사 미리보기 - 스크린</h3>
+      <img id="screenRenderImage">
+    </section>
+  `;
+}
 
-    if(!panel){
-      panel = document.createElement('div');
-      panel.id = 'rightPreviewPanel';
-    }
+function setImg(id,path){
+  ensurePanel();
+  const img=document.getElementById(id);
+  if(img && path){
+    img.src=path;
+  }
+}
 
-    panel.innerHTML = ''
-      + '<section class="ff-preview-card ff-option-preview-card">'
-      + '  <h3>데스크 옵션 이미지</h3>'
-      + '  <img id="optionPreviewImage" alt="데스크 옵션 이미지">'
-      + '</section>'
-      + '<section class="ff-preview-card ff-desk-render-card">'
-      + '  <h3>AI 실사 미리보기 - 데스크</h3>'
-      + '  <img id="deskRenderImage" alt="데스크 실사 미리보기">'
-      + '</section>'
-      + '<section class="ff-preview-card ff-screen-render-card">'
-      + '  <h3>AI 실사 미리보기 - 스크린</h3>'
-      + '  <img id="screenRenderImage" alt="스크린 실사 미리보기">'
-      + '</section>';
+window.showOptionImage=function(path){
+  setImg('optionPreviewImage', path);
+};
 
-    if(panel.parentElement !== host){
-      host.appendChild(panel);
-    }
+function topImg(v){
+  if(/라운드/.test(v)) return 'images/options/top/round.png';
+  return 'images/options/top/rect.png';
+}
 
-    return panel;
+function legImg(v){
+  if(/A자/.test(v)) return 'images/options/leg/aframe.png';
+  if(/원형/.test(v)) return 'images/options/leg/round.png';
+  return 'images/options/leg/ladder.png';
+}
+
+function moveImg(v){
+  const leg=(window.state && state.legType) || '';
+
+  if(/A자/.test(leg)){
+    return /캐스터/.test(v)
+      ? 'images/options/mobility/aframe_caster.png'
+      : 'images/options/mobility/aframe_glide.png';
   }
 
-  function setImage(id, path){
-    ensureRightPreviewPanel();
-    var img = document.getElementById(id);
-    if(!img || !path) return;
-    img.src = String(path).replace(/\?v=.*$/,'');
+  if(/원형/.test(leg)){
+    return /캐스터/.test(v)
+      ? 'images/options/mobility/round_caster.png'
+      : 'images/options/mobility/round_glide.png';
   }
 
-  function normTop(v){
-    v = String(v || '');
-    if(/라운드/.test(v)) return 'round';
-    return 'rect';
+  return /캐스터/.test(v)
+    ? 'images/options/mobility/ladder_caster.png'
+    : 'images/options/mobility/ladder_glide.png';
+}
+
+document.addEventListener('click',function(e){
+  const btn=e.target.closest('button');
+  if(!btn) return;
+
+  const text=(btn.textContent||'').trim();
+
+  if(/직사각|라운드/.test(text)){
+    showOptionImage(topImg(text));
   }
 
-  function normLeg(v){
-    v = String(v || '');
-    if(/A자|a자|에이/.test(v)) return 'aframe';
-    if(/원형/.test(v)) return 'round';
-    return 'ladder';
+  if(/사다리형|원형|A자형/.test(text)){
+    if(window.state) state.legType=text;
+    showOptionImage(legImg(text));
   }
 
-  function normMove(v){
-    v = String(v || '');
-    if(/캐스터|바퀴/.test(v)) return 'caster';
-    return 'glide';
+  if(/글라이드|캐스터/.test(text)){
+    showOptionImage(moveImg(text));
   }
+}, true);
 
-  function optionImageFor(kind, value){
-    if(kind === 'top'){
-      return 'images/options/top/' + normTop(value) + '.png';
-    }
-
-    if(kind === 'leg'){
-      return 'images/options/leg/' + normLeg(value) + '.png';
-    }
-
-    if(kind === 'move'){
-      var leg = normLeg(
-        (window.state && (state.legType || (state.current && state.current.legType))) || ''
-      );
-      return 'images/options/mobility/' + leg + '_' + normMove(value) + '.png';
-    }
-
-    return '';
-  }
-
-  window.showOptionImage = function(path){
-    setImage('optionPreviewImage', path);
-  };
-
-  window.showDeskRenderImage = function(path){
-    setImage('deskRenderImage', path);
-  };
-
-  window.showScreenRenderImage = function(path){
-    setImage('screenRenderImage', path);
-  };
-
-  function updateOptionPreview(kind, value){
-    var path = optionImageFor(kind, value);
-    if(path) window.showOptionImage(path);
-    console.log('[FF158 option preview]', kind, value, path);
-  }
-
-  function wrapFn(name, kind){
-    var old = window[name];
-    window[name] = function(value){
-      var result;
-      if(typeof old === 'function'){
-        result = old.apply(this, arguments);
-      }
-
-      window.state = window.state || {};
-      state.current = state.current || {};
-
-      if(kind === 'top'){
-        state.topShape = value;
-        state.current.topShape = value;
-      }else if(kind === 'leg'){
-        state.legType = value;
-        state.current.legType = value;
-      }else if(kind === 'move'){
-        state.mobility = value;
-        state.casterType = value;
-        state.current.mobility = value;
-        state.current.casterType = value;
-      }
-
-      setTimeout(function(){ updateOptionPreview(kind, value); }, 30);
-      return result;
-    };
-  }
-
-  wrapFn('ffPickTop', 'top');
-  wrapFn('ffPickLeg', 'leg');
-  wrapFn('ffPickMove', 'move');
-
-  // Fallback: catch button clicks even if the site uses older inline functions instead of ffPickTop/Leg/Move.
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest && e.target.closest('button');
-    if(!btn) return;
-
-    var text = (btn.textContent || '').replace(/\s+/g,' ').trim();
-
-    setTimeout(function(){
-      if(/직사각|스퀘어|라운드/.test(text)){
-        if(window.state){
-          state.topShape = text;
-          state.current = state.current || {};
-          state.current.topShape = text;
-        }
-        updateOptionPreview('top', text);
-      }else if(/사다리형|원형|A자형|a자형/.test(text)){
-        if(window.state){
-          state.legType = text;
-          state.current = state.current || {};
-          state.current.legType = text;
-        }
-        updateOptionPreview('leg', text);
-      }else if(/글라이드|캐스터|바퀴/.test(text)){
-        if(window.state){
-          state.mobility = text;
-          state.casterType = text;
-          state.current = state.current || {};
-          state.current.mobility = text;
-          state.current.casterType = text;
-        }
-        updateOptionPreview('move', text);
-      }
-    }, 40);
-  }, true);
-
-  // Nano Banana base path remains preview-folder based.
-  window.getNanoBaseImagePath = function(){
-    var productName = (window.state && (state._currentCatName || state.product || '')) || '';
-    var folder = productName.indexOf('덕트') >= 0 ? 'desk_duct' : 'desk_standard';
-
-    var top = normTop(window.state && state.topShape);
-    var leg = normLeg(window.state && state.legType);
-    var move = normMove(window.state && (state.mobility || state.casterType));
-
-    var screen = 'front';
-    if(/사이드/.test(productName)) screen = 'side';
-    else if(/일자/.test(productName)) screen = 'straight';
-    else if(/L형|엘형|l형/i.test(productName)) screen = 'lshape';
-
-    return 'images/previews/' + folder + '/' + leg + '_' + move + '_' + top + '_' + screen + '.png';
-  };
-
-  // Stop old duplicate generators if they still exist.
-  window.ensureQuickOptions = function(){ return; };
-
-  ['DOMContentLoaded','load'].forEach(function(ev){
-    window.addEventListener(ev, function(){
-      setTimeout(ensureRightPreviewPanel, 50);
-      setTimeout(ensureRightPreviewPanel, 500);
-    });
-  });
-
-  setTimeout(ensureRightPreviewPanel, 50);
+window.addEventListener('load', ensurePanel);
+setTimeout(ensurePanel,100);
 })();
 </script>
 
