@@ -5171,7 +5171,7 @@ startFlow();
 
 /* ── FlowFinder local mask renderer injected ── */
 (function() {
-  var FF_MANIFEST = {"products": {"desk_duct": {"label": "덕트형 데스크", "type": "desk", "base": "products/desk_duct/base/base.png", "masks": {"leg_mask": "products/desk_duct/masks/leg_mask.png", "top_mask": "products/desk_duct/masks/top_mask.png"}}, "desk_standard": {"label": "일반형 데스크", "type": "desk", "base": "products/desk_standard/base/base.png", "masks": {"leg_mask": "products/desk_standard/masks/leg_mask.png", "top_mask": "products/desk_standard/masks/top_mask.png"}}, "screen_front": {"label": "전면 스크린", "type": "screen", "base": "products/screen_front/base/base.png", "masks": {"leg_mask": "products/screen_front/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_front/masks/top_mask.png"}}, "screen_lshape": {"label": "L형 스크린", "type": "screen", "base": "products/screen_lshape/base/base.png", "masks": {"leg_mask": "products/screen_lshape/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_lshape/masks/top_mask.png"}}, "screen_side": {"label": "사이드 스크린", "type": "screen", "base": "products/screen_side/base/base.png", "masks": {"leg_mask": "products/screen_side/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_side/masks/top_mask.png"}}, "screen_straight": {"label": "일자형 스크린", "type": "screen", "base": "products/screen_straight/base/base.png", "masks": {"leg_mask": "products/screen_straight/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_straight/masks/top_mask.png"}}}, "textures": {"desktop": {"standard": [{"code": "HW", "file": "textures/desktop/standard/HW.png"}, {"code": "OSG", "file": "textures/desktop/standard/OSG.jpg"}, {"code": "WW", "file": "textures/desktop/standard/WW.jpg"}], "veneer": [{"code": "DBL", "file": "textures/desktop/veneer/DBL.jpg"}, {"code": "NCE", "file": "textures/desktop/veneer/NCE.jpg"}, {"code": "NMOK", "file": "textures/desktop/veneer/NMOK.jpg"}, {"code": "OB", "file": "textures/desktop/veneer/OB.jpg"}, {"code": "OGG", "file": "textures/desktop/veneer/OGG.jpg"}], "laminate": [{"code": "BGM", "file": "textures/desktop/laminate/BGM.jpg"}, {"code": "BKA", "file": "textures/desktop/laminate/BKA.jpg"}, {"code": "CC", "file": "textures/desktop/laminate/CC.jpg"}, {"code": "CGY", "file": "textures/desktop/laminate/CGY.jpg"}, {"code": "FIV", "file": "textures/desktop/laminate/FIV.jpg"}, {"code": "FK", "file": "textures/desktop/laminate/FK.jpg"}, {"code": "GG", "file": "textures/desktop/laminate/GG.jpg"}, {"code": "IO", "file": "textures/desktop/laminate/IO.jpg"}, {"code": "KAP", "file": "textures/desktop/laminate/KAP.jpg"}, {"code": "LD", "file": "textures/desktop/laminate/LD.jpg"}, {"code": "LL", "file": "textures/desktop/laminate/LL.jpg"}, {"code": "LT", "file": "textures/desktop/laminate/LT.jpg"}, {"code": "MDB", "file": "textures/desktop/laminate/MDB.png"}, {"code": "NBK", "file": "textures/desktop/laminate/NBK.jpg"}, {"code": "NSS", "file": "textures/desktop/laminate/NSS.jpg"}, {"code": "OHN", "file": "textures/desktop/laminate/OHN.jpg"}, {"code": "RCN", "file": "textures/desktop/laminate/RCN.jpg"}, {"code": "TL", "file": "textures/desktop/laminate/TL.jpg"}, {"code": "TRZ", "file": "textures/desktop/laminate/TRZ.jpg"}, {"code": "UA", "file": "textures/desktop/laminate/UA.jpg"}, {"code": "WP", "file": "textures/desktop/laminate/WP.jpg"}, {"code": "WW", "file": "textures/desktop/laminate/WW.jpg"}]}, "screen": {"front": {"standard": [{"code": "061", "file": "textures/screen/front/standard/061.jpg"}, {"code": "064", "file": "textures/screen/front/standard/064.jpg"}, {"code": "067", "file": "textures/screen/front/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/front/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/front/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/front/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/front/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/front/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/front/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/front/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/front/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/front/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/front/custom/067.jpg"}, {"code": "071", "file": "textures/screen/front/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/front/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/front/custom/072.jpg"}, {"code": "074", "file": "textures/screen/front/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/front/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/front/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/front/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/front/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/front/custom/452A.png"}, {"code": "452N", "file": "textures/screen/front/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/front/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/front/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/front/custom/458.jpg"}]}, "side": {"standard": [{"code": "061", "file": "textures/screen/side/standard/061.jpg"}, {"code": "064", "file": "textures/screen/side/standard/064.jpg"}, {"code": "067", "file": "textures/screen/side/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/side/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/side/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/side/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/side/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/side/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/side/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/side/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/side/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/side/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/side/custom/067.jpg"}, {"code": "071", "file": "textures/screen/side/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/side/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/side/custom/072.jpg"}, {"code": "074", "file": "textures/screen/side/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/side/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/side/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/side/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/side/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/side/custom/452A.png"}, {"code": "452N", "file": "textures/screen/side/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/side/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/side/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/side/custom/458.jpg"}]}, "straight": {"standard": [{"code": "1P1", "file": "textures/screen/straight/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/straight/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/straight/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/straight/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/straight/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/straight/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/straight/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/straight/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/straight/custom/MGR.jpg"}]}, "lshape": {"standard": [{"code": "1P1", "file": "textures/screen/lshape/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/lshape/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/lshape/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/lshape/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/lshape/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/lshape/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/lshape/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/lshape/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/lshape/custom/MGR.jpg"}]}}, "leg": {"standard": [{"code": "WW", "file": "textures/leg/standard/WW.png"}, {"code": "BKM", "file": ""}, {"code": "DCR", "file": "textures/leg/standard/DCR.png"}, {"code": "TS", "file": "textures/leg/standard/TS.png"}], "custom": []}}};
+  var FF_MANIFEST = {"products": {"desk_duct": {"label": "덕트형 데스크", "type": "desk", "base": "images/previews/desk_duct/ladder_glide_rect_front.png", "masks": {"leg_mask": "products/desk_duct/masks/leg_mask.png", "top_mask": "products/desk_duct/masks/top_mask.png"}}, "desk_standard": {"label": "일반형 데스크", "type": "desk", "base": "images/previews/desk_standard/ladder_glide_rect_front.png", "masks": {"leg_mask": "products/desk_standard/masks/leg_mask.png", "top_mask": "products/desk_standard/masks/top_mask.png"}}, "screen_front": {"label": "전면 스크린", "type": "screen", "base": "images/previews/desk_standard/ladder_glide_rect_front.png", "masks": {"leg_mask": "products/screen_front/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_front/masks/top_mask.png"}}, "screen_lshape": {"label": "L형 스크린", "type": "screen", "base": "images/previews/desk_standard/ladder_glide_rect_lshape.png", "masks": {"leg_mask": "products/screen_lshape/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_lshape/masks/top_mask.png"}}, "screen_side": {"label": "사이드 스크린", "type": "screen", "base": "images/previews/desk_standard/ladder_glide_rect_side.png", "masks": {"leg_mask": "products/screen_side/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_side/masks/top_mask.png"}}, "screen_straight": {"label": "일자형 스크린", "type": "screen", "base": "images/previews/desk_standard/ladder_glide_rect_straight.png", "masks": {"leg_mask": "products/screen_straight/masks/leg_mask.png", "screen_mask": "", "top_mask": "products/screen_straight/masks/top_mask.png"}}}, "textures": {"desktop": {"standard": [{"code": "HW", "file": "textures/desktop/standard/HW.png"}, {"code": "OSG", "file": "textures/desktop/standard/OSG.jpg"}, {"code": "WW", "file": "textures/desktop/standard/WW.jpg"}], "veneer": [{"code": "DBL", "file": "textures/desktop/veneer/DBL.jpg"}, {"code": "NCE", "file": "textures/desktop/veneer/NCE.jpg"}, {"code": "NMOK", "file": "textures/desktop/veneer/NMOK.jpg"}, {"code": "OB", "file": "textures/desktop/veneer/OB.jpg"}, {"code": "OGG", "file": "textures/desktop/veneer/OGG.jpg"}], "laminate": [{"code": "BGM", "file": "textures/desktop/laminate/BGM.jpg"}, {"code": "BKA", "file": "textures/desktop/laminate/BKA.jpg"}, {"code": "CC", "file": "textures/desktop/laminate/CC.jpg"}, {"code": "CGY", "file": "textures/desktop/laminate/CGY.jpg"}, {"code": "FIV", "file": "textures/desktop/laminate/FIV.jpg"}, {"code": "FK", "file": "textures/desktop/laminate/FK.jpg"}, {"code": "GG", "file": "textures/desktop/laminate/GG.jpg"}, {"code": "IO", "file": "textures/desktop/laminate/IO.jpg"}, {"code": "KAP", "file": "textures/desktop/laminate/KAP.jpg"}, {"code": "LD", "file": "textures/desktop/laminate/LD.jpg"}, {"code": "LL", "file": "textures/desktop/laminate/LL.jpg"}, {"code": "LT", "file": "textures/desktop/laminate/LT.jpg"}, {"code": "MDB", "file": "textures/desktop/laminate/MDB.png"}, {"code": "NBK", "file": "textures/desktop/laminate/NBK.jpg"}, {"code": "NSS", "file": "textures/desktop/laminate/NSS.jpg"}, {"code": "OHN", "file": "textures/desktop/laminate/OHN.jpg"}, {"code": "RCN", "file": "textures/desktop/laminate/RCN.jpg"}, {"code": "TL", "file": "textures/desktop/laminate/TL.jpg"}, {"code": "TRZ", "file": "textures/desktop/laminate/TRZ.jpg"}, {"code": "UA", "file": "textures/desktop/laminate/UA.jpg"}, {"code": "WP", "file": "textures/desktop/laminate/WP.jpg"}, {"code": "WW", "file": "textures/desktop/laminate/WW.jpg"}]}, "screen": {"front": {"standard": [{"code": "061", "file": "textures/screen/front/standard/061.jpg"}, {"code": "064", "file": "textures/screen/front/standard/064.jpg"}, {"code": "067", "file": "textures/screen/front/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/front/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/front/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/front/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/front/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/front/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/front/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/front/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/front/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/front/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/front/custom/067.jpg"}, {"code": "071", "file": "textures/screen/front/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/front/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/front/custom/072.jpg"}, {"code": "074", "file": "textures/screen/front/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/front/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/front/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/front/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/front/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/front/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/front/custom/452A.png"}, {"code": "452N", "file": "textures/screen/front/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/front/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/front/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/front/custom/458.jpg"}]}, "side": {"standard": [{"code": "061", "file": "textures/screen/side/standard/061.jpg"}, {"code": "064", "file": "textures/screen/side/standard/064.jpg"}, {"code": "067", "file": "textures/screen/side/standard/067.jpg"}, {"code": "3F1", "file": "textures/screen/side/standard/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/standard/3F2.jpg"}], "custom": [{"code": "001", "file": "textures/screen/side/custom/001.jpg"}, {"code": "001A", "file": "textures/screen/front/custom/001A.jpg"}, {"code": "001B", "file": "textures/screen/side/custom/001B.jpg"}, {"code": "004", "file": "textures/screen/side/custom/004.jpg"}, {"code": "004B", "file": "textures/screen/side/custom/004B.jpg"}, {"code": "007", "file": "textures/screen/side/custom/007.jpg"}, {"code": "007B", "file": "textures/screen/side/custom/007B.jpg"}, {"code": "014", "file": "textures/screen/side/custom/014.jpg"}, {"code": "014A", "file": "textures/screen/front/custom/014A.jpg"}, {"code": "061", "file": "textures/screen/side/custom/061.jpg"}, {"code": "064", "file": "textures/screen/front/custom/064.jpg"}, {"code": "067", "file": "textures/screen/side/custom/067.jpg"}, {"code": "071", "file": "textures/screen/side/custom/071.jpg"}, {"code": "071A", "file": "textures/screen/side/custom/071A.jpg"}, {"code": "072", "file": "textures/screen/side/custom/072.jpg"}, {"code": "074", "file": "textures/screen/side/custom/074.jpg"}, {"code": "2M4A", "file": "textures/screen/side/custom/2M4A.jpg"}, {"code": "371", "file": "textures/screen/side/custom/371.jpg"}, {"code": "3F1", "file": "textures/screen/side/custom/3F1.jpg"}, {"code": "3F2", "file": "textures/screen/side/custom/3F2.jpg"}, {"code": "451", "file": "textures/screen/side/custom/451.jpg"}, {"code": "452A", "file": "textures/screen/side/custom/452A.png"}, {"code": "452N", "file": "textures/screen/side/custom/452N.jpg"}, {"code": "457", "file": "textures/screen/side/custom/457.jpg"}, {"code": "457L", "file": "textures/screen/side/custom/457L.jpg"}, {"code": "458", "file": "textures/screen/side/custom/458.jpg"}]}, "straight": {"standard": [{"code": "1P1", "file": "textures/screen/straight/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/straight/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/straight/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/straight/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/straight/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/straight/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/straight/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/straight/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/straight/custom/MGR.jpg"}]}, "lshape": {"standard": [{"code": "1P1", "file": "textures/screen/lshape/standard/1P1.jpg"}, {"code": "1P2", "file": "textures/screen/lshape/standard/1P2.jpg"}, {"code": "1P4", "file": "textures/screen/lshape/standard/1P4.jpg"}, {"code": "1P7", "file": "textures/screen/lshape/standard/1P7.jpg"}], "custom": [{"code": "1P5", "file": "textures/screen/lshape/custom/1P5.jpg"}, {"code": "BRD", "file": "textures/screen/lshape/custom/BRD.jpg"}, {"code": "COB", "file": "textures/screen/lshape/custom/COB.png"}, {"code": "MBE", "file": "textures/screen/lshape/custom/MBE.jpg"}, {"code": "MGR", "file": "textures/screen/lshape/custom/MGR.jpg"}]}}, "leg": {"standard": [{"code": "WW", "file": "textures/leg/standard/WW.png"}, {"code": "BKM", "file": ""}, {"code": "DCR", "file": "textures/leg/standard/DCR.png"}, {"code": "TS", "file": "textures/leg/standard/TS.png"}], "custom": []}}};
   var FF_LABELS = {
     standard:'표준품', veneer:'무늬목', laminate:'라미네이트', custom:'주문품',
     front:'전면 스크린', side:'사이드 스크린', straight:'일자형 스크린', lshape:'L형 스크린'
@@ -6776,7 +6776,7 @@ body.ff-dashboard-preview #preview-panel{
     var txt = (e.target && e.target.textContent || '').trim();
     if(/사다리형|원형|A자/.test(txt)) setTimeout(function(){ updateOptionRows('legtype'); if(window.setPreviewGlow) setPreviewGlow('leg'); }, 50);
     if(/글라이드|캐스터|바퀴/.test(txt)) setTimeout(function(){ updateOptionRows('caster'); if(window.setPreviewGlow) setPreviewGlow('leg'); }, 50);
-    if(/직각|스퀘어|라운드/.test(txt)) setTimeout(function(){ updateOptionRows('topshape'); if(window.setPreviewGlow) setPreviewGlow('top'); }, 50);
+    if(/직각|직사각|라운드/.test(txt)) setTimeout(function(){ updateOptionRows('topshape'); if(window.setPreviewGlow) setPreviewGlow('top'); }, 50);
   }, true);
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(function(){ ensureOptionRows(); updateOptionRows(); }, 300); });
 })();
@@ -8006,7 +8006,7 @@ button.material-btn{
 (function(){
   var COMBO_MAP = {
     "W1200_직사각_고정형_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_스퀘어_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
+    "W1200_직사각_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
     "W1200_직각_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_"
   };
 
@@ -8025,7 +8025,7 @@ button.material-btn{
     top: {
       "직각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
       "직사각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
-      "스퀘어": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
+      "직사각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
       "라운드": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png"
     }
   };
@@ -8046,7 +8046,7 @@ button.material-btn{
   function normTop(v){
     v = String(v||'');
     if(/라운드/.test(v)) return '라운드';
-    if(/직각|직사각|스퀘어|스퀘어/.test(v)) return '직사각';
+    if(/직각|직사각|직사각|직사각/.test(v)) return '직사각';
     return v || '';
   }
   function pickImage(kind, value){
@@ -8199,7 +8199,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
   function activeMaterialFromLabels(label){const groups=Array.from(document.querySelectorAll('.material-button-section,.btn-group,.color-pair-grid,#messages'));let best='';groups.forEach(function(g){const t=g.textContent||'';if(label&&!t.includes(label))return;const active=g.querySelector('.material-btn.active,.material-btn.selected,.choice-btn.selected,.choice-btn.multi-selected');if(active)best=active.textContent.replace('선택','').trim().split(/\s+/).pop()||best;});return best;}
   function ensureSummary(){let panel=document.getElementById('ff-right-summary');if(panel)return panel;panel=document.createElement('aside');panel.id='ff-right-summary';panel.innerHTML='<div class="ff-rs-top"><h2>현재 선택</h2><button class="ff-rs-close" type="button">×</button></div><section class="ff-rs-section"><div class="ff-rs-label">데스크</div><div class="ff-rs-main" id="ff-rs-desk">일반형 데스크</div><div class="ff-rs-sub" id="ff-rs-desk-sub">다리: -<br>상판 모서리: - <span style="float:right">1개</span></div></section><section class="ff-rs-section"><div class="ff-rs-label">스크린</div><div class="ff-rs-main" id="ff-rs-screen">선택 없음</div><div class="ff-rs-sub"><span style="float:right">1개</span></div></section><section class="ff-rs-section"><div class="ff-rs-label">옵션</div><div class="ff-rs-row"><span>다리 색상</span><b><span class="ff-rs-swatch" id="ff-rs-leg-swatch"></span><span id="ff-rs-leg">-</span></b></div><div class="ff-rs-row"><span>상판 색상</span><b><span class="ff-rs-swatch" id="ff-rs-top-swatch"></span><span id="ff-rs-top">-</span></b></div><div class="ff-rs-row"><span>하부 형태</span><b id="ff-rs-caster">-</b></div></section><section class="ff-rs-section"><div class="ff-rs-label" style="font-size:18px;color:#fff;margin-bottom:18px;">견적 요약</div><div class="ff-rs-price-row"><span>공급가</span><strong id="ff-rs-supply">-</strong></div><div class="ff-rs-price-row"><span>부가세 (10%)</span><b id="ff-rs-vat">-</b></div><div class="ff-rs-price-row ff-rs-total"><span>합계<br><small>(VAT 포함)</small></span><strong id="ff-rs-total">-</strong></div></section><button class="ff-rs-btn" type="button" id="ff-rs-download">↧ 견적서 다운로드</button>';document.body.appendChild(panel);panel.querySelector('.ff-rs-close').onclick=function(){panel.style.display='none'};panel.querySelector('#ff-rs-download').onclick=function(){const btn=Array.from(document.querySelectorAll('button')).find(b=>/다운로드|견적서/.test(b.textContent));if(btn)btn.click();};return panel;}
   function won(n){return Number(n||0).toLocaleString('ko-KR')+'원';}
-  function updateSummary(){const panel=ensureSummary();const currentText=textFrom('#current-box','')+' '+textFrom('#preview-items','')+' '+textFrom('#messages','');const desk=/덕트형/.test(currentText)?'덕트형 데스크':'일반형 데스크';const screen=/L형/.test(currentText)?'L형 스크린':(/사이드/.test(currentText)?'사이드 스크린':(/전면/.test(currentText)?'전면 스크린':(/일자/.test(currentText)?'일자형 스크린':'선택 없음')));const legType=/일자형/.test(currentText)?'일자형':(/사다리/.test(currentText)?'사다리형':'-');const topShape=/라운드/.test(currentText)?'라운드':(/사각|직각|스퀘어/.test(currentText)?'사각':'-');const caster=/캐스터/.test(currentText)?'캐스터':(/글라이드|고정형/.test(currentText)?'글라이드':'-');const topCode=activeMaterialFromLabels('상판')||(currentText.match(/상판\s*([A-Z0-9]+)/)||[])[1]||'HW';const legCode=activeMaterialFromLabels('다리')||(currentText.match(/다리\s*([A-Z0-9]+)/)||[])[1]||'WW';panel.querySelector('#ff-rs-desk').textContent=desk;panel.querySelector('#ff-rs-desk-sub').innerHTML='다리: '+legType+'<br>상판 모서리: '+topShape+' <span style="float:right">1개</span>';panel.querySelector('#ff-rs-screen').textContent=screen;panel.querySelector('#ff-rs-leg').textContent=legCode;panel.querySelector('#ff-rs-top').textContent=topCode;panel.querySelector('#ff-rs-caster').textContent=caster;panel.querySelector('#ff-rs-leg-swatch').style.backgroundImage='url('+(LEG_TEXTURES[legCode]||'')+')';panel.querySelector('#ff-rs-top-swatch').style.backgroundImage='url('+(DESK_TEXTURES[topCode]||'')+')';let totalText=textFrom('.total-price','')||textFrom('.qr-total','');let totalNum=0;const nums=totalText.match(/[\d,]+/g);if(nums&&nums.length)totalNum=parseInt(nums[nums.length-1].replace(/,/g,''),10);if(!totalNum)totalNum=1474000;const supply=Math.round(totalNum/1.1);const vat=totalNum-supply;panel.querySelector('#ff-rs-supply').textContent=won(supply);panel.querySelector('#ff-rs-vat').textContent=won(vat);panel.querySelector('#ff-rs-total').textContent=won(totalNum);}
+  function updateSummary(){const panel=ensureSummary();const currentText=textFrom('#current-box','')+' '+textFrom('#preview-items','')+' '+textFrom('#messages','');const desk=/덕트형/.test(currentText)?'덕트형 데스크':'일반형 데스크';const screen=/L형/.test(currentText)?'L형 스크린':(/사이드/.test(currentText)?'사이드 스크린':(/전면/.test(currentText)?'전면 스크린':(/일자/.test(currentText)?'일자형 스크린':'선택 없음')));const legType=/일자형/.test(currentText)?'일자형':(/사다리/.test(currentText)?'사다리형':'-');const topShape=/라운드/.test(currentText)?'라운드':(/사각|직각|직사각/.test(currentText)?'사각':'-');const caster=/캐스터/.test(currentText)?'캐스터':(/글라이드|고정형/.test(currentText)?'글라이드':'-');const topCode=activeMaterialFromLabels('상판')||(currentText.match(/상판\s*([A-Z0-9]+)/)||[])[1]||'HW';const legCode=activeMaterialFromLabels('다리')||(currentText.match(/다리\s*([A-Z0-9]+)/)||[])[1]||'WW';panel.querySelector('#ff-rs-desk').textContent=desk;panel.querySelector('#ff-rs-desk-sub').innerHTML='다리: '+legType+'<br>상판 모서리: '+topShape+' <span style="float:right">1개</span>';panel.querySelector('#ff-rs-screen').textContent=screen;panel.querySelector('#ff-rs-leg').textContent=legCode;panel.querySelector('#ff-rs-top').textContent=topCode;panel.querySelector('#ff-rs-caster').textContent=caster;panel.querySelector('#ff-rs-leg-swatch').style.backgroundImage='url('+(LEG_TEXTURES[legCode]||'')+')';panel.querySelector('#ff-rs-top-swatch').style.backgroundImage='url('+(DESK_TEXTURES[topCode]||'')+')';let totalText=textFrom('.total-price','')||textFrom('.qr-total','');let totalNum=0;const nums=totalText.match(/[\d,]+/g);if(nums&&nums.length)totalNum=parseInt(nums[nums.length-1].replace(/,/g,''),10);if(!totalNum)totalNum=1474000;const supply=Math.round(totalNum/1.1);const vat=totalNum-supply;panel.querySelector('#ff-rs-supply').textContent=won(supply);panel.querySelector('#ff-rs-vat').textContent=won(vat);panel.querySelector('#ff-rs-total').textContent=won(totalNum);}
   function init(){document.body.classList.add('ff-pro-dashboard');patchImages();ensureSummary();updateSummary();setInterval(function(){patchImages();updateSummary();},900);new MutationObserver(function(){patchImages();updateSummary();}).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['src','class','style']});}
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
@@ -8472,12 +8472,12 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
   };
   function quoteImageForItem70(item){
     var p=(item&&item.product)||'';
-    if(/덕트형/.test(p)) return 'products/desk_duct/base/base.png';
-    if(/전면/.test(p)) return 'products/screen_front/base/base.png';
-    if(/사이드/.test(p)) return 'products/screen_side/base/base.png';
-    if(/일자형/.test(p)) return 'products/screen_straight/base/base.png';
-    if(/L형|엘형/.test(p)) return 'products/screen_lshape/base/base.png';
-    return 'products/desk_standard/base/base.png';
+    if(/덕트형/.test(p)) return 'images/previews/desk_duct/ladder_glide_rect_front.png';
+    if(/전면/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_front.png';
+    if(/사이드/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_side.png';
+    if(/일자형/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_straight.png';
+    if(/L형|엘형/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_lshape.png';
+    return 'images/previews/desk_standard/ladder_glide_rect_front.png';
   }
   function won(n){try{return (Number(n)||0).toLocaleString('ko-KR')+'원';}catch(e){return '0원';}}
   window.showFinalQuote = function(){
@@ -8525,7 +8525,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
   function $(id){return document.getElementById(id);} 
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   var PRODUCT_IMG={
-    '일반형 데스크':'products/desk_standard/base/base.png','덕트형 데스크':'products/desk_duct/base/base.png','전면 스크린':'products/screen_front/base/base.png','사이드 스크린':'products/screen_side/base/base.png','일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
+    '일반형 데스크':'images/previews/desk_standard/ladder_glide_rect_front.png','덕트형 데스크':'images/previews/desk_duct/ladder_glide_rect_front.png','전면 스크린':'images/previews/desk_standard/ladder_glide_rect_front.png','사이드 스크린':'images/previews/desk_standard/ladder_glide_rect_side.png','일자형 스크린':'images/previews/desk_standard/ladder_glide_rect_straight.png','L형 스크린':'images/previews/desk_standard/ladder_glide_rect_lshape.png'
   };
   var OPTION_IMG={
     leg:{'사다리형':'./images/options/combo/normal/ladder_glide.png','사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','원형':'./images/options/combo/normal/round_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png'},
@@ -8582,7 +8582,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     var btn=$('quick-ai-preview-btn'), panel=$('ff-ai-live-panel');
     if(btn&&panel&&btn.parentElement!==panel){panel.appendChild(btn);}
   }
-  function normalize(v){v=String(v||''); if(/사다리/.test(v))return '사다리형'; if(/원형/.test(v))return '원형'; if(/A자|a자|에이/.test(v))return 'A자형'; if(/캐스터|바퀴/.test(v))return '캐스터'; if(/글라이드|고정/.test(v))return '글라이드'; if(/라운드/.test(v))return '라운드 상판'; if(/스퀘어|직사각|직각/.test(v))return '직사각 상판'; return v;}
+  function normalize(v){v=String(v||''); if(/사다리/.test(v))return '사다리형'; if(/원형/.test(v))return '원형'; if(/A자|a자|에이/.test(v))return 'A자형'; if(/캐스터|바퀴/.test(v))return '캐스터'; if(/글라이드|고정/.test(v))return '글라이드'; if(/라운드/.test(v))return '라운드 상판'; if(/직사각|직사각|직각/.test(v))return '직사각 상판'; return v;}
   function setOptionCard(id,imgId,labelId,value,kind){
     var card=$(id), img=$(imgId), lab=$(labelId); if(!card||!img||!lab)return;
     var label=normalize(value), src=(OPTION_IMG[kind]||{})[label] || (OPTION_IMG[kind]||{})[value] || '';
@@ -11659,6 +11659,102 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+<script id="ff-v136-preview-routing-fix">
+(function(){
+  function $all(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function getState(){ return window.state || window.appState || window.currentState || window.FF_STATE || {}; }
+  function text(){ return document.body ? document.body.innerText : ''; }
+  function productKey(){
+    var st=getState(), t=JSON.stringify(st)+' '+text();
+    if(/덕트형/.test(t)) return 'desk_duct';
+    return 'desk_standard';
+  }
+  function topKey(){
+    var st=getState(), t=(st.topShape||st.top||st.topType||'')+' '+text();
+    return /라운드|round/i.test(t) ? 'round' : 'rect';
+  }
+  function legKey(){
+    var st=getState(), t=(st.legType||st.leg||st.legLabel||'')+' '+text();
+    if(/A자|a자|에이|aframe/i.test(t)) return 'aframe';
+    if(/원형|round/i.test(t) && topKey()==='round') return 'round';
+    return 'ladder';
+  }
+  function mobilityKey(){
+    var st=getState(), t=(st.casterType||st.mobility||st.moving||'')+' '+text();
+    return /캐스터|caster|바퀴/i.test(t) ? 'caster' : 'glide';
+  }
+  function screenSuffix(){
+    var st=getState(), t=JSON.stringify(st)+' '+text();
+    if(/L형|lshape/i.test(t)) return '_lshape';
+    if(/일자형|straight/i.test(t)) return '_straight';
+    if(/사이드|side/i.test(t)) return '_side';
+    if(/전면|front/i.test(t)) return '_front';
+    return '_front';
+  }
+  function comboPath(){
+    var top=topKey(), leg=legKey();
+    if(top==='rect') leg='ladder';
+    if(top==='round' && leg==='ladder') leg='round';
+    var file=leg+'_'+mobilityKey()+'_'+top+screenSuffix()+'.png';
+    return './images/previews/'+productKey()+'/'+file;
+  }
+  function optionPath(kind, value){
+    value=String(value||'');
+    if(kind==='top') return /라운드|round/i.test(value) ? './images/options/tops/round.png' : './images/options/tops/square.png';
+    if(kind==='leg'){
+      if(/A자|a자|에이|aframe/i.test(value)) return './images/options/leg/a_type.png';
+      if(/원형|round/i.test(value)) return './images/options/leg/round.png';
+      return './images/options/leg/ladder.png';
+    }
+    if(kind==='mobility'){
+      var lk=/A자|a자|aframe/i.test(value)?'aframe':(/원형|round/i.test(value)?'round':legKey());
+      var mk=/캐스터|caster|바퀴/i.test(value)?'caster':'glide';
+      return './images/options/moving/'+lk+'_'+mk+'.png';
+    }
+    return comboPath();
+  }
+  function fixSrc(src){
+    src=String(src||'');
+    if(/leg_ladder\.(svg|png)$/i.test(src)) return './images/options/leg/ladder.png';
+    if(/leg_round\.(svg|png)$/i.test(src)) return './images/options/leg/round.png';
+    if(/leg_a\.(svg|png)$/i.test(src)) return './images/options/leg/a_type.png';
+    if(/mobility_glide\.(svg|png)$/i.test(src)) return './images/options/moving/'+legKey()+'_glide.png';
+    if(/mobility_caster\.(svg|png)$/i.test(src)) return './images/options/moving/'+legKey()+'_caster.png';
+    if(/top_rect\.(svg|png)$/i.test(src)) return './images/options/tops/square.png';
+    if(/top_round\.(svg|png)$/i.test(src)) return './images/options/tops/round.png';
+    if(/products\/(desk_standard|desk_duct|screen_[^/]+)\/base\/base\.png/i.test(src)) return comboPath();
+    return src;
+  }
+  window.ffDeskComboPreviewPath = comboPath;
+  window.ffOptionImagePath = optionPath;
+  var nativeSet=HTMLImageElement.prototype.setAttribute;
+  HTMLImageElement.prototype.setAttribute=function(name, value){
+    if(String(name).toLowerCase()==='src') value=fixSrc(value);
+    return nativeSet.call(this,name,value);
+  };
+  function apply(){
+    $all('img').forEach(function(img){
+      var next=fixSrc(img.getAttribute('src')||img.src||'');
+      if(next && img.getAttribute('src')!==next) img.setAttribute('src', next);
+      img.onerror=function(){
+        var s=fixSrc(this.getAttribute('src')||'');
+        if(s && s!==this.getAttribute('src')) this.setAttribute('src',s);
+        else this.setAttribute('src', comboPath());
+      };
+    });
+    // Main preview image candidates
+    $all('#preview-img,#previewImage,#main-preview-img,.preview-img,.product-preview img,#previewStage img,.stage img').forEach(function(img){
+      var p=comboPath();
+      if(!/textures\//.test(img.getAttribute('src')||'')) img.setAttribute('src', p);
+    });
+  }
+  ['click','change','input'].forEach(function(ev){ document.addEventListener(ev,function(){ setTimeout(apply,60); setTimeout(apply,250); },true); });
+  document.addEventListener('DOMContentLoaded', function(){ apply(); setTimeout(apply,300); });
+  window.addEventListener('load', function(){ apply(); setInterval(apply,1200); });
+})();
+</script>
+
 </body>
 
 
@@ -13027,13 +13123,13 @@ button.material-btn{
   function quoteImageForItem(item){
     var p = (item && item.product) || '';
     if(item && item._quoteImage) return item._quoteImage;
-    if(/덕트형/.test(p)) return 'products/desk_duct/base/base.png';
-    if(/일반형|데스크/.test(p)) return 'products/desk_standard/base/base.png';
-    if(/전면/.test(p)) return 'products/screen_front/base/base.png';
-    if(/사이드/.test(p)) return 'products/screen_side/base/base.png';
-    if(/일자형/.test(p)) return 'products/screen_straight/base/base.png';
-    if(/L형|엘형/.test(p)) return 'products/screen_lshape/base/base.png';
-    return 'products/desk_standard/base/base.png';
+    if(/덕트형/.test(p)) return 'images/previews/desk_duct/ladder_glide_rect_front.png';
+    if(/일반형|데스크/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_front.png';
+    if(/전면/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_front.png';
+    if(/사이드/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_side.png';
+    if(/일자형/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_straight.png';
+    if(/L형|엘형/.test(p)) return 'images/previews/desk_standard/ladder_glide_rect_lshape.png';
+    return 'images/previews/desk_standard/ladder_glide_rect_front.png';
   }
   function won(n){ try{return (Math.floor((Number(n)||0)/1000)*1000).toLocaleString('ko-KR')+'원';}catch(e){return '0원';} }
   window.showFinalQuote = function(){
@@ -13241,9 +13337,9 @@ button.material-btn{
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
   var SINGLE=['일자형 스크린','L형 스크린'];
   var PRODUCT_IMG={
-    '일반형 데스크':'products/desk_standard/base/base.png','덕트형 데스크':'products/desk_duct/base/base.png',
-    '전면 스크린':'products/screen_front/base/base.png','사이드 스크린':'products/screen_side/base/base.png',
-    '일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
+    '일반형 데스크':'images/previews/desk_standard/ladder_glide_rect_front.png','덕트형 데스크':'images/previews/desk_duct/ladder_glide_rect_front.png',
+    '전면 스크린':'images/previews/desk_standard/ladder_glide_rect_front.png','사이드 스크린':'images/previews/desk_standard/ladder_glide_rect_side.png',
+    '일자형 스크린':'images/previews/desk_standard/ladder_glide_rect_straight.png','L형 스크린':'images/previews/desk_standard/ladder_glide_rect_lshape.png'
   };
   var OPTION_IMG={
     leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
@@ -13494,12 +13590,12 @@ button.material-btn{
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
   var SINGLE=['일자형 스크린','L형 스크린'];
   var PRODUCT_IMG={
-    '일반형 데스크':'products/desk_standard/base/base.png',
-    '덕트형 데스크':'products/desk_duct/base/base.png',
-    '전면 스크린':'products/screen_front/base/base.png',
-    '사이드 스크린':'products/screen_side/base/base.png',
-    '일자형 스크린':'products/screen_straight/base/base.png',
-    'L형 스크린':'products/screen_lshape/base/base.png'
+    '일반형 데스크':'images/previews/desk_standard/ladder_glide_rect_front.png',
+    '덕트형 데스크':'images/previews/desk_duct/ladder_glide_rect_front.png',
+    '전면 스크린':'images/previews/desk_standard/ladder_glide_rect_front.png',
+    '사이드 스크린':'images/previews/desk_standard/ladder_glide_rect_side.png',
+    '일자형 스크린':'images/previews/desk_standard/ladder_glide_rect_straight.png',
+    'L형 스크린':'images/previews/desk_standard/ladder_glide_rect_lshape.png'
   };
   var OPTION_IMG={
     leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
