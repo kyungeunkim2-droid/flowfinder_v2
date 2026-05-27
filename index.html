@@ -13695,50 +13695,12 @@ body{
     else if(oldConfirm) oldConfirm.apply(this,arguments);
   };
   // 5. 바퀴형태 → 이동 방식, 옵션 3개를 선택 미리보기 안에 보장
-  function ensureQuickOptions(){
-    var panel=document.getElementById('texture-preview');
-    if(!panel) return;
-    var box=document.getElementById('ff-quick-options');
-    if(!box){
-      box=document.createElement('div');
-      box.id='ff-quick-options';
-      var mats=panel.querySelector('.quick-materials');
-      if(mats && mats.parentNode) mats.parentNode.insertBefore(box, mats.nextSibling);
-      else panel.appendChild(box);
-    }
-    if(!document.getElementById('quick-legtype-row')){
-      box.innerHTML = '<div class="quick-option-row" id="quick-legtype-row"><span>다리형태</span><b id="quick-legtype-code">-</b></div>'+
-        '<div class="quick-option-row" id="quick-caster-row"><span>이동 방식</span><b id="quick-caster-code">-</b></div>'+
-        '<div class="quick-option-row" id="quick-topshape-row"><span>상판형태</span><b id="quick-topshape-code">-</b></div>';
-    } else {
-      var casterLabel=document.querySelector('#quick-caster-row span'); if(casterLabel) casterLabel.textContent='이동 방식';
-    }
-  }
-  function syncQuickOptions(active){
-    ensureQuickOptions();
-    var pairs=[
-      ['quick-legtype-row','quick-legtype-code',(window.state&&state.legType)||'-','legtype'],
-      ['quick-caster-row','quick-caster-code',(window.state&&state.casterType)||'-','caster'],
-      ['quick-topshape-row','quick-topshape-code',(window.state&&state.topShape)||'-','topshape']
-    ];
-    pairs.forEach(function(p){
-      var row=document.getElementById(p[0]), code=document.getElementById(p[1]);
-      if(code) code.textContent=p[2]||'-';
-      if(row){ row.classList.toggle('active-option', active===p[3]); }
-    });
-  }
-  var oldRenderFast = window.renderFastPreview;
-  window.renderFastPreview = function(part){ if(oldRenderFast) oldRenderFast.apply(this,arguments); setTimeout(function(){syncQuickOptions(part);},0); };
-  ['askLegType','askCasterType','askTopShape'].forEach(function(fn){
-    var old=window[fn];
-    if(typeof old==='function') window[fn]=function(){ var r=old.apply(this,arguments); setTimeout(function(){syncQuickOptions(fn==='askLegType'?'legtype':fn==='askCasterType'?'caster':'topshape');},60); return r; };
-  });
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){
-      ensureQuickOptions(); syncQuickOptions();
-      document.querySelectorAll('#quick-caster-row span').forEach(function(el){el.textContent='이동 방식';});
-    },200);
-  });
+function ensureQuickOptions(){
+  return;
+}
+function syncQuickOptions(active){
+  return;
+}
 })();
 </script>
 
@@ -14328,9 +14290,7 @@ button.material-btn{
       g.classList.add(n>=9 ? 'ff-mat-many' : 'ff-mat-count-' + n);
     });
   }
-  document.addEventListener('DOMContentLoaded', function(){ setTimeout(applyMaterialGrid, 50); setTimeout(applyMaterialGrid, 400); });
-  var obs = new MutationObserver(function(){ applyMaterialGrid(); });
-  obs.observe(document.documentElement, {childList:true, subtree:true});
+  
 })();
 </script>
 <!-- === Fixed64: true Nano Banana material remap + material-only selector preview === -->
@@ -14776,11 +14736,7 @@ button.material-btn{
     }
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(showFlowFinderFirstScreen, 900);
-    setTimeout(enforceScroll, 950);
-    setTimeout(patchNanoButton, 1000);
-  });
+
   window.addEventListener('load', function(){
     setTimeout(removeOldSetUnitUI, 100);
     setTimeout(enforceScroll, 120);
