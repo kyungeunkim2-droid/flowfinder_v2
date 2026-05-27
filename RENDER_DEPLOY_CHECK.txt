@@ -1,0 +1,5 @@
+Render 반영 체크:
+1) 이 zip 안의 모든 파일을 GitHub repository 루트에 그대로 업로드/커밋하세요.
+2) Render Dashboard > Manual Deploy > Clear build cache & deploy 를 실행하세요.
+3) 브라우저에서 Ctrl+F5 또는 시크릿창으로 확인하세요.
+4) server.js는 Cache-Control no-store로 수정되어 이전 HTML 캐시를 덜 타게 되어 있습니다.
