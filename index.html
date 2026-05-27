@@ -4514,7 +4514,7 @@ function askLegType(catName) {
   if (!state.topShape) return askTopShape(catName);
   var choices = ffDeskAllowedLegsByTop(state.topShape);
   var note = state.topShape === '라운드 상판'
-    ? '라운드 상판은 원형 4레그 또는 A자 4레그만 선택 가능합니다.'
+    ? '라운드 상판은 원형 4레그 또는 A자형 4레그만 선택 가능합니다.'
     : '직사각 상판은 사다리형 4레그만 선택 가능합니다.';
   addMsg('bot', '<b>다리형태를 선택해주세요:</b><div class="ff-flow-note">' + note + '</div>');
   addButtons(choices, function() { askTopShape(catName); }, function(v) {
@@ -11573,9 +11573,9 @@ ${map.move[move] || move}
 
   window.askLegType = askLegType = function(catName){
     var st=s(); st.step='choose_leg'; st._currentCatName=catName;
-    var choices = (st.topShape === '라운드 상판') ? ['원형 4레그','A자 4레그'] : ['사다리형 4레그'];
+    var choices = (st.topShape === '라운드 상판') ? ['원형 4레그','A자형 4레그'] : ['사다리형 4레그'];
     if(choices.indexOf(st.legType)<0){ st.legType=null; st.casterType=null; st._legLabel=null; st.current.legLabel=null; }
-    var note = (st.topShape === '라운드 상판') ? '라운드 상판은 원형 4레그 또는 A자 4레그만 선택 가능합니다.' : '직사각 상판은 사다리형 4레그만 선택 가능합니다.';
+    var note = (st.topShape === '라운드 상판') ? '라운드 상판은 원형 4레그 또는 A자형 4레그만 선택 가능합니다.' : '직사각 상판은 사다리형 4레그만 선택 가능합니다.';
     optionSelector('다리 형태를 선택해주세요', choices, st.legType, function(v){
       st.legType=v; st.current.legLabel=v; st.casterType=null; st._legLabel=null;
       if(window.FlowFinderFastPreview&&FlowFinderFastPreview.state) FlowFinderFastPreview.state.legType=v;
@@ -11890,7 +11890,7 @@ ${map.move[move] || move}
       return askTopShape(s._currentCatName);
     }
     s.step = 'choose_leg';
-    var choices = s.topShape === '라운드 상판' ? ['원형 4레그','A자 4레그'] : ['사다리형 4레그'];
+    var choices = s.topShape === '라운드 상판' ? ['원형 4레그','A자형 4레그'] : ['사다리형 4레그'];
     var note = s.topShape === '라운드 상판'
       ? '라운드 상판 선택 시 <b>원형 4레그</b>, <b>A자 4레그</b>만 선택 가능합니다.'
       : '직사각 상판 선택 시 <b>사다리형 4레그</b>만 선택 가능합니다.';
@@ -11982,7 +11982,7 @@ ${map.move[move] || move}
   function S(){ window.state=window.state||{}; state.current=state.current||{}; return state; }
   function isDesk(cat){ return /데스크/.test(String(cat||'')) || !!((window.USER_CATEGORIES&&USER_CATEGORIES[cat])||{}).isDesk; }
   function normTop(v){ return /라운드|round/i.test(String(v||'')) ? '라운드 상판' : '직사각 상판'; }
-  function allowedLegs(){ return normTop(S().topShape)==='라운드 상판' ? ['원형 4레그','A자 4레그'] : ['사다리형 4레그']; }
+  function allowedLegs(){ return normTop(S().topShape)==='라운드 상판' ? ['원형 4레그','A자형 4레그'] : ['사다리형 4레그']; }
   function patchText(root){
     (root||document).querySelectorAll('body,body *').forEach(function(el){
       if(el.children && el.children.length>20) return;
@@ -12178,7 +12178,7 @@ ${map.move[move] || move}
   patchGlobals(); patchText(document); replaceOldDeskMessages(document);
   try{new MutationObserver(function(muts){patchGlobals(); muts.forEach(function(m){m.addedNodes&&m.addedNodes.forEach(function(n){if(n.nodeType===1){patchText(n);replaceOldDeskMessages(n);}});});}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
   setInterval(patchGlobals,500);
-  window.addEventListener('load',function(){patchGlobals(); patchText(document); replaceOldDeskMessages(document); if(!document.getElementById('ff142-badge')){var b=document.createElement('div');b.id='ff142-badge';b.className='ff142-badge';b.textContent='FF142 적용됨';document.body.appendChild(b);}});
+  window.addEventListener('load',function(){patchGlobals(); patchText(document); replaceOldDeskMessages(document); if(!document.getElementById('ff142-badge')){var b=document.createElement('div');b.id='ff142-badge';b.className='ff142-badge';b.textContent='FF143 적용됨';document.body.appendChild(b);}});
 })();
 </script>
 
@@ -13499,7 +13499,7 @@ button.material-btn{
   }
   function allowedLegs(){
     var top = normalizeTop((window.state && state.topShape) || '');
-    if(top === '라운드 상판') return ['원형 4레그','A자 4레그'];
+    if(top === '라운드 상판') return ['원형 4레그','A자형 4레그'];
     return ['사다리형 4레그'];
   }
   function deskOptionHTML(catName){
@@ -15871,8 +15871,8 @@ button.material-btn{
   function isLineOrL(cat){return /일자형|L형|l형|엘/i.test(String(cat||''));}
   function screenDef(cat){return isLineOrL(cat)?{h:590,above:350}:{h:715,above:405};}
   function topNorm(v){v=String(v||''); if(/라운드|round/i.test(v)) return '라운드 상판'; return '직사각 상판';}
-  function selected(type,val){var s=S(), cur= type==='top'?topNorm(s.topShape): type==='leg'?(s.legType||''):(s.casterType||''); return cur===val?' selected':'';}
-  function allowedLegs(){return topNorm(S().topShape)==='라운드 상판'?['원형 4레그','A자 4레그']:['사다리형 4레그'];}
+  function selected(type,val){var s=S(); if(type==='top' && !s.topShape) return ''; var cur= type==='top'?topNorm(s.topShape): type==='leg'?(s.legType||''):(s.casterType||''); return cur===val?' selected':'';}
+  function allowedLegs(){return topNorm(S().topShape)==='라운드 상판'?['원형 4레그','A자형 4레그']:['사다리형 4레그'];}
   function renderDeskHTML(catName){
     var s=S(), top=topNorm(s.topShape), legs=allowedLegs();
     var topChosen=!!s.topShape, legChosen=!!s.legType;
@@ -15888,11 +15888,11 @@ button.material-btn{
       + '<div class="ff-desk-option-section"><div>이동방식</div>'
       + (topChosen&&legChosen?'<div class="ff-desk-option-grid">'+['글라이드','캐스터'].map(function(v){return '<button type="button" class="ff-desk-option-btn'+selected('caster',v)+'" onclick="ffPickDeskOption138(\'caster\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')+'</div>':'<div class="ff-desk-option-placeholder">다리형태를 선택하면 글라이드/캐스터를 선택할 수 있습니다.</div>')
       + '</div>'
-      + '<div class="ff-desk-option-warning">직사각 상판: 사다리형 4레그만 선택 가능<br>라운드 상판: 원형 4레그 또는 A자 4레그만 선택 가능</div>'
+      + '<div class="ff-desk-option-warning">직사각 상판: 사다리형 4레그만 선택 가능<br>라운드 상판: 원형 4레그 또는 A자형 4레그만 선택 가능</div>'
       + '<div class="ff-desk-option-actions"><button type="button" onclick="ffDeskOptionBack138()">← 이전 단계</button><button type="button" class="primary" onclick="ffConfirmDeskOptions138(\''+esc(catName||s._currentCatName||'일반형 데스크')+'\')">옵션 선택 완료</button></div>'
       + '</div>';
   }
-  function refreshBoxes(){document.querySelectorAll('.ff-desk-option-box').forEach(function(box){var cat=box.getAttribute('data-cat')||S()._currentCatName||'일반형 데스크'; if(!box.classList.contains('ff138')) box.outerHTML=renderDeskHTML(cat);});}
+  function refreshBoxes(){document.querySelectorAll('.ff-desk-option-box').forEach(function(box){var cat=box.getAttribute('data-cat')||S()._currentCatName||'일반형 데스크'; box.outerHTML=renderDeskHTML(cat);});}
   window.ffPickDeskOption138=function(type,value){
     var s=S(); s.current=s.current||{};
     if(type==='top'){
@@ -15968,5 +15968,64 @@ button.material-btn{
   refreshBoxes(); textPatch(document);
   try{new MutationObserver(function(muts){muts.forEach(function(m){m.addedNodes&&m.addedNodes.forEach(function(n){if(n.nodeType===1){refreshBoxes(); textPatch(n);}});});}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
   window.addEventListener('load',function(){refreshBoxes(); textPatch(document);});
+})();
+</script>
+
+
+<!-- === FF143: real rerender fix for desk option buttons === -->
+<script id="ff143-desk-option-real-fix">
+(function(){
+  function S(){ window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state; }
+  function esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function normTop(v){ v=String(v||''); return /라운드|round/i.test(v) ? '라운드 상판' : (/직사각|스퀘어|square|rect|직각/i.test(v) ? '직사각 상판' : ''); }
+  function allowedLegs(){ return normTop(S().topShape)==='라운드 상판' ? ['원형 4레그','A자형 4레그'] : ['사다리형 4레그']; }
+  function selected(kind,v){ var s=S(); var cur = kind==='top' ? normTop(s.topShape) : kind==='leg' ? (s.legType||s.legShape||'') : (s.casterType||s.mobility||''); return cur===v ? ' selected' : ''; }
+  function html(cat){
+    var s=S(), top=normTop(s.topShape), topChosen=!!top, legs=topChosen?allowedLegs():[], legChosen=!!(s.legType||s.legShape);
+    return '<div class="ff-desk-option-box ff138 ff143" data-cat="'+esc(cat||s._currentCatName||'일반형 데스크')+'">'
+      + '<div class="ff-desk-title">데스크 옵션을 선택해주세요</div>'
+      + '<div class="ff-desk-desc">1. 상판형태 → 2. 다리형태 → 3. 이동방식 순서로 선택해주세요.</div>'
+      + '<div class="ff-desk-option-section"><div>상판형태</div><div class="ff-desk-option-grid">'
+      + ['직사각 상판','라운드 상판'].map(function(v){return '<button type="button" class="ff-desk-option-btn'+selected('top',v)+'" onclick="ffPickDeskOption143(\'top\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')
+      + '</div></div>'
+      + '<div class="ff-desk-option-section"><div>다리형태</div>'
+      + (topChosen ? '<div class="ff-desk-option-grid '+(legs.length===1?'one':'')+'">'+legs.map(function(v){return '<button type="button" class="ff-desk-option-btn'+selected('leg',v)+'" onclick="ffPickDeskOption143(\'leg\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')+'</div>' : '<div class="ff-desk-option-placeholder">상판형태를 먼저 선택해주세요.</div>')
+      + '</div>'
+      + '<div class="ff-desk-option-section"><div>이동방식</div>'
+      + (topChosen && legChosen ? '<div class="ff-desk-option-grid">'+['글라이드','캐스터'].map(function(v){return '<button type="button" class="ff-desk-option-btn'+selected('move',v)+'" onclick="ffPickDeskOption143(\'move\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')+'</div>' : '<div class="ff-desk-option-placeholder">다리형태를 선택하면 글라이드/캐스터를 선택할 수 있습니다.</div>')
+      + '</div>'
+      + '<div class="ff-desk-option-warning">직사각 상판 선택 시: 사다리형 4레그만 선택 가능<br>라운드 상판 선택 시: 원형 4레그 또는 A자형 4레그만 선택 가능</div>'
+      + '<div class="ff-desk-option-actions"><button type="button" onclick="ffDeskOptionBack143()">← 이전 단계</button><button type="button" class="primary" onclick="ffConfirmDeskOptions143(\''+esc(cat||s._currentCatName||'일반형 데스크')+'\')">옵션 선택 완료</button></div>'
+      + '</div>';
+  }
+  function rerender(){ document.querySelectorAll('.ff-desk-option-box').forEach(function(box){ var cat=box.getAttribute('data-cat') || S()._currentCatName || '일반형 데스크'; box.outerHTML=html(cat); }); }
+  window.ffPickDeskOption143=function(kind,value){ var s=S();
+    if(kind==='top'){
+      value=normTop(value); s.topShape=value; s.current.topShape=value;
+      var legs=allowedLegs(); if(legs.indexOf(s.legType||s.legShape||'')<0){ s.legType=''; s.legShape=''; s.casterType=''; s.mobility=''; s._legLabel=''; }
+    } else if(kind==='leg'){
+      if(allowedLegs().indexOf(value)<0){ alert('현재 상판에서 선택할 수 없는 다리형태입니다.'); return; }
+      s.legType=value; s.legShape=value; s.current.legType=value; s.casterType=''; s.mobility=''; s._legLabel='';
+    } else if(kind==='move'){
+      if(!(s.legType||s.legShape)){ alert('다리형태를 먼저 선택해주세요.'); return; }
+      s.casterType=value; s.mobility=value; s._legLabel=(s.legType||s.legShape)+' · '+value; s.current.legLabel=s._legLabel;
+    }
+    try{ if(typeof updateCurrent==='function') updateCurrent(); }catch(e){}
+    try{ if(window.FlowFinderFastPreview&&FlowFinderFastPreview.state){FlowFinderFastPreview.state.topShape=s.topShape; FlowFinderFastPreview.state.legType=s.legType; FlowFinderFastPreview.state.casterType=s.casterType; if(typeof FlowFinderFastPreview.render==='function') FlowFinderFastPreview.render(kind==='top'?'top':'leg');} }catch(e){}
+    rerender();
+  };
+  window.ffConfirmDeskOptions143=function(cat){ var s=S(); if(!normTop(s.topShape)){alert('상판형태를 선택해주세요.');return;} if(!(s.legType||s.legShape)){alert('다리형태를 선택해주세요.');return;} if(!(s.casterType||s.mobility)){alert('이동방식을 선택해주세요.');return;} s._legLabel=(s.legType||s.legShape)+' · '+(s.casterType||s.mobility); s.current.legLabel=s._legLabel; s.current.topShape=normTop(s.topShape); try{if(typeof updateCurrent==='function')updateCurrent();}catch(e){} if(typeof askSizeInput==='function') askSizeInput(cat||s._currentCatName||'일반형 데스크'); };
+  window.ffDeskOptionBack143=function(){ try{ if(typeof goBack==='function') goBack(); }catch(e){} };
+  function ask(cat){ var s=S(); s.step='choose_desk_options'; s._currentCatName=cat||s._currentCatName||'일반형 데스크'; s.topShape=''; s.legType=''; s.legShape=''; s.casterType=''; s.mobility=''; s._legLabel=''; if(typeof addMsg==='function') addMsg('bot', html(s._currentCatName)); }
+  window.askLegType=window.askCasterType=window.askTopShape=ask;
+  try{ askLegType=askCasterType=askTopShape=ask; }catch(e){}
+  var oldStart=window.startCategoryFlow;
+  window.startCategoryFlow=function(cat){ if(/데스크/.test(String(cat||''))){ ask(cat); return; } return oldStart ? oldStart.apply(this,arguments) : undefined; };
+  try{ startCategoryFlow=window.startCategoryFlow; }catch(e){}
+  // Upgrade any old visible option block already on screen.
+  window.addEventListener('load',function(){
+    document.querySelectorAll('.ff-desk-option-box').forEach(function(box){ var cat=box.getAttribute('data-cat')||S()._currentCatName||'일반형 데스크'; box.outerHTML=html(cat); });
+    var b=document.getElementById('ff142-badge'); if(b) b.textContent='FF143 적용됨';
+  });
 })();
 </script>
