@@ -11196,150 +11196,239 @@ ${map.move[move] || move}
 </script>
 
 
-
-<!-- FF PATCH: robust material hover preview using current images/textures folder -->
-<style id="ff-material-hover-visible-fix-css">
-#material-hover-preview{
-  position:fixed!important;
-  display:none;
-  z-index:2147483647!important;
-  width:260px!important;
-  padding:10px!important;
-  border-radius:16px!important;
-  border:1px solid #2ef2c9!important;
-  background:#071827!important;
-  box-shadow:0 18px 60px rgba(0,0,0,.62),0 0 26px rgba(46,242,201,.22)!important;
-  pointer-events:none!important;
-}
-#material-hover-preview.show{display:block!important;}
-#material-hover-preview .mh-thumb{
-  width:100%!important;
-  height:170px!important;
-  border-radius:12px!important;
-  border:1px solid rgba(255,255,255,.16)!important;
-  background:#111827 center/cover no-repeat!important;
-}
-#material-hover-preview .mh-label{color:#fff!important;font-weight:900!important;font-size:12px!important;margin-bottom:8px!important;}
-#material-hover-preview .mh-caption{color:#9fb1c8!important;font-size:10px!important;margin-top:6px!important;}
-.material-btn.is-hovering{outline:2px solid #2ef2c9!important;outline-offset:2px!important;}
-</style>
-<script id="ff-material-hover-visible-fix-js">
+<!-- FF v133 asset path repair patch: inserted automatically -->
+<script id="ff-v133-asset-path-fix">
 (function(){
-  function normCode(code){ return String(code||'').trim().toUpperCase(); }
-  function screenFolder(catName){
-    catName = String(catName || (window.state && state._currentCatName) || '');
-    if(catName.indexOf('전면') !== -1) return 'screen_front';
-    if(catName.indexOf('사이드') !== -1) return 'screen_side';
-    if(catName.indexOf('일자') !== -1) return 'screen_straight';
-    if(catName.indexOf('L형') !== -1 || catName.indexOf('l형') !== -1) return 'screen_lshape';
-    if(window.state && state.selectedScreens && state.selectedScreens.length){
-      var s=String(state.selectedScreens[0]||'');
-      if(s.indexOf('전면')!==-1) return 'screen_front';
-      if(s.indexOf('사이드')!==-1) return 'screen_side';
-      if(s.indexOf('일자')!==-1) return 'screen_straight';
-      if(s.indexOf('L형')!==-1 || s.indexOf('l형')!==-1) return 'screen_lshape';
+  var ASSET_TEXTURES = {"LEG|DCR|custom": "images/textures/leg/custom/DCR.png", "LEG|DCR": "images/textures/leg/custom/DCR.png", "LEG|TS|custom": "images/textures/leg/custom/TS.png", "LEG|TS": "images/textures/leg/custom/TS.png", "LEG|BKM|standard": "images/textures/leg/standard/BKM.png", "LEG|BKM": "images/textures/leg/standard/BKM.png", "LEG|DSG|standard": "images/textures/leg/standard/DSG.png", "LEG|DSG": "images/textures/leg/standard/DSG.png", "LEG|WW|standard": "images/textures/leg/standard/WW.png", "LEG|WW": "images/textures/leg/standard/WW.png", "SCREEN|screen_front|001|custom": "images/textures/screen/screen_front/custom/001.jpg", "SCREEN|screen_front|001": "images/textures/screen/screen_front/custom/001.jpg", "SCREEN|001": "images/textures/screen/screen_front/custom/001.jpg", "SCREEN|screen_front|001A|custom": "images/textures/screen/screen_front/custom/001A.jpg", "SCREEN|screen_front|001A": "images/textures/screen/screen_front/custom/001A.jpg", "SCREEN|001A": "images/textures/screen/screen_front/custom/001A.jpg", "SCREEN|screen_front|001B|custom": "images/textures/screen/screen_front/custom/001B.jpg", "SCREEN|screen_front|001B": "images/textures/screen/screen_front/custom/001B.jpg", "SCREEN|001B": "images/textures/screen/screen_front/custom/001B.jpg", "SCREEN|screen_front|004|custom": "images/textures/screen/screen_front/custom/004.jpg", "SCREEN|screen_front|004": "images/textures/screen/screen_front/custom/004.jpg", "SCREEN|004": "images/textures/screen/screen_front/custom/004.jpg", "SCREEN|screen_front|004B|custom": "images/textures/screen/screen_front/custom/004B.jpg", "SCREEN|screen_front|004B": "images/textures/screen/screen_front/custom/004B.jpg", "SCREEN|004B": "images/textures/screen/screen_front/custom/004B.jpg", "SCREEN|screen_front|007|custom": "images/textures/screen/screen_front/custom/007.jpg", "SCREEN|screen_front|007": "images/textures/screen/screen_front/custom/007.jpg", "SCREEN|007": "images/textures/screen/screen_front/custom/007.jpg", "SCREEN|screen_front|007B|custom": "images/textures/screen/screen_front/custom/007B.jpg", "SCREEN|screen_front|007B": "images/textures/screen/screen_front/custom/007B.jpg", "SCREEN|007B": "images/textures/screen/screen_front/custom/007B.jpg", "SCREEN|screen_front|014|custom": "images/textures/screen/screen_front/custom/014.jpg", "SCREEN|screen_front|014": "images/textures/screen/screen_front/custom/014.jpg", "SCREEN|014": "images/textures/screen/screen_front/custom/014.jpg", "SCREEN|screen_front|014A|custom": "images/textures/screen/screen_front/custom/014A.jpg", "SCREEN|screen_front|014A": "images/textures/screen/screen_front/custom/014A.jpg", "SCREEN|014A": "images/textures/screen/screen_front/custom/014A.jpg", "SCREEN|screen_front|061|custom": "images/textures/screen/screen_front/custom/061.jpg", "SCREEN|screen_front|061": "images/textures/screen/screen_front/custom/061.jpg", "SCREEN|061": "images/textures/screen/screen_front/custom/061.jpg", "SCREEN|screen_front|064|custom": "images/textures/screen/screen_front/custom/064.jpg", "SCREEN|screen_front|064": "images/textures/screen/screen_front/custom/064.jpg", "SCREEN|064": "images/textures/screen/screen_front/custom/064.jpg", "SCREEN|screen_front|067|custom": "images/textures/screen/screen_front/custom/067.jpg", "SCREEN|screen_front|067": "images/textures/screen/screen_front/custom/067.jpg", "SCREEN|067": "images/textures/screen/screen_front/custom/067.jpg", "SCREEN|screen_front|071|custom": "images/textures/screen/screen_front/custom/071.jpg", "SCREEN|screen_front|071": "images/textures/screen/screen_front/custom/071.jpg", "SCREEN|071": "images/textures/screen/screen_front/custom/071.jpg", "SCREEN|screen_front|071A|custom": "images/textures/screen/screen_front/custom/071A.jpg", "SCREEN|screen_front|071A": "images/textures/screen/screen_front/custom/071A.jpg", "SCREEN|071A": "images/textures/screen/screen_front/custom/071A.jpg", "SCREEN|screen_front|072|custom": "images/textures/screen/screen_front/custom/072.jpg", "SCREEN|screen_front|072": "images/textures/screen/screen_front/custom/072.jpg", "SCREEN|072": "images/textures/screen/screen_front/custom/072.jpg", "SCREEN|screen_front|074|custom": "images/textures/screen/screen_front/custom/074.jpg", "SCREEN|screen_front|074": "images/textures/screen/screen_front/custom/074.jpg", "SCREEN|074": "images/textures/screen/screen_front/custom/074.jpg", "SCREEN|screen_front|2M4A|custom": "images/textures/screen/screen_front/custom/2M4A.jpg", "SCREEN|screen_front|2M4A": "images/textures/screen/screen_front/custom/2M4A.jpg", "SCREEN|2M4A": "images/textures/screen/screen_front/custom/2M4A.jpg", "SCREEN|screen_front|371|custom": "images/textures/screen/screen_front/custom/371.jpg", "SCREEN|screen_front|371": "images/textures/screen/screen_front/custom/371.jpg", "SCREEN|371": "images/textures/screen/screen_front/custom/371.jpg", "SCREEN|screen_front|3F1|custom": "images/textures/screen/screen_front/custom/3F1.jpg", "SCREEN|screen_front|3F1": "images/textures/screen/screen_front/custom/3F1.jpg", "SCREEN|3F1": "images/textures/screen/screen_front/custom/3F1.jpg", "SCREEN|screen_front|3F2|custom": "images/textures/screen/screen_front/custom/3F2.jpg", "SCREEN|screen_front|3F2": "images/textures/screen/screen_front/custom/3F2.jpg", "SCREEN|3F2": "images/textures/screen/screen_front/custom/3F2.jpg", "SCREEN|screen_front|451|custom": "images/textures/screen/screen_front/custom/451.jpg", "SCREEN|screen_front|451": "images/textures/screen/screen_front/custom/451.jpg", "SCREEN|451": "images/textures/screen/screen_front/custom/451.jpg", "SCREEN|screen_front|452A|custom": "images/textures/screen/screen_front/custom/452A.png", "SCREEN|screen_front|452A": "images/textures/screen/screen_front/custom/452A.png", "SCREEN|452A": "images/textures/screen/screen_front/custom/452A.png", "SCREEN|screen_front|452N|custom": "images/textures/screen/screen_front/custom/452N.jpg", "SCREEN|screen_front|452N": "images/textures/screen/screen_front/custom/452N.jpg", "SCREEN|452N": "images/textures/screen/screen_front/custom/452N.jpg", "SCREEN|screen_front|457|custom": "images/textures/screen/screen_front/custom/457.jpg", "SCREEN|screen_front|457": "images/textures/screen/screen_front/custom/457.jpg", "SCREEN|457": "images/textures/screen/screen_front/custom/457.jpg", "SCREEN|screen_front|457L|custom": "images/textures/screen/screen_front/custom/457L.jpg", "SCREEN|screen_front|457L": "images/textures/screen/screen_front/custom/457L.jpg", "SCREEN|457L": "images/textures/screen/screen_front/custom/457L.jpg", "SCREEN|screen_front|458|custom": "images/textures/screen/screen_front/custom/458.jpg", "SCREEN|screen_front|458": "images/textures/screen/screen_front/custom/458.jpg", "SCREEN|458": "images/textures/screen/screen_front/custom/458.jpg", "SCREEN|screen_front|061|standard": "images/textures/screen/screen_front/standard/061.jpg", "SCREEN|screen_front|064|standard": "images/textures/screen/screen_front/standard/064.jpg", "SCREEN|screen_front|067|standard": "images/textures/screen/screen_front/standard/067.jpg", "SCREEN|screen_front|3F1|standard": "images/textures/screen/screen_front/standard/3F1.jpg", "SCREEN|screen_front|3F2|standard": "images/textures/screen/screen_front/standard/3F2.jpg", "SCREEN|screen_lshape|1P5|custom": "images/textures/screen/screen_lshape/custom/1P5.jpg", "SCREEN|screen_lshape|1P5": "images/textures/screen/screen_lshape/custom/1P5.jpg", "SCREEN|1P5": "images/textures/screen/screen_lshape/custom/1P5.jpg", "SCREEN|screen_lshape|BRD|custom": "images/textures/screen/screen_lshape/custom/BRD.jpg", "SCREEN|screen_lshape|BRD": "images/textures/screen/screen_lshape/custom/BRD.jpg", "SCREEN|BRD": "images/textures/screen/screen_lshape/custom/BRD.jpg", "SCREEN|screen_lshape|COB|custom": "images/textures/screen/screen_lshape/custom/COB.png", "SCREEN|screen_lshape|COB": "images/textures/screen/screen_lshape/custom/COB.png", "SCREEN|COB": "images/textures/screen/screen_lshape/custom/COB.png", "SCREEN|screen_lshape|MBE|custom": "images/textures/screen/screen_lshape/custom/MBE.jpg", "SCREEN|screen_lshape|MBE": "images/textures/screen/screen_lshape/custom/MBE.jpg", "SCREEN|MBE": "images/textures/screen/screen_lshape/custom/MBE.jpg", "SCREEN|screen_lshape|MGR|custom": "images/textures/screen/screen_lshape/custom/MGR.jpg", "SCREEN|screen_lshape|MGR": "images/textures/screen/screen_lshape/custom/MGR.jpg", "SCREEN|MGR": "images/textures/screen/screen_lshape/custom/MGR.jpg", "SCREEN|screen_lshape|1P1|standard": "images/textures/screen/screen_lshape/standard/1P1.jpg", "SCREEN|screen_lshape|1P1": "images/textures/screen/screen_lshape/standard/1P1.jpg", "SCREEN|1P1": "images/textures/screen/screen_lshape/standard/1P1.jpg", "SCREEN|screen_lshape|1P2|standard": "images/textures/screen/screen_lshape/standard/1P2.jpg", "SCREEN|screen_lshape|1P2": "images/textures/screen/screen_lshape/standard/1P2.jpg", "SCREEN|1P2": "images/textures/screen/screen_lshape/standard/1P2.jpg", "SCREEN|screen_lshape|1P4|standard": "images/textures/screen/screen_lshape/standard/1P4.jpg", "SCREEN|screen_lshape|1P4": "images/textures/screen/screen_lshape/standard/1P4.jpg", "SCREEN|1P4": "images/textures/screen/screen_lshape/standard/1P4.jpg", "SCREEN|screen_lshape|1P7|standard": "images/textures/screen/screen_lshape/standard/1P7.jpg", "SCREEN|screen_lshape|1P7": "images/textures/screen/screen_lshape/standard/1P7.jpg", "SCREEN|1P7": "images/textures/screen/screen_lshape/standard/1P7.jpg", "SCREEN|screen_side|001|custom": "images/textures/screen/screen_side/custom/001.jpg", "SCREEN|screen_side|001": "images/textures/screen/screen_side/custom/001.jpg", "SCREEN|screen_side|001A|custom": "images/textures/screen/screen_side/custom/001A.jpg", "SCREEN|screen_side|001A": "images/textures/screen/screen_side/custom/001A.jpg", "SCREEN|screen_side|001B|custom": "images/textures/screen/screen_side/custom/001B.jpg", "SCREEN|screen_side|001B": "images/textures/screen/screen_side/custom/001B.jpg", "SCREEN|screen_side|004|custom": "images/textures/screen/screen_side/custom/004.jpg", "SCREEN|screen_side|004": "images/textures/screen/screen_side/custom/004.jpg", "SCREEN|screen_side|004B|custom": "images/textures/screen/screen_side/custom/004B.jpg", "SCREEN|screen_side|004B": "images/textures/screen/screen_side/custom/004B.jpg", "SCREEN|screen_side|007|custom": "images/textures/screen/screen_side/custom/007.jpg", "SCREEN|screen_side|007": "images/textures/screen/screen_side/custom/007.jpg", "SCREEN|screen_side|007B|custom": "images/textures/screen/screen_side/custom/007B.jpg", "SCREEN|screen_side|007B": "images/textures/screen/screen_side/custom/007B.jpg", "SCREEN|screen_side|014|custom": "images/textures/screen/screen_side/custom/014.jpg", "SCREEN|screen_side|014": "images/textures/screen/screen_side/custom/014.jpg", "SCREEN|screen_side|014A|custom": "images/textures/screen/screen_side/custom/014A.jpg", "SCREEN|screen_side|014A": "images/textures/screen/screen_side/custom/014A.jpg", "SCREEN|screen_side|061|custom": "images/textures/screen/screen_side/custom/061.jpg", "SCREEN|screen_side|061": "images/textures/screen/screen_side/custom/061.jpg", "SCREEN|screen_side|064|custom": "images/textures/screen/screen_side/custom/064.jpg", "SCREEN|screen_side|064": "images/textures/screen/screen_side/custom/064.jpg", "SCREEN|screen_side|067|custom": "images/textures/screen/screen_side/custom/067.jpg", "SCREEN|screen_side|067": "images/textures/screen/screen_side/custom/067.jpg", "SCREEN|screen_side|071|custom": "images/textures/screen/screen_side/custom/071.jpg", "SCREEN|screen_side|071": "images/textures/screen/screen_side/custom/071.jpg", "SCREEN|screen_side|071A|custom": "images/textures/screen/screen_side/custom/071A.jpg", "SCREEN|screen_side|071A": "images/textures/screen/screen_side/custom/071A.jpg", "SCREEN|screen_side|072|custom": "images/textures/screen/screen_side/custom/072.jpg", "SCREEN|screen_side|072": "images/textures/screen/screen_side/custom/072.jpg", "SCREEN|screen_side|074|custom": "images/textures/screen/screen_side/custom/074.jpg", "SCREEN|screen_side|074": "images/textures/screen/screen_side/custom/074.jpg", "SCREEN|screen_side|2M4A|custom": "images/textures/screen/screen_side/custom/2M4A.jpg", "SCREEN|screen_side|2M4A": "images/textures/screen/screen_side/custom/2M4A.jpg", "SCREEN|screen_side|371|custom": "images/textures/screen/screen_side/custom/371.jpg", "SCREEN|screen_side|371": "images/textures/screen/screen_side/custom/371.jpg", "SCREEN|screen_side|3F1|custom": "images/textures/screen/screen_side/custom/3F1.jpg", "SCREEN|screen_side|3F1": "images/textures/screen/screen_side/custom/3F1.jpg", "SCREEN|screen_side|3F2|custom": "images/textures/screen/screen_side/custom/3F2.jpg", "SCREEN|screen_side|3F2": "images/textures/screen/screen_side/custom/3F2.jpg", "SCREEN|screen_side|451|custom": "images/textures/screen/screen_side/custom/451.jpg", "SCREEN|screen_side|451": "images/textures/screen/screen_side/custom/451.jpg", "SCREEN|screen_side|452A|custom": "images/textures/screen/screen_side/custom/452A.png", "SCREEN|screen_side|452A": "images/textures/screen/screen_side/custom/452A.png", "SCREEN|screen_side|452N|custom": "images/textures/screen/screen_side/custom/452N.jpg", "SCREEN|screen_side|452N": "images/textures/screen/screen_side/custom/452N.jpg", "SCREEN|screen_side|457|custom": "images/textures/screen/screen_side/custom/457.jpg", "SCREEN|screen_side|457": "images/textures/screen/screen_side/custom/457.jpg", "SCREEN|screen_side|457L|custom": "images/textures/screen/screen_side/custom/457L.jpg", "SCREEN|screen_side|457L": "images/textures/screen/screen_side/custom/457L.jpg", "SCREEN|screen_side|458|custom": "images/textures/screen/screen_side/custom/458.jpg", "SCREEN|screen_side|458": "images/textures/screen/screen_side/custom/458.jpg", "SCREEN|screen_side|061|standard": "images/textures/screen/screen_side/standard/061.jpg", "SCREEN|screen_side|064|standard": "images/textures/screen/screen_side/standard/064.jpg", "SCREEN|screen_side|067|standard": "images/textures/screen/screen_side/standard/067.jpg", "SCREEN|screen_side|3F1|standard": "images/textures/screen/screen_side/standard/3F1.jpg", "SCREEN|screen_side|3F2|standard": "images/textures/screen/screen_side/standard/3F2.jpg", "SCREEN|screen_straight|1P5|custom": "images/textures/screen/screen_straight/custom/1P5.jpg", "SCREEN|screen_straight|1P5": "images/textures/screen/screen_straight/custom/1P5.jpg", "SCREEN|screen_straight|BRD|custom": "images/textures/screen/screen_straight/custom/BRD.jpg", "SCREEN|screen_straight|BRD": "images/textures/screen/screen_straight/custom/BRD.jpg", "SCREEN|screen_straight|COB|custom": "images/textures/screen/screen_straight/custom/COB.png", "SCREEN|screen_straight|COB": "images/textures/screen/screen_straight/custom/COB.png", "SCREEN|screen_straight|MBE|custom": "images/textures/screen/screen_straight/custom/MBE.jpg", "SCREEN|screen_straight|MBE": "images/textures/screen/screen_straight/custom/MBE.jpg", "SCREEN|screen_straight|MGR|custom": "images/textures/screen/screen_straight/custom/MGR.jpg", "SCREEN|screen_straight|MGR": "images/textures/screen/screen_straight/custom/MGR.jpg", "SCREEN|screen_straight|1P1|standard": "images/textures/screen/screen_straight/standard/1P1.jpg", "SCREEN|screen_straight|1P1": "images/textures/screen/screen_straight/standard/1P1.jpg", "SCREEN|screen_straight|1P2|standard": "images/textures/screen/screen_straight/standard/1P2.jpg", "SCREEN|screen_straight|1P2": "images/textures/screen/screen_straight/standard/1P2.jpg", "SCREEN|screen_straight|1P4|standard": "images/textures/screen/screen_straight/standard/1P4.jpg", "SCREEN|screen_straight|1P4": "images/textures/screen/screen_straight/standard/1P4.jpg", "SCREEN|screen_straight|1P7|standard": "images/textures/screen/screen_straight/standard/1P7.jpg", "SCREEN|screen_straight|1P7": "images/textures/screen/screen_straight/standard/1P7.jpg", "TOP|BGM|laminate": "images/textures/top/laminate/BGM.jpg", "TOP|BGM": "images/textures/top/laminate/BGM.jpg", "TOP|BKA|laminate": "images/textures/top/laminate/BKA.jpg", "TOP|BKA": "images/textures/top/laminate/BKA.jpg", "TOP|CC|laminate": "images/textures/top/laminate/CC.jpg", "TOP|CC": "images/textures/top/laminate/CC.jpg", "TOP|CGY|laminate": "images/textures/top/laminate/CGY.jpg", "TOP|CGY": "images/textures/top/laminate/CGY.jpg", "TOP|FIV|laminate": "images/textures/top/laminate/FIV.jpg", "TOP|FIV": "images/textures/top/laminate/FIV.jpg", "TOP|FK|laminate": "images/textures/top/laminate/FK.jpg", "TOP|FK": "images/textures/top/laminate/FK.jpg", "TOP|GG|laminate": "images/textures/top/laminate/GG.jpg", "TOP|GG": "images/textures/top/laminate/GG.jpg", "TOP|IO|laminate": "images/textures/top/laminate/IO.jpg", "TOP|IO": "images/textures/top/laminate/IO.jpg", "TOP|KAP|laminate": "images/textures/top/laminate/KAP.jpg", "TOP|KAP": "images/textures/top/laminate/KAP.jpg", "TOP|LD|laminate": "images/textures/top/laminate/LD.jpg", "TOP|LD": "images/textures/top/laminate/LD.jpg", "TOP|LL|laminate": "images/textures/top/laminate/LL.jpg", "TOP|LL": "images/textures/top/laminate/LL.jpg", "TOP|LT|laminate": "images/textures/top/laminate/LT.jpg", "TOP|LT": "images/textures/top/laminate/LT.jpg", "TOP|MDB|laminate": "images/textures/top/laminate/MDB.png", "TOP|MDB": "images/textures/top/laminate/MDB.png", "TOP|NBK|laminate": "images/textures/top/laminate/NBK.jpg", "TOP|NBK": "images/textures/top/laminate/NBK.jpg", "TOP|NSS|laminate": "images/textures/top/laminate/NSS.jpg", "TOP|NSS": "images/textures/top/laminate/NSS.jpg", "TOP|OHN|laminate": "images/textures/top/laminate/OHN.jpg", "TOP|OHN": "images/textures/top/laminate/OHN.jpg", "TOP|RCN|laminate": "images/textures/top/laminate/RCN.jpg", "TOP|RCN": "images/textures/top/laminate/RCN.jpg", "TOP|TL|laminate": "images/textures/top/laminate/TL.jpg", "TOP|TL": "images/textures/top/laminate/TL.jpg", "TOP|TRZ|laminate": "images/textures/top/laminate/TRZ.jpg", "TOP|TRZ": "images/textures/top/laminate/TRZ.jpg", "TOP|UA|laminate": "images/textures/top/laminate/UA.jpg", "TOP|UA": "images/textures/top/laminate/UA.jpg", "TOP|WP|laminate": "images/textures/top/laminate/WP.jpg", "TOP|WP": "images/textures/top/laminate/WP.jpg", "TOP|WW|laminate": "images/textures/top/laminate/WW.jpg", "TOP|WW": "images/textures/top/laminate/WW.jpg", "TOP|HW|standard": "images/textures/top/standard/HW.png", "TOP|HW": "images/textures/top/standard/HW.png", "TOP|OSG|standard": "images/textures/top/standard/OSG.jpg", "TOP|OSG": "images/textures/top/standard/OSG.jpg", "TOP|WW|standard": "images/textures/top/standard/WW.jpg", "TOP|DBL|veneer": "images/textures/top/veneer/DBL.jpg", "TOP|DBL": "images/textures/top/veneer/DBL.jpg", "TOP|NCE|veneer": "images/textures/top/veneer/NCE.jpg", "TOP|NCE": "images/textures/top/veneer/NCE.jpg", "TOP|NMOK|veneer": "images/textures/top/veneer/NMOK.jpg", "TOP|NMOK": "images/textures/top/veneer/NMOK.jpg", "TOP|OB|veneer": "images/textures/top/veneer/OB.jpg", "TOP|OB": "images/textures/top/veneer/OB.jpg", "TOP|OGG|veneer": "images/textures/top/veneer/OGG.jpg", "TOP|OGG": "images/textures/top/veneer/OGG.jpg"};
+  var ASSET_PREVIEWS = ["images/previews/desk_duct/aframe_caster_round.png", "images/previews/desk_duct/aframe_caster_round_front.png", "images/previews/desk_duct/aframe_caster_round_frontside.png", "images/previews/desk_duct/aframe_caster_round_lshape.png", "images/previews/desk_duct/aframe_caster_round_lshape_R.png", "images/previews/desk_duct/aframe_caster_round_side.png", "images/previews/desk_duct/aframe_caster_round_straight.png", "images/previews/desk_duct/aframe_glide_round.png", "images/previews/desk_duct/aframe_glide_round_front.png", "images/previews/desk_duct/aframe_glide_round_frontside.png", "images/previews/desk_duct/aframe_glide_round_lshape.png", "images/previews/desk_duct/aframe_glide_round_lshape_R.png", "images/previews/desk_duct/aframe_glide_round_side.png", "images/previews/desk_duct/aframe_glide_round_straight.png", "images/previews/desk_duct/ladder_caster_rect.png", "images/previews/desk_duct/ladder_caster_rect_front.png", "images/previews/desk_duct/ladder_caster_rect_frontside.png", "images/previews/desk_duct/ladder_caster_rect_lshape.png", "images/previews/desk_duct/ladder_caster_rect_lshape_R.png", "images/previews/desk_duct/ladder_caster_rect_side.png", "images/previews/desk_duct/ladder_caster_rect_straight.png", "images/previews/desk_duct/ladder_glide_rect.png", "images/previews/desk_duct/ladder_glide_rect_front.png", "images/previews/desk_duct/ladder_glide_rect_frontside.png", "images/previews/desk_duct/ladder_glide_rect_lshape.png", "images/previews/desk_duct/ladder_glide_rect_lshape_R.png", "images/previews/desk_duct/ladder_glide_rect_side.png", "images/previews/desk_duct/ladder_glide_rect_straight.png", "images/previews/desk_duct/round_caster_round.png", "images/previews/desk_duct/round_caster_round_front.png", "images/previews/desk_duct/round_caster_round_frontside.png", "images/previews/desk_duct/round_caster_round_lshape.png", "images/previews/desk_duct/round_caster_round_lshape_R.png", "images/previews/desk_duct/round_caster_round_side.png", "images/previews/desk_duct/round_caster_round_straight.png", "images/previews/desk_duct/round_glide_round.png", "images/previews/desk_duct/round_glide_round_front.png", "images/previews/desk_duct/round_glide_round_frontside.png", "images/previews/desk_duct/round_glide_round_lshape.png", "images/previews/desk_duct/round_glide_round_lshape_R.png", "images/previews/desk_duct/round_glide_round_side.png", "images/previews/desk_duct/round_glide_round_straight.png", "images/previews/desk_standard/aframe_caster_round_front.png", "images/previews/desk_standard/aframe_caster_round_frontside.png", "images/previews/desk_standard/aframe_caster_round_lshape.png", "images/previews/desk_standard/aframe_caster_round_lshape_R.png", "images/previews/desk_standard/aframe_caster_round_side.png", "images/previews/desk_standard/aframe_caster_round_straight.png", "images/previews/desk_standard/aframe_glide_round_front.png", "images/previews/desk_standard/aframe_glide_round_frontside.png", "images/previews/desk_standard/aframe_glide_round_lshape.png", "images/previews/desk_standard/aframe_glide_round_lshape_R.png", "images/previews/desk_standard/aframe_glide_round_side.png", "images/previews/desk_standard/aframe_glide_round_straight.png", "images/previews/desk_standard/ladder_caster_rect_front.png", "images/previews/desk_standard/ladder_caster_rect_frontside.png", "images/previews/desk_standard/ladder_caster_rect_lshape.png", "images/previews/desk_standard/ladder_caster_rect_lshape_R.png", "images/previews/desk_standard/ladder_caster_rect_side.png", "images/previews/desk_standard/ladder_caster_rect_straight.png", "images/previews/desk_standard/ladder_glide_rect_front.png", "images/previews/desk_standard/ladder_glide_rect_frontside.png", "images/previews/desk_standard/ladder_glide_rect_lshape.png", "images/previews/desk_standard/ladder_glide_rect_lshape_R.png", "images/previews/desk_standard/ladder_glide_rect_side.png", "images/previews/desk_standard/ladder_glide_rect_straight.png", "images/previews/desk_standard/round_caster_round_front.png", "images/previews/desk_standard/round_caster_round_frontside.png", "images/previews/desk_standard/round_caster_round_lshape.png", "images/previews/desk_standard/round_caster_round_lshape_R.png", "images/previews/desk_standard/round_caster_round_side.png", "images/previews/desk_standard/round_caster_round_straight.png", "images/previews/desk_standard/round_glide_round_front.png", "images/previews/desk_standard/round_glide_round_frontside.png", "images/previews/desk_standard/round_glide_round_lshape.png", "images/previews/desk_standard/round_glide_round_lshape_R.png", "images/previews/desk_standard/round_glide_round_side.png", "images/previews/desk_standard/round_glide_round_straight.png"];
+  var ASSET_OPTIONS = ["images/options/accessories/bag_hook.png", "images/options/accessories/monitor_arm_topmount.png", "images/options/accessories/multitap_embedded_2outlet.png", "images/options/accessories/multitap_external_3outlet.png", "images/options/accessories/multitap_sliding_3outlet.png", "images/options/accessories/pc_basic_hanging.png", "images/options/accessories/pc_hanging.png", "images/options/accessories/pc_strap.png", "images/options/combo/duct/aframe_caster.png", "images/options/combo/duct/aframe_glide.png", "images/options/combo/duct/ladder_caster.png", "images/options/combo/duct/ladder_glide.png", "images/options/combo/duct/round_caster.png", "images/options/combo/duct/round_glide.png", "images/options/combo/normal/aframe_caster.png", "images/options/combo/normal/aframe_glide.png", "images/options/combo/normal/ladder_caster.png", "images/options/combo/normal/ladder_glide.png", "images/options/combo/normal/round_caster.png", "images/options/combo/normal/round_glide.png", "images/options/leg/a_type.png", "images/options/leg/ladder.png", "images/options/leg/round.png", "images/options/moving/aframe_caster.png", "images/options/moving/aframe_glide.png", "images/options/moving/ladder_caster.png", "images/options/moving/ladder_glide.png", "images/options/moving/round_caster.png", "images/options/moving/round_glide.png", "images/options/tops/round.png", "images/options/tops/square.png"];
+
+  function asRel(p){ return p ? './' + String(p).replace(/^\.\//,'') : ''; }
+  function norm(s){ return String(s||'').trim(); }
+  function codeOf(s){ return norm(s).toUpperCase().replace(/\s+/g,''); }
+  function state(){ return window.state || window.appState || {}; }
+
+  function legKey(v){
+    v = norm(v || state().legType || state().leg || '');
+    if(/A자|a자|에이|aframe|a_type/i.test(v)) return 'aframe';
+    if(/원형|round/i.test(v)) return 'round';
+    return 'ladder';
+  }
+  function moveKey(v){
+    v = norm(v || state().casterType || state().moveType || state().moving || '');
+    if(/캐스터|바퀴|caster/i.test(v)) return 'caster';
+    return 'glide';
+  }
+  function topKey(v){
+    v = norm(v || state().topShape || state().top || '');
+    if(/라운드|round/i.test(v)) return 'round';
+    return 'rect';
+  }
+  function screenKey(v){
+    v = norm(v || state().screenType || state().screen || state().selectedScreen || '');
+    if(/전면|front/i.test(v)) return 'front';
+    if(/사이드|side/i.test(v)) return 'side';
+    if(/일자|straight/i.test(v)) return 'straight';
+    if(/L형|l형|lshape/i.test(v)) return 'lshape';
+    return '';
+  }
+  function deskFolder(){
+    var p = norm(state().product || state().currentProduct || state().deskType || state().selectedDesk || '');
+    return (/덕트|duct/i.test(p)) ? 'desk_duct' : 'desk_standard';
+  }
+
+  function optionComboPath(){
+    var folder = /덕트|duct/i.test(norm(state().product || state().currentProduct || state().deskType || '')) ? 'duct' : 'normal';
+    var p = 'images/options/combo/' + folder + '/' + legKey() + '_' + moveKey() + '.png';
+    return asRel(p);
+  }
+  function optionImagePath(kind, value){
+    kind = norm(kind); value = norm(value);
+    if(kind === 'leg'){
+      if(/A자|a자|에이|aframe/i.test(value)) return './images/options/leg/a_type.png';
+      if(/원형|round/i.test(value)) return './images/options/leg/round.png';
+      return './images/options/leg/ladder.png';
     }
-    return 'screen_front';
-  }
-  function extCandidates(code){
-    code = normCode(code);
-    if(code === '452A' || code === 'COB' || code === 'MDB') return ['.png','.jpg','.jpeg'];
-    return ['.jpg','.png','.jpeg'];
-  }
-  function firstCandidate(paths){ return paths && paths.length ? paths[0] : ''; }
-  function localTextureCandidates(code, part, catName){
-    code = normCode(code);
-    part = part || 'top';
-    if(!code) return [];
-    var exts = extCandidates(code), out=[];
-    function push(base){ exts.forEach(function(ext){ out.push('./images/textures/' + base + '/' + code + ext); }); }
-    if(part === 'leg'){
-      push('leg/standard');
-      push('leg/custom');
-      return out;
+    if(kind === 'caster' || kind === 'move' || kind === 'moving' || kind === 'mobility'){
+      return './images/options/moving/' + legKey() + '_' + moveKey(value) + '.png';
     }
-    if(part === 'screen'){
-      var sf = screenFolder(catName);
-      push('screen/' + sf + '/standard');
-      push('screen/' + sf + '/custom');
-      ['screen_front','screen_side','screen_straight','screen_lshape'].forEach(function(k){
-        if(k!==sf){ push('screen/' + k + '/standard'); push('screen/' + k + '/custom'); }
-      });
-      return out;
+    if(kind === 'top'){
+      return /라운드|round/i.test(value) ? './images/options/tops/round.png' : './images/options/tops/square.png';
     }
-    push('top/standard');
-    push('top/veneer');
-    push('top/laminate');
-    return out;
+    if(kind === 'combo') return optionComboPath();
+    return '';
   }
-  function setBg(el, url){
-    if(!el) return;
-    if(url){
-      el.style.backgroundImage = 'url("' + String(url).replace(/"/g,'%22') + '")';
-      el.style.backgroundColor = '#111827';
+
+  function textureResolver(code, part, catName){
+    var raw = codeOf(code).replace(/^LEG_/,'');
+    part = norm(part).toLowerCase();
+    catName = norm(catName || (state().currentCatName || state()._currentCatName || state().product || ''));
+
+    if(!raw || raw === '-') return '';
+
+    if(part === 'leg' || /^LEG_/.test(codeOf(code))){
+      return asRel(ASSET_TEXTURES['LEG|' + raw] || ASSET_TEXTURES['LEG|' + raw + '|standard'] || ASSET_TEXTURES['LEG|' + raw + '|custom']);
     }
+
+    if(part === 'screen' || /스크린|screen/i.test(catName)){
+      var sk = 'screen_front';
+      if(/사이드|side/i.test(catName)) sk = 'screen_side';
+      else if(/일자|straight/i.test(catName)) sk = 'screen_straight';
+      else if(/L형|l형|lshape/i.test(catName)) sk = 'screen_lshape';
+      else {
+        var stSk = screenKey();
+        if(stSk) sk = 'screen_' + stSk;
+      }
+      var stripped = raw.replace(/K$/,'');
+      return asRel(
+        ASSET_TEXTURES['SCREEN|' + sk + '|' + raw] ||
+        ASSET_TEXTURES['SCREEN|' + sk + '|' + stripped] ||
+        ASSET_TEXTURES['SCREEN|' + raw] ||
+        ASSET_TEXTURES['SCREEN|' + stripped]
+      );
+    }
+
+    // top: prefer explicitly chosen category when possible; otherwise use whatever exists.
+    return asRel(
+      ASSET_TEXTURES['TOP|' + raw + '|standard'] ||
+      ASSET_TEXTURES['TOP|' + raw + '|veneer'] ||
+      ASSET_TEXTURES['TOP|' + raw + '|laminate'] ||
+      ASSET_TEXTURES['TOP|' + raw]
+    );
   }
-  function placePop(ev){
-    var pop=document.getElementById('material-hover-preview');
-    if(!pop || !ev) return;
-    var w=280, h=230;
-    var x=ev.clientX+18, y=ev.clientY+18;
-    if(x+w>window.innerWidth) x=ev.clientX-w-18;
-    if(y+h>window.innerHeight) y=ev.clientY-h-18;
-    pop.style.left=Math.max(10,x)+'px';
-    pop.style.top=Math.max(10,y)+'px';
-  }
-  window.ffTextureUrlForChoice = function(code, part, catName){
-    return firstCandidate(localTextureCandidates(code, part, catName));
+
+  window._ffLocalTextureForCode = function(code, catName){
+    var c = codeOf(code);
+    if(/^LEG_/.test(c)) return textureResolver(c, 'leg', catName);
+    if(/스크린|screen/i.test(catName||'')) return textureResolver(c, 'screen', catName);
+    return textureResolver(c, 'top', catName);
   };
+
   window.ffMaterialTextureUrl = function(code, part){
-    return window.ffTextureUrlForChoice(code, part, (window.state && state._currentCatName) || '');
+    return textureResolver(code, part, (state().currentCatName || state()._currentCatName || state().product || ''));
   };
-  window.ffShowMaterialHover = function(code, part, ev, btn){
-    code = normCode(code);
-    var pop=document.getElementById('material-hover-preview');
-    var label=document.getElementById('mh-label');
-    var thumb=document.getElementById('mh-thumb');
-    var caption=pop && pop.querySelector('.mh-caption');
-    var url=window.ffMaterialTextureUrl(code, part);
-    if(label) label.textContent=(part==='leg'?'다리 ':part==='screen'?'스크린 ':'상판 ') + code;
-    setBg(thumb, url);
-    if(caption) caption.textContent='재질 확대 미리보기';
-    if(pop){ pop.classList.add('show'); placePop(ev); }
-    if(btn) btn.classList.add('is-hovering');
+
+  window.ffOptionAssetPath = optionImagePath;
+  window.ffComboAssetPath = optionComboPath;
+
+  var oldFull = window.ff124FullDeskPreview;
+  window.ffPreviewAssetPath = function(){
+    var folder = deskFolder();
+    var base = legKey() + '_' + moveKey() + '_' + topKey();
+    var sk = screenKey();
+    var candidates = [];
+    if(sk) candidates.push('images/previews/' + folder + '/' + base + '_' + sk + '.png');
+    candidates.push('images/previews/' + folder + '/' + base + '.png');
+    // Fallback for current folder if rect-only/round-only combinations are incomplete.
+    candidates.push('images/previews/' + folder + '/' + legKey() + '_' + moveKey() + '_rect.png');
+    candidates.push('images/previews/' + folder + '/' + legKey() + '_' + moveKey() + '_round.png');
+    for(var i=0;i<candidates.length;i++) if(ASSET_PREVIEWS.indexOf(candidates[i])>-1) return asRel(candidates[i]);
+    return oldFull ? oldFull() : '';
   };
-  window.ffMoveMaterialPreview = placePop;
-  window.ffHideMaterialHover = function(btn){
-    var pop=document.getElementById('material-hover-preview');
-    if(pop) pop.classList.remove('show');
-    if(btn) btn.classList.remove('is-hovering');
-  };
-  window.ffHoverMaterial = function(inputId, code, part, ev, btn){
-    window.ffShowMaterialHover(code, part, ev, btn);
-    if(typeof setPreviewGlow === 'function') setPreviewGlow(part === 'screen' ? 'screen' : part === 'leg' ? 'leg' : 'top');
-  };
-  window.ffRepairMaterialThumbnails = function(){
-    document.querySelectorAll('.material-btn').forEach(function(btn){
-      var code=btn.getAttribute('data-code')||'';
-      var part=btn.getAttribute('data-part')||'top';
-      setBg(btn.querySelector('.mat-thumb'), window.ffTextureUrlForChoice(code, part, (window.state && state._currentCatName) || ''));
+
+  function rewriteSrc(src){
+    if(!src) return src;
+    var s = String(src);
+    if(/leg_ladder\.(svg|png)/i.test(s)) return './images/options/leg/ladder.png';
+    if(/leg_round\.(svg|png)/i.test(s)) return './images/options/leg/round.png';
+    if(/leg_a\.(svg|png)/i.test(s)) return './images/options/leg/a_type.png';
+    if(/mobility_glide\.(svg|png)/i.test(s)) return './images/options/moving/' + legKey() + '_glide.png';
+    if(/mobility_caster\.(svg|png)/i.test(s)) return './images/options/moving/' + legKey() + '_caster.png';
+    if(/top_rect\.(svg|png)/i.test(s)) return './images/options/tops/square.png';
+    if(/top_round\.(svg|png)/i.test(s)) return './images/options/tops/round.png';
+    if(/images\/options\/desk_combo\/([^/?#]+)/i.test(s)) {
+      var name = s.match(/images\/options\/desk_combo\/([^/?#]+)/i)[1];
+      var folder = /덕트|duct/i.test(norm(state().product || state().currentProduct || state().deskType || '')) ? 'duct' : 'normal';
+      return './images/options/combo/' + folder + '/' + name;
+    }
+    if(/images\/options\/combo\/[^/]+\//i.test(s)) return s;
+    return s;
+  }
+
+  function repairImages(root){
+    (root || document).querySelectorAll('img').forEach(function(img){
+      var fixed = rewriteSrc(img.getAttribute('src') || img.src || '');
+      if(fixed && fixed !== img.getAttribute('src')) img.setAttribute('src', fixed);
+      img.onerror = function(){
+        var now = img.getAttribute('src') || '';
+        var again = rewriteSrc(now);
+        if(again && again !== now) img.setAttribute('src', again);
+      };
     });
-  };
-  document.addEventListener('mouseover', function(e){
-    var btn=e.target.closest && e.target.closest('.material-btn');
+
+    (root || document).querySelectorAll('.mat-thumb, .tex-chip, .material-chip-row em, [id^="quick-"][id$="-chip"]').forEach(function(el){
+      var parent = el.closest('.material-btn,.material-chip-row') || el.parentElement;
+      var txt = '';
+      if(parent){
+        var c = parent.querySelector('.mat-code, i, b, span');
+        txt = c ? c.textContent : parent.textContent;
+      }
+      txt = codeOf(txt).replace(/[^A-Z0-9]/g,'');
+      if(!txt) return;
+      var around = (parent && parent.closest('.material-button-section,.quick-materials')) ? parent.closest('.material-button-section,.quick-materials').textContent : '';
+      var part = /다리/.test(around) ? 'leg' : (/스크린/.test(around) ? 'screen' : 'top');
+      var url = textureResolver(txt, part, around);
+      if(url) el.style.backgroundImage = 'url("' + url + '")';
+    });
+  }
+
+  function showHover(code, part, ev){
+    var pop = document.getElementById('material-hover-preview');
+    if(!pop) return;
+    var url = textureResolver(code, part, '');
+    var label = document.getElementById('mh-label');
+    var thumb = document.getElementById('mh-thumb');
+    if(label) label.textContent = (part==='leg'?'다리 ':part==='screen'?'스크린 ':'상판 ') + codeOf(code);
+    if(thumb){
+      thumb.style.backgroundImage = url ? 'url("' + url + '")' : 'none';
+      thumb.style.backgroundColor = '#222';
+      thumb.style.backgroundSize = 'cover';
+      thumb.style.backgroundPosition = 'center';
+    }
+    var x = (ev && ev.clientX || 20) + 18;
+    var y = (ev && ev.clientY || 20) + 18;
+    pop.style.left = Math.min(x, window.innerWidth - 290) + 'px';
+    pop.style.top = Math.min(y, window.innerHeight - 250) + 'px';
+    pop.classList.add('show');
+  }
+  window.ffShowMaterialHover = showHover;
+
+  document.addEventListener('mouseover', function(ev){
+    var btn = ev.target.closest && ev.target.closest('.material-btn');
     if(!btn) return;
-    window.ffRepairMaterialThumbnails();
-    window.ffShowMaterialHover(btn.getAttribute('data-code'), btn.getAttribute('data-part')||'top', e, btn);
+    var codeEl = btn.querySelector('.mat-code');
+    var code = codeEl ? codeEl.textContent : btn.textContent;
+    var sec = btn.closest('.material-button-section');
+    var txt = sec ? sec.textContent : '';
+    var part = /다리/.test(txt) ? 'leg' : (/스크린/.test(txt) ? 'screen' : 'top');
+    showHover(code, part, ev);
+    var thumb = btn.querySelector('.mat-thumb');
+    var url = textureResolver(code, part, txt);
+    if(thumb && url) thumb.style.backgroundImage = 'url("' + url + '")';
   }, true);
-  document.addEventListener('mousemove', function(e){
-    if(e.target.closest && e.target.closest('.material-btn')) placePop(e);
+  document.addEventListener('mousemove', function(ev){
+    var pop = document.getElementById('material-hover-preview');
+    if(!pop || !pop.classList.contains('show')) return;
+    pop.style.left = Math.min(ev.clientX + 18, window.innerWidth - 290) + 'px';
+    pop.style.top = Math.min(ev.clientY + 18, window.innerHeight - 250) + 'px';
   }, true);
-  document.addEventListener('mouseout', function(e){
-    var btn=e.target.closest && e.target.closest('.material-btn');
-    if(btn) window.ffHideMaterialHover(btn);
+  document.addEventListener('mouseout', function(ev){
+    if(ev.target.closest && ev.target.closest('.material-btn')) {
+      var pop = document.getElementById('material-hover-preview');
+      if(pop) pop.classList.remove('show');
+    }
   }, true);
-  setTimeout(window.ffRepairMaterialThumbnails, 300);
-  setTimeout(window.ffRepairMaterialThumbnails, 1200);
+
+  function scheduleRepair(){
+    setTimeout(function(){repairImages(document);}, 50);
+    setTimeout(function(){repairImages(document);}, 400);
+    setTimeout(function(){repairImages(document);}, 1200);
+  }
+  document.addEventListener('DOMContentLoaded', scheduleRepair);
+  window.addEventListener('load', scheduleRepair);
+  try{
+    new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.addedNodes) m.addedNodes.forEach(function(n){ if(n.nodeType===1) repairImages(n); }); }); }).observe(document.documentElement, {childList:true, subtree:true});
+  }catch(e){}
 })();
 </script>
 
