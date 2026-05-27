@@ -10580,7 +10580,7 @@ function comboImg124(){
 
   ['click','change'].forEach(function(ev){document.addEventListener(ev,function(){setTimeout(function(){try{ff90RefreshOptionSummary();refreshLeftProductButtons();}catch(e){}},100);},true);});
   setTimeout(function(){try{ff90RefreshOptionSummary();refreshLeftProductButtons();}catch(e){}},500);
-  setInterval(function(){try{ff90RefreshOptionSummary();}catch(e){}},1200);
+  /* disabled by v152: removed continuous polling for faster load */
 })();
 </script>
 
@@ -12302,9 +12302,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
 });
 
-setInterval(function(){
-  hydrateButtons(document);
-},1000);
+/* disabled by v152: removed continuous polling for faster load */
 
 })();
 </script>
@@ -13557,6 +13555,204 @@ function showMoveImage(text) {
   function hydrateMaterialButtons(root){(root||document).querySelectorAll('.material-btn').forEach(function(btn){var code=btn.getAttribute('data-code')||''; var part=btn.getAttribute('data-part')||'top'; var thumb=btn.querySelector('.mat-thumb'); if(!thumb){thumb=document.createElement('span'); thumb.className='mat-thumb'; btn.insertBefore(thumb,btn.firstChild);} var url=(typeof window.ffTextureUrlForChoice==='function')?window.ffTextureUrlForChoice(code,part,(st()._currentCatName||'')):''; if(url)thumb.style.backgroundImage='url("'+url+'")';});}
   document.addEventListener('DOMContentLoaded',function(){hydrateMaterialButtons(document); setTimeout(function(){try{window.ff90RefreshOptionSummary();}catch(e){}},300); var msgs=$('messages'); if(msgs)new MutationObserver(function(muts){muts.forEach(function(m){m.addedNodes.forEach(function(n){if(n.nodeType===1)hydrateMaterialButtons(n);});});}).observe(msgs,{childList:true,subtree:true});});
   ['click','change'].forEach(function(ev){document.addEventListener(ev,function(){setTimeout(function(){try{window.ff90RefreshOptionSummary();hydrateMaterialButtons(document);}catch(e){}},80);},true);});
+})();
+</script>
+
+
+<!-- FF v152: performance optimization, preload, no-loop rendering -->
+<style id="ff-v152-performance-css">
+  #ff90-option-summary{
+    position:relative!important;
+    width:100%!important;
+    min-height:240px!important;
+    margin:18px 0 22px!important;
+    clear:both!important;
+    z-index:1!important;
+  }
+  #ff90-option-summary .ff90-grid{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:12px!important;
+  }
+  #ff90-option-summary .ff90-card{
+    position:relative!important;
+    min-height:165px!important;
+    overflow:hidden!important;
+  }
+  #texture-preview{
+    position:relative!important;
+    clear:both!important;
+    margin-top:22px!important;
+    z-index:2!important;
+  }
+  .material-btn .mat-thumb{
+    display:inline-block!important;
+    background-size:cover!important;
+    background-position:center!important;
+    background-repeat:no-repeat!important;
+  }
+</style>
+
+<script id="ff-v152-performance-js">
+(function(){
+  var PRELOAD_DONE = false;
+
+  function preloadImages(){
+    if(PRELOAD_DONE) return;
+    PRELOAD_DONE = true;
+
+    var base = [
+      './images/options/top/rect.png',
+      './images/options/top/round.png',
+      './images/options/leg/ladder.png',
+      './images/options/leg/round.png',
+      './images/options/leg/a_type.png',
+      './images/options/combo/normal/ladder_glide.png',
+      './images/options/combo/normal/ladder_caster.png',
+      './images/options/combo/normal/round_glide.png',
+      './images/options/combo/normal/round_caster.png',
+      './images/options/combo/normal/aframe_glide.png',
+      './images/options/combo/normal/aframe_caster.png',
+      './images/options/combo/duct/ladder_glide.png',
+      './images/options/combo/duct/ladder_caster.png',
+      './images/options/combo/duct/round_glide.png',
+      './images/options/combo/duct/round_caster.png',
+      './images/options/combo/duct/aframe_glide.png',
+      './images/options/combo/duct/aframe_caster.png'
+    ];
+
+    base.forEach(function(src){
+      var img = new Image();
+      img.decoding = 'async';
+      img.loading = 'eager';
+      img.src = src;
+    });
+  }
+
+  function removeDuplicateOptionSummaries(){
+    var nodes = document.querySelectorAll('#ff90-option-summary');
+    nodes.forEach(function(el, i){
+      if(i > 0) el.remove();
+    });
+  }
+
+  function texturePath(code, part, cat){
+    code = String(code || '').replace(/^LEG_/,'').trim();
+    if(!code || code === '-') return '';
+
+    var ext = ['png','jpg','jpeg','webp'];
+    var paths = [];
+
+    if(part === 'leg'){
+      ['standard','custom'].forEach(function(group){
+        ext.forEach(function(e){ paths.push('./images/textures/leg/'+group+'/'+code+'.'+e); });
+      });
+    }else if(part === 'screen'){
+      var screenType = 'screen_front';
+      var c = String(cat || '');
+      if(c.indexOf('사이드') > -1) screenType = 'screen_side';
+      else if(c.indexOf('일자') > -1) screenType = 'screen_straight';
+      else if(c.indexOf('L형') > -1 || c.indexOf('l형') > -1) screenType = 'screen_lshape';
+
+      ['standard','custom'].forEach(function(group){
+        ext.forEach(function(e){ paths.push('./images/textures/screen/'+screenType+'/'+group+'/'+code+'.'+e); });
+      });
+    }else{
+      ['standard','veneer','laminate'].forEach(function(group){
+        ext.forEach(function(e){ paths.push('./images/textures/top/'+group+'/'+code+'.'+e); });
+      });
+    }
+
+    return paths[0] || '';
+  }
+
+  function hydrateMaterialButton(btn){
+    if(!btn || !btn.classList || !btn.classList.contains('material-btn')) return;
+
+    var code = btn.getAttribute('data-code') || '';
+    var part = btn.getAttribute('data-part') || 'top';
+    var cat = (window.state && (window.state._currentCatName || window.state.currentCatName)) || '';
+
+    var thumb = btn.querySelector('.mat-thumb');
+    if(!thumb){
+      thumb = document.createElement('span');
+      thumb.className = 'mat-thumb';
+      btn.insertBefore(thumb, btn.firstChild);
+    }
+
+    var src = '';
+    if(typeof window.ffTextureUrlForChoice === 'function'){
+      try{ src = window.ffTextureUrlForChoice(code, part, cat) || ''; }catch(e){}
+    }
+    if(!src && typeof window._ffLocalTextureForCode === 'function'){
+      try{ src = window._ffLocalTextureForCode(part === 'leg' ? 'LEG_'+code : code, cat) || ''; }catch(e){}
+    }
+    if(!src) src = texturePath(code, part, cat);
+
+    if(src && thumb.dataset.src !== src){
+      thumb.dataset.src = src;
+      thumb.style.backgroundImage = 'url("' + src + '")';
+    }
+  }
+
+  function hydrateMaterialButtons(root){
+    (root || document).querySelectorAll('.material-btn').forEach(hydrateMaterialButton);
+  }
+
+  function throttle(fn, wait){
+    var timer = null;
+    return function(){
+      if(timer) return;
+      timer = setTimeout(function(){
+        timer = null;
+        fn();
+      }, wait || 120);
+    };
+  }
+
+  var oldRefresh = window.ff90RefreshOptionSummary;
+  if(typeof oldRefresh === 'function'){
+    window.ff90RefreshOptionSummary = throttle(function(){
+      removeDuplicateOptionSummaries();
+      oldRefresh();
+      removeDuplicateOptionSummaries();
+    }, 120);
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    preloadImages();
+    removeDuplicateOptionSummaries();
+    hydrateMaterialButtons(document);
+
+    var messages = document.getElementById('messages');
+    if(messages){
+      new MutationObserver(function(muts){
+        muts.forEach(function(m){
+          m.addedNodes && m.addedNodes.forEach(function(n){
+            if(n.nodeType === 1){
+              hydrateMaterialButtons(n);
+            }
+          });
+        });
+      }).observe(messages, {childList:true, subtree:true});
+    }
+
+    var btn = document.getElementById('quick-ai-preview-btn');
+    if(btn && typeof window.prepareNanoBananaPreview === 'function'){
+      btn.onclick = function(e){
+        if(e) e.preventDefault();
+        window.prepareNanoBananaPreview();
+        return false;
+      };
+    }
+  });
+
+  // One delayed hydration only, not repeated forever.
+  setTimeout(function(){
+    preloadImages();
+    removeDuplicateOptionSummaries();
+    hydrateMaterialButtons(document);
+  }, 800);
 })();
 </script>
 
