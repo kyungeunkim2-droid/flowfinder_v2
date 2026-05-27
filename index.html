@@ -8041,9 +8041,15 @@ var OPTION_IMAGES = {
     "A자": "./images/options/leg/aframe.png"
   },
   caster: {
-    "글라이드": "./images/options/mobility/ladder_glide.png",
-    "캐스터": "./images/options/mobility/ladder_caster.png"
-  },
+  "사다리형_글라이드": "./images/options/mobility/ladder_glide.png",
+  "사다리형_캐스터": "./images/options/mobility/ladder_caster.png",
+
+  "원형_글라이드": "./images/options/mobility/round_glide.png",
+  "원형_캐스터": "./images/options/mobility/round_caster.png",
+
+  "A자형_글라이드": "./images/options/mobility/aframe_glide.png",
+  "A자형_캐스터": "./images/options/mobility/aframe_caster.png"
+},
   top: {
     "직사각": "./images/options/top/rect.png",
     "직사각 상판": "./images/options/top/rect.png",
@@ -8071,24 +8077,29 @@ var OPTION_IMAGES = {
     if(/직각|직사각|직사각|직사각/.test(v)) return '직사각';
     return v || '';
   }
-  function pickImage(kind, value){
-    var map = OPTION_IMAGES[kind] || {};
-    value = String(value||'');
-    for(var k in map){ if(value.indexOf(k) > -1) return map[k]; }
-    return '';
+function pickImage(kind, value){
+  value = String(value || "");
+
+  if (kind === "caster") {
+    var legKey = normLeg(
+      (state && (state.legType || state.current?.legType)) || ""
+    );
+
+    var casterKey = legKey + "_" + normCaster(value);
+
+    return OPTION_IMAGES.caster[casterKey] || "";
   }
-  function buildComboKey(){
-    var w = state && (state.w || (state.size && String(state.size).match(/W(\d+)/)||[])[1]) || '';
-    var d = state && (state.d || (state.size && String(state.size).match(/D(\d+)/)||[])[1]) || '';
-    var top = state && (state._deskTopColor || state.topColor || state.color || '');
-    var legColor = state && (state._deskLegColor || state.legColor || '');
-    var topShape = normTop(state && state.topShape) || '직사각';
-    var caster = normCaster(state && state.casterType) || '글라이드';
-    var leg = normLeg(state && state.legType) || '';
-    if(!w || !d || !top || !legColor || !leg) return '';
-    var casterLabel = caster === '글라이드' ? '고정형' : caster;
-    return ['W'+w, topShape, casterLabel, leg, 'D'+d, top, legColor].join('_');
+
+  var map = OPTION_IMAGES[kind] || {};
+  for (var k in map) {
+    if (value.indexOf(k) > -1) return map[k];
   }
+
+  return "";
+}
+ function buildComboKey(){
+  return "";
+}
   function ensureStaticPanel(){
     var texture = document.getElementById('texture-preview');
     if(!texture) return null;
