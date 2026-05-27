@@ -17202,6 +17202,40 @@ if(anchor && anchor.parentElement === panel){
 .ff-desk-option-box.ff138 .ff-desk-option-actions button.primary{background:#26f5c9;color:#00110f;border-color:#a7fff3}
 .ff-desk-option-box.ff138 .ff-desk-option-warning{font-size:11px;color:#9ccfc7;margin-top:8px;line-height:1.45}
 @media(max-width:720px){.ff-desk-option-box.ff138 .ff-desk-option-grid,.ff-desk-option-box.ff138 .ff-desk-option-grid.three{grid-template-columns:1fr}}
+
+#set-product-selector [data-set-name],
+#set-product-selector [data-set-name] *,
+#desk-grid *,
+#screen-grid *{
+  opacity:1 !important;
+  visibility:visible !important;
+  color:#fff !important;
+}
+
+#set-product-selector [data-set-name] img,
+#desk-grid img,
+#screen-grid img{
+  display:block !important;
+  opacity:1 !important;
+  visibility:visible !important;
+  object-fit:contain !important;
+}
+
+#set-product-selector [data-set-name] > div:not(.set-check-badge){
+  display:block !important;
+  color:#fff !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+#messages,
+#messages *,
+.bubble,
+.bubble *{
+  color:#fff !important;
+  opacity:1 !important;
+  visibility:visible !important;
+}  
 </style>
 <script id="ff138-final-hard-override-js">
 (function(){
