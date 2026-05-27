@@ -1483,6 +1483,32 @@ body.ff-dashboard-preview #messages::-webkit-scrollbar-track,
   body.ff-dashboard-preview #chat-panel,body.ff-dashboard-preview #preview-panel,#ff-ai-live-panel{width:100%!important;height:auto!important;max-height:none!important;min-height:520px!important;}
 }
 </style>
+
+<style id="ff-material-thumb-fix">
+.material-btn{
+  display:flex !important;
+  align-items:center !important;
+  min-height:48px !important;
+}
+.material-btn .mat-thumb{
+  width:36px !important;
+  height:36px !important;
+  border-radius:8px !important;
+  background-size:cover !important;
+  background-position:center !important;
+  border:1px solid #666 !important;
+  display:block !important;
+  flex-shrink:0 !important;
+}
+.material-btn img{
+  width:36px !important;
+  height:36px !important;
+  object-fit:cover !important;
+  border-radius:8px !important;
+  display:block !important;
+}
+</style>
+
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -7986,21 +8012,21 @@ button.material-btn{
 
   var OPTION_IMAGES = {
     leg: {
-      "사다리": "./images/options/leg_ladder.svg",
-      "원형": "./images/options/leg_round.svg",
-      "A자": "./images/options/leg_a.svg"
+      "사다리": "./images/options/combo/normal/ladder_glide.png",
+      "원형": "./images/options/combo/normal/round_glide.png",
+      "A자": "./images/options/combo/normal/aframe_glide.png"
     },
     caster: {
-      "글라이드": "./images/options/mobility_glide.svg",
-      "고정": "./images/options/mobility_glide.svg",
-      "캐스터": "./images/options/mobility_caster.svg",
-      "바퀴": "./images/options/mobility_caster.svg"
+      "글라이드": "./images/options/combo/normal/ladder_glide.png",
+      "고정": "./images/options/combo/normal/ladder_glide.png",
+      "캐스터": "./images/options/combo/normal/ladder_caster.png",
+      "바퀴": "./images/options/combo/normal/ladder_caster.png"
     },
     top: {
-      "직각": "./images/options/top_rect.svg",
-      "직사각": "./images/options/top_rect.svg",
-      "스퀘어": "./images/options/top_rect.svg",
-      "라운드": "./images/options/top_round.svg"
+      "직각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
+      "직사각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
+      "스퀘어": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
+      "라운드": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png"
     }
   };
 
@@ -8502,9 +8528,9 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     '일반형 데스크':'products/desk_standard/base/base.png','덕트형 데스크':'products/desk_duct/base/base.png','전면 스크린':'products/screen_front/base/base.png','사이드 스크린':'products/screen_side/base/base.png','일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
   };
   var OPTION_IMG={
-    leg:{'사다리형':'./images/options/leg_ladder.svg','사다리형 4레그':'./images/options/leg_ladder.svg','원형':'./images/options/leg_round.svg','원형 4레그':'./images/options/leg_round.svg','A자형':'./images/options/leg_a.svg','A자 4레그':'./images/options/leg_a.svg'},
-    caster:{'글라이드':'./images/options/mobility_glide.svg','고정형':'./images/options/mobility_glide.svg','캐스터':'./images/options/mobility_caster.svg'},
-    top:{'스퀘어 상판':'./images/options/top_rect.svg','직사각':'./images/options/top_rect.svg','직사각 / 스퀘어 상판':'./images/options/top_rect.svg','라운드 상판':'./images/options/top_round.svg','라운드':'./images/options/top_round.svg'}
+    leg:{'사다리형':'./images/options/combo/normal/ladder_glide.png','사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','원형':'./images/options/combo/normal/round_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png'},
+    caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
+    top:{'스퀘어 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','직사각':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','직사각 / 스퀘어 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png'}
   };
   function selectedNames(){return Array.from(document.querySelectorAll('[data-set-name].selected-set-card')).map(function(el){return el.getAttribute('data-set-name');});}
   function refreshChatButtons(){
@@ -10402,7 +10428,7 @@ ${map.move[move] || move}
   function norm124(v){return String(v||'').replace(/\s+/g,' ').trim();}
   function legKey124(v){v=norm124(v); if(v.indexOf('사다리')>-1) return 'ladder'; if(v.indexOf('원형')>-1) return 'round'; if(v.indexOf('A')>-1 || v.indexOf('에이')>-1) return 'aframe'; return 'ladder';}
   function moveKey124(v){v=norm124(v); if(v.indexOf('캐스터')>-1 || v.indexOf('바퀴')>-1) return 'caster'; return 'glide';}
-  function topImg124(v){v=norm124(v); if(v.indexOf('라운드')>-1) return './images/options/top_round.png'; return './images/options/top_rect.svg';}
+  function topImg124(v){v=norm124(v); if(v.indexOf('라운드')>-1) return './images/options/top_round.png'; return './images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png';}
   function comboImg124(){
     var st=window.state||{};
     return './images/options/desk_combo/'+legKey124(st.legType)+'_'+moveKey124(st.casterType)+'.png';
@@ -10429,7 +10455,7 @@ ${map.move[move] || move}
     var rows=[];
     function add(title,val,src){
       if(!val) return;
-      rows.push('<div class="ff90-card"><span class="ff90-card-title">'+esc124(title)+'</span><img src="'+esc124(src)+'" alt="'+esc124(title)+'" loading="eager" onerror="this.onerror=null;this.src=\'./images/options/top_rect.svg\';"><b>'+esc124(val)+'</b></div>');
+      rows.push('<div class="ff90-card"><span class="ff90-card-title">'+esc124(title)+'</span><img src="'+esc124(src)+'" alt="'+esc124(title)+'" loading="eager" onerror="this.onerror=null;this.src=\'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png\';"><b>'+esc124(val)+'</b></div>');
     }
     add('다리형태',st.legType,window.ff124DeskOptionImage('leg'));
     add('이동방식',st.casterType,window.ff124DeskOptionImage('move'));
@@ -10583,7 +10609,7 @@ ${map.move[move] || move}
   function combo(){return normLeg(S().legType||S().legShape)+'_'+normMove(S().casterType||S().mobility);}
   function comboSrc(){return './images/options/desk_combo/'+combo()+'.png';}
   function fullDeskSrc(){return './images/previews/'+normDesk()+'/'+combo()+'.png';}
-  function topSrc(){var v=String(S().topShape||''); return v.indexOf('라운드')>-1?'./images/options/top_round.png':'./images/options/top_rect.svg';}
+  function topSrc(){var v=String(S().topShape||''); return v.indexOf('라운드')>-1?'./images/options/top_round.png':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png';}
   function labelLeg(){return S().legType||S().legShape||'다리형태';}
   function labelMove(){return S().casterType||S().mobility||'이동방식';}
   function labelTop(){return S().topShape||'상판형태';}
@@ -11429,6 +11455,40 @@ ${map.move[move] || move}
   try{
     new MutationObserver(function(muts){ muts.forEach(function(m){ if(m.addedNodes) m.addedNodes.forEach(function(n){ if(n.nodeType===1) repairImages(n); }); }); }).observe(document.documentElement, {childList:true, subtree:true});
   }catch(e){}
+})();
+</script>
+
+
+<script id="ff-preview-fallback-fix">
+(function(){
+  const oldFetch = window.fetch;
+  window.fetch = function(){
+    return oldFetch.apply(this, arguments).catch(function(err){
+      console.log("Preview generation fallback:", err);
+      alert("실사 미리보기가 연결되지 않았습니다. Render backend 또는 API endpoint를 확인해주세요.");
+      throw err;
+    });
+  };
+
+  window.addEventListener('load', function(){
+    document.querySelectorAll('.material-btn').forEach(function(btn){
+      const thumb = btn.querySelector('.mat-thumb');
+      if(thumb){
+        const bg = thumb.style.backgroundImage;
+        if(!bg || bg === 'none'){
+          const code = (btn.textContent || '').trim();
+          const textures = window.FF_MANIFEST && FF_MANIFEST.textures;
+          if(textures){
+            Object.values(textures).flat().forEach(function(t){
+              if(t.code === code && t.thumb){
+                thumb.style.backgroundImage = 'url(' + t.thumb + ')';
+              }
+            });
+          }
+        }
+      }
+    });
+  });
 })();
 </script>
 
@@ -13019,9 +13079,9 @@ button.material-btn{
     '일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
   };
   var OPTION_IMG={
-    leg:{'사다리형 4레그':'./images/options/leg_ladder.svg','사다리형':'./images/options/leg_ladder.svg','원형 4레그':'./images/options/leg_round.svg','원형':'./images/options/leg_round.svg','A자 4레그':'./images/options/leg_a.svg','A자형':'./images/options/leg_a.svg'},
-    caster:{'글라이드':'./images/options/mobility_glide.svg','고정형':'./images/options/mobility_glide.svg','캐스터':'./images/options/mobility_caster.svg'},
-    top:{'스퀘어 상판':'./images/options/top_rect.svg','직사각':'./images/options/top_rect.svg','라운드 상판':'./images/options/top_round.svg','라운드':'./images/options/top_round.svg'}
+    leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
+    caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
+    top:{'스퀘어 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','직사각':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png'}
   };
   function has(a,v){return a.indexOf(v)>-1;}
   function orderSelection(a){return DESKS.concat(SCREENS).filter(function(n){return has(a,n);});}
@@ -13275,9 +13335,9 @@ button.material-btn{
     'L형 스크린':'products/screen_lshape/base/base.png'
   };
   var OPTION_IMG={
-    leg:{'사다리형 4레그':'./images/options/leg_ladder.svg','사다리형':'./images/options/leg_ladder.svg','원형 4레그':'./images/options/leg_round.svg','원형':'./images/options/leg_round.svg','A자 4레그':'./images/options/leg_a.svg','A자형':'./images/options/leg_a.svg'},
-    caster:{'글라이드':'./images/options/mobility_glide.svg','고정형':'./images/options/mobility_glide.svg','캐스터':'./images/options/mobility_caster.svg'},
-    top:{'스퀘어 상판':'./images/options/top_rect.svg','직사각':'./images/options/top_rect.svg','라운드 상판':'./images/options/top_round.svg','라운드':'./images/options/top_round.svg'}
+    leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
+    caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
+    top:{'스퀘어 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','직사각':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png'}
   };
   function $(id){return document.getElementById(id);} 
   function has(a,v){return (a||[]).indexOf(v)>-1;}
@@ -14888,7 +14948,7 @@ button.material-btn{
   function topSrc(){
     var v=String(st().topShape||'');
     if(v.indexOf('라운드')>-1) return './images/options/top_round.png';
-    return './images/options/top_rect.svg';
+    return './images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png';
   }
   function labelLeg(){return st().legType || st().legShape || '다리형태';}
   function labelMove(){return st().casterType || st().mobility || '이동방식';}
