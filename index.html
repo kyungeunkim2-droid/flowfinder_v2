@@ -1559,7 +1559,7 @@ body.ff-dashboard-preview #messages::-webkit-scrollbar-track,
     <div class="ff-hero-grid">
       <div>
         <div class="ff-hero-image-card" onclick="openHeroPreviewModal()">
-          <img id="ff-hero-img" src="" alt="선택 제품 고해상도 미리보기" />
+         <img id="ff-hero-img" style="display:none;" alt="선택 제품 고해상도 미리보기" />
           <canvas id="ff-hero-canvas" aria-label="재질 반영 고해상도 미리보기"></canvas>
         </div>
         <div class="ff-hero-thumbs">
@@ -6450,7 +6450,9 @@ body.ff-dashboard-preview #preview-panel{
 <style id="fixed34-original-photo-preview-style">
 /* Fixed34: 실시간 미리보기는 원본 제품사진 중심, Canvas 재질 합성 비활성 */
 #ff-hero-canvas{display:none!important;}
-#ff-hero-img,#ff-hero-img.ff-composited-hidden{display:block!important;opacity:1!important;visibility:visible!important;width:100%!important;height:100%!important;object-fit:contain!important;max-height:100%!important;background:linear-gradient(135deg,#f8fafc,#e6ebf2)!important;}
+#ff-hero-img.ff-composited-hidden{
+display:block!important;
+opacity:1!important;visibility:visible!important;width:100%!important;height:100%!important;object-fit:contain!important;max-height:100%!important;background:linear-gradient(135deg,#f8fafc,#e6ebf2)!important;}
 .ff-hero-image-card.ff-rendering-material{background:linear-gradient(135deg,#f8fafc,#e6ebf2)!important;}
 .ff-hero-image-card::after{content:'원본 제품사진 미리보기 · 재질은 칩으로 확인 후 AI 실사 미리보기 생성'!important;}
 #quick-ai-preview-note img{max-height:420px;object-fit:contain;background:#fff;}
