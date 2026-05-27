@@ -4625,6 +4625,8 @@ function ffDataTypeForMode(catInfo) {
 function pickScreenPriceColor(catName, items) {
   var selected = state.color || '';
   items = items || [];
+
+  
   if (!items.length) return selected;
   if (items.some(function(i) { return i.color === selected; })) return selected;
 
@@ -8030,30 +8032,25 @@ button.material-btn{
 <script id="ff60-static-option-preview-js">
 (function(){
   var COMBO_MAP = {
-    "W1200_직사각_고정형_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_직사각_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_직각_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_"
   };
 
-  var OPTION_IMAGES = {
-    leg: {
-      "사다리": "./images/options/combo/normal/ladder_glide.png",
-      "원형": "./images/options/combo/normal/round_glide.png",
-      "A자": "./images/options/combo/normal/aframe_glide.png"
-    },
-    caster: {
-      "글라이드": "./images/options/combo/normal/ladder_glide.png",
-      "고정": "./images/options/combo/normal/ladder_glide.png",
-      "캐스터": "./images/options/combo/normal/ladder_caster.png",
-      "바퀴": "./images/options/combo/normal/ladder_caster.png"
-    },
-    top: {
-      "직각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
-      "직사각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
-      "직사각": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png",
-      "라운드": "./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png"
-    }
-  };
+var OPTION_IMAGES = {
+  leg: {
+    "사다리": "./images/options/leg/ladder.png",
+    "원형": "./images/options/leg/round.png",
+    "A자": "./images/options/leg/aframe.png"
+  },
+  caster: {
+    "글라이드": "./images/options/mobility/ladder_glide.png",
+    "캐스터": "./images/options/mobility/ladder_caster.png"
+  },
+  top: {
+    "직사각": "./images/options/top/rect.png",
+    "직사각 상판": "./images/options/top/rect.png",
+    "라운드": "./images/options/top/round.png",
+    "라운드 상판": "./images/options/top/round.png"
+  }
+};
 
   function normLeg(v){
     v = String(v||'');
