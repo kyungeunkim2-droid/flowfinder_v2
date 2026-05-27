@@ -5578,7 +5578,11 @@ function setPreviewGlow(part) {
     if (typeof oldSetPreviewGlow === 'function') { try { oldSetPreviewGlow(part); } catch(e){} }
   };
   window.prepareNanoBananaPreview = async function(){
-    renderFastPreview('');
+  // renderFastPreview('');
+    const preview = document.getElementById('preview-image');
+if(preview){
+  preview.src = '';
+}
     var note=$('quick-ai-preview-note');
     var btn=$('quick-ai-preview-btn');
     if (note) {
