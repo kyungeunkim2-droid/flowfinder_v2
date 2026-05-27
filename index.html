@@ -13390,6 +13390,50 @@ window.addEventListener('load',function(){
     clear: both !important;
   }
 </style>
+  <script id="ff-render-loading-fix">
+function showDeskLoading() {
+
+  let box = document.getElementById("deskRenderBox");
+
+  // 없으면 자동 생성
+  if (!box) {
+    box = document.createElement("section");
+    box.id = "deskRenderBox";
+
+    box.innerHTML = `
+      <h3>AI 실사 미리보기 - 데스크</h3>
+      <div class="render-loading">생성 중...</div>
+    `;
+
+    // 오른쪽 패널에 붙이기
+    const panel =
+      document.getElementById("rightPreviewPanel") ||
+      document.querySelector(".preview-panel") ||
+      document.body;
+
+    panel.appendChild(box);
+
+  } else {
+
+    // 이미 있으면 내용만 교체
+    box.innerHTML = `
+      <h3>AI 실사 미리보기 - 데스크</h3>
+      <div class="render-loading">생성 중...</div>
+    `;
+  }
+}
+</script>
+  <script>
+function showDeskLoading() {
+  const box = document.getElementById("deskRenderBox");
+  if (!box) return;
+
+  box.innerHTML = `
+    <h3>AI 실사 미리보기 - 데스크</h3>
+    <div class="render-loading">생성 중...</div>
+  `;
+}
+</script>
 </body>
 
 
@@ -13837,12 +13881,12 @@ body{
   window.ffFinishConsultationYes = function(){
     var m=document.getElementById('ff-end-confirm-modal'); if(m) m.remove();
     if(typeof closeFinalQuoteModal==='function') closeFinalQuoteModal();
-    if(typeof addMsg==='function') addMsg('bot','견적 상담이 완료되었습니다. 다음 작업을 선택해주세요.' + postFinalActionHtml());
+    if(typeof addMsg==='function') showDeskLoading();
   };
   var oldConfirm = window.confirmFinalQuote;
   window.confirmFinalQuote = function(){
     if(typeof closeFinalQuoteModal==='function') closeFinalQuoteModal();
-    if(typeof addMsg==='function') addMsg('bot','견적이 확정되었습니다. 다음 작업을 선택해주세요.' + postFinalActionHtml());
+    if(typeof addMsg==='function') showDeskLoading();
     else if(oldConfirm) oldConfirm.apply(this,arguments);
   };
   // 5. 바퀴형태 → 이동 방식, 옵션 3개를 선택 미리보기 안에 보장
