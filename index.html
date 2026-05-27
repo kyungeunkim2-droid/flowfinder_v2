@@ -13237,7 +13237,48 @@ function showMoveImage(text) {
   setDeskOptionImage(`images/options/mobility/${legKey}_${moveKey}.png`);
 }
 </script>
+<style id="force-remove-quick-options-final">
+#ff-quick-options,
+#quick-legtype-row,
+#quick-caster-row,
+#quick-topshape-row,
+.quick-option-row,
+.quick-option-box,
+.quick-option-card {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
+}
+</style>
 
+<script id="force-remove-quick-options-final-js">
+(function(){
+  function removeQuickOptions(){
+    [
+      "#ff-quick-options",
+      "#quick-legtype-row",
+      "#quick-caster-row",
+      "#quick-topshape-row"
+    ].forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){
+        el.remove();
+      });
+    });
+  }
+
+  window.ensureQuickOptions = function(){ return; };
+  window.syncQuickOptions = function(){ return; };
+
+  removeQuickOptions();
+  setInterval(removeQuickOptions, 300);
+})();
+</script>
 
 </body>
 
