@@ -12888,83 +12888,85 @@ setInterval(function(){
   }, 300);
 })();
 </script>
-<script id="ff-preview-path-final-fix">
+
+
+<style id="ff154-preview-layout-fix">
+#rightPreviewPanel{display:flex;flex-direction:column;gap:16px}
+.ff-preview-card{border:1px solid rgba(46,242,201,.2);border-radius:18px;padding:14px;background:rgba(255,255,255,.03)}
+.ff-preview-card h3{color:#2ef2c9;font-size:14px;margin-bottom:10px}
+.ff-preview-card img{width:100%;border-radius:12px;background:#fff;object-fit:contain}
+</style>
+
+<script id="ff154-preview-separate-layout">
 (function(){
-  function getDeskFolder() {
-    const name = (state && (state._currentCatName || state.product || "")) || "";
-    if (name.includes("덕트")) return "desk_duct";
-    return "desk_standard";
-  }
+function ensurePreviewLayout(){
+ if(document.getElementById('rightPreviewPanel')) return;
+ const target=document.querySelector('.preview-panel')||document.querySelector('.right-panel')||document.querySelector('.preview-stage')||document.querySelector('#previewArea')||document.body;
+ const wrap=document.createElement('div');
+ wrap.id='rightPreviewPanel';
+ wrap.innerHTML=`
+ <section class="ff-preview-card"><h3>옵션 미리보기</h3><img id="optionPreviewImage"></section>
+ <section class="ff-preview-card"><h3>데스크 실사 미리보기</h3><img id="deskRenderImage"></section>
+ <section class="ff-preview-card"><h3>스크린 실사 미리보기</h3><img id="screenRenderImage"></section>`;
+ target.appendChild(wrap);
+}
 
-  function getPreviewFileName() {
-    const topMap = {
-      "직사각 상판": "rect",
-      "스퀘어 상판": "rect",
-      "라운드 상판": "round"
-    };
+window.showOptionImage=function(path){
+ ensurePreviewLayout();
+ const img=document.getElementById('optionPreviewImage');
+ if(img) img.src=path+'?v='+Date.now();
+};
 
-    const legMap = {
-      "사다리형 4레그": "ladder",
-      "원형 4레그": "round",
-      "A자형 4레그": "aframe"
-    };
+window.getNanoBaseImagePath=function(){
+ const folder=((window.state&&(state._currentCatName||state.product||'')).includes('덕트'))?'desk_duct':'desk_standard';
+ const topMap={'직사각 상판':'rect','스퀘어 상판':'rect','라운드 상판':'round'};
+ const legMap={'사다리형 4레그':'ladder','원형 4레그':'round','A자형 4레그':'aframe'};
+ const moveMap={'글라이드':'glide','캐스터':'caster'};
+ const s=window.state||{};
+ const top=topMap[s.topShape]||'rect';
+ const leg=legMap[s.legType]||'ladder';
+ const move=moveMap[s.mobility||s.casterType]||'glide';
+ let screen='front';
+ const name=s._currentCatName||s.product||'';
+ if(name.includes('사이드')) screen='side';
+ else if(name.includes('일자')) screen='straight';
+ else if(name.includes('L형')) screen='lshape';
+ return `images/previews/${folder}/${leg}_${move}_${top}_${screen}.png`;
+};
 
-    const moveMap = {
-      "글라이드": "glide",
-      "캐스터": "caster"
-    };
+function hook(){
+ const oldTop=window.ffPickTop;
+ window.ffPickTop=function(v){
+   if(oldTop) oldTop(v);
+   const map={'직사각 상판':'images/options/top/rect.png','스퀘어 상판':'images/options/top/rect.png','라운드 상판':'images/options/top/round.png'};
+   if(map[v]) showOptionImage(map[v]);
+ };
 
-    const top = topMap[state.topShape] || "rect";
-    const leg = legMap[state.legType] || "ladder";
-    const move = moveMap[state.casterType] || moveMap[state.mobility] || "glide";
+ const oldLeg=window.ffPickLeg;
+ window.ffPickLeg=function(v){
+   if(oldLeg) oldLeg(v);
+   const map={'사다리형 4레그':'images/options/leg/ladder.png','원형 4레그':'images/options/leg/round.png','A자형 4레그':'images/options/leg/aframe.png'};
+   if(map[v]) showOptionImage(map[v]);
+ };
 
-    let screen = "front";
-    const name = state._currentCatName || state.product || "";
+ const oldMove=window.ffPickMove;
+ window.ffPickMove=function(v){
+   if(oldMove) oldMove(v);
+   const legMap={'사다리형 4레그':'ladder','원형 4레그':'round','A자형 4레그':'aframe'};
+   const moveMap={'글라이드':'glide','캐스터':'caster'};
+   const leg=legMap[(window.state||{}).legType]||'ladder';
+   const move=moveMap[v]||'glide';
+   showOptionImage(`images/options/mobility/${leg}_${move}.png`);
+ };
+}
 
-    if (name.includes("사이드")) screen = "side";
-    else if (name.includes("일자")) screen = "straight";
-    else if (name.includes("L형")) screen = "lshape";
-    else if (name.includes("전면")) screen = "front";
-
-    return `${leg}_${move}_${top}_${screen}.png`;
-  }
-
-  window.updateMainPreview = function() {
-    const path = `images/previews/${getDeskFolder()}/${getPreviewFileName()}`;
-
-    const img =
-      document.querySelector("#previewImage") ||
-      document.querySelector(".preview-image") ||
-      document.querySelector("#mainPreview img") ||
-      document.querySelector(".preview-stage img") ||
-      document.querySelector(".product-preview img");
-
-    if (img) {
-      img.src = path + "?v=" + Date.now();
-    }
-
-    console.log("Preview path:", path);
-  };
-
-  const oldPickTop = window.ffPickTop;
-  window.ffPickTop = function(top){
-    if (oldPickTop) oldPickTop(top);
-    setTimeout(updateMainPreview, 50);
-  };
-
-  const oldPickLeg = window.ffPickLeg;
-  window.ffPickLeg = function(leg){
-    if (oldPickLeg) oldPickLeg(leg);
-    setTimeout(updateMainPreview, 50);
-  };
-
-  const oldPickMove = window.ffPickMove;
-  window.ffPickMove = function(move){
-    if (oldPickMove) oldPickMove(move);
-    setTimeout(updateMainPreview, 50);
-  };
+window.addEventListener('load',function(){
+ ensurePreviewLayout();
+ hook();
+});
 })();
 </script>
+
 </body>
 
 
