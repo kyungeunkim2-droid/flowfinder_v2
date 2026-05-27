@@ -13497,7 +13497,40 @@ function showMoveImage(text) {
   setInterval(removeOldPanels, 700);
 })();
 </script>
+<style>
+#ff90-option-summary{
+  position:relative !important;
+  width:100% !important;
+  min-height:260px !important;
+  margin:24px 0 !important;
+  clear:both !important;
+  z-index:1 !important;
+}
 
+#ff90-option-summary .ff90-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,1fr) !important;
+  gap:12px !important;
+}
+
+#ff90-option-summary .ff90-card{
+  position:relative !important;
+  min-height:170px !important;
+}
+
+#texture-preview{
+  position:relative !important;
+  clear:both !important;
+  margin-top:24px !important;
+  z-index:2 !important;
+}
+
+#quick-ai-preview-btn,
+#quick-ai-preview-note{
+  position:relative !important;
+  clear:both !important;
+}
+</style>
 </body>
 
 
@@ -15366,9 +15399,18 @@ button.material-btn{
     var panel=$('preview-panel'); if(!panel) return null;
     var box=$('ff90-option-summary');
     if(!box){
-      box=document.createElement('div'); box.id='ff90-option-summary';
-      var before=$('texture-preview') || $('preview-items') || panel.firstChild;
-      panel.insertBefore(box,before||null);
+     box=document.createElement('div');
+box.id='ff90-option-summary';
+
+var anchor =
+  document.getElementById('texture-preview') ||
+  document.getElementById('preview-items');
+
+if(anchor && anchor.parentElement === panel){
+  panel.insertBefore(box, anchor);
+}else{
+  panel.appendChild(box);
+}
     }
     return box;
   }
