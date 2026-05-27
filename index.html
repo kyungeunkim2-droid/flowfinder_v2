@@ -12182,6 +12182,87 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+
+<!-- === FF145 FINAL: desk option order -> size -> material, screen defaults fixed === -->
+<style id="ff145-final-style">
+.ff145-box{border:1px solid rgba(38,245,201,.42);background:#071513;border-radius:18px;padding:14px;margin:8px 0;color:#eafffb;box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.ff145-title{font-weight:950;font-size:15px;margin-bottom:6px;color:#fff}.ff145-desc{font-size:12px;color:#9ecfc7;line-height:1.45;margin-bottom:12px}
+.ff145-section{margin-top:12px}.ff145-label{font-size:12px;font-weight:950;color:#26f5c9;margin-bottom:7px;display:block}.ff145-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ff145-grid.three{grid-template-columns:repeat(3,minmax(0,1fr))}
+.ff145-btn{border:1px solid #17413a;background:#081614;color:#dffff9;border-radius:13px;padding:11px 8px;min-height:44px;font-weight:900;font-size:12px;cursor:pointer;text-align:center}.ff145-btn:hover{border-color:#26f5c9;background:#0e2b27}.ff145-btn.selected{background:#26f5c9;color:#00110f;border-color:#a7fff3;box-shadow:0 0 0 2px rgba(38,245,201,.18)}.ff145-btn.disabled{opacity:.35;cursor:not-allowed;filter:grayscale(1)}
+.ff145-rule{font-size:11px;color:#9ccfc7;line-height:1.55;margin-top:12px}.ff145-actions{display:flex;gap:8px;margin-top:13px}.ff145-actions button{flex:1;border-radius:12px;padding:11px 12px;font-weight:950;cursor:pointer;border:1px solid #25534c;background:#06110f;color:#bffff2}.ff145-actions button.primary{background:#26f5c9;color:#00110f;border-color:#a7fff3}
+.ff145-size-control{display:flex;align-items:center;gap:6px;background:#06110f;border:1px solid #17413a;border-radius:12px;padding:6px}.ff145-size-control button{width:30px;height:30px;border-radius:8px;border:1px solid #24564f;background:#0b211e;color:#cffff8;font-weight:900;cursor:pointer}.ff145-size-control input{width:78px!important;border:none!important;background:transparent!important;text-align:center!important;font-weight:900!important;color:#fff!important}.ff145-size-field{display:flex;flex-direction:column;gap:5px;min-width:120px}.ff145-size-field span:first-child{font-size:12px;color:#26f5c9;font-weight:950}.ff145-size-field span:last-child{font-size:10px;color:#7fa8a0}
+@media(max-width:720px){.ff145-grid,.ff145-grid.three{grid-template-columns:1fr}.ff145-actions{flex-direction:column}}
+</style>
+<script id="ff145-final-script">
+(function(){
+  function S(){ window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state; }
+  function esc(x){ return String(x==null?'':x).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function isDesk(cat){ return /데스크/.test(String(cat||'')) || !!((window.USER_CATEGORIES||{})[cat||'']||{}).isDesk; }
+  function isScreen(cat){ return /스크린/.test(String(cat||'')) || !!((window.USER_CATEGORIES||{})[cat||'']||{}).isScreen; }
+  function isLineOrL(cat){ return /일자형|L형|l형|엘/i.test(String(cat||'')); }
+  function screenDef(cat){ return isLineOrL(cat) ? {h:590, above:350} : {h:715, above:405}; }
+  function normTop(v){ return /라운드|round/i.test(String(v||'')) ? '라운드 상판' : '직사각 상판'; }
+  function curLeg(){ var s=S(); return s.legType || s.legShape || ''; }
+  function curMove(){ var s=S(); return s.casterType || s.mobility || ''; }
+  function allowedLegs(){ return normTop(S().topShape)==='라운드 상판' ? ['원형 4레그','A자형 4레그'] : ['사다리형 4레그']; }
+  function isAllowedLeg(v){ return allowedLegs().indexOf(v)>=0; }
+  function sel(kind,v){ var s=S(); var cur=kind==='top'?normTop(s.topShape):(kind==='leg'?curLeg():curMove()); return cur===v?' selected':''; }
+  function legBtn(v){ var dis=isAllowedLeg(v)?'':' disabled'; return '<button type="button" class="ff145-btn'+sel('leg',v)+dis+'" onclick="ff145PickDesk(\'leg\',\''+esc(v)+'\')">'+esc(v)+'</button>'; }
+  function getPack(cat){
+    var cats=window.USER_CATEGORIES||{}, info=cats[cat]||{};
+    var mode=(typeof window.ffDataTypeForMode==='function')?window.ffDataTypeForMode(info):(info.type||'unit');
+    var keys=(typeof window.ffUnitKeysForMode==='function')?window.ffUnitKeysForMode(cat,info.keys):(info.keys||[]);
+    var key=keys[0]; var data=(mode==='set'?window.SET_DATA:window.UNIT_DATA)||{};
+    return {mode:mode,key:key,items:data[key]||[]};
+  }
+  function deskHTML(cat){ var s=S(); s.topShape=s.topShape?normTop(s.topShape):'직사각 상판'; s.current.topShape=s.topShape; var legs=['사다리형 4레그','원형 4레그','A자형 4레그'];
+    return '<div class="ff145-box" data-ff145="desk" data-cat="'+esc(cat||s._currentCatName||'일반형 데스크')+'">'
+      + '<div class="ff145-title">데스크 옵션을 선택해주세요</div>'
+      + '<div class="ff145-desc">선택 순서: 1. 상판형태 → 2. 다리형태 → 3. 이동방식</div>'
+      + '<div class="ff145-section"><span class="ff145-label">1. 상판형태</span><div class="ff145-grid">'
+      + ['직사각 상판','라운드 상판'].map(function(v){return '<button type="button" class="ff145-btn'+sel('top',v)+'" onclick="ff145PickDesk(\'top\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')
+      + '</div></div>'
+      + '<div class="ff145-section"><span class="ff145-label">2. 다리형태</span><div class="ff145-grid three">'+legs.map(legBtn).join('')+'</div></div>'
+      + '<div class="ff145-section"><span class="ff145-label">3. 이동방식</span><div class="ff145-grid">'
+      + ['글라이드','캐스터'].map(function(v){return '<button type="button" class="ff145-btn'+sel('move',v)+'" onclick="ff145PickDesk(\'move\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')
+      + '</div></div>'
+      + '<div class="ff145-rule">직사각 상판 선택 시: 사다리형 4레그만 선택 가능<br>라운드 상판 선택 시: 원형 4레그 / A자형 4레그만 선택 가능</div>'
+      + '<div class="ff145-actions"><button type="button" onclick="ff145Back()">← 이전 단계</button><button type="button" class="primary" onclick="ff145DeskDone(\''+esc(cat||s._currentCatName||'일반형 데스크')+'\')">옵션 선택 완료</button></div>'
+      + '</div>'; }
+  function rerenderDesk(){ document.querySelectorAll('[data-ff145="desk"]').forEach(function(box){ var cat=box.getAttribute('data-cat')||S()._currentCatName||'일반형 데스크'; box.outerHTML=deskHTML(cat); }); }
+  function preview(kind){ try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){} try{ if(window.FlowFinderFastPreview&&FlowFinderFastPreview.state){ FlowFinderFastPreview.state.topShape=S().topShape; FlowFinderFastPreview.state.legType=S().legType; FlowFinderFastPreview.state.casterType=S().casterType; if(typeof FlowFinderFastPreview.render==='function') FlowFinderFastPreview.render(kind==='top'?'top':'leg'); } }catch(e){} }
+  window.ff145PickDesk=function(kind,value){ var s=S(); s.topShape=s.topShape?normTop(s.topShape):'직사각 상판';
+    if(kind==='top'){ s.topShape=normTop(value); s.current.topShape=s.topShape; if(!isAllowedLeg(curLeg())){ s.legType=''; s.legShape=''; s.casterType=''; s.mobility=''; s._legLabel=''; s.current.legLabel=''; } }
+    if(kind==='leg'){ if(!isAllowedLeg(value)){ alert('현재 상판에서는 선택할 수 없는 다리형태입니다.'); return; } s.legType=value; s.legShape=value; s.current.legType=value; s.casterType=''; s.mobility=''; s._legLabel=''; s.current.legLabel=value; }
+    if(kind==='move'){ if(!curLeg()){ alert('다리형태를 먼저 선택해주세요.'); return; } s.casterType=value; s.mobility=value; s._legLabel=curLeg()+' · '+value; s.current.legLabel=s._legLabel; }
+    preview(kind); rerenderDesk(); };
+  window.ff145DeskDone=function(cat){ var s=S(); cat=cat||s._currentCatName||'일반형 데스크'; if(!s.topShape) s.topShape='직사각 상판'; if(!curLeg()){ alert('다리형태를 선택해주세요.'); return; } if(!curMove()){ alert('이동방식을 선택해주세요.'); return; } s._legLabel=curLeg()+' · '+curMove(); s.current.legLabel=s._legLabel; s.current.topShape=normTop(s.topShape); preview('leg'); window.ff145AskSize(cat); };
+  window.ff145Back=function(){ try{ if(typeof window.goBack==='function') window.goBack(); }catch(e){} };
+  function askDeskOptions(cat){ var s=S(); cat=cat||s._currentCatName||'일반형 데스크'; s.step='choose_desk_options'; s._currentCatName=cat; s.topShape='직사각 상판'; s.current.topShape='직사각 상판'; s.legType=''; s.legShape=''; s.casterType=''; s.mobility=''; s._legLabel=''; s.current.legLabel=''; var pack=getPack(cat); s._flowColorPack=pack; s._currentDataType=pack.mode; s._currentProductKey=pack.key; s._currentItems=pack.items; if(typeof window.addMsg==='function') window.addMsg('bot',deskHTML(cat)); }
+  window.ff145AskDeskOptions=askDeskOptions;
+  function sizeField(label,desc,val,id,min,max,step){ step=step||10; return '<div class="ff145-size-field"><span>'+label+'</span><div class="ff145-size-control"><button type="button" onclick="ff145Step(\''+id+'\',-'+step+')">−</button><input id="'+id+'" type="number" value="'+val+'" min="'+min+'" max="'+max+'"><button type="button" onclick="ff145Step(\''+id+'\','+step+')">+</button></div><span>'+desc+'</span></div>'; }
+  window.ff145Step=function(id,delta){ var el=document.getElementById(id); if(!el) return; var min=parseInt(el.min||'0',10), max=parseInt(el.max||'9999',10), v=parseInt(el.value||'0',10)||0; el.value=Math.max(min,Math.min(max,v+delta)); };
+  window.ff145AskSize=function(cat){ var s=S(); cat=cat||s._currentCatName||''; s.step='input_size'; s._currentCatName=cat; window._ff145SizeId=(window._ff145SizeId||0)+1; var fid=window._ff145SizeId; var fields='', hint='';
+    if(isDesk(cat)){ var minW=/덕트/.test(cat)?1200:1000; fields+=sizeField('W','가로',s.w||(/덕트/.test(cat)?1200:1500),'ff145-w-'+fid,minW,2400,100); fields+=sizeField('D','세로',s.d||700,'ff145-d-'+fid,560,900,10); var isA=/A자/.test(curLeg()); fields+=sizeField('H','높이',isA?720:(s.h||720),'ff145-h-'+fid,650,isA?720:900,10); hint='<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">· 옵션 선택 후 사이즈를 입력합니다. 다음 단계는 재질 선택입니다.<br>· A자형은 H720 고정 / 사다리형·원형은 H 최대 900mm</span>'; }
+    else if(isScreen(cat)){ var def=screenDef(cat); fields+=sizeField('H','높이',s.h||def.h,'ff145-h-'+fid,300,1200,10); hint='<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">전면/사이드 스크린: H715 · 상판위 H405<br>일자형/L형 스크린: H590 · 상판위 H350</span>'; }
+    else { if(typeof window.afterSizeInput==='function') window.afterSizeInput({w:null,d:null,h:null}); return; }
+    var html='원하시는 사이즈를 확인/조절해주세요:'+'<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'+fields+'</div>'+hint+'<br><button class="confirm-btn" style="margin-top:10px;" onclick="ff145SubmitSize('+fid+')">사이즈 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html); };
+  window.ff145SubmitSize=function(fid){ var s=S(), cat=s._currentCatName||''; var wEl=document.getElementById('ff145-w-'+fid), dEl=document.getElementById('ff145-d-'+fid), hEl=document.getElementById('ff145-h-'+fid); var w=wEl?parseInt(wEl.value,10):null, d=dEl?parseInt(dEl.value,10):null, h=hEl?parseInt(hEl.value,10):null; if(wEl&&!w){wEl.focus();return;} if(hEl&&!h){hEl.focus();return;} [wEl,dEl,hEl].forEach(function(e){if(e)e.disabled=true;}); var btn=document.querySelector('[onclick="ff145SubmitSize('+fid+')"]'); if(btn) btn.disabled=true; var parts=[]; if(w)parts.push('W'+w); if(d)parts.push('D'+d); if(h)parts.push('H'+h); if(typeof window.addMsg==='function') window.addMsg('user',parts.join(' ')); s.w=w; s.d=d; s.h=h; s.current.size=parts.join(' '); try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){} if(isDesk(cat)){ ff145GoMaterial(cat); } else if(isScreen(cat)){ ff145AskScreenTop(cat,h); } else if(typeof window.afterSizeInput==='function') window.afterSizeInput({w:w,d:d,h:h}); };
+  window.ff145AskScreenTop=function(cat,newH){ var s=S(); var def=screenDef(cat); newH=newH||def.h; window._ff145TopId=(window._ff145TopId||0)+1; var fid=window._ff145TopId; var above=Math.min(def.above,Math.max(1,newH-1)); s._screenNewH=newH; var html='<div class="ff-screen-default-box">전체 H: <b>'+newH+'mm</b><br>상판위 H 기본값: <b>'+above+'mm</b></div>책상 <b>상판 위</b> 높이(mm)를 입력해주세요:'+'<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'+sizeField('상판 위 H','상판 위',above,'ff145-top-'+fid,1,newH-1,10)+'</div><span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">전면/사이드: H715 · 상판위 H405<br>일자형/L형: H590 · 상판위 H350</span><br><button class="confirm-btn" style="margin-top:10px;" onclick="ff145SubmitTop('+fid+')">상판 위 값 확인 ✓</button>'; if(typeof window.addMsg==='function') window.addMsg('bot',html); };
+  window.ff145SubmitTop=function(fid){ var s=S(), cat=s._currentCatName||''; var el=document.getElementById('ff145-top-'+fid); var val=parseInt(el&&el.value,10); var newH=s._screenNewH||s.h||screenDef(cat).h; if(!val||val>=newH){ alert('상판 위 값은 전체 H보다 작아야 합니다.'); return; } if(el)el.disabled=true; var btn=document.querySelector('[onclick="ff145SubmitTop('+fid+')"]'); if(btn)btn.disabled=true; s._screenTopGap=val; s.screenTopGap=val; s.current.screenTopGap=val; s.current.size=(s.current.size||('H'+newH))+' / 상판위 '+val+'mm'; try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){} if(typeof window.addMsg==='function'){ window.addMsg('user','상판 위 '+val+'mm'); window.addMsg('bot','📐 스크린 사이즈 정리:<br>· 전체 H: <b>'+newH+'mm</b><br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+(newH-val)+'mm</b><br><br>이제 재질을 선택해주세요.'); } ff145GoMaterial(cat); };
+  window.ff145GoMaterial=function(cat){ var s=S(); cat=cat||s._currentCatName||''; var pack=s._flowColorPack||getPack(cat); s._flowColorPack=pack; s._currentDataType=pack.mode; s._currentProductKey=pack.key; s._currentItems=pack.items; if(typeof window.askColorTypeFirst==='function'){ window.askColorTypeFirst(cat,pack.mode,pack.items,pack.key); } else if(typeof window.askStdColorDrop==='function'){ window.askStdColorDrop(cat,pack.mode,pack.items,pack.key); } };
+  var prevStart=window.startCategoryFlow;
+  window.startCategoryFlow=function(cat){ if(isDesk(cat)){ askDeskOptions(cat); return; } return prevStart?prevStart.apply(this,arguments):undefined; };
+  window.askTopShape=window.askLegType=window.askCasterType=askDeskOptions; try{ startCategoryFlow=window.startCategoryFlow; askTopShape=askLegType=askCasterType=askDeskOptions; }catch(e){}
+  var prevAskSize=window.askSizeInput; window.askSizeInput=function(cat){ if(isDesk(cat)||isScreen(cat)) return window.ff145AskSize(cat); return prevAskSize?prevAskSize.apply(this,arguments):undefined; }; try{ askSizeInput=window.askSizeInput; }catch(e){}
+  function cleanText(){ try{ document.body.innerHTML=document.body.innerHTML.replace(/스퀘어\s*상판/g,'직사각 상판').replace(/H\s*720mm\s*·\s*상판위\s*H\s*405mm/g,'H 715mm · 상판위 H 405mm').replace(/전면\/사이드\s*스크린:\s*H\s*720/g,'전면/사이드 스크린: H 715').replace(/전면\/사이드:\s*H720/g,'전면/사이드: H715'); }catch(e){} }
+  function init(){ var b=document.getElementById('ff142-badge'); if(b) b.textContent='FF145 적용됨'; }
+  document.addEventListener('DOMContentLoaded',init); window.addEventListener('load',init); setTimeout(init,400); setTimeout(init,1200);
+})();
+</script>
+
 </body>
 
 
