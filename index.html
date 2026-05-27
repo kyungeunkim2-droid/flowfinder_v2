@@ -17218,3 +17218,262 @@ button.material-btn{
   try{ startCategoryFlow=window.startCategoryFlow; askTopShape=window.askTopShape; askLegType=window.askLegType; askCasterType=window.askCasterType; askSizeInput=window.askSizeInput; afterSizeInput=window.afterSizeInput; }catch(e){}
 })();
 </script>
+
+
+<!-- FF161 FINAL: remove overlapping desk option preview cards and use one clean #texture-preview panel -->
+<style id="ff161-final-overlap-option-panel-css">
+/* Kill every old quick/material preview layer that caused overlap */
+#texture-preview .quick-materials,
+#texture-preview .material-chip-row,
+#texture-preview .quick-preview-grid,
+#texture-preview .quick-card,
+#texture-preview #quick-ai-preview-btn,
+#texture-preview #quick-ai-preview-note,
+#texture-preview #ff-quick-options,
+#ff-quick-options,
+#quick-legtype-row,
+#quick-caster-row,
+#quick-topshape-row,
+.quick-option-row,
+.quick-option-box,
+.quick-option-card,
+.ff-static-option-preview,
+.static-option-preview {
+  display:none !important;
+  visibility:hidden !important;
+  opacity:0 !important;
+  height:0 !important;
+  min-height:0 !important;
+  max-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+  overflow:hidden !important;
+  pointer-events:none !important;
+}
+
+/* Use the existing right panel only */
+#texture-preview {
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  margin:14px 0 12px 0 !important;
+  padding:12px !important;
+  border:1px solid rgba(32,245,197,.32) !important;
+  border-radius:18px !important;
+  background:rgba(255,255,255,.035) !important;
+  overflow:hidden !important;
+  color:#f8fffd !important;
+  box-shadow:none !important;
+}
+
+#ff161-option-panel {
+  display:block !important;
+  width:100% !important;
+}
+
+#ff161-option-panel .ff161-title {
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  color:#20f5c5 !important;
+  font-size:13px !important;
+  font-weight:900 !important;
+  margin:0 0 10px !important;
+}
+
+#ff161-option-panel .ff161-title small {
+  color:#8fb1bd !important;
+  font-size:10px !important;
+  font-weight:700 !important;
+}
+
+#ff161-option-box {
+  background:#071827 !important;
+  border:1px solid rgba(32,245,197,.22) !important;
+  border-radius:16px !important;
+  padding:12px !important;
+  min-height:190px !important;
+}
+
+#ff161-option-img {
+  width:100% !important;
+  height:210px !important;
+  max-height:210px !important;
+  object-fit:contain !important;
+  display:none;
+  background:#fff !important;
+  border-radius:12px !important;
+}
+
+#ff161-option-empty {
+  height:210px !important;
+  border:1px dashed rgba(32,245,197,.28) !important;
+  border-radius:12px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  color:#8fb1bd !important;
+  font-size:12px !important;
+  text-align:center !important;
+  line-height:1.5 !important;
+}
+</style>
+
+<script id="ff161-final-overlap-option-panel-js">
+(function(){
+  var lastOptionPath = "";
+  var lastLegText = "";
+  var timer = null;
+
+  function normLeg(text){
+    text = String(text || "");
+    if(/A자|a자|에이/.test(text)) return "aframe";
+    if(/원형/.test(text)) return "round";
+    return "ladder";
+  }
+
+  function normTop(text){
+    text = String(text || "");
+    return /라운드/.test(text) ? "round" : "rect";
+  }
+
+  function normMove(text){
+    text = String(text || "");
+    return /캐스터|바퀴/.test(text) ? "caster" : "glide";
+  }
+
+  function topPath(text){
+    return "images/options/top/" + normTop(text) + ".png";
+  }
+
+  function legPath(text){
+    return "images/options/leg/" + normLeg(text) + ".png";
+  }
+
+  function movePath(text){
+    var legText = lastLegText ||
+      (window.state && (state.legType || (state.current && state.current.legType))) ||
+      "";
+    return "images/options/mobility/" + normLeg(legText) + "_" + normMove(text) + ".png";
+  }
+
+  function removeOldQuickNodes(){
+    [
+      "#ff-quick-options",
+      "#quick-legtype-row",
+      "#quick-caster-row",
+      "#quick-topshape-row"
+    ].forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){ el.remove(); });
+    });
+  }
+
+  function ensureOptionPanel(){
+    var panel = document.getElementById("texture-preview");
+    if(!panel) return null;
+
+    removeOldQuickNodes();
+
+    if(panel.getAttribute("data-ff161-clean") !== "1"){
+      panel.setAttribute("data-ff161-clean","1");
+      panel.classList.remove("quick-preview-panel");
+      panel.innerHTML =
+        '<div id="ff161-option-panel">' +
+          '<div class="ff161-title"><span>데스크 옵션 이미지</span><small>images/options 기준</small></div>' +
+          '<div id="ff161-option-box">' +
+            '<img id="ff161-option-img" alt="데스크 옵션 이미지">' +
+            '<div id="ff161-option-empty">상판형태 / 다리형태 / 이동방식을 선택하면<br>해당 옵션 이미지가 여기에 표시됩니다.</div>' +
+          '</div>' +
+        '</div>';
+    }
+
+    panel.style.display = "block";
+    panel.style.visibility = "visible";
+    panel.style.opacity = "1";
+    return panel;
+  }
+
+  window.setDeskOptionImage = function(path){
+    lastOptionPath = path || lastOptionPath;
+    var panel = ensureOptionPanel();
+    if(!panel || !lastOptionPath) return;
+
+    var img = document.getElementById("ff161-option-img");
+    var empty = document.getElementById("ff161-option-empty");
+    if(!img) return;
+
+    img.src = lastOptionPath;
+    img.style.display = "block";
+    if(empty) empty.style.display = "none";
+    console.log("[FF161 option image]", lastOptionPath);
+  };
+
+  window.showOptionImage = window.setDeskOptionImage;
+
+  // Stop the legacy creator completely.
+  window.ensureQuickOptions = function(){ return; };
+  window.syncQuickOptions = function(){ return; };
+
+  function handleText(text){
+    text = String(text || "").replace(/\s+/g," ").trim();
+    if(!text) return;
+
+    if(/직사각|스퀘어|라운드/.test(text)){
+      if(window.state){
+        state.topShape = text;
+        state.current = state.current || {};
+        state.current.topShape = text;
+      }
+      window.setDeskOptionImage(topPath(text));
+      return;
+    }
+
+    if(/사다리형|원형 4레그|A자형|a자형/.test(text)){
+      lastLegText = text;
+      if(window.state){
+        state.legType = text;
+        state.current = state.current || {};
+        state.current.legType = text;
+      }
+      window.setDeskOptionImage(legPath(text));
+      return;
+    }
+
+    if(/글라이드|캐스터|바퀴/.test(text)){
+      if(window.state){
+        state.mobility = text;
+        state.casterType = text;
+        state.current = state.current || {};
+        state.current.mobility = text;
+        state.current.casterType = text;
+      }
+      window.setDeskOptionImage(movePath(text));
+      return;
+    }
+  }
+
+  document.addEventListener("click", function(e){
+    var btn = e.target.closest && e.target.closest("button");
+    if(!btn) return;
+    setTimeout(function(){ handleText(btn.textContent || ""); }, 10);
+  }, true);
+
+  function stabilize(){
+    ensureOptionPanel();
+    if(lastOptionPath) window.setDeskOptionImage(lastOptionPath);
+  }
+
+  document.addEventListener("DOMContentLoaded", stabilize);
+  window.addEventListener("load", stabilize);
+
+  // Old scripts recreate nodes, so keep this lightweight guard active.
+  clearInterval(timer);
+  timer = setInterval(stabilize, 400);
+  setTimeout(stabilize, 50);
+  setTimeout(stabilize, 800);
+})();
+</script>
