@@ -4408,7 +4408,7 @@ function afterSizeInput(parsed) {
   }
 
   if (catInfo.isDesk) {
-    askLegType(catName);
+    askTopShape(catName);
   } else {
     // 모든 스크린: H 입력 시 상판위 질문
     if (parsed.h) {
@@ -4487,33 +4487,58 @@ function submitTopGapForm(fid2) {
   calcAndFinish(state._currentCatName);
 }
 
+
+function ffDeskAllowedLegsByTop(topShape) {
+  return /라운드|round/i.test(String(topShape || '')) ? ['원형 4레그', 'A자 4레그'] : ['사다리형 4레그'];
+}
+function ffNormalizeTopShape(v) {
+  return /라운드|round/i.test(String(v || '')) ? '라운드 상판' : '직사각 상판';
+}
+function askTopShape(catName) {
+  state.step = 'choose_top';
+  state._currentCatName = catName;
+  addMsg('bot', '<b>상판형태를 선택해주세요:</b><div class="ff-flow-note">상판형태를 먼저 선택하면 가능한 다리형태가 자동으로 제한됩니다.</div>');
+  addButtons(['직사각 상판', '라운드 상판'], function() { afterSizeInput({w:state.w, d:state.d, h:state.h}); }, function(v) {
+    saveHistory(function() { askTopShape(catName); });
+    state.topShape = ffNormalizeTopShape(v);
+    state.current.topShape = state.topShape;
+    if (state.topShape === '직사각 상판' && state.legType && !/사다리/.test(state.legType)) { state.legType = ''; state.casterType = ''; state._legLabel = ''; state.current.legLabel = ''; }
+    if (state.topShape === '라운드 상판' && state.legType && !/원형|A자/.test(state.legType)) { state.legType = ''; state.casterType = ''; state._legLabel = ''; state.current.legLabel = ''; }
+    updateCurrent();
+    askLegType(catName);
+  });
+}
+
 function askLegType(catName) {
   state.step = 'choose_leg';
-  addMsg('bot', '레그 타입을 선택해주세요:');
-  addButtons(['사다리형 4레그', '원형 4레그', 'A자 4레그'], function() { afterSizeInput({w:state.w, d:state.d, h:state.h}); }, function(v) {
+  if (!state.topShape) return askTopShape(catName);
+  var choices = ffDeskAllowedLegsByTop(state.topShape);
+  var note = state.topShape === '라운드 상판'
+    ? '라운드 상판은 원형 4레그 또는 A자 4레그만 선택 가능합니다.'
+    : '직사각 상판은 사다리형 4레그만 선택 가능합니다.';
+  addMsg('bot', '<b>다리형태를 선택해주세요:</b><div class="ff-flow-note">' + note + '</div>');
+  addButtons(choices, function() { askTopShape(catName); }, function(v) {
     saveHistory(function() { askLegType(catName); });
-    state.legType = v; state.current.legLabel = v; updateCurrent();
+    if (choices.indexOf(v) < 0) { alert('현재 상판에서 선택할 수 없는 다리형태입니다.'); return; }
+    state.legType = v;
+    state.casterType = '';
+    state.current.legLabel = v;
+    updateCurrent();
     askCasterType(catName);
   });
 }
 
 function askCasterType(catName) {
-  addMsg('bot', '이동 방식을 선택해주세요:');
+  if (!state.topShape) return askTopShape(catName);
+  if (!state.legType) return askLegType(catName);
+  state.step = 'choose_caster';
+  addMsg('bot', '<b>이동방식을 선택해주세요:</b>');
   addButtons(['글라이드', '캐스터'], function() { askLegType(catName); }, function(v) {
     saveHistory(function() { askCasterType(catName); });
     state.casterType = v;
     state._legLabel = state.legType + ' · ' + v;
-    state.current.legLabel = state._legLabel; updateCurrent();
-    askTopShape(catName);
-  });
-}
-
-function askTopShape(catName) {
-  addMsg('bot', '상판 형태를 선택해주세요:');
-  addButtons(['직사각 상판', '라운드 상판'], function() { askCasterType(catName); }, function(v) {
-    saveHistory(function() { askTopShape(catName); });
-    state.topShape = v; state.current.topShape = v; updateCurrent();
-    // R값 입력 안내 (라운드 선택 시 이미 추천됨)
+    state.current.legLabel = state._legLabel;
+    updateCurrent();
     calcAndFinish(catName);
   });
 }
@@ -6900,7 +6925,7 @@ input[type="number"]::placeholder,#user-input::placeholder{color:#6d8f89!importa
       var pack=getDataPack(catName);
       state.subKey=pack.key; state._currentDataType=pack.mode; state._currentItems=pack.items; state._currentProductKey=pack.key; state._currentCatName=catName;
       state._flowColorPack=pack;
-      askLegType(catName);
+      askTopShape(catName);
       return;
     }
     return oldStartCategoryFlow.apply(this, arguments);
@@ -11946,6 +11971,144 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+
+<!-- === FF141 REAL LOCK: desk option order + Nano Banana texture-reference mapping === -->
+<style id="ff141-real-lock-style">
+  .ff141-version-badge{position:fixed;right:10px;bottom:10px;z-index:999999;background:#071615;color:#26f5c9;border:1px solid #26f5c9;border-radius:999px;padding:5px 9px;font-size:10px;font-weight:900;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:.85}
+</style>
+<script id="ff141-real-lock-js">
+(function(){
+  function S(){ window.state=window.state||{}; state.current=state.current||{}; return state; }
+  function isDesk(cat){ return /데스크/.test(String(cat||'')) || !!((window.USER_CATEGORIES&&USER_CATEGORIES[cat])||{}).isDesk; }
+  function normTop(v){ return /라운드|round/i.test(String(v||'')) ? '라운드 상판' : '직사각 상판'; }
+  function allowedLegs(){ return normTop(S().topShape)==='라운드 상판' ? ['원형 4레그','A자 4레그'] : ['사다리형 4레그']; }
+  function patchText(root){
+    (root||document).querySelectorAll('body,body *').forEach(function(el){
+      if(el.children && el.children.length>20) return;
+      if(!el.childNodes || el.childNodes.length!==1 || el.childNodes[0].nodeType!==3) return;
+      var t=el.textContent, nt=t.replace(/스퀘어\s*상판/g,'직사각 상판').replace(/H\s*720\b/g,'H715').replace(/720mm/g,'715mm');
+      if(nt!==t) el.textContent=nt;
+    });
+  }
+  function afterPreview(part){
+    try{ if(typeof updateCurrent==='function') updateCurrent(); }catch(e){}
+    try{ if(typeof updateOptionRows==='function') updateOptionRows(); }catch(e){}
+    try{ if(window.FlowFinderFastPreview&&FlowFinderFastPreview.state){
+      FlowFinderFastPreview.state.topShape=S().topShape; FlowFinderFastPreview.state.legType=S().legType; FlowFinderFastPreview.state.casterType=S().casterType;
+      if(typeof FlowFinderFastPreview.render==='function') FlowFinderFastPreview.render(part||'top');
+    }}catch(e){}
+  }
+  window.askTopShape = askTopShape = function(catName){
+    var s=S(); s.step='choose_top'; s._currentCatName=catName||s._currentCatName||'일반형 데스크';
+    if(typeof addMsg==='function') addMsg('bot','<b>상판형태를 선택해주세요:</b><div class="ff-flow-note">먼저 상판형태를 선택하면 가능한 다리형태만 나옵니다.</div>');
+    if(typeof addButtons==='function') addButtons(['직사각 상판','라운드 상판'], function(){ if(typeof goBack==='function') goBack(); }, function(v){
+      s.topShape=normTop(v); s.current.topShape=s.topShape;
+      s.legType=''; s.casterType=''; s._legLabel=''; s.current.legLabel='';
+      afterPreview('top'); window.askLegType(s._currentCatName);
+    });
+  };
+  window.askLegType = askLegType = function(catName){
+    var s=S(); s.step='choose_leg'; s._currentCatName=catName||s._currentCatName||'일반형 데스크';
+    if(!s.topShape) return window.askTopShape(s._currentCatName);
+    var choices=allowedLegs();
+    var note=normTop(s.topShape)==='라운드 상판' ? '라운드 상판: 원형 4레그, A자 4레그만 선택 가능' : '직사각 상판: 사다리형 4레그만 선택 가능';
+    if(typeof addMsg==='function') addMsg('bot','<b>다리형태를 선택해주세요:</b><div class="ff-flow-note">'+note+'</div>');
+    if(typeof addButtons==='function') addButtons(choices, function(){ window.askTopShape(s._currentCatName); }, function(v){
+      if(choices.indexOf(v)<0){ alert('현재 상판에서 선택할 수 없는 다리형태입니다.'); return; }
+      s.legType=v; s.casterType=''; s.current.legLabel=v; afterPreview('leg'); window.askCasterType(s._currentCatName);
+    });
+  };
+  window.askCasterType = askCasterType = function(catName){
+    var s=S(); s.step='choose_caster'; s._currentCatName=catName||s._currentCatName||'일반형 데스크';
+    if(!s.topShape) return window.askTopShape(s._currentCatName);
+    if(!s.legType) return window.askLegType(s._currentCatName);
+    if(typeof addMsg==='function') addMsg('bot','<b>이동방식을 선택해주세요:</b>');
+    if(typeof addButtons==='function') addButtons(['글라이드','캐스터'], function(){ window.askLegType(s._currentCatName); }, function(v){
+      s.casterType=v; s._legLabel=s.legType+' · '+v; s.current.legLabel=s._legLabel; afterPreview('leg');
+      if(typeof calcAndFinish==='function') calcAndFinish(s._currentCatName);
+      else if(typeof askSizeInput==='function') askSizeInput(s._currentCatName);
+    });
+  };
+  var prevAfter=window.afterSizeInput;
+  window.afterSizeInput = afterSizeInput = function(parsed){
+    var s=S(), catName=s._currentCatName, info=(window.USER_CATEGORIES&&USER_CATEGORIES[catName])||{};
+    parsed=parsed||{}; s.w=parsed.w; s.d=parsed.d; s.h=parsed.h;
+    var sizeStr=''; if(parsed.w) sizeStr+='W'+parsed.w; if(parsed.d) sizeStr+=' D'+parsed.d; if(parsed.h) sizeStr+=' H'+parsed.h;
+    if(sizeStr){ s.current.size=sizeStr; afterPreview('size'); }
+    if(isDesk(catName)) return window.askTopShape(catName);
+    if(typeof prevAfter==='function') return prevAfter.apply(this,arguments);
+  };
+  var prevStart=window.startCategoryFlow;
+  window.startCategoryFlow = startCategoryFlow = function(catName){
+    if(isDesk(catName)){
+      var s=S(); s._currentCatName=catName; s.topShape=''; s.legType=''; s.casterType=''; s._legLabel='';
+      var info=(window.USER_CATEGORIES&&USER_CATEGORIES[catName])||{};
+      var mode=(typeof ffDataTypeForMode==='function')?ffDataTypeForMode(info):(info.type||'unit');
+      var keys=(typeof ffUnitKeysForMode==='function')?ffUnitKeysForMode(catName,info.keys):(info.keys||[]);
+      var data=mode==='set'?window.SET_DATA:window.UNIT_DATA;
+      if(keys[0] && typeof askColorTypeFirst==='function') return askColorTypeFirst(catName,mode,data&&data[keys[0]],keys[0]);
+    }
+    return (typeof prevStart==='function') ? prevStart.apply(this,arguments) : undefined;
+  };
+  function productPreviewPath(){
+    var s=S(), cat=s._currentCatName||s.current.product||'일반형 데스크';
+    var product=/덕트/.test(cat)?'desk_duct':'desk_standard';
+    var top=normTop(s.topShape)==='라운드 상판'?'round':'rect';
+    var leg=/A자|a자|aframe/i.test(s.legType||'')?'aframe':(/원형|round/i.test(s.legType||'')?'round':'ladder');
+    if(top==='rect') leg='ladder';
+    var move=/캐스터|caster/i.test(s.casterType||'')?'caster':'glide';
+    return './images/previews/'+product+'/'+leg+'_'+move+'_'+top+'_front.png';
+  }
+  function texturePath(kind){
+    var s=S();
+    var topCode=(s._deskTopColor||s.topColor||s.current.topColor||s.color||'HW').toString().trim();
+    var legCode=(s._deskLegColor||s.legColor||s.current.legColor||'BKM').toString().trim();
+    if(kind==='leg') return './images/textures/leg/standard/'+legCode+'.png';
+    var jpg='./images/textures/top/standard/'+topCode+'.png';
+    // common laminate files are jpg; server will ignore missing png if path fails, so prefer known extension map below
+    var jpgCodes='BGM BKA CC CGY FIV FK GG IO KAP LD LL LT NBK NSS OHN RCN TL TRZ UA WP';
+    if(jpgCodes.split(' ').indexOf(topCode)>=0) return './images/textures/top/laminate/'+topCode+'.jpg';
+    return jpg;
+  }
+  window.prepareNanoBananaPreview = async function(){
+    var btn=document.getElementById('quick-ai-preview-btn');
+    var note=document.getElementById('quick-ai-preview-note') || document.getElementById('ai-preview-result');
+    if(btn){btn.disabled=true;btn.textContent='✨ 재질 맵핑 중...';}
+    if(note){note.style.display='block';note.innerHTML='<b>실사 미리보기 생성 중...</b><br><span style="color:#aaa;">원본 PNG와 선택 texture를 Nano Banana에 보내 재질만 맵핑합니다.</span>';}
+    try{
+      var s=S();
+      var payload={
+        mode:'original-png-plus-texture-mapping-ff141',
+        deskImage:productPreviewPath(),
+        topTexture:texturePath('top'),
+        legTexture:texturePath('leg'),
+        topCode:(s._deskTopColor||s.topColor||s.current.topColor||''),
+        legCode:(s._deskLegColor||s.legColor||s.current.legColor||''),
+        deskLabel:s._currentCatName||s.current.product||'',
+        legType:s.legType||'', casterType:s.casterType||'', topShape:normTop(s.topShape),
+        size:{w:s.w||'',d:s.d||'',h:s.h||''}
+      };
+      var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      var data=await res.json().catch(function(){return {};});
+      if(!res.ok) throw new Error(data.error||data.detail||'실사 미리보기 생성 실패');
+      var imageSrc=data.imageUrl||data.url||data.image||data.output;
+      if(!imageSrc) throw new Error('이미지 결과가 없습니다.');
+      window.__lastNanoBananaImage=imageSrc;
+      if(note){note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">AI 실사 미리보기</div><img src="'+imageSrc+'" alt="AI 실사 미리보기" style="width:100%;border-radius:16px;border:1px solid #2a1e48;background:#fff;display:block;max-height:520px;object-fit:contain;"><div style="margin-top:8px;color:#888;font-size:10px;">원본 PNG 형태는 유지하고 선택 texture만 적용한 결과입니다.</div>';}
+    }catch(err){
+      if(note){note.innerHTML='<b style="color:#fca5a5;">실사 미리보기 생성 실패</b><br><span style="color:#ddd;">'+(err.message||err)+'</span>';}
+    }finally{ if(btn){btn.disabled=false;btn.textContent='✨ 실사 미리보기 생성';} }
+  };
+  function init(){
+    patchText(document);
+    if(!document.querySelector('.ff141-version-badge')){var b=document.createElement('div');b.className='ff141-version-badge';b.textContent='FF141 적용됨';document.body.appendChild(b);} 
+  }
+  document.addEventListener('DOMContentLoaded',init); window.addEventListener('load',init);
+  try{new MutationObserver(function(m){m.forEach(function(x){x.addedNodes&&x.addedNodes.forEach(function(n){if(n.nodeType===1) patchText(n);});});}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+})();
+</script>
+
 </body>
 
 
@@ -13335,7 +13498,7 @@ button.material-btn{
     if(typeof scrollBottom==='function') scrollBottom();
   };
   window.askCasterType = function(catName){ return window.askLegType(catName || state._currentCatName); };
-  window.askTopShape = function(catName){ return window.askLegType(catName || state._currentCatName); };
+  window.askTopShape = askTopShape;
 })();
 </script>
 
