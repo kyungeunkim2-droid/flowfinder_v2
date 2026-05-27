@@ -13075,6 +13075,279 @@ window.addEventListener('load',function(){
 })();
 </script>
 
+
+
+<style id="ff156-material-category-restore-css">
+.ff156-material-wrap{border:1px solid rgba(46,242,201,.28);background:rgba(3,17,15,.72);border-radius:18px;padding:14px;margin:8px 0;color:#eafffb}
+.ff156-material-title{font-weight:950;font-size:15px;color:#fff;margin-bottom:4px}
+.ff156-material-sub{font-size:12px;color:#9ccfc7;line-height:1.45;margin-bottom:12px}
+.ff156-material-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:760px){.ff156-material-grid{grid-template-columns:1fr}}
+.ff156-panel{border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:12px;background:rgba(255,255,255,.035)}
+.ff156-panel-title{font-size:14px;font-weight:950;color:#fff;margin-bottom:10px}
+.ff156-section{margin:10px 0 12px;padding:10px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(46,242,201,.16)}
+.ff156-section-title{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:12px;font-weight:950;color:#2ef2c9;margin-bottom:8px}
+.ff156-section-title small{font-size:10px;color:#a7f3d0;font-weight:800;opacity:.9}
+.ff156-buttons{display:flex;flex-wrap:wrap;gap:7px}
+.ff156-buttons .material-btn{min-height:42px!important;padding:7px 9px!important;border:1px solid rgba(255,255,255,.16)!important;background:#101b1a!important;color:#eef!important;border-radius:12px!important;transition:none!important;transform:none!important}
+.ff156-buttons .material-btn:hover{transform:none!important;border-color:#2ef2c9!important}
+.ff156-buttons .material-btn.active,.ff156-buttons .material-btn.selected{background:#153d37!important;border-color:#2ef2c9!important;color:#fff!important}
+.ff156-buttons .mat-thumb{width:30px!important;height:30px!important;min-width:30px!important;border-radius:8px!important;background-size:cover!important;background-position:center!important;display:block!important}
+.ff156-confirm{margin-top:12px;width:100%;border:0;border-radius:13px;padding:12px 14px;background:#2ef2c9;color:#00110f;font-weight:950;cursor:pointer}
+#material-hover-preview .mh-label{font-weight:950!important;color:#fff!important}
+</style>
+
+<script id="ff156-material-category-restore">
+(function(){
+  function S(){ window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function isDesk(cat){ return /데스크/.test(String(cat||'')); }
+  function isScreen(cat){ return /스크린/.test(String(cat||'')); }
+  function isLineL(cat){ return /일자형|L형|엘형/i.test(String(cat||'')); }
+  function uniq(a){ var out=[];(a||[]).forEach(function(x){x=String(x||'').trim(); if(x&&out.indexOf(x)<0)out.push(x);}); return out; }
+
+  var TOP_STD=['HW','OSG','WW'];
+  var TOP_WOOD=['DBL','NCE','NMOK','OB','OGG'];
+  var TOP_LAM=['BGM','BKA','CC','CGY','FIV','FK','GG','IO','KAP','LD','LL','LT','MDB','NBK','NSS','OHN','RCN','TL','TRZ','UA','WP','WW'];
+  var LEG_STD=['WW','BKM','DSG'];
+  var LEG_CUSTOM=['DCR','TS'];
+  var SCREEN_FAB_STD=['061','064','067','3F1','3F2'];
+  var SCREEN_FAB_CUSTOM=['001','001A','001B','004','004B','007','007B','014','014A','071','071A','072','074','2M4A','371','451','452A','452N','457','457L','458'];
+  var SCREEN_PET_STD=['1P1','1P2','1P4','1P7'];
+  var SCREEN_PET_CUSTOM=['1P5','BRD','COB','MBE','MGR'];
+
+  function tex(code,part,cat){
+    code=String(code||'').trim(); cat=cat||S()._currentCatName||'';
+    if(!code) return '';
+    if(typeof window.ff153TexturePath==='function'){ try{ var p=window.ff153TexturePath(code,part,cat); if(p) return p; }catch(e){} }
+    if(part==='leg'){
+      if(LEG_STD.indexOf(code)>=0) return 'images/textures/leg/standard/'+code+'.png';
+      if(LEG_CUSTOM.indexOf(code)>=0) return 'images/textures/leg/custom/'+code+'.png';
+    }
+    if(part==='top'){
+      var c=code; if(c==='WWK')c='WW'; if(c==='OCY')c='OSG';
+      if(TOP_STD.indexOf(c)>=0) return 'images/textures/top/standard/'+c+(c==='HW'?'.png':'.jpg');
+      if(TOP_WOOD.indexOf(c)>=0) return 'images/textures/top/veneer/'+c+'.jpg';
+      if(TOP_LAM.indexOf(c)>=0) return 'images/textures/top/laminate/'+c+(c==='MDB'?'.png':'.jpg');
+    }
+    if(part==='screen'){
+      var folder=/사이드/.test(cat)?'screen_side':isLineL(cat)?(/L형|엘형/i.test(cat)?'screen_lshape':'screen_straight'):'screen_front';
+      var c2=code; if(c2==='1P4A'||c2==='1P4B')c2='1P4'; if(c2==='1P6')c2='1P7';
+      var isPet=(folder==='screen_straight'||folder==='screen_lshape');
+      var std=isPet?SCREEN_PET_STD:SCREEN_FAB_STD, custom=isPet?SCREEN_PET_CUSTOM:SCREEN_FAB_CUSTOM;
+      if(std.indexOf(c2)>=0) return 'images/textures/screen/'+folder+'/standard/'+c2+'.jpg';
+      if(custom.indexOf(c2)>=0) return 'images/textures/screen/'+folder+'/custom/'+c2+((c2==='COB'||c2==='452A')?'.png':'.jpg');
+    }
+    return '';
+  }
+  window.resolveMaterialTexturePath=tex;
+  window.ffMaterialTextureUrl=function(code,part){ return tex(code,part,S()._currentCatName||''); };
+  window.ffTextureUrlForChoice=function(code,part,cat){ return tex(code,part,cat); };
+
+  window.ffMaterialBtnHtml=function(code,inputId,part,catName){
+    var url=tex(code,part,catName), bg=url?"background-image:url('"+url+"')":"background:#333";
+    return '<button type="button" class="material-btn" data-input="'+esc(inputId)+'" data-part="'+esc(part)+'" data-code="'+esc(code)+'" '
+      +'onclick="ffSelectMaterialButton(\''+esc(inputId)+'\',\''+esc(code)+'\',\''+esc(part)+'\',this)" '
+      +'onmouseenter="ffHoverMaterial(\''+esc(inputId)+'\',\''+esc(code)+'\',\''+esc(part)+'\',event,this)" '
+      +'onmouseleave="ffHideMaterialHover&&ffHideMaterialHover(this)">'
+      +'<span class="mat-thumb" style="'+bg+'"></span><span class="mat-code">'+esc(code)+'</span></button>';
+  };
+
+  window.ffHoverMaterial=function(inputId,code,part,ev,btn){
+    if(btn && btn.getAttribute('data-part')) part=btn.getAttribute('data-part');
+    var pop=document.getElementById('material-hover-preview');
+    var label=document.getElementById('mh-label');
+    var thumb=document.getElementById('mh-thumb');
+    var url=tex(code,part,S()._currentCatName||'');
+    if(label){ label.textContent=(part==='top'?'상판 재질 ':part==='leg'?'다리 재질 ':'스크린 재질 ')+code; }
+    if(thumb){ thumb.style.backgroundImage=url?'url('+url+')':'none'; thumb.style.backgroundColor=url?'#222':'#333'; }
+    if(pop){ pop.classList.add('show'); pop.style.left='auto'; pop.style.top='auto'; pop.style.right='24px'; pop.style.bottom='24px'; }
+    if(btn) btn.classList.add('is-hovering');
+  };
+  window.ffMoveMaterialPreview=function(){};
+
+  window.ffSelectMaterialButton=function(inputId,code,part,btn){
+    if(btn && btn.getAttribute('data-part')) part=btn.getAttribute('data-part');
+    var input=document.getElementById(inputId); if(input) input.value=code;
+    document.querySelectorAll('.material-btn[data-input="'+String(inputId).replace(/"/g,'\\"')+'"]').forEach(function(b){b.classList.remove('active','selected');});
+    if(btn) btn.classList.add('active','selected');
+    if(part==='top'||part==='leg'){
+      var peer=input&&input.getAttribute('data-peer');
+      if(peer && typeof window.deskColorPairPreview==='function') window.deskColorPairPreview(part==='top'?inputId:peer, part==='leg'?inputId:peer);
+    }else if(typeof window.stdColorPreview==='function') window.stdColorPreview(code);
+  };
+
+  function buttons(arr,id,part,cat){ return '<div class="ff156-buttons material-button-group">'+uniq(arr).map(function(c){return window.ffMaterialBtnHtml(c,id,part,cat);}).join('')+'</div>'; }
+  function section(title,sub,arr,id,part,cat){ arr=uniq(arr); if(!arr.length)return ''; return '<div class="ff156-section"><div class="ff156-section-title"><span>'+esc(title)+'</span>'+(sub?'<small>'+esc(sub)+'</small>':'')+'</div>'+buttons(arr,id,part,cat)+'</div>'; }
+
+  window.ff156AskMaterial=function(cat){
+    var s=S(); cat=cat||s._currentCatName||'일반형 데스크'; s._currentCatName=cat; s.step='choose_color';
+    var uid=Date.now();
+    if(isDesk(cat)){
+      var topId='ff156-top-'+uid, legId='ff156-leg-'+uid;
+      var html='<div class="ff156-material-wrap"><div class="ff156-material-title">재질을 선택해주세요</div><div class="ff156-material-sub">상판 재질과 다리 재질을 각각 선택하세요.</div>'
+        +'<input class="material-hidden-input" id="'+topId+'" data-peer="'+legId+'" value=""><input class="material-hidden-input" id="'+legId+'" data-peer="'+topId+'" value="">'
+        +'<div class="ff156-material-grid"><div class="ff156-panel"><div class="ff156-panel-title">상판 재질</div>'
+        +section('표준품','상판 기본 재질',TOP_STD,topId,'top',cat)
+        +section('주문품 · 원목','무늬목',TOP_WOOD,topId,'top',cat)
+        +section('주문품 · 라미네이트','HPL/LPM 계열',TOP_LAM,topId,'top',cat)
+        +'</div><div class="ff156-panel"><div class="ff156-panel-title">다리 재질</div>'
+        +section('표준품','다리 기본 재질',LEG_STD,legId,'leg',cat)
+        +section('주문품','다리 주문 재질',LEG_CUSTOM,legId,'leg',cat)
+        +'</div></div><button class="ff156-confirm" onclick="ff156ConfirmDeskMaterial(\''+esc(cat)+'\',\''+topId+'\',\''+legId+'\')">재질 선택 완료 ✓</button></div>';
+      if(typeof window.addMsg==='function') window.addMsg('bot',html);
+      return;
+    }
+    if(isScreen(cat)){
+      var id='ff156-screen-'+uid;
+      var std=isLineL(cat)?SCREEN_PET_STD:SCREEN_FAB_STD, custom=isLineL(cat)?SCREEN_PET_CUSTOM:SCREEN_FAB_CUSTOM;
+      var title=isLineL(cat)?'PET':'패브릭';
+      var html2='<div class="ff156-material-wrap"><div class="ff156-material-title">스크린 재질을 선택해주세요</div><div class="ff156-material-sub">'+title+' 표준품/주문품을 구분해서 선택합니다.</div>'
+        +'<input class="material-hidden-input" id="'+id+'" value="">'
+        +section('표준품 · '+title,'',std,id,'screen',cat)
+        +section('주문품 · '+title,'',custom,id,'screen',cat)
+        +'<button class="ff156-confirm" onclick="ff156ConfirmScreenMaterial(\''+esc(cat)+'\',\''+id+'\')">재질 선택 완료 ✓</button></div>';
+      if(typeof window.addMsg==='function') window.addMsg('bot',html2);
+      return;
+    }
+    if(typeof window.calcAndFinish==='function') window.calcAndFinish(cat);
+  };
+
+  window.ff156ConfirmDeskMaterial=function(cat,topId,legId){
+    var s=S(), top=(document.getElementById(topId)||{}).value||'', leg=(document.getElementById(legId)||{}).value||'';
+    if(!top){alert('상판 재질을 선택해주세요.');return;} if(!leg){alert('다리 재질을 선택해주세요.');return;}
+    s._deskTopColor=top; s._deskLegColor=leg; s.topColor=top; s.legColor=leg; s.color=top+leg; s.current.color='상판 '+top+' / 다리 '+leg;
+    if(typeof window.addMsg==='function') window.addMsg('user','상판 재질 '+top+' / 다리 재질 '+leg);
+    if(typeof window.calcAndFinish==='function') window.calcAndFinish(cat);
+  };
+  window.ff156ConfirmScreenMaterial=function(cat,id){
+    var s=S(), val=(document.getElementById(id)||{}).value||''; if(!val){alert('스크린 재질을 선택해주세요.');return;}
+    s.color=val; s.screenColor=val; s.current.color=val;
+    if(typeof window.addMsg==='function') window.addMsg('user','스크린 재질 '+val);
+    if(typeof window.calcAndFinish==='function') window.calcAndFinish(cat);
+  };
+
+  // 사이즈 확인 뒤 기존 ff149 단순 재질목록 대신 카테고리 복구 UI로 이동
+  window.ff149SubmitSize=function(fid){
+    var s=S(),cat=s._currentCatName||'';
+    var wEl=document.getElementById('ff149-w-'+fid),dEl=document.getElementById('ff149-d-'+fid),hEl=document.getElementById('ff149-h-'+fid);
+    var w=wEl?parseInt(wEl.value,10):null,d=dEl?parseInt(dEl.value,10):null,h=hEl?parseInt(hEl.value,10):null;
+    if(wEl&&!w){wEl.focus();return;} if(dEl&&!d){dEl.focus();return;} if(hEl&&!h){hEl.focus();return;}
+    [wEl,dEl,hEl].forEach(function(x){if(x)x.disabled=true;});
+    var b=document.querySelector('[onclick="ff149SubmitSize('+fid+')"]'); if(b)b.disabled=true;
+    var parts=[]; if(w)parts.push('W'+w); if(d)parts.push('D'+d); if(h)parts.push('H'+h);
+    s.w=w; s.d=d; s.h=h; s.current.size=parts.join(' ');
+    if(typeof window.addMsg==='function') window.addMsg('user',parts.join(' '));
+    if(isScreen(cat)){
+      var def=isLineL(cat)?{h:590,above:350}:{h:715,above:405};
+      var above=Math.min(def.above,(h||def.h)-1); window._ff156Tid=(window._ff156Tid||0)+1; var tid=window._ff156Tid; s._screenNewH=h||def.h;
+      var html='책상 <b>상판 위</b> 높이(mm)를 입력해주세요:<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;"><div class="ff149-size-field"><span>상판위 H</span><div class="ff149-size-control"><input id="ff156-topgap-'+tid+'" type="number" value="'+above+'" min="1" max="'+((h||def.h)-1)+'"></div><span>상판 위</span></div></div><span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">전면/사이드: H715 · 상판위 H405<br>일자형/L형: H590 · 상판위 H350</span><br><button class="confirm-btn" style="margin-top:10px;" onclick="ff156SubmitTopGap('+tid+')">상판위 H 확인 ✓</button>';
+      if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    }else window.ff156AskMaterial(cat);
+  };
+  window.ff156SubmitTopGap=function(tid){
+    var s=S(),cat=s._currentCatName||'', el=document.getElementById('ff156-topgap-'+tid), val=parseInt(el&&el.value,10), h=s._screenNewH||s.h||(/일자형|L형/.test(cat)?590:715);
+    if(!val||val>=h){alert('상판위 H는 전체 H보다 작아야 합니다.');return;}
+    if(el)el.disabled=true; var b=document.querySelector('[onclick="ff156SubmitTopGap('+tid+')"]'); if(b)b.disabled=true;
+    s._screenTopGap=val; s.screenTopGap=val; s.current.size=(s.current.size||('H'+h))+' / 상판위 '+val+'mm';
+    if(typeof window.addMsg==='function') window.addMsg('user','상판위 H '+val+'mm');
+    window.ff156AskMaterial(cat);
+  };
+  window.ff149SubmitTop=window.ff156SubmitTopGap;
+  window.askDeskColorPairDrop=function(catName){ window.ff156AskMaterial(catName); };
+})();
+</script>
+
+
+
+<style id="ff157-single-preview-panel-css">
+/* 오른쪽 preview 영역 중복 표시 방지: 기존 legacy preview 이미지는 숨기고, 분리된 3개 박스만 사용 */
+.preview-panel > img,
+.right-panel > img,
+.preview-stage > img,
+#previewArea > img,
+#preview-img,
+#previewImage,
+#main-preview-img,
+.preview-img,
+.product-preview > img,
+#previewStage > img,
+.stage > img{
+  display:none!important;
+}
+#rightPreviewPanel,
+#rightPreviewPanel img,
+#optionPreviewImage,
+#deskRenderImage,
+#screenRenderImage{
+  display:block!important;
+}
+#rightPreviewPanel{width:100%!important;box-sizing:border-box!important;gap:14px!important}
+#rightPreviewPanel .ff-preview-card{min-height:0!important;overflow:hidden!important}
+#rightPreviewPanel .ff-preview-card img{height:180px!important;max-height:180px!important;object-fit:contain!important;background:#fff!important}
+#optionPreviewImage[src=""],#deskRenderImage[src=""],#screenRenderImage[src=""]{display:none!important;}
+</style>
+
+<script id="ff157-single-preview-panel-js">
+(function(){
+  function first(qs){
+    for(var i=0;i<qs.length;i++){var el=document.querySelector(qs[i]); if(el) return el;}
+    return null;
+  }
+  function ensureSinglePreviewPanel(){
+    var panel=document.getElementById('rightPreviewPanel');
+    var host=first(['.preview-panel','.right-panel','.preview-stage','#previewArea','#previewStage','.stage','.product-preview']);
+    if(!host) host=document.body;
+
+    // 여러 번 삽입된 패널은 첫 번째만 남김
+    var panels=[].slice.call(document.querySelectorAll('#rightPreviewPanel'));
+    if(panels.length){
+      panel=panels[0];
+      panels.slice(1).forEach(function(p){p.remove();});
+    }else{
+      panel=document.createElement('div');
+      panel.id='rightPreviewPanel';
+      panel.innerHTML=''
+        +'<section class="ff-preview-card ff-option-preview-card"><h3>옵션 미리보기</h3><img id="optionPreviewImage" alt="옵션 미리보기"></section>'
+        +'<section class="ff-preview-card ff-desk-render-card"><h3>데스크 실사 미리보기</h3><img id="deskRenderImage" alt="데스크 실사 미리보기"></section>'
+        +'<section class="ff-preview-card ff-screen-render-card"><h3>스크린 실사 미리보기</h3><img id="screenRenderImage" alt="스크린 실사 미리보기"></section>';
+    }
+    if(panel.parentElement!==host){ host.appendChild(panel); }
+
+    // 기존 오른쪽 preview 이미지들은 화면만 숨김. 삭제하지 않아서 기존 코드 오류는 막음.
+    ['#preview-img','#previewImage','#main-preview-img','.preview-img','.product-preview > img','#previewStage > img','.stage > img','.preview-stage > img'].forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(img){
+        if(!panel.contains(img)) img.style.setProperty('display','none','important');
+      });
+    });
+    return panel;
+  }
+
+  function showImg(id,path){
+    ensureSinglePreviewPanel();
+    var img=document.getElementById(id);
+    if(!img) return;
+    if(!path) return;
+    // 옵션 이미지는 매번 Date.now를 붙이지 않아서 깜빡임/흔들림 방지
+    img.src=String(path).replace(/\?v=\d+$/,'');
+  }
+
+  window.showOptionImage=function(path){ showImg('optionPreviewImage', path); };
+  window.showDeskRenderImage=function(path){ showImg('deskRenderImage', path); };
+  window.showScreenRenderImage=function(path){ showImg('screenRenderImage', path); };
+
+  // 기존 ff154 ensurePreviewLayout이 append를 다시 해도 마지막에 하나로 정리
+  ['DOMContentLoaded','load'].forEach(function(ev){
+    window.addEventListener(ev,function(){
+      setTimeout(ensureSinglePreviewPanel,50);
+      setTimeout(ensureSinglePreviewPanel,500);
+      setTimeout(ensureSinglePreviewPanel,1500);
+    });
+  });
+  document.addEventListener('click',function(){ setTimeout(ensureSinglePreviewPanel,80); },true);
+})();
+</script>
+
 </body>
 
 
