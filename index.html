@@ -8836,19 +8836,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     };
   }
 
-  ['ffPickDeskOption69','ffConfirmDeskOptions69'].forEach(function(fn){
-    var old=window[fn];
-    if(typeof old==='function'){
-      window[fn]=function(){
-        var r=old.apply(this,arguments);
-        setTimeout(function(){
-          if(typeof window.ff90RefreshOptionSummary==='function') window.ff90RefreshOptionSummary();
-          focusPreview('#ff90-option-summary');
-        },120);
-        return r;
-      };
-    }
-  });
+
 
   document.addEventListener('click',function(e){
     if(e.target.closest && e.target.closest('.material-btn')){
