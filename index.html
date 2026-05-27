@@ -12888,7 +12888,83 @@ setInterval(function(){
   }, 300);
 })();
 </script>
+<script id="ff-preview-path-final-fix">
+(function(){
+  function getDeskFolder() {
+    const name = (state && (state._currentCatName || state.product || "")) || "";
+    if (name.includes("덕트")) return "desk_duct";
+    return "desk_standard";
+  }
 
+  function getPreviewFileName() {
+    const topMap = {
+      "직사각 상판": "rect",
+      "스퀘어 상판": "rect",
+      "라운드 상판": "round"
+    };
+
+    const legMap = {
+      "사다리형 4레그": "ladder",
+      "원형 4레그": "round",
+      "A자형 4레그": "aframe"
+    };
+
+    const moveMap = {
+      "글라이드": "glide",
+      "캐스터": "caster"
+    };
+
+    const top = topMap[state.topShape] || "rect";
+    const leg = legMap[state.legType] || "ladder";
+    const move = moveMap[state.casterType] || moveMap[state.mobility] || "glide";
+
+    let screen = "front";
+    const name = state._currentCatName || state.product || "";
+
+    if (name.includes("사이드")) screen = "side";
+    else if (name.includes("일자")) screen = "straight";
+    else if (name.includes("L형")) screen = "lshape";
+    else if (name.includes("전면")) screen = "front";
+
+    return `${leg}_${move}_${top}_${screen}.png`;
+  }
+
+  window.updateMainPreview = function() {
+    const path = `images/previews/${getDeskFolder()}/${getPreviewFileName()}`;
+
+    const img =
+      document.querySelector("#previewImage") ||
+      document.querySelector(".preview-image") ||
+      document.querySelector("#mainPreview img") ||
+      document.querySelector(".preview-stage img") ||
+      document.querySelector(".product-preview img");
+
+    if (img) {
+      img.src = path + "?v=" + Date.now();
+    }
+
+    console.log("Preview path:", path);
+  };
+
+  const oldPickTop = window.ffPickTop;
+  window.ffPickTop = function(top){
+    if (oldPickTop) oldPickTop(top);
+    setTimeout(updateMainPreview, 50);
+  };
+
+  const oldPickLeg = window.ffPickLeg;
+  window.ffPickLeg = function(leg){
+    if (oldPickLeg) oldPickLeg(leg);
+    setTimeout(updateMainPreview, 50);
+  };
+
+  const oldPickMove = window.ffPickMove;
+  window.ffPickMove = function(move){
+    if (oldPickMove) oldPickMove(move);
+    setTimeout(updateMainPreview, 50);
+  };
+})();
+</script>
 </body>
 
 
