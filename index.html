@@ -12407,6 +12407,87 @@ ${map.move[move] || move}
 <!-- FF149 stable flow moved to end -->
 
 
+
+<!-- v151 material selector restore -->
+<style id="ff-v151-material-restore">
+.material-btn .mat-thumb{
+  width:24px!important;
+  height:24px!important;
+  border-radius:7px!important;
+  border:1px solid #444!important;
+  background-size:cover!important;
+  background-position:center!important;
+  background-repeat:no-repeat!important;
+  display:inline-block!important;
+  flex-shrink:0!important;
+}
+</style>
+
+<script id="ff-v151-material-restore-script">
+(function(){
+
+function texturePath(code, part){
+  code=String(code||'').replace(/^LEG_/,'').trim();
+  if(!code) return '';
+
+  if(part==='leg'){
+    return './images/textures/leg/standard/'+code+'.png';
+  }
+
+  return './images/textures/top/standard/'+code+'.png';
+}
+
+function hydrateButtons(root){
+  (root||document).querySelectorAll('.material-btn').forEach(function(btn){
+
+    var code=btn.getAttribute('data-code')||'';
+    var part=btn.getAttribute('data-part')||'top';
+
+    var thumb=btn.querySelector('.mat-thumb');
+
+    if(!thumb){
+      thumb=document.createElement('span');
+      thumb.className='mat-thumb';
+      btn.insertBefore(thumb, btn.firstChild);
+    }
+
+    thumb.style.backgroundImage='url("'+texturePath(code,part)+'")';
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+
+  hydrateButtons(document);
+
+  var msgs=document.getElementById('messages');
+
+  if(msgs){
+    new MutationObserver(function(muts){
+
+      muts.forEach(function(m){
+
+        m.addedNodes.forEach(function(n){
+
+          if(n.nodeType===1){
+            hydrateButtons(n);
+          }
+
+        });
+
+      });
+
+    }).observe(msgs,{childList:true,subtree:true});
+  }
+
+});
+
+setInterval(function(){
+  hydrateButtons(document);
+},1000);
+
+})();
+</script>
+
 </body>
 
 
