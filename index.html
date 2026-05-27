@@ -13195,174 +13195,49 @@ setInterval(function(){
   font-size:12px !important;
 }
 </style>
+<script>
+function setDeskOptionImage(path) {
+  const img =
+    document.querySelector("#texture-preview img") ||
+    document.querySelector("#optionPreviewImage");
 
-<script id="ff160-texture-preview-single-panel-js">
-(function(){
-  var lastOptionPath = "";
-  var lastDeskPath = "";
-  var lastScreenPath = "";
-  var lastLegText = "";
+  if (!img) return;
 
-  function q(sel){ return document.querySelector(sel); }
+  img.src = path;
+  img.style.display = "block";
+}
 
-  function cleanTexturePanel(){
-    var panel = document.getElementById("texture-preview");
-    if(!panel) return null;
-
-    // 기존 코드가 다시 내용을 집어넣어도, 우리가 단일 구조로 계속 고정
-    if(panel.getAttribute("data-ff160-clean") !== "1"){
-      panel.setAttribute("data-ff160-clean","1");
-      panel.innerHTML = ''
-        + '<div class="ff160-preview-title"><span>데스크 옵션 이미지</span><small>options 폴더 기준</small></div>'
-        + '<div class="ff160-preview-card">'
-        + '  <h3>옵션 선택 이미지</h3>'
-        + '  <img id="ff160-option-img" alt="옵션 선택 이미지" style="display:none;">'
-        + '  <div id="ff160-option-empty" class="ff160-empty">상판형태 / 다리형태 / 이동방식을 선택하면 이미지가 표시됩니다.</div>'
-        + '</div>'
-        + '<div class="ff160-preview-card">'
-        + '  <h3>AI 실사 미리보기 - 데스크</h3>'
-        + '  <img id="ff160-desk-img" alt="데스크 실사 미리보기" style="display:none;">'
-        + '  <div id="ff160-desk-empty" class="ff160-empty">실사 미리보기 생성 결과가 여기에 표시됩니다.</div>'
-        + '</div>'
-        + '<div class="ff160-preview-card">'
-        + '  <h3>AI 실사 미리보기 - 스크린</h3>'
-        + '  <img id="ff160-screen-img" alt="스크린 실사 미리보기" style="display:none;">'
-        + '  <div id="ff160-screen-empty" class="ff160-empty">스크린 실사 미리보기 결과가 여기에 표시됩니다.</div>'
-        + '</div>';
-    }
-
-    panel.style.display = "block";
-    return panel;
+function showTopImage(text) {
+  if (text.includes("라운드")) {
+    setDeskOptionImage("images/options/top/round.png");
+  } else {
+    setDeskOptionImage("images/options/top/rect.png");
   }
+}
 
-  function setPanelImage(imgId, emptyId, path){
-    cleanTexturePanel();
-    var img = document.getElementById(imgId);
-    var empty = document.getElementById(emptyId);
-    if(!img || !path) return;
-
-    img.src = path;
-    img.style.display = "block";
-    if(empty) empty.style.display = "none";
+function showLegImage(text) {
+  if (text.includes("A자")) {
+    setDeskOptionImage("images/options/leg/aframe.png");
+  } else if (text.includes("원형")) {
+    setDeskOptionImage("images/options/leg/round.png");
+  } else {
+    setDeskOptionImage("images/options/leg/ladder.png");
   }
+}
 
-  function normTop(text){
-    text = String(text || "");
-    return /라운드/.test(text) ? "round" : "rect";
-  }
+function showMoveImage(text) {
+  const leg = state?.legType || "";
 
-  function normLeg(text){
-    text = String(text || "");
-    if(/A자|a자|에이/.test(text)) return "aframe";
-    if(/원형/.test(text)) return "round";
-    return "ladder";
-  }
+  let legKey = "ladder";
+  if (leg.includes("A자")) legKey = "aframe";
+  else if (leg.includes("원형")) legKey = "round";
 
-  function normMove(text){
-    text = String(text || "");
-    return /캐스터|바퀴/.test(text) ? "caster" : "glide";
-  }
+  const moveKey = text.includes("캐스터") ? "caster" : "glide";
 
-  function topPath(text){
-    return "images/options/top/" + normTop(text) + ".png";
-  }
-
-  function legPath(text){
-    return "images/options/leg/" + normLeg(text) + ".png";
-  }
-
-  function movePath(text){
-    var leg = normLeg(
-      lastLegText ||
-      (window.state && (state.legType || (state.current && state.current.legType))) ||
-      ""
-    );
-    return "images/options/mobility/" + leg + "_" + normMove(text) + ".png";
-  }
-
-  window.showOptionImage = function(path){
-    lastOptionPath = path || lastOptionPath;
-    if(lastOptionPath) setPanelImage("ff160-option-img", "ff160-option-empty", lastOptionPath);
-  };
-
-  window.showDeskRenderImage = function(path){
-    lastDeskPath = path || lastDeskPath;
-    if(lastDeskPath) setPanelImage("ff160-desk-img", "ff160-desk-empty", lastDeskPath);
-  };
-
-  window.showScreenRenderImage = function(path){
-    lastScreenPath = path || lastScreenPath;
-    if(lastScreenPath) setPanelImage("ff160-screen-img", "ff160-screen-empty", lastScreenPath);
-  };
-
-  // 예전 quick options 생성 함수 무력화
-  window.ensureQuickOptions = function(){ return; };
-
-  // 버튼 클릭을 가장 마지막에 잡아서 오른쪽 단일 패널에만 표시
-  document.addEventListener("click", function(e){
-    var btn = e.target.closest && e.target.closest("button");
-    if(!btn) return;
-
-    var text = (btn.textContent || "").replace(/\s+/g," ").trim();
-
-    setTimeout(function(){
-      if(/직사각|스퀘어|라운드/.test(text)){
-        if(window.state){
-          state.topShape = text;
-          state.current = state.current || {};
-          state.current.topShape = text;
-        }
-        window.showOptionImage(topPath(text));
-        return;
-      }
-
-      if(/사다리형|원형 4레그|A자형|a자형/.test(text)){
-        lastLegText = text;
-        if(window.state){
-          state.legType = text;
-          state.current = state.current || {};
-          state.current.legType = text;
-        }
-        window.showOptionImage(legPath(text));
-        return;
-      }
-
-      if(/글라이드|캐스터|바퀴/.test(text)){
-        if(window.state){
-          state.mobility = text;
-          state.casterType = text;
-          state.current = state.current || {};
-          state.current.mobility = text;
-          state.current.casterType = text;
-        }
-        window.showOptionImage(movePath(text));
-        return;
-      }
-    }, 20);
-  }, true);
-
-  // 기존 코드가 DOM을 다시 건드려도 복구
-  var mo = new MutationObserver(function(){
-    var panel = document.getElementById("texture-preview");
-    if(panel && panel.getAttribute("data-ff160-clean") !== "1"){
-      cleanTexturePanel();
-      if(lastOptionPath) window.showOptionImage(lastOptionPath);
-      if(lastDeskPath) window.showDeskRenderImage(lastDeskPath);
-      if(lastScreenPath) window.showScreenRenderImage(lastScreenPath);
-    }
-  });
-
-  window.addEventListener("load", function(){
-    cleanTexturePanel();
-    var panel = document.getElementById("texture-preview");
-    if(panel && panel.parentNode) mo.observe(panel.parentNode, {childList:true, subtree:true});
-  });
-
-  document.addEventListener("DOMContentLoaded", cleanTexturePanel);
-  setTimeout(cleanTexturePanel, 100);
-  setTimeout(cleanTexturePanel, 800);
-})();
+  setDeskOptionImage(`images/options/mobility/${legKey}_${moveKey}.png`);
+}
 </script>
+
 
 </body>
 
