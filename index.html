@@ -10463,7 +10463,12 @@ ${map.move[move] || move}
   function combo(){return normLeg(S().legType||S().legShape)+'_'+normMove(S().casterType||S().mobility);}
   function comboSrc(){return './images/options/desk_combo/'+combo()+'.png';}
   function fullDeskSrc(){return './images/previews/'+normDesk()+'/'+combo()+'.png';}
-  function topSrc(){var v=String(S().topShape||''); return v.indexOf('라운드')>-1?'./images/options/top_round.png':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png';}
+  function topSrc(){
+  var v = String(S().topShape || '');
+  return v.indexOf('라운드') > -1
+    ? './images/options/tops/round.png'
+    : './images/options/tops/square.png';
+}
   function labelLeg(){return S().legType||S().legShape||'다리형태';}
   function labelMove(){return S().casterType||S().mobility||'이동방식';}
   function labelTop(){return S().topShape||'상판형태';}
@@ -15311,8 +15316,11 @@ button.material-btn{
   var OPTION_IMG={
     leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
     caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
-    top:{'직사각 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','직사각':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드 상판':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png','라운드':'./images/previews/W1200_rect_fixed_ladder_D700_HW_BKM.png'}
-  };
+   top:{
+  '직사각 상판':'./images/options/tops/square.png',
+  '라운드 상판':'./images/options/tops/round.png',
+ 
+}
   function $(id){return document.getElementById(id);} 
   function has(a,v){return (a||[]).indexOf(v)>-1;}
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
