@@ -12263,6 +12263,144 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+
+<!-- === FF147 REAL FIX: prevent desk option loop after size, direct material step === -->
+<style id="ff147-style">
+#ff147-badge{position:fixed;right:12px;bottom:42px;z-index:100000;background:#ffcc33;color:#07110f;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:950;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+</style>
+<script id="ff147-no-repeat-material-fix">
+(function(){
+  function S(){ window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state; }
+  function info(cat){ return ((window.USER_CATEGORIES||{})[cat||''])||{}; }
+  function isDesk(cat){ return /데스크/.test(String(cat||'')) || !!info(cat).isDesk; }
+  function isScreen(cat){ return /스크린/.test(String(cat||'')) || !!info(cat).isScreen; }
+  function isLineOrL(cat){ return /일자형|L형|l형|엘/i.test(String(cat||'')); }
+  function screenDef(cat){ return isLineOrL(cat)?{h:590,above:350}:{h:715,above:405}; }
+  function getPack(cat){
+    var ci=info(cat), mode=(typeof window.ffDataTypeForMode==='function')?window.ffDataTypeForMode(ci):(ci.type||'unit');
+    var keys=(typeof window.ffUnitKeysForMode==='function')?window.ffUnitKeysForMode(cat,ci.keys):(ci.keys||[]);
+    var key=keys&&keys[0], data=(mode==='set'?window.SET_DATA:window.UNIT_DATA)||{};
+    return {mode:mode,key:key,items:(key&&data[key])?data[key]:[]};
+  }
+  function directMaterial(cat){
+    var s=S(); cat=cat||s._currentCatName||'';
+    s._ff147PassedSize=true;
+    s._ff147MaterialStarted=true;
+    s.step='choose_color';
+    s._currentCatName=cat;
+    var pack=s._flowColorPack||getPack(cat);
+    s._flowColorPack=pack; s._currentDataType=pack.mode; s._currentProductKey=pack.key; s._currentItems=pack.items;
+    if(isDesk(cat) && typeof window.askDeskColorPairDrop==='function'){
+      return window.askDeskColorPairDrop(cat, pack.mode, pack.items, pack.key);
+    }
+    if(typeof window.askStdColorDrop==='function'){
+      return window.askStdColorDrop(cat, pack.mode, pack.items, pack.key);
+    }
+    if(typeof window.askColorTypeFirst==='function'){
+      return window.askColorTypeFirst(cat, pack.mode, pack.items, pack.key);
+    }
+  }
+  window.ff147GoMaterial=directMaterial;
+
+  // Fix the current FF146 submit button path: size confirmation must go directly to material.
+  var oldSubmit=window.ff146SubmitSize;
+  window.ff146SubmitSize=function(fid){
+    var s=S(), cat=s._currentCatName||'';
+    var wEl=document.getElementById('ff146-w-'+fid), dEl=document.getElementById('ff146-d-'+fid), hEl=document.getElementById('ff146-h-'+fid);
+    var w=wEl?parseInt(wEl.value,10):null, d=dEl?parseInt(dEl.value,10):null, h=hEl?parseInt(hEl.value,10):null;
+    if(wEl&&!w){wEl.focus();return;} if(hEl&&!h){hEl.focus();return;}
+    [wEl,dEl,hEl].forEach(function(e){if(e)e.disabled=true;});
+    var btn=document.querySelector('[onclick="ff146SubmitSize('+fid+')"]'); if(btn)btn.disabled=true;
+    var parts=[]; if(w)parts.push('W'+w); if(d)parts.push('D'+d); if(h)parts.push('H'+h);
+    if(typeof window.addMsg==='function') window.addMsg('user',parts.join(' '));
+    try{ if(window.input){input.disabled=false;input.placeholder='입력하세요...';} }catch(e){}
+    s.w=w; s.d=d; s.h=h; s.current.size=parts.join(' '); s._ff147PassedSize=true;
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    if(isScreen(cat)){
+      if(typeof window.ff146SubmitTop==='function'){
+        // Use existing screen top-height question but keep corrected defaults.
+        var def=screenDef(cat); var newH=h||def.h;
+        window._ff147TopId=(window._ff147TopId||0)+1; var tid=window._ff147TopId; var above=Math.min(def.above,Math.max(1,newH-1));
+        var html='<div class="ff-screen-default-box">전체 H: <b>'+newH+'mm</b><br>상판위 H 기본값: <b>'+above+'mm</b></div>책상 <b>상판 위</b> 높이(mm)를 입력해주세요:'+
+          '<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'+
+          '<div class="ff146-size-field"><span>상판 위 H</span><div class="ff146-size-control"><button type="button" onclick="ff146Step(\'ff147-top-'+tid+'\',-10)">−</button><input id="ff147-top-'+tid+'" type="number" value="'+above+'" min="1" max="'+(newH-1)+'"><button type="button" onclick="ff146Step(\'ff147-top-'+tid+'\',10)">+</button></div><span>상판 위</span></div></div>'+
+          '<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">전면/사이드: H715 · 상판위 H405<br>일자형/L형: H590 · 상판위 H350</span><br><button class="confirm-btn" style="margin-top:10px;" onclick="ff147SubmitTop('+tid+')">상판 위 값 확인 ✓</button>';
+        if(typeof window.addMsg==='function') window.addMsg('bot',html);
+        return;
+      }
+    }
+    return directMaterial(cat);
+  };
+
+  window.ff147SubmitTop=function(fid){
+    var s=S(), cat=s._currentCatName||'', el=document.getElementById('ff147-top-'+fid), val=parseInt(el&&el.value,10), newH=s.h||screenDef(cat).h;
+    if(!val||val>=newH){alert('상판 위 값은 전체 H보다 작아야 합니다.');return;}
+    if(el)el.disabled=true; var btn=document.querySelector('[onclick="ff147SubmitTop('+fid+')"]'); if(btn)btn.disabled=true;
+    s._screenTopGap=val; s.screenTopGap=val; s.current.screenTopGap=val; s.current.size=(s.current.size||('H'+newH))+' / 상판위 '+val+'mm';
+    if(typeof window.addMsg==='function') window.addMsg('user','상판 위 '+val+'mm');
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    directMaterial(cat);
+  };
+
+  // Typed size input path also must go directly to material, not back to desk options.
+  window.afterSizeInput=function(parsed){
+    var s=S(), cat=s._currentCatName||''; parsed=parsed||{};
+    s.w=parsed.w; s.d=parsed.d; s.h=parsed.h;
+    var parts=[]; if(parsed.w)parts.push('W'+parsed.w); if(parsed.d)parts.push('D'+parsed.d); if(parsed.h)parts.push('H'+parsed.h);
+    if(parts.length) s.current.size=parts.join(' ');
+    s._ff147PassedSize=true;
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    if(isScreen(cat)){
+      // keep screen top question; if no height, use correct default
+      var def=screenDef(cat); s.h=s.h||def.h; return window.ff146SubmitSize ? (function(){
+        // lightweight direct top question by reusing a fake flow
+        window._ff147TopId=(window._ff147TopId||0)+1; var tid=window._ff147TopId, newH=s.h, above=Math.min(def.above,Math.max(1,newH-1));
+        var html='<div class="ff-screen-default-box">전체 H: <b>'+newH+'mm</b><br>상판위 H 기본값: <b>'+above+'mm</b></div>책상 <b>상판 위</b> 높이(mm)를 입력해주세요:<br><input id="ff147-top-'+tid+'" type="number" value="'+above+'" min="1" max="'+(newH-1)+'" style="margin-top:8px;"><br><button class="confirm-btn" style="margin-top:10px;" onclick="ff147SubmitTop('+tid+')">상판 위 값 확인 ✓</button>';
+        if(typeof window.addMsg==='function') window.addMsg('bot',html);
+      })() : directMaterial(cat);
+    }
+    return directMaterial(cat);
+  };
+  try{ afterSizeInput=window.afterSizeInput; }catch(e){}
+
+  // Safety: if any older script tries to restart desk options after size, block it and go material once.
+  var oldStart=window.startCategoryFlow;
+  window.startCategoryFlow=function(cat){
+    var s=S();
+    if(isDesk(cat) && s._ff147PassedSize && (s.step==='choose_color' || s.step==='input_size')) return directMaterial(cat);
+    return oldStart ? oldStart.apply(this,arguments) : undefined;
+  };
+  try{ startCategoryFlow=window.startCategoryFlow; }catch(e){}
+
+  // Mutation guard removes newly inserted desk-option repeat after size and replaces it with material.
+  function looksLikeDeskRepeat(node){
+    if(!node || node.nodeType!==1) return false;
+    var txt=(node.textContent||'');
+    return txt.indexOf('데스크 옵션을 선택해주세요')>=0 && txt.indexOf('상판형태')>=0 && txt.indexOf('다리형태')>=0;
+  }
+  var guard=false;
+  function removeRepeatAndMaterial(n){
+    var s=S(); if(!s._ff147PassedSize || guard) return;
+    var target=null;
+    if(looksLikeDeskRepeat(n)) target=n;
+    else if(n.querySelector){ target=n.querySelector('[data-ff146="desk"], [data-ff145="desk"], [data-ff144="desk"], [data-ff142="desk"], .ff146-box, .ff145-box, .ff144-box, .ff142-box'); if(target && !looksLikeDeskRepeat(target)) target=null; }
+    if(target){
+      guard=true;
+      try{ target.remove(); }catch(e){ target.style.display='none'; }
+      setTimeout(function(){ directMaterial(s._currentCatName||'일반형 데스크'); guard=false; },0);
+    }
+  }
+  try{
+    new MutationObserver(function(ms){ ms.forEach(function(m){ Array.prototype.forEach.call(m.addedNodes||[], removeRepeatAndMaterial); }); }).observe(document.body,{childList:true,subtree:true});
+  }catch(e){}
+
+  function fixText(){ try{ document.body.innerHTML=document.body.innerHTML.replace(/스퀘어\s*상판/g,'직사각 상판').replace(/H\s*720mm\s*·\s*상판위\s*H\s*405mm/g,'H 715mm · 상판위 H 405mm').replace(/전면\/사이드\s*스크린:\s*H\s*720/g,'전면/사이드 스크린: H715'); }catch(e){} }
+  function badge(){ var b=document.getElementById('ff147-badge'); if(!b){b=document.createElement('div');b.id='ff147-badge';b.textContent='FF147 오류수정 적용됨';document.body.appendChild(b);} }
+  window.addEventListener('load',function(){badge();}); setTimeout(badge,500);
+})();
+</script>
+
 </body>
 
 
