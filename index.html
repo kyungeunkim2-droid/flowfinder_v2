@@ -12109,6 +12109,79 @@ ${map.move[move] || move}
 })();
 </script>
 
+
+<!-- FF142: REAL desk option flow lock - top > leg > mobility -->
+<style id="ff142-desk-flow-style">
+.ff142-box{border:1px solid rgba(38,245,201,.35);background:#071513;border-radius:18px;padding:14px;margin:8px 0;color:#eafffb;box-shadow:0 12px 30px rgba(0,0,0,.22)}
+.ff142-title{font-weight:950;font-size:15px;margin-bottom:6px;color:#fff}.ff142-desc{font-size:12px;color:#9ecfc7;line-height:1.45;margin-bottom:12px}
+.ff142-section{margin-top:12px}.ff142-label{font-size:12px;font-weight:950;color:#26f5c9;margin-bottom:7px;display:flex;align-items:center;gap:6px}.ff142-label:before{content:attr(data-step);display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:999px;background:#26f5c9;color:#00110f;font-size:11px;font-weight:950}
+.ff142-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.ff142-grid.one{grid-template-columns:1fr}.ff142-btn{border:1px solid #17413a;background:#081614;color:#dffff9;border-radius:13px;padding:11px 9px;min-height:44px;font-weight:900;font-size:12px;cursor:pointer;text-align:center}.ff142-btn:hover{border-color:#26f5c9;background:#0e2b27}.ff142-btn.selected{background:#26f5c9;color:#00110f;border-color:#a7fff3;box-shadow:0 0 0 2px rgba(38,245,201,.18)}.ff142-btn.disabled{opacity:.38;pointer-events:none}
+.ff142-placeholder{border:1px dashed rgba(38,245,201,.26);border-radius:13px;padding:11px;color:#8fbdb5;font-size:12px;line-height:1.45;background:rgba(8,22,20,.45)}
+.ff142-rule{font-size:11px;color:#9ccfc7;line-height:1.55;margin-top:12px}.ff142-actions{display:flex;gap:8px;margin-top:13px}.ff142-actions button{flex:1;border-radius:12px;padding:11px 12px;font-weight:950;cursor:pointer;border:1px solid #25534c;background:#06110f;color:#bffff2}.ff142-actions button.primary{background:#26f5c9;color:#00110f;border-color:#a7fff3}.ff142-badge{position:fixed;right:12px;bottom:12px;z-index:999999;background:#26f5c9;color:#00110f;border-radius:999px;padding:7px 10px;font-size:11px;font-weight:950;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+</style>
+<script id="ff142-desk-flow-script">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function st(){window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state;}
+  function isDesk(cat){return /데스크/.test(String(cat||''));}
+  function normTop(v){v=String(v||''); return /라운드|round/i.test(v)?'라운드 상판':'직사각 상판';}
+  function allowedLegs(){return normTop(st().topShape)==='라운드 상판'?['원형 4레그','A자형 4레그']:['사다리형 4레그'];}
+  function sel(kind,v){var s=st(); var cur=kind==='top'?normTop(s.topShape):kind==='leg'?(s.legType||s.legShape||''):(s.casterType||s.mobility||''); return cur===v?' selected':'';}
+  function render(cat){
+    var s=st(); var topChosen=!!s.topShape; var legChosen=!!(s.legType||s.legShape); var legs=topChosen?allowedLegs():[];
+    return '<div class="ff142-box" data-ff142="desk" data-cat="'+esc(cat||s._currentCatName||'일반형 데스크')+'">'
+      + '<div class="ff142-title">데스크 옵션을 선택해주세요</div>'
+      + '<div class="ff142-desc">선택 순서: 상판형태 → 다리형태 → 이동방식</div>'
+      + '<div class="ff142-section"><div class="ff142-label" data-step="1">상판형태</div><div class="ff142-grid">'
+      + ['직사각 상판','라운드 상판'].map(function(v){return '<button type="button" class="ff142-btn'+sel('top',v)+'" onclick="ff142PickDesk(\'top\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')
+      + '</div></div>'
+      + '<div class="ff142-section"><div class="ff142-label" data-step="2">다리형태</div>'
+      + (topChosen?'<div class="ff142-grid '+(legs.length===1?'one':'')+'">'+legs.map(function(v){return '<button type="button" class="ff142-btn'+sel('leg',v)+'" onclick="ff142PickDesk(\'leg\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')+'</div>':'<div class="ff142-placeholder">상판형태를 먼저 선택하면 가능한 다리형태가 표시됩니다.</div>')
+      + '</div>'
+      + '<div class="ff142-section"><div class="ff142-label" data-step="3">이동방식</div>'
+      + (topChosen&&legChosen?'<div class="ff142-grid">'+['글라이드','캐스터'].map(function(v){return '<button type="button" class="ff142-btn'+sel('move',v)+'" onclick="ff142PickDesk(\'move\',\''+esc(v)+'\')">'+esc(v)+'</button>';}).join('')+'</div>':'<div class="ff142-placeholder">다리형태를 선택하면 글라이드/캐스터가 표시됩니다.</div>')
+      + '</div><div class="ff142-rule">직사각 상판 선택 시: 사다리형 4레그만 선택 가능<br>라운드 상판 선택 시: 원형 4레그 / A자형 4레그만 선택 가능</div>'
+      + '<div class="ff142-actions"><button type="button" onclick="ff142Back()">← 이전</button><button type="button" class="primary" onclick="ff142Done()">옵션 선택 완료</button></div></div>';
+  }
+  function rerenderAll(){document.querySelectorAll('[data-ff142="desk"]').forEach(function(box){var cat=box.getAttribute('data-cat')||st()._currentCatName||'일반형 데스크'; box.outerHTML=render(cat);}); patchText(document);}
+  window.ff142PickDesk=function(kind,value){var s=st();
+    if(kind==='top'){
+      value=normTop(value); s.topShape=value; s.current.topShape=value;
+      var legs=value==='라운드 상판'?['원형 4레그','A자형 4레그']:['사다리형 4레그'];
+      if(legs.indexOf(s.legType)<0){s.legType=''; s.legShape=''; s.casterType=''; s.mobility='';}
+    }
+    if(kind==='leg'){
+      if(allowedLegs().indexOf(value)<0){alert('현재 상판에서 선택할 수 없는 다리형태입니다.');return;}
+      s.legType=value; s.legShape=value; s.current.legType=value; s.casterType=''; s.mobility='';
+    }
+    if(kind==='move'){
+      if(!s.legType&&!s.legShape){alert('다리형태를 먼저 선택해주세요.');return;}
+      s.casterType=value; s.mobility=value; s.current.casterType=value; s._legLabel=(s.legType||s.legShape)+' · '+value; s.current.legLabel=s._legLabel;
+    }
+    try{if(window.FlowFinderFastPreview&&FlowFinderFastPreview.state){FlowFinderFastPreview.state.topShape=s.topShape;FlowFinderFastPreview.state.legType=s.legType;FlowFinderFastPreview.state.casterType=s.casterType;if(typeof FlowFinderFastPreview.render==='function')FlowFinderFastPreview.render(kind==='top'?'top':'leg');}}catch(e){}
+    try{if(typeof updateCurrent==='function') updateCurrent();}catch(e){}
+    rerenderAll();
+  };
+  window.ff142Done=function(){var s=st(); if(!s.topShape){alert('상판형태를 선택해주세요.');return;} if(!s.legType&&!s.legShape){alert('다리형태를 선택해주세요.');return;} if(!s.casterType&&!s.mobility){alert('이동방식을 선택해주세요.');return;} s._legLabel=(s.legType||s.legShape)+' · '+(s.casterType||s.mobility); s.current.legLabel=s._legLabel; s.current.topShape=s.topShape; try{if(typeof updateCurrent==='function') updateCurrent();}catch(e){} var cat=s._currentCatName||'일반형 데스크'; if(typeof window.__ff142OldAskSize==='function') window.__ff142OldAskSize(cat); else if(typeof askSizeInput==='function' && askSizeInput!==window.ff142AskSizeFallback) askSizeInput(cat); };
+  window.ff142Back=function(){try{if(typeof goBack==='function')goBack();}catch(e){}};
+  function askDesk(cat){var s=st(); s.step='choose_desk_options'; s._currentCatName=cat||s._currentCatName||'일반형 데스크'; s.topShape=''; s.legType=''; s.legShape=''; s.casterType=''; s.mobility=''; s._legLabel=''; if(typeof addMsg==='function') addMsg('bot',render(s._currentCatName)); else document.body.insertAdjacentHTML('beforeend',render(s._currentCatName)); try{if(typeof scrollBottom==='function')scrollBottom();}catch(e){} }
+  function patchGlobals(){
+    if(!window.__ff142OldStart && typeof window.startCategoryFlow==='function') window.__ff142OldStart=window.startCategoryFlow;
+    if(!window.__ff142OldAskSize && typeof window.askSizeInput==='function') window.__ff142OldAskSize=window.askSizeInput;
+    window.askTopShape=window.askLegType=window.askCasterType=askDesk;
+    try{askTopShape=askLegType=askCasterType=askDesk;}catch(e){}
+    window.startCategoryFlow=function(cat){if(isDesk(cat)){askDesk(cat);return;} return window.__ff142OldStart?window.__ff142OldStart.apply(this,arguments):undefined;};
+    try{startCategoryFlow=window.startCategoryFlow;}catch(e){}
+  }
+  function patchText(root){try{(root||document).querySelectorAll('div,span,b,button,small').forEach(function(el){if(el.children&&el.children.length>4)return; var h=el.innerHTML||''; var nh=h.replace(/스퀘어\s*상판/g,'직사각 상판').replace(/A자\s*4레그/g,'A자형 4레그'); if(nh!==h)el.innerHTML=nh;});}catch(e){}}
+  function replaceOldDeskMessages(root){try{(root||document).querySelectorAll('.bubble,.msg,.bot-message,.chat-message').forEach(function(el){var t=el.textContent||''; if(/데스크 옵션을 선택|상판형태를 선택|다리형태를 선택|이동방식을 선택/.test(t) && !el.querySelector('[data-ff142="desk"]')){el.innerHTML=render(st()._currentCatName||'일반형 데스크');}});}catch(e){}}
+  patchGlobals(); patchText(document); replaceOldDeskMessages(document);
+  try{new MutationObserver(function(muts){patchGlobals(); muts.forEach(function(m){m.addedNodes&&m.addedNodes.forEach(function(n){if(n.nodeType===1){patchText(n);replaceOldDeskMessages(n);}});});}).observe(document.documentElement,{childList:true,subtree:true});}catch(e){}
+  setInterval(patchGlobals,500);
+  window.addEventListener('load',function(){patchGlobals(); patchText(document); replaceOldDeskMessages(document); if(!document.getElementById('ff142-badge')){var b=document.createElement('div');b.id='ff142-badge';b.className='ff142-badge';b.textContent='FF142 적용됨';document.body.appendChild(b);}});
+})();
+</script>
+
 </body>
 
 
