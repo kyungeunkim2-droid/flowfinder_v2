@@ -8397,7 +8397,7 @@ body.ff-pro-dashboard #set-product-selector{display:grid!important;grid-template
     leg:{'사다리형':'./images/options/combo/normal/ladder_glide.png','사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','원형':'./images/options/combo/normal/round_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png'},
     caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
   top:{
-  '직사각 상판':'./images/options/tops/square.png',
+  '직사각 상판':'./images/options/tops/rect.png',
   '라운드 상판':'./images/options/tops/round.png'
 };
   function selectedNames(){return Array.from(document.querySelectorAll('[data-set-name].selected-set-card')).map(function(el){return el.getAttribute('data-set-name');});}
@@ -10291,7 +10291,7 @@ ${map.move[move] || move}
     return './images/options/tops/round.png';
   }
 
-  return './images/options/tops/square.png';
+  return './images/options/tops/rect.png';
 }
  function deskType124(){
   var st = window.state || {};
@@ -10491,7 +10491,7 @@ function comboImg124(){
   var v = String(S().topShape || '');
   return v.indexOf('라운드') > -1
     ? './images/options/tops/round.png'
-    : './images/options/tops/square.png';
+    : './images/options/tops/rect.png';
 }
   function labelLeg(){return S().legType||S().legShape||'다리형태';}
   function labelMove(){return S().casterType||S().mobility||'이동방식';}
@@ -11162,7 +11162,7 @@ function comboImg124(){
       return './images/options/moving/' + legKey() + '_' + moveKey(value) + '.png';
     }
     if(kind === 'top'){
-      return /라운드|round/i.test(value) ? './images/options/tops/round.png' : './images/options/tops/square.png';
+      return /라운드|round/i.test(value) ? './images/options/tops/round.png' : './images/options/tops/rect.png';
     }
     if(kind === 'combo') return optionComboPath();
     return '';
@@ -11243,7 +11243,7 @@ function comboImg124(){
     if(/leg_a\.(svg|png)/i.test(s)) return './images/options/leg/a_type.png';
     if(/mobility_glide\.(svg|png)/i.test(s)) return './images/options/moving/' + legKey() + '_glide.png';
     if(/mobility_caster\.(svg|png)/i.test(s)) return './images/options/moving/' + legKey() + '_caster.png';
-    if(/top_rect\.(svg|png)/i.test(s)) return './images/options/tops/square.png';
+    if(/top_rect\.(svg|png)/i.test(s)) return './images/options/tops/rect.png';
     if(/top_round\.(svg|png)/i.test(s)) return './images/options/tops/round.png';
     if(/images\/options\/desk_combo\/([^/?#]+)/i.test(s)) {
       var name = s.match(/images\/options\/desk_combo\/([^/?#]+)/i)[1];
@@ -11584,7 +11584,7 @@ function comboImg124(){
   }
   function optionPath(kind, value){
     value=String(value||'');
-    if(kind==='top') return /라운드|round/i.test(value) ? './images/options/tops/round.png' : './images/options/tops/square.png';
+    if(kind==='top') return /라운드|round/i.test(value) ? './images/options/tops/round.png' : './images/options/tops/rect.png';
     if(kind==='leg'){
       if(/A자|a자|에이|aframe/i.test(value)) return './images/options/leg/a_type.png';
       if(/원형|round/i.test(value)) return './images/options/leg/round.png';
@@ -11604,7 +11604,7 @@ function comboImg124(){
     if(/leg_a\.(svg|png)$/i.test(src)) return './images/options/leg/a_type.png';
     if(/mobility_glide\.(svg|png)$/i.test(src)) return './images/options/moving/'+legKey()+'_glide.png';
     if(/mobility_caster\.(svg|png)$/i.test(src)) return './images/options/moving/'+legKey()+'_caster.png';
-    if(/top_rect\.(svg|png)$/i.test(src)) return './images/options/tops/square.png';
+    if(/top_rect\.(svg|png)$/i.test(src)) return './images/options/tops/rect.png';
     if(/top_round\.(svg|png)$/i.test(src)) return './images/options/tops/round.png';
     if(/products\/(desk_standard|desk_duct|screen_[^/]+)\/base\/base\.png/i.test(src)) return comboPath();
     return src;
@@ -15085,7 +15085,7 @@ button.material-btn{
     leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
     caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
   top:{
-  '직사각 상판':'./images/options/tops/square.png',
+  '직사각 상판':'./images/options/tops/rect.png',
   '라운드 상판':'./images/options/tops/round.png'
 };
   function has(a,v){return a.indexOf(v)>-1;}
@@ -15343,7 +15343,7 @@ button.material-btn{
     leg:{'사다리형 4레그':'./images/options/combo/normal/ladder_glide.png','사다리형':'./images/options/combo/normal/ladder_glide.png','원형 4레그':'./images/options/combo/normal/round_glide.png','원형':'./images/options/combo/normal/round_glide.png','A자 4레그':'./images/options/combo/normal/aframe_glide.png','A자형':'./images/options/combo/normal/aframe_glide.png'},
     caster:{'글라이드':'./images/options/combo/normal/ladder_glide.png','고정형':'./images/options/combo/normal/ladder_glide.png','캐스터':'./images/options/combo/normal/ladder_caster.png'},
    top:{
-  '직사각 상판':'./images/options/tops/square.png',
+  '직사각 상판':'./images/options/tops/rect.png',
   '라운드 상판':'./images/options/tops/round.png',
  
 }
@@ -16969,7 +16969,7 @@ if(anchor && anchor.parentElement === panel){
     return './images/options/tops/round.png';
   }
 
-  return './images/options/tops/square.png';
+  return './images/options/tops/rect.png';
 }
   function labelLeg(){return st().legType || st().legShape || '다리형태';}
   function labelMove(){return st().casterType || st().mobility || '이동방식';}
