@@ -15376,3 +15376,135 @@ var OPTION_IMG = {
   try{ new MutationObserver(function(muts){muts.forEach(function(m){m.addedNodes&&m.addedNodes.forEach(function(n){if(n.nodeType===1) applyAll(n);});});}).observe(document.documentElement,{childList:true,subtree:true}); }catch(e){}
 })();
 </script>
+
+<!-- === FF126: final desk option image order + real mobility images === -->
+<style id="ff126-desk-option-image-fix-style">
+  #ff90-option-summary{
+    overflow:visible !important;
+    padding:12px !important;
+  }
+  #ff90-option-summary .ff90-grid{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+    align-items:stretch !important;
+  }
+  #ff90-option-summary .ff90-card{
+    display:grid !important;
+    grid-template-rows:22px 104px 34px !important;
+    min-height:160px !important;
+    height:auto !important;
+    padding:0 !important;
+    overflow:hidden !important;
+    border-radius:14px !important;
+    background:#0b1a29 !important;
+    border:1px solid rgba(46,242,201,.22) !important;
+  }
+  #ff90-option-summary .ff90-card-title{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    height:22px !important;
+    padding:0 4px !important;
+    color:#34f0cb !important;
+    font-size:10px !important;
+    font-weight:900 !important;
+    line-height:1 !important;
+    background:rgba(46,242,201,.08) !important;
+  }
+  #ff90-option-summary .ff90-card img{
+    width:100% !important;
+    height:104px !important;
+    max-height:104px !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    padding:6px !important;
+    background:#f7f8fa !important;
+    display:block !important;
+    opacity:1 !important;
+  }
+  #ff90-option-summary .ff90-card b{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    min-height:34px !important;
+    padding:6px !important;
+    color:#fff !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    line-height:1.25 !important;
+    text-align:center !important;
+    word-break:keep-all !important;
+    background:#071211 !important;
+  }
+  @media(max-width:520px){
+    #ff90-option-summary .ff90-grid{grid-template-columns:1fr !important;}
+    #ff90-option-summary .ff90-card{grid-template-rows:22px 130px 34px !important;}
+    #ff90-option-summary .ff90-card img{height:130px !important;max-height:130px !important;}
+  }
+</style>
+<script id="ff126-desk-option-image-fix-js">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function $(id){return document.getElementById(id);}
+  function state(){return window.state || {};}
+  function normLeg(v){
+    v=String(v||'');
+    if(/사다리/.test(v)) return 'ladder';
+    if(/원형|라운드형/.test(v)) return 'round';
+    if(/A자|에이|A형|a자/i.test(v)) return 'aframe';
+    return 'ladder';
+  }
+  function normMove(v){
+    v=String(v||'');
+    if(/캐스터|바퀴|이동/.test(v)) return 'caster';
+    return 'glide';
+  }
+  function topSrc(v){
+    v=String(v||'');
+    return /라운드/.test(v) ? './images/options/top/round.png' : './images/options/top/rect.png';
+  }
+  function legSrc(v){
+    return './images/options/mobility/' + normLeg(v) + '_glide.png';
+  }
+  function moveSrc(move, leg){
+    return './images/options/mobility/' + normLeg(leg) + '_' + normMove(move) + '.png';
+  }
+  function ensureBox(){
+    var panel=$('preview-panel'); if(!panel) return null;
+    var box=$('ff90-option-summary');
+    if(!box){
+      box=document.createElement('div'); box.id='ff90-option-summary';
+      var before=$('texture-preview') || $('preview-items') || panel.firstChild;
+      panel.insertBefore(box,before||null);
+    }
+    return box;
+  }
+  window.ff90RefreshOptionSummary=function(){
+    var s=state();
+    var box=ensureBox(); if(!box) return;
+    var rows=[];
+    function add(title,val,src){
+      if(!val) return;
+      rows.push('<div class="ff90-card"><span class="ff90-card-title">'+esc(title)+'</span><img src="'+esc(src)+'" alt="'+esc(title)+'" loading="eager" onerror="this.onerror=null;this.style.visibility=\'hidden\';"><b>'+esc(val)+'</b></div>');
+    }
+    var top=s.topShape || (s.current && s.current.topShape) || '';
+    var leg=s.legType || s.legShape || '';
+    var move=s.casterType || s.mobility || '';
+    add('상판형태', top, topSrc(top));
+    add('다리형태', leg, legSrc(leg));
+    add('이동방식', move, moveSrc(move, leg));
+    box.innerHTML='<div class="ff90-title"><span>데스크 옵션 이미지</span><small>이미지 기준 선택값</small></div>'+
+      (rows.length?'<div class="ff90-grid">'+rows.join('')+'</div>':'<div class="ff90-empty">데스크 옵션을 선택하면 상판형태 → 다리형태 → 이동방식 순서로 이미지가 표시됩니다.</div>');
+  };
+  function refreshSoon(){setTimeout(function(){ if(window.ff90RefreshOptionSummary) window.ff90RefreshOptionSummary(); },50);}
+  document.addEventListener('click',function(e){
+    if(e.target && e.target.closest && (e.target.closest('.ff-desk-option-btn') || e.target.closest('.choice-btn') || e.target.closest('[data-set-name]'))) refreshSoon();
+  },true);
+  ['load','DOMContentLoaded'].forEach(function(ev){window.addEventListener(ev,refreshSoon);});
+  var oldPick=window.ffPickDeskOption69;
+  if(typeof oldPick==='function'){
+    window.ffPickDeskOption69=function(){var r=oldPick.apply(this,arguments); refreshSoon(); return r;};
+  }
+})();
+</script>
