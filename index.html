@@ -7979,30 +7979,27 @@ button.material-btn{
 <script id="ff60-static-option-preview-js">
 (function(){
   var COMBO_MAP = {
-    "W1200_직사각_고정형_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_스퀘어_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_",
-    "W1200_직각_글라이드_사다리형_D700_HW_BKM": "./images/previews/W1200_rect_fixed_ladder_D700_HW_"
   };
 
   var OPTION_IMAGES = {
-    leg: {
-      "사다리": "./images/options/leg_ladder.svg",
-      "원형": "./images/options/leg_round.svg",
-      "A자": "./images/options/leg_a.svg"
-    },
-    caster: {
-      "글라이드": "./images/options/mobility_glide.svg",
-      "고정": "./images/options/mobility_glide.svg",
-      "캐스터": "./images/options/mobility_caster.svg",
-      "바퀴": "./images/options/mobility_caster.svg"
-    },
-    top: {
-      "직각": "./images/options/top_rect.svg",
-      "직사각": "./images/options/top_rect.svg",
-      "스퀘어": "./images/options/top_rect.svg",
-      "라운드": "./images/options/top_round.svg"
-    }
-  };
+  leg: {
+    "사다리": "./images/options/combo/normal/ladder_glide.png",
+    "원형": "./images/options/combo/normal/round_glide.png",
+    "A자": "./images/options/combo/normal/aframe_glide.png"
+  },
+  caster: {
+    "글라이드": "./images/options/combo/normal/ladder_glide.png",
+    "고정": "./images/options/combo/normal/ladder_glide.png",
+    "캐스터": "./images/options/combo/normal/ladder_caster.png",
+    "바퀴": "./images/options/combo/normal/ladder_caster.png"
+  },
+  top: {
+    "직사각": "./images/options/top/rect.png",
+    "직사각 상판": "./images/options/top/rect.png",
+    "라운드": "./images/options/top/round.png",
+    "라운드 상판": "./images/options/top/round.png"
+  }
+};
 
   function normLeg(v){
     v = String(v||'');
