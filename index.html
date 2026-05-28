@@ -2072,21 +2072,40 @@ body.ff-dashboard-preview #preview-panel,
 </style>
 
 
-<style id="ff-final-layout-readability-fix">
-#texture-preview .material-chip-row i,
-#texture-preview .material-chip-row span,
-#screen-composite-preview,
-#screen-composite-preview *,
-#product-preview-box,
-#product-preview-box * {
-  color: #111827 !important;
+<style id="ff-final-cleanup-fix">
+/* 오른쪽 패널 중복 미리보기 충돌 방지: 새 대시보드 카드 중심 */
+body.ff-dashboard-preview #product-preview-box,
+body.ff-dashboard-preview #screen-composite-preview{
+  display:none !important;
 }
-#texture-preview .texture-label,
-#texture-preview .texture-name-badge {
-  color: #ffffff !important;
+
+/* 글자 안 보임 방지 */
+input, textarea, select, option,
+#user-input,
+.ff-num-control input,
+.color-pair-grid select,
+.ff-field select{
+  color:#ffffff !important;
+  background:#0b1220 !important;
+  -webkit-text-fill-color:#ffffff !important;
 }
-#screen-composite-preview {
-  display: none !important;
+
+.choice-btn,
+.material-btn,
+.confirm-btn,
+.back-btn{
+  color:inherit;
+}
+
+.material-btn .mat-code,
+.material-button-section-title,
+.material-picker-hint,
+.ff-hero-row b,
+.ff-hero-row span,
+.preview-item .item-name,
+.preview-item .item-detail{
+  visibility:visible !important;
+  opacity:1 !important;
 }
 </style>
 
@@ -2866,17 +2885,21 @@ function _ffDrawActualScreenPreview(ctx, W, H, entry) {
 //     'leg'
 //   );
 // }
-  var tex = _ffNormalizeTextureUrl(entry.texUrl) || _ffLocalTextureForCode(screenCode, entry.type);
- // if (screenCode && prod.masks.mask) {
-//   _ffApplyMasked(
-//     ctx,
-//     tex,
-//     prod.masks.mask,
-//     dx, dy, dw, dh,
-//     screenCode,
-//     'screen'
-//   );
-// }
+  var tex = _ffNormalizeTextureUrl(entry.texUrl) || _ffLocalTextureForCode('SCREEN_' + screenCode, entry.type);
+  if (screenCode && prod.masks) {
+    if (prod.masks.mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+    if (prod.masks.screen_mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.screen_mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+    if (prod.masks.front_mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.front_mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+    if (prod.masks.side_mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.side_mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+  }
   // 원본 하이라이트/그림자 보존
   ctx.save();
   ctx.globalAlpha = 0.10;
@@ -6252,11 +6275,8 @@ function setPreviewGlow(part) {
         legTexture: PREVIEW.legTex || '',
         topCode: PREVIEW.top || '',
         legCode: PREVIEW.leg || '',
-        screenTexture: PREVIEW.screenTex || '',
-        screenImage: getBase(PREVIEW.screenKey) || '',
-        screenCode: PREVIEW.screen || '',
         screenMaterialCode: (document.getElementById('quick-screen-code') && document.getElementById('quick-screen-code').textContent ? document.getElementById('quick-screen-code').textContent.trim() : ''),
-        screenInstruction: '스크린에는 선택된 스크린 재질 이미지를 반드시 적용하세요.',
+        screenInstruction: '스크린에는 선택된 스크린 재질을 적용하세요.',
         deskLabel: productLabel(PREVIEW.deskKey),
         legType: (state.legType || ''),
         casterType: (state.casterType || ''),
@@ -14631,7 +14651,7 @@ window.showPanel = function(){
 
 
 
-<script id="ff-final-screen-texture-force-fix">
+<script id="ff-final-screen-texture-fix">
 (function(){
   function clean(code){
     return String(code || '')
@@ -14640,176 +14660,235 @@ window.showPanel = function(){
       .replace(/^SCREEN_/, '')
       .replace(/^TOP_/, '')
       .replace(/^LEG_/, '')
-      .replace(/\s+/g, '')
-      .replace(/[^A-Z0-9]/g, '');
+      .replace(/\s+/g, '');
   }
 
-  function currentScreenKind(ctx){
+  function detectScreenKind(ctx){
     var s = window.state || {};
     var t = [
       ctx,
-      s._currentCatName,
-      s.currentCatName,
-      s.screenLabel,
       s.product,
-      s.current && s.current.product
-    ].filter(Boolean).join(' ');
+      s.screenLabel,
+      s.currentCatName,
+      s._currentCatName,
+      s.selectedScreenType,
+      s.screenType
+    ].join(' ');
 
-    if (/사이드|side/i.test(t)) return 'side';
-    if (/일자|straight/i.test(t)) return 'straight';
-    if (/L형|l형|ㄴ형|엘|lshape/i.test(t)) return 'lshape';
-    if (/전면|front/i.test(t)) return 'front';
+    if(/사이드|side/i.test(t)) return 'side';
+    if(/일자|straight/i.test(t)) return 'straight';
+    if(/L형|l형|ㄴ형|엘|lshape/i.test(t)) return 'lshape';
+    if(/전면|front/i.test(t)) return 'front';
 
     return 'front';
   }
 
-  function isScreenContext(ctx){
-    var s = window.state || {};
-    var t = [
-      ctx,
-      s._currentCatName,
-      s.currentCatName,
-      s.screenLabel,
-      s.product,
-      s.current && s.current.product
-    ].filter(Boolean).join(' ');
-
-    return /스크린|screen|전면|사이드|일자|L형|l형|straight|front|side|lshape/i.test(t);
-  }
-
-  function isStraightStandard(code){
-    return ['1P1','1P2','1P4','1P4A','1P4B','1P7'].indexOf(code) >= 0;
-  }
-
-  function isFrontSideStandard(code){
-    return ['3F1','3F2','061','064','067'].indexOf(code) >= 0;
-  }
-
-  function screenTextureUrl(code, ctx){
+  function makeScreenUrl(code, ctx){
     code = clean(code);
-    if (!code || code === '-' || code === '선택') return '';
+    if(!code || code === '-' || code === '선택전' || code === '선택') return '';
 
-    if (code === '1P4A' || code === '1P4B') code = '1P4';
+    var kind = detectScreenKind(ctx);
+    var standardByKind = {
+      front:['3F1','3F2','061','064','067'],
+      side:['3F1','3F2','061','064','067'],
+      straight:['1P1','1P2','1P4','1P7'],
+      lshape:['1P1','1P2','1P4','1P7']
+    };
 
-    var kind = currentScreenKind(ctx);
-    var isStandard = (kind === 'straight' || kind === 'lshape')
-      ? isStraightStandard(code)
-      : isFrontSideStandard(code);
+    if(code === '1P4B') code = '1P4';
 
-    var ext = code === '452A' || code === 'COB' ? 'png' : 'jpg';
-    var group = isStandard ? 'standard' : 'custom';
+    var isStandard = (standardByKind[kind] || []).indexOf(code) >= 0;
+    var folder = isStandard ? 'standard' : 'custom';
+    var ext = (code === '452A' || code === 'COB') ? 'png' : 'jpg';
 
-    return './images/textures/screen/' + kind + '/' + group + '/' + code + '.' + ext;
-  }
-
-  function normalizeUrl(url){
-    if (!url) return '';
-    url = String(url);
-    if (/^https?:\/\//i.test(url)) return url;
-    if (url.indexOf('./') === 0) return url;
-    if (url.indexOf('/images/') === 0) return '.' + url;
-    if (url.indexOf('images/') === 0) return './' + url;
-    return url;
+    return './images/textures/screen/' + kind + '/' + folder + '/' + code + '.' + ext;
   }
 
   var oldLocal = window._ffLocalTextureForCode;
   window._ffLocalTextureForCode = function(code, catName){
     var raw = String(code || '').toUpperCase();
-    if (raw.indexOf('SCREEN_') === 0 || isScreenContext(catName)) {
-      return screenTextureUrl(raw, catName);
+    if(raw.indexOf('SCREEN_') === 0 || /스크린|screen|front|side|straight|lshape|일자|사이드|전면|L형|l형/i.test(String(catName || ''))){
+      return makeScreenUrl(raw, catName);
     }
-    var v = oldLocal ? oldLocal(code, catName) : '';
-    return normalizeUrl(v);
+    return oldLocal ? oldLocal(code, catName) : '';
   };
 
-  var oldMaterial = window.ffMaterialTextureUrl;
+  var oldMat = window.ffMaterialTextureUrl;
   window.ffMaterialTextureUrl = function(code, part){
-    if (String(part || '').toLowerCase() === 'screen') {
-      return screenTextureUrl(code, (window.state && (state._currentCatName || state.currentCatName || state.product)) || '');
+    if(String(part || '').toLowerCase() === 'screen'){
+      return makeScreenUrl(code, '');
     }
-    var v = oldMaterial ? oldMaterial(code, part) : '';
-    return normalizeUrl(v);
+    return oldMat ? oldMat(code, part) : '';
   };
 
-  var oldShowTexturePreview = window.showTexturePreview;
-  window.showTexturePreview = function(colorCode){
+  window.ffResolveScreenTextureUrl = makeScreenUrl;
+})();
+</script>
+
+
+<!-- === FINAL DESK/SCREEN PREVIEW FIX === -->
+<script id="ff-final-desk-screen-preview-fix">
+(function(){
+  if(window.__ffDeskScreenPreviewFix) return;
+  window.__ffDeskScreenPreviewFix = true;
+
+  function safe(v){ return String(v||'').trim(); }
+
+  function currentDeskBase(){
+    try{
+      var leg = (typeof legKey==='function') ? legKey() : 'ladder';
+      var move = (typeof moveKey==='function') ? moveKey() : 'glide';
+      var top = (typeof topKey==='function') ? topKey() : 'rect';
+      return leg + '_' + move + '_' + top;
+    }catch(e){
+      return 'ladder_glide_rect';
+    }
+  }
+
+  function currentFolder(){
+    try{
+      return (typeof deskFolder==='function') ? deskFolder() : 'desk_standard';
+    }catch(e){
+      return 'desk_standard';
+    }
+  }
+
+  function fixedScreenKind(raw){
+    raw = safe(raw);
+
+    if(/사이드|side/i.test(raw)) return 'side';
+    if(/일자|straight/i.test(raw)) return 'straight';
+    if(/L형|ㄴ형|엘|lshape/i.test(raw)) return 'lshape';
+    if(/전면|front/i.test(raw)) return 'front';
+
     var s = window.state || {};
-    var cat = s._currentCatName || s.currentCatName || s.product || '';
-    var code = clean(colorCode);
+    var r = safe(
+      s.screenLabel ||
+      s.screen ||
+      s._currentScreenType ||
+      s._currentCatName ||
+      s.currentCatName
+    );
 
-    if (isScreenContext(cat)) {
-      var tex = screenTextureUrl(code, cat);
-      window.__ffPreviewScreen = code;
-      window.__ffLastColor = code;
-      window.__ffLastTex = tex;
-      window.__ffActiveGlowPart = 'screen';
+    if(/사이드|side/i.test(r)) return 'side';
+    if(/일자|straight/i.test(r)) return 'straight';
+    if(/L형|ㄴ형|엘|lshape/i.test(r)) return 'lshape';
+    if(/전면|front/i.test(r)) return 'front';
 
-      try {
-        if (typeof oldShowTexturePreview === 'function') oldShowTexturePreview(colorCode);
-      } catch(e) {}
+    return 'straight';
+  }
 
-      try {
-        if (typeof window.updateScreenComposite === 'function') {
-          window.updateScreenComposite(cat, code, tex);
+  window.screenKind = fixedScreenKind;
+
+  function deskOnlyPreviewPath(){
+    return './images/previews/' + currentFolder() + '/' + currentDeskBase() + '.png';
+  }
+
+  function screenPreviewPath(){
+    var s = window.state || {};
+
+    var raw = safe(
+      s.screenLabel ||
+      s.screen ||
+      s._currentScreenType ||
+      s._currentCatName ||
+      s.currentCatName
+    );
+
+    var type = fixedScreenKind(raw);
+
+    return './images/previews/' +
+      currentFolder() + '/' +
+      currentDeskBase() + '_' + type + '.png';
+  }
+
+  function currentScreenTexture(){
+    var s = window.state || {};
+
+    var code = safe(
+      s.screenCode ||
+      s.screenMaterialCode ||
+      s._screenMaterialCode ||
+      document.getElementById('quick-screen-code')?.textContent
+    );
+
+    var type = fixedScreenKind(
+      s.screenLabel ||
+      s.screen ||
+      s._currentScreenType ||
+      s._currentCatName ||
+      s.currentCatName
+    );
+
+    if(!code) return '';
+
+    return 'images/textures/screen/' + type + '/standard/' + code + '.jpg';
+  }
+
+  var oldFetch = window.fetch;
+
+  window.fetch = function(input, init){
+    try{
+      var url = String(input || '');
+
+      if(
+        url.indexOf('/api/generate-preview') > -1 &&
+        init &&
+        typeof init.body === 'string'
+      ){
+        var data = JSON.parse(init.body || '{}');
+
+        var hasScreen =
+          !!(data.screenCode || data.screenMaterialCode);
+
+        var previewPath = hasScreen
+          ? screenPreviewPath()
+          : deskOnlyPreviewPath();
+
+        data.baseImage = previewPath;
+        data.sourceImage = previewPath;
+        data.deskImage = previewPath;
+        data.fallbackDeskImage = previewPath;
+        data.productImage = previewPath;
+
+        if(hasScreen){
+          var tex = currentScreenTexture();
+
+          data.screenTexture = tex;
+          data.screenType = fixedScreenKind(
+            (window.state||{}).screenLabel ||
+            (window.state||{}).screen ||
+            (window.state||{})._currentScreenType ||
+            (window.state||{})._currentCatName ||
+            (window.state||{}).currentCatName
+          );
+
+          var line1 =
+            '\\n뒤쪽 스크린 패널 영역 전체에 반드시 ' +
+            data.screenCode +
+            ' 재질을 적용해줘.';
+
+          var line2 =
+            '\\n상판이나 다리가 아니라 스크린 보드 부분만 변경해줘.';
+
+          var line3 =
+            '\\n스크린 패널은 단색 검정이 아니라 선택된 패브릭/패널 재질로 표현해줘.';
+
+          data.prompt = String(data.prompt || '');
+
+          if(data.prompt.indexOf(line1) === -1) data.prompt += line1;
+          if(data.prompt.indexOf(line2) === -1) data.prompt += line2;
+          if(data.prompt.indexOf(line3) === -1) data.prompt += line3;
         }
-      } catch(e) {}
 
-      try {
-        if (typeof window.drawProductCanvas === 'function') {
-          window.drawProductCanvas(code, tex);
-        }
-      } catch(e) {}
-
-      try {
-        if (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) {
-          var st = window.FlowFinderFastPreview.state;
-          st.screen = code;
-          st.screenTex = tex;
-          if (/사이드|side/i.test(cat)) st.screenKey = 'side';
-          else if (/일자|straight/i.test(cat)) st.screenKey = 'straight';
-          else if (/L형|l형|lshape/i.test(cat)) st.screenKey = 'lshape';
-          else st.screenKey = 'front';
-          if (typeof window.FlowFinderFastPreview.render === 'function') {
-            window.FlowFinderFastPreview.render('screen');
-          }
-        }
-      } catch(e) {}
-
-      var chip = document.getElementById('quick-screen-chip');
-      var codeEl = document.getElementById('quick-screen-code');
-      if (chip) chip.style.backgroundImage = 'url("' + tex + '")';
-      if (codeEl) codeEl.textContent = code;
-
-      return;
+        init.body = JSON.stringify(data);
+      }
+    }catch(e){
+      console.error(e);
     }
 
-    if (typeof oldShowTexturePreview === 'function') {
-      return oldShowTexturePreview(colorCode);
-    }
+    return oldFetch.apply(this, arguments);
   };
-
-  var oldUpdateScreenComposite = window.updateScreenComposite;
-  window.updateScreenComposite = function(type, colorCode, texUrl){
-    var tex = normalizeUrl(texUrl) || screenTextureUrl(colorCode, type);
-    window.__ffPreviewScreen = clean(colorCode);
-    window.__ffLastColor = clean(colorCode);
-    window.__ffLastTex = tex;
-    window.__ffActiveGlowPart = 'screen';
-
-    if (typeof oldUpdateScreenComposite === 'function') {
-      return oldUpdateScreenComposite(type, clean(colorCode), tex);
-    }
-  };
-
-  // 렌더링 버튼/AI용 상태도 최종 동기화
-  document.addEventListener('click', function(e){
-    var btn = e.target && e.target.closest && e.target.closest('.material-btn[data-part="screen"]');
-    if (!btn) return;
-    var code = btn.getAttribute('data-code') || btn.textContent || '';
-    setTimeout(function(){
-      window.showTexturePreview(code);
-    }, 0);
-  }, true);
 })();
 </script>
 
