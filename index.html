@@ -14011,7 +14011,7 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
     /* 실제 DOM 순서도 선택내역 제목 바로 아래가 제품 선택 영역이 되도록 이동 */
     if(h2 && selector) after(h2, selector);
     if(selector && rec) after(selector, rec);
-    /* hero는 제품선택/옵션/재질 아래로 내려야 하므로 여기서 위로 올리지 않음 */
+    if((rec || selector) && hero) after(rec || selector, hero);
     if(selector){
       var title=selector.querySelector(':scope > div:first-child');
       if(title){ title.innerHTML='추가할 제품을 선택하세요 <span style="color:#2ef2c9;font-size:12px;">(복수선택)</span>'; }
@@ -19349,11 +19349,9 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   border-radius:14px !important;
 }
 
-/* 고해상도 미리보기는 옵션이미지/재질값 아래 */
-#ff-dashboard-hero{order:50 !important;}
-#recommend-panel{order:1 !important;}
-#preview-items{order:2 !important;}
-#total-box{order:80 !important;}
+/* 고해상도 미리보기는 위, 옵션이미지/재질값은 아래 */
+#ff-dashboard-hero{order:10 !important;}
+#recommend-panel,#preview-items,#total-box{order:60 !important;}
 
 /* 데스크 옵션 선택 카드 이미지가 너무 작아지는 문제 복구 */
 #desk-grid img,
@@ -19439,78 +19437,118 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 <!-- === /USER HOTFIX === -->
 
 
-<!-- === FINAL FIX: right panel order, keep real preview below material === -->
-<style id="ff-final-right-panel-order-fix">
+<!-- === FINAL RIGHT PANEL ORDER OVERRIDE: keep live preview below selector/options/material === -->
+<style id="ff-final-right-panel-order-override">
 #preview-panel{
   display:flex !important;
   flex-direction:column !important;
-  gap:14px !important;
-  overflow-y:auto !important;
-  overflow-x:hidden !important;
 }
-#preview-panel > *{
+#preview-panel > h2{ order:1 !important; }
+#set-product-selector{
+  order:10 !important;
+  display:block !important;
+  width:100% !important;
+  margin:0 0 16px 0 !important;
+}
+#ff90-option-summary,
+#ff136-option-summary{
+  order:20 !important;
+  width:100% !important;
+  margin:0 0 16px 0 !important;
   position:relative !important;
-  flex:0 0 auto !important;
-  float:none !important;
   clear:both !important;
+  z-index:2 !important;
 }
-#preview-panel > h2{order:0 !important;}
-#set-product-selector{order:1 !important; display:block !important; width:100% !important;}
-#recommend-panel{order:2 !important;}
-#ff90-option-summary,#ff136-option-summary{order:30 !important; width:100% !important;}
-#texture-preview{order:40 !important; width:100% !important;}
-#ff-dashboard-hero{order:50 !important; width:100% !important; margin-top:0 !important;}
-#preview-items{order:60 !important;}
-#total-box{order:90 !important;}
+#texture-preview{
+  order:30 !important;
+  width:100% !important;
+  margin:0 0 16px 0 !important;
+  position:relative !important;
+  clear:both !important;
+  z-index:1 !important;
+}
+#ff-dashboard-hero,
+body.ff-dashboard-preview #ff-dashboard-hero{
+  order:40 !important;
+  width:100% !important;
+  margin:0 0 16px 0 !important;
+}
+#preview-items,
+#recommend-panel{ order:50 !important; }
+#total-box{ order:90 !important; }
 
-/* 재질선택값: 데스크 상판/다리 한 줄, 스크린 한 줄 */
+/* 재질 선택값: 데스크는 상판+다리 한 줄, 스크린은 한 줄 전체 */
 #texture-preview .quick-materials{
   display:grid !important;
   grid-template-columns:1fr 1fr !important;
   gap:10px !important;
 }
-#texture-preview .material-chip-row{min-height:52px !important;}
-#quick-screen-row,
-#texture-preview .material-chip-row.active-screen,
-#texture-preview .material-chip-row:nth-child(3){
+#texture-preview .material-chip-row{
+  min-height:58px !important;
+}
+#texture-preview .material-chip-row:nth-child(3),
+#quick-screen-row{
   grid-column:1 / -1 !important;
 }
+
+/* 옵션 이미지 크게 유지 */
+#desk-grid img,
+#screen-grid img,
+#set-product-selector [data-set-name] img{
+  height:128px !important;
+  max-height:128px !important;
+  object-fit:contain !important;
+  padding:8px !important;
+  background:#fff !important;
+}
+#set-product-selector [data-set-name]{
+  min-height:168px !important;
+}
 </style>
-<script id="ff-final-right-panel-order-fix-script">
+<script id="ff-final-right-panel-order-override-script">
 (function(){
-  function $(id){return document.getElementById(id);}
-  function moveAfter(ref,node){
-    if(ref && node && ref.parentNode && node.parentNode && ref.nextSibling !== node){
+  function byId(id){ return document.getElementById(id); }
+  function after(ref,node){
+    if(ref && node && ref.parentNode && ref.nextSibling!==node){
       ref.parentNode.insertBefore(node, ref.nextSibling);
     }
   }
-  function fixRightOrder(){
-    var panel=$('preview-panel'); if(!panel) return;
+  function moveRightPanelFinal(){
+    var panel=byId('preview-panel');
+    if(!panel) return;
     var h2=panel.querySelector('h2');
-    var selector=$('set-product-selector');
-    var recommend=$('recommend-panel');
-    var option=$('ff90-option-summary') || $('ff136-option-summary');
-    var material=$('texture-preview');
-    var hero=$('ff-dashboard-hero');
-    var previewItems=$('preview-items');
-    var total=$('total-box');
+    var selector=byId('set-product-selector');
+    var opt=byId('ff90-option-summary') || byId('ff136-option-summary');
+    var tex=byId('texture-preview');
+    var hero=byId('ff-dashboard-hero');
+    var items=byId('preview-items');
+    var total=byId('total-box');
 
-    var anchor=h2 || panel.firstElementChild;
-    if(selector){ selector.style.display='block'; moveAfter(anchor, selector); anchor=selector; }
-    if(recommend){ moveAfter(anchor, recommend); anchor=recommend; }
-    if(option){ moveAfter(anchor, option); anchor=option; }
-    if(material){ moveAfter(anchor, material); anchor=material; }
-    if(hero){ moveAfter(anchor, hero); anchor=hero; }
-    if(previewItems){ moveAfter(anchor, previewItems); anchor=previewItems; }
-    if(total){ panel.appendChild(total); }
+    if(selector){
+      selector.style.display='block';
+      selector.classList.add('ff-visible','ff70-visible');
+      var first=selector.querySelector(':scope > div:first-child');
+      if(first){ first.innerHTML='추가할 제품을 선택하세요 <span style="color:#2ef2c9;font-size:12px;">(복수선택)</span>'; }
+    }
+
+    // DOM 순서 강제: 선택내역 제목 → 추가 제품 선택 → 데스크 옵션 이미지 → 재질 선택값 → 실사 미리보기 → 선택칩/합계
+    if(h2 && selector) after(h2, selector);
+    if(selector && opt) after(selector, opt);
+    if((opt || selector) && tex) after(opt || selector, tex);
+    if((tex || opt || selector) && hero) after(tex || opt || selector, hero);
+    if((hero || tex || opt || selector) && items) after(hero || tex || opt || selector, items);
+    if(total) panel.appendChild(total);
   }
-  document.addEventListener('DOMContentLoaded',fixRightOrder);
-  window.addEventListener('load',fixRightOrder);
-  document.addEventListener('click',function(){setTimeout(fixRightOrder,120);},true);
-  setTimeout(fixRightOrder,50);
-  setTimeout(fixRightOrder,500);
-  setTimeout(fixRightOrder,1200);
-  setInterval(fixRightOrder,500);
+
+  document.addEventListener('DOMContentLoaded', moveRightPanelFinal);
+  window.addEventListener('load', moveRightPanelFinal);
+  document.addEventListener('click', function(){ setTimeout(moveRightPanelFinal, 30); }, true);
+  document.addEventListener('change', function(){ setTimeout(moveRightPanelFinal, 30); }, true);
+  setTimeout(moveRightPanelFinal, 0);
+  setTimeout(moveRightPanelFinal, 300);
+  setTimeout(moveRightPanelFinal, 1000);
+  // 기존 파일 안의 800ms reorder interval보다 자주 실행해서 마지막 순서를 유지
+  setInterval(moveRightPanelFinal, 250);
 })();
 </script>
-<!-- === /FINAL FIX === -->
+<!-- === /FINAL RIGHT PANEL ORDER OVERRIDE === -->
