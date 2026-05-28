@@ -2115,6 +2115,126 @@ input, textarea, select, option,
 #quick-ai-preview-actions button:hover{border-color:#a78bfa;color:#fff;}
 #quick-ai-preview-actions button:disabled{opacity:.55;cursor:not-allowed;}
 </style>
+
+
+<!-- === NARROW COMPACT FIX: accessory options only === -->
+<style id="ff-narrow-compact-accessory-only">
+/* 옵션추가: 멀티탭/PC홀더/기타 영역만 작게 */
+#additional-options,
+#extra-options-panel,
+#accessory-options,
+#option-add-panel,
+.ff-extra-option-panel,
+.ff-accessory-only-panel,
+.accessory-options-panel,
+[data-accessory-panel="true"]{
+  max-width:100% !important;
+  width:100% !important;
+  padding:8px !important;
+  margin:6px 0 !important;
+  border-radius:12px !important;
+  overflow:hidden !important;
+  box-sizing:border-box !important;
+}
+
+/* 옵션추가 내부 버튼만 축소 */
+#additional-options .btn-group,
+#extra-options-panel .btn-group,
+#accessory-options .btn-group,
+#option-add-panel .btn-group,
+.ff-extra-option-panel .btn-group,
+.ff-accessory-only-panel .btn-group,
+.accessory-options-panel .btn-group,
+[data-accessory-panel="true"] .btn-group{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:5px !important;
+  width:100% !important;
+}
+
+#additional-options button,
+#extra-options-panel button,
+#accessory-options button,
+#option-add-panel button,
+.ff-extra-option-panel button,
+.ff-accessory-only-panel button,
+.accessory-options-panel button,
+[data-accessory-panel="true"] button{
+  min-width:0 !important;
+  width:100% !important;
+  min-height:28px !important;
+  padding:5px 6px !important;
+  border-radius:9px !important;
+  font-size:10.5px !important;
+  line-height:1.2 !important;
+  white-space:normal !important;
+  word-break:keep-all !important;
+  overflow-wrap:anywhere !important;
+  text-align:center !important;
+}
+
+/* 스크린/재질 선택 영역은 절대 숨기지 않음 */
+#texture-preview,
+.quick-preview-panel,
+.quick-materials,
+.material-chip-row,
+#quick-screen-code,
+#quick-screen-chip,
+[data-part="screen"],
+[data-material-part="screen"]{
+  visibility:visible !important;
+}
+
+/* 스크린 재질 선택 카드 복구 */
+#texture-preview{
+  display:block !important;
+  position:relative !important;
+  width:100% !important;
+  max-width:100% !important;
+  clear:both !important;
+  margin:10px 0 14px 0 !important;
+}
+
+#texture-preview .quick-materials{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:8px !important;
+}
+
+#texture-preview .material-chip-row.active-screen,
+#texture-preview .material-chip-row:nth-child(3){
+  grid-column:1 / -1 !important;
+  display:grid !important;
+}
+
+/* 스크린 재질 적용 버튼은 너무 작게 눌리지 않게 */
+#quick-ai-preview-btn,
+#screen-ai-btn,
+[data-action="screen-material"],
+button.screen-material-btn{
+  display:block !important;
+  width:100% !important;
+  min-height:38px !important;
+  padding:9px 12px !important;
+  font-size:13px !important;
+  line-height:1.25 !important;
+  white-space:normal !important;
+}
+
+@media(max-width:1200px){
+  #additional-options .btn-group,
+  #extra-options-panel .btn-group,
+  #accessory-options .btn-group,
+  #option-add-panel .btn-group,
+  .ff-extra-option-panel .btn-group,
+  .ff-accessory-only-panel .btn-group,
+  .accessory-options-panel .btn-group,
+  [data-accessory-panel="true"] .btn-group{
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+  }
+}
+</style>
+
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -14725,6 +14845,75 @@ window.showPanel = function(){
   };
 
   window.ffResolveScreenTextureUrl = makeScreenUrl;
+})();
+</script>
+
+
+<!-- === SAFE PATCH: keep screen material after size step === -->
+<script id="ff-keep-screen-material-after-size">
+(function(){
+  if(window.__ffKeepScreenMaterialAfterSize) return;
+  window.__ffKeepScreenMaterialAfterSize = true;
+
+  function text(el){ return el ? String(el.textContent || el.innerText || '').trim() : ''; }
+
+  function rememberScreenMaterial(){
+    try{
+      var s = window.state || (window.state = {});
+      var codeEl = document.getElementById('quick-screen-code');
+      var chipEl = document.getElementById('quick-screen-chip');
+
+      var code = text(codeEl);
+      if(code && code !== '-') {
+        s.screenCode = code;
+        s.screenMaterialCode = code;
+      }
+
+      var bg = '';
+      if(chipEl){
+        bg = chipEl.style.backgroundImage || getComputedStyle(chipEl).backgroundImage || '';
+      }
+      if(bg && bg !== 'none'){
+        var m = bg.match(/url\(["']?(.*?)["']?\)/);
+        s.screenTex = m ? m[1] : bg;
+        s.screenTexture = s.screenTex;
+      }
+    }catch(e){}
+  }
+
+  function restoreScreenMaterial(){
+    try{
+      var s = window.state || {};
+      var code = s.screenCode || s.screenMaterialCode || '';
+      var tex = s.screenTex || s.screenTexture || '';
+
+      var codeEl = document.getElementById('quick-screen-code');
+      if(codeEl && code) codeEl.textContent = code;
+
+      var chipEl = document.getElementById('quick-screen-chip');
+      if(chipEl && tex){
+        chipEl.style.backgroundImage = 'url("' + tex + '")';
+      }
+
+      var texture = document.getElementById('texture-preview');
+      if(texture) texture.style.display = 'block';
+    }catch(e){}
+  }
+
+  document.addEventListener('click', function(){
+    rememberScreenMaterial();
+    setTimeout(restoreScreenMaterial, 60);
+    setTimeout(restoreScreenMaterial, 250);
+  }, true);
+
+  document.addEventListener('change', function(){
+    rememberScreenMaterial();
+    setTimeout(restoreScreenMaterial, 80);
+  }, true);
+
+  window.addEventListener('load', function(){
+    setTimeout(restoreScreenMaterial, 300);
+  });
 })();
 </script>
 
