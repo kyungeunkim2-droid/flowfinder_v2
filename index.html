@@ -20147,12 +20147,19 @@ arr.push(
       if(payload.screenCode){
         var fixedScreenTexture = screenTextureForCurrent(payload.screenCode);
         if(fixedScreenTexture) payload.screenTexture = fixedScreenTexture;
+        payload.referenceImages = payload.referenceImages || [];
+
+if(payload.screenTexture){
+  payload.referenceImages.push(payload.screenTexture);
+}
         payload.screenMaterialCode = payload.screenCode;
         payload.screenTextureCode = payload.screenCode;
         payload.screenInstruction = '스크린 파트에는 ' + payload.screenCode + ' 재질을 적용해줘.';
         payload.prompt += '\n뒤쪽 스크린 패널 영역 전체에 반드시 ' + payload.screenCode + ' 재질을 적용해줘.';
         payload.prompt += '\n상판이나 다리가 아니라 스크린 보드 부분만 변경해줘.';
         payload.prompt += '\n스크린 패널은 단색 검정이 아니라 선택된 패브릭/패널 재질로 표현해줘.';
+        payload.prompt += '\nscreenTexture 이미지를 참고 이미지로 사용해서 스크린 패널 전체에 적용하세요.';
+payload.prompt += '\n검정 스크린을 유지하지 말고 선택한 스크린 재질의 색상과 질감을 반영하세요.';
       }
       var out=await fetchJson('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},90000);
       if(!out.res.ok) throw new Error(out.data.error||out.data.detail||('/api/generate-preview '+out.res.status));
