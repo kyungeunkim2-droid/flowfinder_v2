@@ -14077,6 +14077,78 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
   }, true);
 })();
 </script>
+  <div id="material-preview-wrap" style="
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-top:14px;
+"></div>
+
+  <script>
+function renderMaterialPreviews(){
+
+  const wrap = document.getElementById('material-preview-wrap');
+  if(!wrap) return;
+
+  wrap.innerHTML = '';
+
+  // 데스크 선택 여부
+  const hasDesk =
+    document.body.innerText.includes('데스크');
+
+  // 스크린 선택 여부
+  const hasScreen =
+    document.body.innerText.includes('스크린');
+
+  // 데스크 미리보기
+  if(hasDesk){
+    wrap.innerHTML += `
+      <div class="material-preview-card">
+        <div class="preview-title">
+          데스크 재질 적용 미리보기
+        </div>
+
+        <div class="preview-box">
+          <img id="desk-material-preview"
+            src=""
+            style="
+              width:100%;
+              border-radius:16px;
+              background:#fff;
+            ">
+        </div>
+      </div>
+    `;
+  }
+
+  // 스크린 미리보기
+  if(hasScreen){
+    wrap.innerHTML += `
+      <div class="material-preview-card">
+        <div class="preview-title">
+          스크린 재질 적용 미리보기
+        </div>
+
+        <div class="preview-box">
+          <img id="screen-material-preview"
+            src=""
+            style="
+              width:100%;
+              border-radius:16px;
+              background:#fff;
+            ">
+        </div>
+      </div>
+    `;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', renderMaterialPreviews);
+
+document.addEventListener('click', function(){
+  setTimeout(renderMaterialPreviews, 100);
+}, true);
+</script>
 </body>
 
 
@@ -19507,6 +19579,10 @@ body.ff-dashboard-preview #ff-dashboard-hero{
 #product-preview-box,
 #screen-composite-preview {
   display: none !important;
+}
+  /* 기존 중복 미리보기 제거 */
+#ff-dashboard-hero{
+  display:none !important;
 }
 </style>
 <script id="ff-final-right-panel-order-override-script">
