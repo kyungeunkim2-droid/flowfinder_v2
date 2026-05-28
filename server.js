@@ -1,31 +1,130 @@
-from pathlib import Path
-import re, subprocess, json
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { GoogleGenAI } from '@google/genai';
 
-src = Path('/mnt/data/server (1).js')
-text = src.read_text(encoding='utf-8', errors='ignore')
+// FlowFinder Nano Banana preview server
+// 1) npm install
+// 2) copy .env.example to .env and set GEMINI_API_KEY
+// 3) npm run dev
 
-# 1) Fix destructuring in /api/generate-preview
-old = """const {
-      deskImage,
-      topTexture,
-      legTexture,
-      topCode,
-      legCode,
-      deskLabel,
-      legType,
-      casterType,
-      topShape,
-      size,
-    } = req.body || {};"""
+dotenv.config();
+if (!process.env.GEMINI_API_KEY && process.env.GOOGLE_API_KEY) process.env.GEMINI_API_KEY = process.env.GOOGLE_API_KEY;
+if (!process.env.GEMINI_API_KEY && process.env.GOOGLE_GENERATIVE_AI_API_KEY) process.env.GEMINI_API_KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
 
-new = """const {
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const app = express();
+const PORT = process.env.PORT || 3000;
+const MODEL = process.env.GEMINI_IMAGE_MODEL || 'gemini-2.5-flash-image-preview';
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
+
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+  next();
+});
+
+app.use(express.static(__dirname, {
+  etag: false,
+  maxAge: 0,
+}));
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+
+app.get('/api/health', (req, res) => {
+  res.json({ ok: true, hasGeminiKey: Boolean(process.env.GEMINI_API_KEY), model: MODEL });
+});
+
+function assertSafeUrl(raw, baseUrl) {
+  if (!raw || typeof raw !== 'string') return null;
+  const url = raw.trim();
+  if (url.startsWith('data:')) return null;
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  return new URL(url, baseUrl).toString();
+}
+
+function dataUrlToImagePart(src) {
+  if (!src || typeof src !== 'string') return null;
+  const match = src.trim().match(/^data:([^;,]+);base64,(.+)$/s);
+  if (!match) return null;
+  return {
+    inlineData: {
+      mimeType: match[1] || 'image/png',
+      data: match[2].replace(/\s/g, ''),
+    },
+  };
+}
+
+async function loadImagePart(src, label, baseUrl) {
+  const dataPart = dataUrlToImagePart(src);
+  if (dataPart) return dataPart;
+
+  const safeUrl = assertSafeUrl(src, baseUrl);
+  if (!safeUrl) return null;
+  const response = await fetch(safeUrl);
+  if (!response.ok) throw new Error(`이미지 로드 실패: ${label || src}`);
+  const mimeType = response.headers.get('content-type')?.split(';')[0] || 'image/png';
+  const bytes = Buffer.from(await response.arrayBuffer());
+  return {
+    inlineData: {
+      mimeType,
+      data: bytes.toString('base64'),
+    },
+  };
+}
+
+function extractInlineImage(response) {
+  const candidates = response?.candidates || [];
+  for (const candidate of candidates) {
+    const partsOut = candidate?.content?.parts || [];
+    for (const part of partsOut) {
+      const inline = part?.inlineData || part?.inline_data || part?.inline_data_content || null;
+      if (inline?.data) {
+        return {
+          data: inline.data,
+          mimeType: inline.mimeType || inline.mime_type || 'image/png',
+        };
+      }
+    }
+  }
+  return null;
+}
+
+function extractText(response) {
+  const candidates = response?.candidates || [];
+  return candidates
+    .flatMap((candidate) => candidate?.content?.parts || [])
+    .map((part) => part?.text)
+    .filter(Boolean)
+    .join('\n');
+}
+
+app.post('/api/generate-preview', async (req, res) => {
+  console.log('[NanoBanana] /api/generate-preview called');
+  try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        error: 'GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요.',
+      });
+    }
+
+    const baseUrl = `${req.protocol}://${req.get('host')}/`;
+
+    const {
       deskImage,
       topTexture,
       legTexture,
       screenTexture,
       screenCode,
       screenImage,
-      screenMask,
       SCREEN_MASK,
       topCode,
       legCode,
@@ -34,87 +133,175 @@ new = """const {
       casterType,
       topShape,
       size,
-    } = req.body || {};"""
+    } = req.body || {};
 
-if old in text:
-    text = text.replace(old, new, 1)
+    const parts = [];
 
-# 2) Replace prompt block lines for screen support
-text = text.replace(
-    """        'Apply the provided leg material naturally only to the vertical desk legs.',
-
-'Keep the cable duct / cable tray area under the desktop matte white.',""",
-    """        'Apply the provided leg material naturally only to the vertical desk legs.',
+    parts.push({
+      text: [
+        'Use the base furniture product image as the exact reference.',
+        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
+        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
+        'Apply the provided leg material naturally only to the vertical desk legs.',
         screenTexture ? 'Apply the provided screen material texture naturally only to the screen panel area.' : '',
         screenCode ? `Screen material code: ${screenCode}.` : '',
-        screenTexture ? 'If a screen panel exists in the base image, preserve it and recolor only the screen surface using the screen material texture reference.' : '',
-        screenTexture ? 'Do not leave the screen panel black if a screen texture reference is provided.' : '',
-        screenTexture ? 'Do not apply the screen material to the desktop or legs.' : '',
+        'If a screen panel exists in the base image, preserve it and recolor only the screen surface.',
+        'Do not leave the screen panel black if a screen texture reference is provided.',
 
-'Keep the cable duct / cable tray area under the desktop matte white.',"""
-)
+'Keep the cable duct / cable tray area under the desktop matte white.',
 
-# 3) Remove "Do not add a screen panel." only from generate-preview prompt
-text = text.replace("        'Do not add a screen panel.',\n", "")
+'Do not recolor the duct/tray section.',
+        'Do not redraw the product.',
+        'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
+        topCode ? `Top material code: ${topCode}.` : '',
+        legCode ? `Leg/frame material code: ${legCode}.` : '',
+        deskLabel ? `Desk product: ${deskLabel}.` : '',
+        legType ? `Selected leg shape: ${legType}. Preserve it if visible.` : '',
+        casterType ? `Selected bottom support: ${casterType}. Preserve it if visible.` : '',
+        topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
+        size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
+        'Create one photorealistic office furniture catalog render.'
+      ].filter(Boolean).join('\n'),
+    });
 
-# 4) Add screen references to imageInputs
-old_inputs = """    const imageInputs = [
-      ['base furniture product image', deskImage],
-      ['desktop material texture reference', topTexture],
-      ['legs and frame material color reference', legTexture],
-    ];"""
-
-new_inputs = """    const imageInputs = [
+    const imageInputs = [
       ['base furniture product image', deskImage],
       ['desktop material texture reference', topTexture],
       ['legs and frame material color reference', legTexture],
       ['screen material texture reference', screenTexture],
       ['screen product reference', screenImage],
-      ['screen mask reference - white area means screen panel only', SCREEN_MASK || screenMask],
-    ];"""
+    ];
 
-if old_inputs in text:
-    text = text.replace(old_inputs, new_inputs, 1)
+    for (const [label, src] of imageInputs) {
+      const part = await loadImagePart(src, label, baseUrl).catch((err) => {
+        console.warn(err.message);
+        return null;
+      });
+      if (part) {
+        parts.push({ text: `Reference image provided: ${label}. Use this according to the instructions.` });
+        parts.push(part);
+      }
+    }
 
-# 5) Make the loop skip empty src to avoid needless warnings
-text = text.replace(
-"""    for (const [label, src] of imageInputs) {
-      const part = await loadImagePart(src, label, baseUrl).catch((err) => {""",
-"""    for (const [label, src] of imageInputs) {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const modelCandidates = Array.from(new Set([
+      MODEL,
+      'gemini-2.5-flash-image-preview',
+      'gemini-3-pro-image-preview',
+    ].filter(Boolean)));
+
+    let lastText = '';
+    let lastModel = '';
+
+    for (const model of modelCandidates) {
+      lastModel = model;
+      console.log(`[NanoBanana] trying model: ${model}`);
+
+      const response = await ai.models.generateContent({
+        model,
+        contents: [{ role: 'user', parts }],
+        config: { responseModalities: ['TEXT', 'IMAGE'] },
+      });
+
+      const inline = extractInlineImage(response);
+      if (inline?.data) {
+        return res.json({ imageUrl: `data:${inline.mimeType};base64,${inline.data}` });
+      }
+
+      lastText = extractText(response);
+      console.warn('[NanoBanana] no inline image returned', {
+        model,
+        text: lastText?.slice(0, 800),
+      });
+    }
+
+    return res.status(500).json({
+      error: '이미지 결과를 받지 못했습니다.',
+      detail: lastText || 'Gemini 응답에 inline image data가 없습니다.',
+      model: lastModel,
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message || '이미지 생성 실패', hint: 'GEMINI_API_KEY, 모델명, Render 환경변수, 이미지 경로(products/textures), 서버 로그를 확인하세요.' });
+  }
+});
+
+app.post('/api/generate-screen-preview', async (req, res) => {
+  try {
+    const baseUrl = `${req.protocol}://${req.get('host')}/`;
+
+    const {
+      deskAiImage,
+      screenImage,
+      screenTexture
+    } = req.body || {};
+
+    const parts = [];
+
+    parts.push({
+      text: [
+        'Use the provided AI-generated desk image as the exact base image.',
+        'Add the provided screen product naturally to the desk.',
+        'Apply the provided screen material only to the screen panel.',
+        'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
+        'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
+        'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
+        'Create one photorealistic office furniture catalog render.'
+      ].join('\n')
+    });
+
+    const imageInputs = [
+      ['generated desk image', deskAiImage],
+      ['screen product image', screenImage],
+      ['screen material texture reference', screenTexture],
+    ];
+
+    for (const [label, src] of imageInputs) {
       if (!src) continue;
-      const part = await loadImagePart(src, label, baseUrl).catch((err) => {""",
-1
-)
 
-# 6) Fix /api/generate-screen-preview ai undefined bug: add ai init before generateContent
-screen_route_old = """    const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image-preview',
-      contents: [{ role: 'user', parts }]
-    });"""
-screen_route_new = """    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const part = await loadImagePart(src, label, baseUrl).catch((err) => {
+        console.warn(err.message);
+        return null;
+      });
+
+      if (part) parts.push(part);
+    }
 
     const result = await ai.models.generateContent({
       model: 'gemini-2.5-flash-image-preview',
-      contents: [{ role: 'user', parts }],
-      config: { responseModalities: ['TEXT', 'IMAGE'] },
-    });"""
-if screen_route_old in text:
-    text = text.replace(screen_route_old, screen_route_new, 1)
+      contents: [{ role: 'user', parts }]
+    });
 
-out = Path('/mnt/data/server_screen_texture_fixed.js')
-out.write_text(text, encoding='utf-8')
+    const partsOut =
+      result?.candidates?.[0]?.content?.parts ||
+      result?.response?.candidates?.[0]?.content?.parts ||
+      [];
 
-# Syntax check with node
-try:
-    res = subprocess.run(['node', '--check', str(out)], capture_output=True, text=True, timeout=20)
-    ok = res.returncode == 0
-    msg = (res.stderr or res.stdout).strip()
-except Exception as e:
-    ok = None
-    msg = str(e)
+    const inlinePart = partsOut.find(
+      p => p.inlineData?.data || p.inline_data?.data
+    );
 
-print(json.dumps({
-    "saved": str(out),
-    "node_check_ok": ok,
-    "msg": msg[:1000]
-}, ensure_ascii=False, indent=2))
+    const inline = inlinePart?.inlineData || inlinePart?.inline_data || null;
+
+    if (!inline?.data) {
+      return res.status(502).json({
+        error: '스크린 이미지 결과를 받지 못했습니다.'
+      });
+    }
+
+    res.json({
+      imageUrl: `data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      error: error.message || '스크린 생성 실패'
+    });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`FlowFinder preview server running: http://localhost:${PORT}`);
+});
