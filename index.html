@@ -3764,9 +3764,39 @@ function getProductAssetKeyByName(name) {
 }
 
 function getProductBasePathByKey(key) {
-  return key ? 'products/' + key + '/base/base.png' : '';
-}
 
+  key = String(key || '');
+
+  var folder = deskFolder();
+
+  var base =
+    legKey() + '_' +
+    moveKey() + '_' +
+    topKey();
+
+  var raw = text(
+    st().screenLabel ||
+    st().screen ||
+    st()._currentScreenType ||
+    st()._currentCatName ||
+    st().currentCatName
+  );
+
+  var hasFront = /전면/.test(raw);
+  var hasSide = /사이드/.test(raw);
+
+  var screen = '';
+
+  if(hasFront && hasSide) screen = 'frontside';
+  else if(hasFront) screen = 'front';
+  else if(hasSide) screen = 'side';
+  else if(/일자/.test(raw)) screen = 'straight';
+  else if(/L형|ㄴ형/.test(raw)) screen = 'lshape';
+
+  return screen
+    ? 'images/previews/' + folder + '/' + base + '_' + screen + '.png'
+    : 'images/previews/' + folder + '/' + base + '.png';
+}
 function loadPreviewImage(src) {
   return new Promise(function(resolve) {
     var img = new Image();
