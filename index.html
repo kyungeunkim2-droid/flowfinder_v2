@@ -1886,29 +1886,29 @@ function _ffLocalTextureForCode(code, catName) {
   }
 
   if (catName.indexOf('일자형 스크린') !== -1) {
-    if (code === 'MBE' || code === 'MGR' || code === '1P5') return 'textures/screen/straight/custom/' + code + '.jpg';
-    if (code === '1P4B') return 'textures/screen/straight/standard/1P4.jpg';
-    if (code === '1P7') return 'textures/screen/straight/standard/1P7.jpg';
+    if (code === 'MBE' || code === 'MGR' || code === '1P5') return './images/textures/screen/straight/custom/' + code + '.jpg';
+    if (code === '1P4B') return './images/textures/screen/straight/standard/1P4.jpg';
+    if (code === '1P7') return './images/textures/screen/straight/standard/1P7.jpg';
     return TEXTURE_MAP[code] || '';
   }
 
   if (catName.indexOf('L형 스크린') !== -1 || catName.indexOf('l형 스크린') !== -1) {
-    if (code === 'MBE' || code === 'MGR' || code === '1P5') return 'textures/screen/lshape/custom/' + code + '.jpg';
-    if (code === '1P4B') return 'textures/screen/lshape/standard/1P4.jpg';
-    if (code === '1P7') return 'textures/screen/lshape/standard/1P7.jpg';
+    if (code === 'MBE' || code === 'MGR' || code === '1P5') return './images/textures/screen/lshape/custom/' + code + '.jpg';
+    if (code === '1P4B') return './images/textures/screen/lshape/standard/1P4.jpg';
+    if (code === '1P7') return './images/textures/screen/lshape/standard/1P7.jpg';
     return TEXTURE_MAP[code] || '';
   }
 
   if (catName.indexOf('전면 스크린') !== -1) {
     var frontCode = code.replace(/K$/,'');
-    if (frontCode === '452A') return 'textures/screen/front/custom/452A.png';
-    return 'textures/screen/front/' + (state.colorType === '주문' ? 'custom' : 'standard') + '/' + frontCode + '.jpg';
+    if (frontCode === '452A') return './images/textures/screen/front/custom/452A.png';
+    return './images/textures/screen/front/' + (state.colorType === '주문' ? 'custom' : 'standard') + '/' + frontCode + '.jpg';
   }
 
   if (catName.indexOf('사이드 스크린') !== -1) {
     var sideCode = code.replace(/K$/,'');
-    if (sideCode === '452A') return 'textures/screen/side/custom/452A.png';
-    return 'textures/screen/side/' + (state.colorType === '주문' ? 'custom' : 'standard') + '/' + sideCode + '.jpg';
+    if (sideCode === '452A') return './images/textures/screen/side/custom/452A.png';
+    return './images/textures/screen/side/' + (state.colorType === '주문' ? 'custom' : 'standard') + '/' + sideCode + '.jpg';
   }
 
   return TEXTURE_MAP[code] || '';
@@ -2209,7 +2209,7 @@ function _ffNormalizeTextureUrl(url) {
   url = String(url);
   var marker = 'textures/';
   var i = url.indexOf(marker);
-  if (i !== -1) return 'textures/' + url.slice(i + marker.length);
+  if (i !== -1) return './images/textures/' + url.slice(i + marker.length);
   return url;
 }
 function _ffScreenProductKey(type) {
