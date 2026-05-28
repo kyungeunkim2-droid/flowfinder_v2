@@ -4739,16 +4739,6 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
     input.style.borderColor = '';
   }
 
-  if (btn) {
-    Array.from(btn.parentElement.children).forEach(function(b) {
-      b.classList.remove('active');
-    });
-    btn.classList.add('active');
-  }
-
-  return true;
-}
-
   var group = btn && btn.parentElement;
 
   // 상판은 표준품/무늬목/라미네이트 전체에서 1개만 선택
@@ -4766,6 +4756,7 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
 
   if (btn) btn.classList.add('active');
 
+  // 선택값 저장 후 미리보기 갱신
   ffHoverMaterial(inputId, code, part);
 
   if (part === 'top' || part === 'leg') {
@@ -4779,6 +4770,8 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
   } else {
     stdColorPreview(code);
   }
+
+  return true;
 }
 
 
