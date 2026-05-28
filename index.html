@@ -13954,7 +13954,8 @@ function topKey(){
     code = clean(code);
     if(!code || code==='-' || code==='선택') return '';
     var kind = screenKind(catName);
-
+console.log('SCREEN KIND =', kind);
+console.log('SCREEN CODE =', code);
     // 일자형/L형 스크린: PET 계열
     if(kind === 'straight' || kind === 'lshape'){
       if(code === '1P4B') return './images/textures/screen/' + kind + '/standard/1P4.jpg';
