@@ -10856,18 +10856,18 @@ button.material-btn{
   function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
   var OPTIONS=[
     {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'images/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'images/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'images/accessories/multitap_embedded_2outlet.png'}
     ]},
     {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'accessories/pc_holder_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'accessories/pc_holder_basic_hanging.png'}
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'images/accessories/pc_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'images/accessories/pc_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'images/accessories/pc_basic_hanging.png'}
     ]},
     {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'},
-      {name:'탑마운트 모니터 암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'}
+      {name:'가방걸이', colors:['XX(투명)'], img:'images/accessories/bag_hook.png'},
+      {name:'탑마운트 모니터 암', colors:['BK'], img:'images/accessories/monitor_arm_topmount.png'}
     ]}
   ];
   window.ff107AccessoryOptions=OPTIONS;
@@ -14982,98 +14982,6 @@ window.showPanel = function(){
 </script>
 <!-- === /FF FINAL HOTFIX === -->
 
-
-<!-- === FINAL FIX: screen size input restore + DCR/TS leg button click === -->
-<style id="ff-final-screen-size-dcr-fix-style">
-.material-btn[data-part="leg"][data-code="DCR"],
-.material-btn[data-part="leg"][data-code="TS"]{
-  pointer-events:auto !important;
-  opacity:1 !important;
-  cursor:pointer !important;
-}
-.material-btn[data-part="leg"][data-code="DCR"] .mat-code,
-.material-btn[data-part="leg"][data-code="TS"] .mat-code{
-  white-space:nowrap !important;
-  overflow:visible !important;
-}
-.ff-screen-size-title + div,
-.ff-screen-size-title ~ form,
-.ff-screen-size-title ~ input{
-  display:block !important;
-  visibility:visible !important;
-}
-</style>
-<script id="ff-final-screen-size-dcr-fix-script">
-(function(){
-  if(window.__ffFinalScreenSizeDcrFix) return;
-  window.__ffFinalScreenSizeDcrFix = true;
-
-  function txt(el){
-    return (el && (el.textContent || el.innerText) || '').replace(/\s+/g,' ').trim();
-  }
-
-  function isScreenCat(cat){
-    cat = String(cat || '');
-    return /스크린|screen|front|side|straight|lshape/i.test(cat);
-  }
-
-  function restoreSizeBubble(){
-    try{
-      var st = window.state || {};
-      if(!isScreenCat(st._currentCatName || (st.current && st.current.product))) return;
-
-      var bubbles = Array.prototype.slice.call(document.querySelectorAll('.msg.bot .bubble'));
-      bubbles.forEach(function(b){
-        var t = txt(b);
-        if(t.indexOf('원하시는 사이즈를 확인/조절해주세요') === -1) return;
-
-        if(!b.querySelector('.ff-screen-size-title')){
-          var title = document.createElement('div');
-          title.className = 'ff-screen-size-title';
-          title.style.cssText = 'font-weight:900;color:#2ef2c9;margin-bottom:8px;line-height:1.55;';
-          title.innerHTML = '&lt;@@스크린 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
-          b.insertBefore(title, b.firstChild);
-        }
-
-        // If a previous destructive patch removed the input, askSizeInput can rebuild the form.
-        var hasInput = b.querySelector('input, textarea, select, .ff-num-control');
-        if(!hasInput && typeof window.askSizeInput === 'function' && st._currentCatName && !window.__ffRebuildingScreenSize){
-          window.__ffRebuildingScreenSize = true;
-          setTimeout(function(){
-            try{ window.askSizeInput(st._currentCatName); }catch(e){}
-            window.__ffRebuildingScreenSize = false;
-          }, 50);
-        }
-      });
-    }catch(e){}
-  }
-
-  document.addEventListener('click', function(e){
-    var btn = e.target && e.target.closest && e.target.closest('.material-btn[data-part="leg"][data-code="DCR"], .material-btn[data-part="leg"][data-code="TS"]');
-    if(!btn) return;
-
-    var inputId = btn.getAttribute('data-input');
-    var code = btn.getAttribute('data-code');
-    if(window.ffSelectMaterialButton && inputId && code){
-      e.preventDefault();
-      e.stopPropagation();
-      window.ffSelectMaterialButton(inputId, code, 'leg', btn);
-    }
-  }, true);
-
-  document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(restoreSizeBubble, 100);
-    setTimeout(restoreSizeBubble, 500);
-  });
-  window.addEventListener('load', function(){
-    setTimeout(restoreSizeBubble, 100);
-    setTimeout(restoreSizeBubble, 800);
-  });
-  document.addEventListener('click', function(){ setTimeout(restoreSizeBubble, 120); }, true);
-  document.addEventListener('change', function(){ setTimeout(restoreSizeBubble, 120); }, true);
-})();
-</script>
-
 </body>
 
 
@@ -18619,18 +18527,18 @@ var OPTION_IMG = {
   function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
   var OPTIONS=[
     {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_embedded_2outlet.png'}
     ]},
     {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'accessories/pc_holder_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'accessories/pc_holder_basic_hanging.png'}
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'images/options/accessories/pc_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'images/options/accessories/pc_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'images/options/accessories/pc_basic_hanging.png'}
     ]},
     {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'},
-      {name:'탑마운트 모니터 암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'}
+      {name:'가방걸이', colors:['XX(투명)'], img:'images/options/accessories/bag_hook.png'},
+      {name:'탑마운트 모니터 암', colors:['BK'], img:'images/options/accessories/monitor_arm_topmount.png'}
     ]}
   ];
   window.ff107AccessoryOptions=OPTIONS;
@@ -20325,6 +20233,21 @@ arr.push(
 })();
 </script>
 
+const STANDARD_LEG_COLORS=['WW','DSG','BKM'];
+
+const ORDER_LEG_COLORS=['DCR','TS'];
+
+
+[FlowFinder NanoBanana Rules]
+- 새로운 이미지를 생성하지 마라.
+- previews 폴더의 원본 이미지를 그대로 사용한다.
+- textures 재질만 해당 영역(top/leg/screen)에 맵핑한다.
+- 책상 형태, 구도, 다리 구조, 스크린 구조를 변경하지 마라.
+- 창의적 생성 금지.
+- 원본 preview 이미지 위에 재질만 입힌다.
+
+
+
 <!-- === USER HOTFIX 2026-05-28: material panel / desk option image separation + label cleanup === -->
 <style id="ff-user-hotfix-layout-material-option-separation">
 /* 오른쪽 패널 전체: 절대 겹치지 않도록 세로 스택 고정 */
@@ -20579,15 +20502,11 @@ arr.push(
     });
   }
   function screenSizeCopy(){
-    // Safe version: never replace whole div innerHTML because it can delete size inputs.
-    [].slice.call(document.querySelectorAll('.msg.bot .bubble')).forEach(function(el){
+    [].slice.call(document.querySelectorAll('.bubble,.msg,.ff-flow-note,div')).forEach(function(el){
+      if(el.children && el.children.length>6) return;
       var s=txt(el);
-      if(s.indexOf('원하시는 사이즈를 확인/조절해주세요')>-1 && !el.querySelector('.ff-screen-size-title')){
-        var title=document.createElement('div');
-        title.className='ff-screen-size-title';
-        title.style.cssText='font-weight:900;color:#2ef2c9;margin-bottom:8px;line-height:1.55;';
-        title.innerHTML='<b>&lt;@@스크린 사이즈입력&gt;</b><br>원하시는 사이즈를 확인/조절해주세요.';
-        el.insertBefore(title, el.firstChild);
+      if(s==='원하시는 사이즈를 확인/조절해주세요:' || s==='원하시는 사이즈를 확인/조절해주세요.'){
+        el.innerHTML='<b>&lt;@@스크린 사이즈입력&gt;</b><br>원하시는 사이즈를 확인/조절해주세요.';
       }
     });
   }
