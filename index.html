@@ -2071,6 +2071,44 @@ body.ff-dashboard-preview #preview-panel,
 }
 </style>
 
+
+<style id="ff-final-cleanup-fix">
+/* 오른쪽 패널 중복 미리보기 충돌 방지: 새 대시보드 카드 중심 */
+body.ff-dashboard-preview #product-preview-box,
+body.ff-dashboard-preview #screen-composite-preview{
+  display:none !important;
+}
+
+/* 글자 안 보임 방지 */
+input, textarea, select, option,
+#user-input,
+.ff-num-control input,
+.color-pair-grid select,
+.ff-field select{
+  color:#ffffff !important;
+  background:#0b1220 !important;
+  -webkit-text-fill-color:#ffffff !important;
+}
+
+.choice-btn,
+.material-btn,
+.confirm-btn,
+.back-btn{
+  color:inherit;
+}
+
+.material-btn .mat-code,
+.material-button-section-title,
+.material-picker-hint,
+.ff-hero-row b,
+.ff-hero-row span,
+.preview-item .item-name,
+.preview-item .item-detail{
+  visibility:visible !important;
+  opacity:1 !important;
+}
+</style>
+
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -2847,17 +2885,21 @@ function _ffDrawActualScreenPreview(ctx, W, H, entry) {
 //     'leg'
 //   );
 // }
-  var tex = _ffNormalizeTextureUrl(entry.texUrl) || _ffLocalTextureForCode(screenCode, entry.type);
- // if (screenCode && prod.masks.mask) {
-//   _ffApplyMasked(
-//     ctx,
-//     tex,
-//     prod.masks.mask,
-//     dx, dy, dw, dh,
-//     screenCode,
-//     'screen'
-//   );
-// }
+  var tex = _ffNormalizeTextureUrl(entry.texUrl) || _ffLocalTextureForCode('SCREEN_' + screenCode, entry.type);
+  if (screenCode && prod.masks) {
+    if (prod.masks.mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+    if (prod.masks.screen_mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.screen_mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+    if (prod.masks.front_mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.front_mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+    if (prod.masks.side_mask) {
+      _ffApplyMasked(ctx, tex, prod.masks.side_mask, dx, dy, dw, dh, screenCode, 'screen');
+    }
+  }
   // 원본 하이라이트/그림자 보존
   ctx.save();
   ctx.globalAlpha = 0.10;
@@ -14608,6 +14650,81 @@ window.showPanel = function(){
 </script>
 
 
+
+<script id="ff-final-screen-texture-fix">
+(function(){
+  function clean(code){
+    return String(code || '')
+      .trim()
+      .toUpperCase()
+      .replace(/^SCREEN_/, '')
+      .replace(/^TOP_/, '')
+      .replace(/^LEG_/, '')
+      .replace(/\s+/g, '');
+  }
+
+  function detectScreenKind(ctx){
+    var s = window.state || {};
+    var t = [
+      ctx,
+      s.product,
+      s.screenLabel,
+      s.currentCatName,
+      s._currentCatName,
+      s.selectedScreenType,
+      s.screenType
+    ].join(' ');
+
+    if(/사이드|side/i.test(t)) return 'side';
+    if(/일자|straight/i.test(t)) return 'straight';
+    if(/L형|l형|ㄴ형|엘|lshape/i.test(t)) return 'lshape';
+    if(/전면|front/i.test(t)) return 'front';
+
+    return 'front';
+  }
+
+  function makeScreenUrl(code, ctx){
+    code = clean(code);
+    if(!code || code === '-' || code === '선택전' || code === '선택') return '';
+
+    var kind = detectScreenKind(ctx);
+    var standardByKind = {
+      front:['3F1','3F2','061','064','067'],
+      side:['3F1','3F2','061','064','067'],
+      straight:['1P1','1P2','1P4','1P7'],
+      lshape:['1P1','1P2','1P4','1P7']
+    };
+
+    if(code === '1P4B') code = '1P4';
+
+    var isStandard = (standardByKind[kind] || []).indexOf(code) >= 0;
+    var folder = isStandard ? 'standard' : 'custom';
+    var ext = (code === '452A' || code === 'COB') ? 'png' : 'jpg';
+
+    return './images/textures/screen/' + kind + '/' + folder + '/' + code + '.' + ext;
+  }
+
+  var oldLocal = window._ffLocalTextureForCode;
+  window._ffLocalTextureForCode = function(code, catName){
+    var raw = String(code || '').toUpperCase();
+    if(raw.indexOf('SCREEN_') === 0 || /스크린|screen|front|side|straight|lshape|일자|사이드|전면|L형|l형/i.test(String(catName || ''))){
+      return makeScreenUrl(raw, catName);
+    }
+    return oldLocal ? oldLocal(code, catName) : '';
+  };
+
+  var oldMat = window.ffMaterialTextureUrl;
+  window.ffMaterialTextureUrl = function(code, part){
+    if(String(part || '').toLowerCase() === 'screen'){
+      return makeScreenUrl(code, '');
+    }
+    return oldMat ? oldMat(code, part) : '';
+  };
+
+  window.ffResolveScreenTextureUrl = makeScreenUrl;
+})();
+</script>
+
 </body>
 
 
@@ -19011,7 +19128,7 @@ var OPTION_IMG = {
   var TEX = {"HW": "./images/textures/top/standard/HW.png", "TOP_HW": "./images/textures/top/standard/HW.png", "OSG": "./images/textures/top/standard/OSG.jpg", "TOP_OSG": "./images/textures/top/standard/OSG.jpg", "BGM": "./images/textures/top/laminate/BGM.jpg", "TOP_BGM": "./images/textures/top/laminate/BGM.jpg", "BKA": "./images/textures/top/laminate/BKA.jpg", "TOP_BKA": "./images/textures/top/laminate/BKA.jpg", "CC": "./images/textures/top/laminate/CC.jpg", "TOP_CC": "./images/textures/top/laminate/CC.jpg", "CGY": "./images/textures/top/laminate/CGY.jpg", "TOP_CGY": "./images/textures/top/laminate/CGY.jpg", "FIV": "./images/textures/top/laminate/FIV.jpg", "TOP_FIV": "./images/textures/top/laminate/FIV.jpg", "FK": "./images/textures/top/laminate/FK.jpg", "TOP_FK": "./images/textures/top/laminate/FK.jpg", "GG": "./images/textures/top/laminate/GG.jpg", "TOP_GG": "./images/textures/top/laminate/GG.jpg", "IO": "./images/textures/top/laminate/IO.jpg", "TOP_IO": "./images/textures/top/laminate/IO.jpg", "KAP": "./images/textures/top/laminate/KAP.jpg", "TOP_KAP": "./images/textures/top/laminate/KAP.jpg", "LD": "./images/textures/top/laminate/LD.jpg", "TOP_LD": "./images/textures/top/laminate/LD.jpg", "LL": "./images/textures/top/laminate/LL.jpg", "TOP_LL": "./images/textures/top/laminate/LL.jpg", "LT": "./images/textures/top/laminate/LT.jpg", "TOP_LT": "./images/textures/top/laminate/LT.jpg", "MDB": "./images/textures/top/laminate/MDB.png", "TOP_MDB": "./images/textures/top/laminate/MDB.png", "NBK": "./images/textures/top/laminate/NBK.jpg", "TOP_NBK": "./images/textures/top/laminate/NBK.jpg", "NSS": "./images/textures/top/laminate/NSS.jpg", "TOP_NSS": "./images/textures/top/laminate/NSS.jpg", "OHN": "./images/textures/top/laminate/OHN.jpg", "TOP_OHN": "./images/textures/top/laminate/OHN.jpg", "RCN": "./images/textures/top/laminate/RCN.jpg", "TOP_RCN": "./images/textures/top/laminate/RCN.jpg", "TL": "./images/textures/top/laminate/TL.jpg", "TOP_TL": "./images/textures/top/laminate/TL.jpg", "TRZ": "./images/textures/top/laminate/TRZ.jpg", "TOP_TRZ": "./images/textures/top/laminate/TRZ.jpg", "UA": "./images/textures/top/laminate/UA.jpg", "TOP_UA": "./images/textures/top/laminate/UA.jpg", "WP": "./images/textures/top/laminate/WP.jpg", "TOP_WP": "./images/textures/top/laminate/WP.jpg", "DBL": "./images/textures/top/veneer/DBL.jpg", "TOP_DBL": "./images/textures/top/veneer/DBL.jpg", "NCE": "./images/textures/top/veneer/NCE.jpg", "TOP_NCE": "./images/textures/top/veneer/NCE.jpg", "NMOK": "./images/textures/top/veneer/NMOK.jpg", "TOP_NMOK": "./images/textures/top/veneer/NMOK.jpg", "OB": "./images/textures/top/veneer/OB.jpg", "TOP_OB": "./images/textures/top/veneer/OB.jpg", "OGG": "./images/textures/top/veneer/OGG.jpg", "TOP_OGG": "./images/textures/top/veneer/OGG.jpg", "LEG_BKM": "./images/textures/leg/standard/BKM.png", "LEG_DSG": "./images/textures/leg/standard/DSG.png", "LEG_WW": "./images/textures/leg/standard/WW.png", "LEG_DCR": "./images/textures/leg/custom/DCR.png", "LEG_TS": "./images/textures/leg/custom/TS.png", "SCREEN_front_001": "./images/textures/screen/front/custom/001.jpg", "SCREEN_001": "./images/textures/screen/front/custom/001.jpg", "001": "./images/textures/screen/front/custom/001.jpg", "SCREEN_front_001A": "./images/textures/screen/front/custom/001A.jpg", "SCREEN_001A": "./images/textures/screen/front/custom/001A.jpg", "001A": "./images/textures/screen/front/custom/001A.jpg", "SCREEN_front_001B": "./images/textures/screen/front/custom/001B.jpg", "SCREEN_001B": "./images/textures/screen/front/custom/001B.jpg", "001B": "./images/textures/screen/front/custom/001B.jpg", "SCREEN_front_004": "./images/textures/screen/front/custom/004.jpg", "SCREEN_004": "./images/textures/screen/front/custom/004.jpg", "004": "./images/textures/screen/front/custom/004.jpg", "SCREEN_front_004B": "./images/textures/screen/front/custom/004B.jpg", "SCREEN_004B": "./images/textures/screen/front/custom/004B.jpg", "004B": "./images/textures/screen/front/custom/004B.jpg", "SCREEN_front_007": "./images/textures/screen/front/custom/007.jpg", "SCREEN_007": "./images/textures/screen/front/custom/007.jpg", "007": "./images/textures/screen/front/custom/007.jpg", "SCREEN_front_007B": "./images/textures/screen/front/custom/007B.jpg", "SCREEN_007B": "./images/textures/screen/front/custom/007B.jpg", "007B": "./images/textures/screen/front/custom/007B.jpg", "SCREEN_front_014": "./images/textures/screen/front/custom/014.jpg", "SCREEN_014": "./images/textures/screen/front/custom/014.jpg", "014": "./images/textures/screen/front/custom/014.jpg", "SCREEN_front_014A": "./images/textures/screen/front/custom/014A.jpg", "SCREEN_014A": "./images/textures/screen/front/custom/014A.jpg", "014A": "./images/textures/screen/front/custom/014A.jpg", "SCREEN_front_061": "./images/textures/screen/front/standard/061.jpg", "SCREEN_front_064": "./images/textures/screen/front/standard/064.jpg",  "SCREEN_front_067": "./images/textures/screen/front/standard/067.jpg",  "SCREEN_front_071": "./images/textures/screen/front/custom/071.jpg", "SCREEN_071": "./images/textures/screen/front/custom/071.jpg", "071": "./images/textures/screen/front/custom/071.jpg", "SCREEN_front_071A": "./images/textures/screen/front/custom/071A.jpg", "SCREEN_071A": "./images/textures/screen/front/custom/071A.jpg", "071A": "./images/textures/screen/front/custom/071A.jpg", "SCREEN_front_072": "./images/textures/screen/front/custom/072.jpg", "SCREEN_072": "./images/textures/screen/front/custom/072.jpg", "072": "./images/textures/screen/front/custom/072.jpg", "SCREEN_front_074": "./images/textures/screen/front/custom/074.jpg", "SCREEN_074": "./images/textures/screen/front/custom/074.jpg", "074": "./images/textures/screen/front/custom/074.jpg", "SCREEN_front_2M4A": "./images/textures/screen/front/custom/2M4A.jpg", "SCREEN_2M4A": "./images/textures/screen/front/custom/2M4A.jpg", "2M4A": "./images/textures/screen/front/custom/2M4A.jpg", "SCREEN_front_371": "./images/textures/screen/front/custom/371.jpg", "SCREEN_371": "./images/textures/screen/front/custom/371.jpg", "371": "./images/textures/screen/front/custom/371.jpg", "SCREEN_front_3F1": "./images/textures/screen/front/standard/3F1.jpg", "SCREEN_front_3F2": "./images/textures/screen/front/standard/3F2.jpg",  "SCREEN_front_451": "./images/textures/screen/front/custom/451.jpg", "SCREEN_451": "./images/textures/screen/front/custom/451.jpg", "451": "./images/textures/screen/front/custom/451.jpg", "SCREEN_front_452A": "./images/textures/screen/front/custom/452A.png", "SCREEN_452A": "./images/textures/screen/front/custom/452A.png", "452A": "./images/textures/screen/front/custom/452A.png", "SCREEN_front_452N": "./images/textures/screen/front/custom/452N.jpg", "SCREEN_452N": "./images/textures/screen/front/custom/452N.jpg", "452N": "./images/textures/screen/front/custom/452N.jpg", "SCREEN_front_457": "./images/textures/screen/front/custom/457.jpg", "SCREEN_457": "./images/textures/screen/front/custom/457.jpg", "457": "./images/textures/screen/front/custom/457.jpg", "SCREEN_front_457L": "./images/textures/screen/front/custom/457L.jpg", "SCREEN_457L": "./images/textures/screen/front/custom/457L.jpg", "457L": "./images/textures/screen/front/custom/457L.jpg", "SCREEN_front_458": "./images/textures/screen/front/custom/458.jpg", "SCREEN_458": "./images/textures/screen/front/custom/458.jpg", "458": "./images/textures/screen/front/custom/458.jpg", "SCREEN_lshape_1P5": "./images/textures/screen/lshape/custom/1P5.jpg", "SCREEN_1P5": "./images/textures/screen/lshape/custom/1P5.jpg", "1P5": "./images/textures/screen/lshape/custom/1P5.jpg", "SCREEN_lshape_BRD": "./images/textures/screen/lshape/custom/BRD.jpg", "SCREEN_BRD": "./images/textures/screen/lshape/custom/BRD.jpg", "BRD": "./images/textures/screen/lshape/custom/BRD.jpg", "SCREEN_lshape_COB": "./images/textures/screen/lshape/custom/COB.png", "SCREEN_COB": "./images/textures/screen/lshape/custom/COB.png", "COB": "./images/textures/screen/lshape/custom/COB.png", "SCREEN_lshape_MBE": "./images/textures/screen/lshape/custom/MBE.jpg", "SCREEN_MBE": "./images/textures/screen/lshape/custom/MBE.jpg", "MBE": "./images/textures/screen/lshape/custom/MBE.jpg", "SCREEN_lshape_MGR": "./images/textures/screen/lshape/custom/MGR.jpg", "SCREEN_MGR": "./images/textures/screen/lshape/custom/MGR.jpg", "MGR": "./images/textures/screen/lshape/custom/MGR.jpg", "SCREEN_lshape_1P1": "./images/textures/screen/lshape/standard/1P1.jpg", "SCREEN_1P1": "./images/textures/screen/lshape/standard/1P1.jpg", "1P1": "./images/textures/screen/lshape/standard/1P1.jpg", "SCREEN_lshape_1P2": "./images/textures/screen/lshape/standard/1P2.jpg", "SCREEN_1P2": "./images/textures/screen/lshape/standard/1P2.jpg", "1P2": "./images/textures/screen/lshape/standard/1P2.jpg", "SCREEN_lshape_1P4": "./images/textures/screen/lshape/standard/1P4.jpg", "SCREEN_1P4": "./images/textures/screen/lshape/standard/1P4.jpg", "1P4": "./images/textures/screen/lshape/standard/1P4.jpg", "SCREEN_lshape_1P7": "./images/textures/screen/lshape/standard/1P7.jpg", "SCREEN_1P7": "./images/textures/screen/lshape/standard/1P7.jpg", "1P7": "./images/textures/screen/lshape/standard/1P7.jpg", "SCREEN_side_001": "./images/textures/screen/side/custom/001.jpg", "SCREEN_side_001A": "./images/textures/screen/side/custom/001A.jpg", "SCREEN_side_001B": "./images/textures/screen/side/custom/001B.jpg", "SCREEN_side_004": "./images/textures/screen/side/custom/004.jpg", "SCREEN_side_004B": "./images/textures/screen/side/custom/004B.jpg", "SCREEN_side_007": "./images/textures/screen/side/custom/007.jpg", "SCREEN_side_007B": "./images/textures/screen/side/custom/007B.jpg", "SCREEN_side_014": "./images/textures/screen/side/custom/014.jpg", "SCREEN_side_014A": "./images/textures/screen/side/custom/014A.jpg", "SCREEN_side_061": "./images/textures/screen/side/standard/061.jpg", "SCREEN_side_064": "./images/textures/screen/side/standard/064.jpg", "SCREEN_side_067": "./images/textures/screen/side/standard/067.jpg", "SCREEN_side_071": "./images/textures/screen/side/custom/071.jpg", "SCREEN_side_071A": "./images/textures/screen/side/custom/071A.jpg", "SCREEN_side_072": "./images/textures/screen/side/custom/072.jpg", "SCREEN_side_074": "./images/textures/screen/side/custom/074.jpg", "SCREEN_side_2M4A": "./images/textures/screen/side/custom/2M4A.jpg", "SCREEN_side_371": "./images/textures/screen/side/custom/371.jpg", "SCREEN_side_3F1": "./images/textures/screen/side/standard/3F1.jpg", "SCREEN_side_3F2": "./images/textures/screen/side/standard/3F2.jpg", "SCREEN_side_451": "./images/textures/screen/side/custom/451.jpg", "SCREEN_side_452A": "./images/textures/screen/side/custom/452A.png", "SCREEN_side_452N": "./images/textures/screen/side/custom/452N.jpg", "SCREEN_side_457": "./images/textures/screen/side/custom/457.jpg", "SCREEN_side_457L": "./images/textures/screen/side/custom/457L.jpg", "SCREEN_side_458": "./images/textures/screen/side/custom/458.jpg", "SCREEN_straight_1P5": "./images/textures/screen/straight/custom/1P5.jpg", "SCREEN_straight_BRD": "./images/textures/screen/straight/custom/BRD.jpg", "SCREEN_straight_COB": "./images/textures/screen/straight/custom/COB.png", "SCREEN_straight_MBE": "./images/textures/screen/straight/custom/MBE.jpg", "SCREEN_straight_MGR": "./images/textures/screen/straight/custom/MGR.jpg", "SCREEN_straight_1P1": "./images/textures/screen/straight/standard/1P1.jpg", "SCREEN_straight_1P2": "./images/textures/screen/straight/standard/1P2.jpg", "SCREEN_straight_1P4": "./images/textures/screen/straight/standard/1P4.jpg", "SCREEN_straight_1P7": "./images/textures/screen/straight/standard/1P7.jpg"};
   function clean(s){return String(s||'').trim().toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9_]/g,'');}
   function rel(p){ if(!p) return ''; return p.indexOf('./')===0 ? p : './' + p.replace(/^\/+/, ''); }
-  function safeTextureUrl(url){ return ''; /* texture files are optional; keep codes for Nano prompt without browser 404 */ }
+  function safeTextureUrl(url){ return url || ''; }
   function currentScreenKind(ctx){
     var t = String(ctx||'') + ' ' + String((window.state&& (window.state.product||window.state.screenLabel||window.state.currentCatName||window.state._currentCatName))||'');
     if(/사이드|side/i.test(t)) return 'side';
