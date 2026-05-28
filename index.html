@@ -12348,7 +12348,14 @@ ${map.move[move] || move}
   function text(id){var el=$(id);return el?(el.textContent||'').trim():'';}
   function texturePath(code,part,cat){try{return window._ffLocalTextureForCode? _ffLocalTextureForCode(part==='leg'?'LEG_'+code:code,cat||'') : '';}catch(e){return '';}}
   function productKey(target){var s=S(); var cat=String(s._currentCatName||s.currentCatName||s.product||''); if(target==='screen'||cat.indexOf('스크린')>-1){if(cat.indexOf('사이드')>-1)return 'side'; if(cat.indexOf('일자')>-1)return 'straight'; if(cat.indexOf('L형')>-1)return 'lshape'; return 'front';} return normDesk();}
-  function productSrc(key){return 'products/'+key+'/base/base.png';}
+  function productSrc(key){
+    // products/.../base/base.png 사용 금지. 현재 선택 조합 preview 이미지를 우선 사용.
+    try{
+      if(typeof choosePreview === 'function') return choosePreview();
+      if(typeof window.__ffChooseDeskPreviewPath === 'function') return window.__ffChooseDeskPreviewPath();
+    }catch(e){}
+    return 'images/previews/desk_standard/ladder_glide_rect.png';
+  }
   function masks(key){var base='products/'+key+'/masks/'; if(key==='side')return {top:base+'top_mask.png',leg:base+'leg_mask.png',screenFront:base+'front_mask.png',screenSide:base+'side_mask.png'}; return {top:base+'top_mask.png',leg:base+'leg_mask.png',screen:base+'mask.png'};}
   async function localPreview(target){
     var key=productKey(target), base=await loadImg(productSrc(key)); if(!base)throw new Error('원본 이미지 로드 실패: '+productSrc(key));
@@ -14600,95 +14607,6 @@ window.showPanel = function(){
 })();
 </script>
 
-
-<!-- === FINAL PATCH: remove products/base fallback + force screen material payload === -->
-<script id="ff-final-screen-material-and-base-patch">
-(function(){
-  if(window.__ffFinalScreenMaterialAndBasePatch) return;
-  window.__ffFinalScreenMaterialAndBasePatch = true;
-
-  function textOf(id){
-    var el = document.getElementById(id);
-    return el ? (el.textContent || el.innerText || '').trim() : '';
-  }
-
-  function getScreenCode(){
-    var v =
-      textOf('quick-screen-code') ||
-      textOf('screen-material-code') ||
-      textOf('ff-screen-code');
-
-    if(v && v !== '-') return v;
-
-    var s = window.state || {};
-    v =
-      s.screenColor ||
-      s.screenMaterial ||
-      s.screenMaterialCode ||
-      s._screenMaterialCode ||
-      (s.current && (s.current.screenColor || s.current.screenMaterial || s.current.screenMaterialCode)) ||
-      '';
-
-    return String(v || '').trim();
-  }
-
-  function currentPreviewPath(){
-    try{
-      if(typeof choosePreview === 'function'){
-        var p = choosePreview();
-        if(p && String(p).indexOf('products/') === -1) return p;
-      }
-    }catch(e){}
-
-    try{
-      if(typeof getProductBasePathByKey === 'function'){
-        var p2 = getProductBasePathByKey((window.state && (state.screen || state._currentScreenType)) || '');
-        if(p2) return p2;
-      }
-    }catch(e){}
-
-    var folder = 'desk_standard';
-    try{
-      if(typeof deskFolder === 'function') folder = deskFolder();
-    }catch(e){}
-
-    var base = window.__ffLastDeskBase || 'ladder_glide_rect';
-    return 'images/previews/' + folder + '/' + base + '.png';
-  }
-
-  var oldFetch = window.fetch;
-  window.fetch = function(input, init){
-    try{
-      var url = String(input || '');
-      if(url.indexOf('/api/generate-preview') > -1 && init && typeof init.body === 'string'){
-        var data = JSON.parse(init.body);
-
-        var preview = currentPreviewPath();
-
-        ['sourceImage','baseImage','deskImage','fallbackDeskImage','productImage'].forEach(function(k){
-          if(!data[k] || String(data[k]).indexOf('products/') > -1){
-            data[k] = preview;
-          }
-        });
-
-        var screenCode = getScreenCode();
-        if(screenCode && screenCode !== '-'){
-          var line = '\n스크린 파트에는 ' + screenCode + ' 재질을 적용해줘.';
-          data.screenMaterialCode = screenCode;
-          data.screenTextureCode = screenCode;
-          data.screenInstruction = '스크린 파트에는 ' + screenCode + ' 재질을 적용해줘.';
-          if(typeof data.prompt === 'string' && data.prompt.indexOf(line) === -1){
-            data.prompt += line;
-          }
-        }
-
-        init = Object.assign({}, init, { body: JSON.stringify(data) });
-      }
-    }catch(e){}
-    return oldFetch.apply(this, arguments);
-  };
-})();
-</script>
 
 </body>
 
@@ -19833,14 +19751,44 @@ arr.push(
   function bgUrl(id){var el=$(id); if(!el)return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
   function textById(id){var el=$(id); return el?val(el.textContent):'';}
   function cleanCode(v){v=val(v); return v==='-'?'':v;}
-  function material(){var s=st(); return {
-    topCode:cleanCode(textById('quick-top-code')||s.topCode||s.topColor||s.top||''),
-    legCode:cleanCode(textById('quick-leg-code')||s.legCode||s.legColor||s.leg||''),
-    screenCode:cleanCode(textById('quick-screen-code')||s.screenCode||s.screenColor||s.screen||''),
-    topTexture:bgUrl('quick-top-chip')||s.topTexture||s.topTex||'',
-    legTexture:bgUrl('quick-leg-chip')||s.legTexture||s.legTex||'',
-    screenTexture:bgUrl('quick-screen-chip')||s.screenTexture||s.screenTex||''
-  };}
+  function screenTextureForCurrent(code){
+    code = cleanCode(code);
+    if(!code) return '';
+    var sk = screenKey();
+    var cat = '';
+    if(sk === 'straight') cat = '일자형 스크린';
+    else if(sk === 'lshape') cat = 'L형 스크린';
+    else if(sk === 'side') cat = '사이드 스크린';
+    else if(sk === 'front' || sk === 'frontside') cat = '전면 스크린';
+    else cat = (st().screenLabel || st().screenType || st().screen || st()._currentScreenType || '일자형 스크린');
+    try{
+      if(typeof window._ffLocalTextureForCode === 'function'){
+        return window._ffLocalTextureForCode('SCREEN_' + code, cat) || '';
+      }
+    }catch(e){}
+    var folder = (sk === 'lshape') ? 'lshape' : (sk === 'side' ? 'side' : (sk === 'front' || sk === 'frontside' ? 'front' : 'straight'));
+    if(folder === 'straight' || folder === 'lshape'){
+      if(code === '1P4B') return './images/textures/screen/' + folder + '/standard/1P4.jpg';
+      if(code === '452A' || code === 'COB') return './images/textures/screen/' + folder + '/custom/' + code + '.png';
+      if(['1P1','1P2','1P4','1P7'].indexOf(code) >= 0) return './images/textures/screen/' + folder + '/standard/' + code + '.jpg';
+      return './images/textures/screen/' + folder + '/custom/' + code + '.jpg';
+    }
+    var standard = ['3F1','3F2','061','064','067'];
+    var group = standard.indexOf(code) >= 0 ? 'standard' : 'custom';
+    if(code === '452A') return './images/textures/screen/' + folder + '/custom/452A.png';
+    return './images/textures/screen/' + folder + '/' + group + '/' + code + '.jpg';
+  }
+  function material(){var s=st(); 
+    var sc = cleanCode(textById('quick-screen-code')||s.screenCode||s.screenColor||s.screen||'');
+    return {
+      topCode:cleanCode(textById('quick-top-code')||s.topCode||s.topColor||s.top||''),
+      legCode:cleanCode(textById('quick-leg-code')||s.legCode||s.legColor||s.leg||''),
+      screenCode:sc,
+      topTexture:bgUrl('quick-top-chip')||s.topTexture||s.topTex||'',
+      legTexture:bgUrl('quick-leg-chip')||s.legTexture||s.legTex||'',
+      screenTexture:screenTextureForCurrent(sc) || bgUrl('quick-screen-chip') || s.screenTexture || s.screenTex || ''
+    };
+  }
   function ensureOrder(){
     var panel=$('preview-panel'), box=$('ff90-option-summary'), texture=$('texture-preview'); if(!panel||!box)return;
     if(texture){panel.insertBefore(box, texture);}
@@ -19878,6 +19826,16 @@ arr.push(
         topShape:topLabel(), legType:legLabel(), casterType:moveLabel(), screenType:screenKey(),
         prompt:'원본 제품 사진의 형태, 각도, 배경, 그림자, 크롭은 유지하세요. 상판에는 topTexture/topCode 재질만, 다리에는 legTexture/legCode 재질만, 스크린이 있으면 스크린에는 screenTexture/screenCode 재질만 자연스럽게 맵핑하세요. 새 제품을 만들지 말고 재질만 교체하세요.'
       };
+      if(payload.screenCode){
+        var fixedScreenTexture = screenTextureForCurrent(payload.screenCode);
+        if(fixedScreenTexture) payload.screenTexture = fixedScreenTexture;
+        payload.screenMaterialCode = payload.screenCode;
+        payload.screenTextureCode = payload.screenCode;
+        payload.screenInstruction = '스크린 파트에는 ' + payload.screenCode + ' 재질을 적용해줘.';
+        payload.prompt += '\n뒤쪽 스크린 패널 영역 전체에 반드시 ' + payload.screenCode + ' 재질을 적용해줘.';
+        payload.prompt += '\n상판이나 다리가 아니라 스크린 보드 부분만 변경해줘.';
+        payload.prompt += '\n스크린 패널은 단색 검정이 아니라 선택된 패브릭/패널 재질로 표현해줘.';
+      }
       var out=await fetchJson('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},90000);
       if(!out.res.ok) throw new Error(out.data.error||out.data.detail||('/api/generate-preview '+out.res.status));
       var src=(typeof out.data==='string')?out.data:(out.data.imageUrl||out.data.image||out.data.url||'');
