@@ -4749,37 +4749,6 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
   return true;
 }
 
-  var group = btn && btn.parentElement;
-
-  // 상판은 표준품/무늬목/라미네이트 전체에서 1개만 선택
-  if (part === 'top') {
-    Array.prototype.forEach.call(
-      document.querySelectorAll('.material-btn[data-part="top"]'),
-      function(b) { b.classList.remove('active'); }
-    );
-  } else if (group) {
-    Array.prototype.forEach.call(
-      group.querySelectorAll('.material-btn'),
-      function(b) { b.classList.remove('active'); }
-    );
-  }
-
-  if (btn) btn.classList.add('active');
-
-  ffHoverMaterial(inputId, code, part);
-
-  if (part === 'top' || part === 'leg') {
-    var peer = input && input.getAttribute('data-peer');
-    if (peer) {
-      deskColorPairPreview(
-        part === 'top' ? inputId : peer,
-        part === 'leg' ? inputId : peer
-      );
-    }
-  } else {
-    stdColorPreview(code);
-  }
-}
 
 
 
@@ -15176,6 +15145,158 @@ window.showPanel = function(){
 })();
 </script>
 <!-- === /USER FINAL HOTFIX === -->
+
+
+<!-- === FINAL HOTFIX: compact accessory options + material button recovery === -->
+<style id="ff-final-compact-options-css">
+  .ff102-options-card{
+    max-width:680px !important;
+    padding:14px 14px 12px !important;
+    border-radius:18px !important;
+    background:#111827 !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    color:#fff !important;
+  }
+  .ff102-options-card h3{font-size:16px !important;margin:0 0 4px !important;line-height:1.2 !important;}
+  .ff102-options-card p{font-size:11px !important;line-height:1.35 !important;margin:0 0 8px !important;color:#9fb1c8 !important;}
+  .ff102-cat{margin-top:8px !important;}
+  .ff102-cat-title{display:flex !important;align-items:center !important;gap:8px !important;margin:0 0 5px !important;}
+  .ff102-cat-title span{font-size:12px !important;font-weight:950 !important;color:#67f59a !important;}
+  .ff102-cat-title small{font-size:10px !important;color:#8190a7 !important;font-weight:700 !important;}
+  .ff102-option-list{display:grid !important;grid-template-columns:repeat(2,minmax(0,1fr)) !important;gap:6px !important;}
+  .ff102-option-row{
+    min-height:44px !important;
+    padding:6px !important;
+    display:grid !important;
+    grid-template-columns:1fr 78px !important;
+    gap:6px !important;
+    align-items:center !important;
+    border-radius:12px !important;
+    background:#0b1220 !important;
+    border:1px solid rgba(255,255,255,.10) !important;
+  }
+  .ff102-option-row.active{border-color:#ff7a1a !important;box-shadow:0 0 0 2px rgba(255,122,26,.18) !important;background:#17111a !important;}
+  .ff102-option-row .ff107-option-img{display:none !important;}
+  .ff107-option-main{display:contents !important;}
+  .ff107-controls{display:block !important;}
+  .ff102-pick{
+    width:100% !important;
+    min-height:32px !important;
+    padding:7px 9px !important;
+    border-radius:10px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    background:#fff !important;
+    color:#111827 !important;
+    font-size:11px !important;
+    font-weight:950 !important;
+    line-height:1.15 !important;
+    text-align:left !important;
+    white-space:normal !important;
+    cursor:pointer !important;
+  }
+  .ff102-option-row.active .ff102-pick{background:linear-gradient(135deg,#ff7a1a,#ff4d00) !important;color:#fff !important;border-color:#ff7a1a !important;}
+  .ff102-field{margin:0 !important;}
+  .ff102-field label{display:none !important;}
+  .ff102-field select{width:100% !important;height:32px !important;padding:4px 7px !important;border-radius:9px !important;font-size:11px !important;background:#fff !important;color:#111827 !important;border:0 !important;}
+  .ff102-field:has(.ff102-qty), .ff102-qty{display:none !important;}
+  .ff102-actions{display:flex !important;gap:6px !important;margin-top:10px !important;}
+  .ff102-actions button{min-height:36px !important;padding:8px 12px !important;border-radius:12px !important;font-size:12px !important;font-weight:950 !important;}
+  @media(max-width:760px){.ff102-option-list{grid-template-columns:1fr !important}.ff102-options-card{max-width:100% !important}}
+</style>
+<script id="ff-final-compact-options-js">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
+  function user(html){ if(typeof addMsg==='function') addMsg('user', html); }
+  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
+  var OPTIONS=(window.ff108AccessoryOptions||window.ff107AccessoryOptions||[
+    {cat:'멀티탭', note:'', items:[{name:'외장 3구 멀티탭', colors:['WW','BK']},{name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK']},{name:'매립형 2구 멀티탭', colors:['WW','BK']}]},
+    {cat:'PC홀더', note:'', items:[{name:'행잉 PC홀더', colors:['WH','BK']},{name:'스트랩 PC홀더', colors:['BK']},{name:'보급형 행잉 PC홀더', colors:['BK']}]},
+    {cat:'기타', note:'', items:[{name:'가방걸이', colors:['XX(투명)']},{name:'탑마운트 모니터 암', colors:['BK']}]}
+  ]);
+  window.ff102ToggleOption=function(rowId){
+    var row=document.getElementById(rowId); if(!row) return;
+    row.classList.toggle('active');
+    var input=row.querySelector('input[type="number"]'); if(input) input.value=row.classList.contains('active')?'1':'0';
+  };
+  window.ff102SyncRow=function(rowId){
+    var row=document.getElementById(rowId); if(!row) return;
+    var input=row.querySelector('input[type="number"]');
+    var q=input ? (parseInt(input.value||'0',10)||0) : (row.classList.contains('active') ? 1 : 0);
+    row.classList.toggle('active', q>0);
+  };
+  window.ff102StepQty=function(rowId,delta){ window.ff102ToggleOption(rowId); };
+  window.ff102ShowOptions=function(){
+    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>제품명과 색상만 선택하세요. 선택한 항목은 각 1개로 견적에 반영됩니다.</p>';
+    OPTIONS.forEach(function(group,gi){
+      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
+      (group.items||[]).forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
+        var colors=(item.colors&&item.colors.length?item.colors:['']);
+        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
+          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
+          +'<div class="ff107-controls"><div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div><input id="'+id+'_qty" type="hidden" value="0"></div>'
+          +'</div>';
+      });
+      html+='</div></div>';
+    });
+    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
+    bot(html); scrollLatest();
+  };
+  function saveChosen(chosen){
+    if(window.state){
+      state.extraOptionItems=chosen;
+      state._ff102OptionsHandled=true;
+      state._ff101OptionsHandled=true;
+      state._ff100OptionsDone=true;
+      state._ff96OptionsAsked=true;
+      state._ff97FinalOptionsAsked=true;
+    }
+  }
+  function nextActions(){
+    if(window.state){ state.step='next_actions'; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
+    scrollLatest();
+  }
+  window.ff102ApplyOptions=function(){
+    var chosen=[];
+    OPTIONS.forEach(function(group,gi){(group.items||[]).forEach(function(item,ii){
+      var row=document.getElementById('ff102row_'+gi+'_'+ii);
+      if(row && row.classList.contains('active')){
+        var color=(document.getElementById('ff102_'+gi+'_'+ii+'_color')||{}).value||'';
+        chosen.push({category:group.cat,name:item.name,color:color,qty:1});
+      }
+    });});
+    saveChosen(chosen);
+    user(chosen.length?chosen.map(function(x){return esc(x.name)+' / '+esc(x.color);}).join('<br>'):'추가 옵션 없음');
+    nextActions();
+  };
+  window.ff102SkipOptions=function(){ saveChosen([]); user('추가 옵션 없음'); nextActions(); };
+
+  // DCR/TS 포함 모든 재질 버튼은 이미지 경로 유무와 관계없이 선택되도록 마지막에 복구
+  window.ffSelectMaterialButton=function(inputId, code, part, btn){
+    var input=document.getElementById(inputId);
+    if(input){ input.value=code; input.style.borderColor=''; }
+    var scope = part==='top' ? document : (btn && btn.parentElement ? btn.parentElement : document);
+    var selector = part==='top' ? '.material-btn[data-part="top"]' : '.material-btn';
+    Array.prototype.forEach.call(scope.querySelectorAll(selector), function(b){ b.classList.remove('active','selected'); });
+    if(btn){ btn.classList.add('active','selected'); }
+    try{ if(typeof ffHoverMaterial==='function') ffHoverMaterial(inputId, code, part); }catch(e){}
+    try{
+      if(part==='top' || part==='leg'){
+        var peer=input && input.getAttribute('data-peer');
+        if(peer && typeof deskColorPairPreview==='function') deskColorPairPreview(part==='top'?inputId:peer, part==='leg'?inputId:peer);
+      }else if(typeof stdColorPreview==='function') stdColorPreview(code);
+    }catch(e){}
+    return true;
+  };
+})();
+</script>
+<!-- === /FINAL HOTFIX === -->
+
 </body>
 
 
