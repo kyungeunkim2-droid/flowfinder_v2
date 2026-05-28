@@ -13814,6 +13814,271 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
 })();
 </script>
 
+
+
+<!-- FF136: screen material thumbnail/url final fix -->
+<script id="ff136-screen-material-url-fix">
+(function(){
+  function clean(code){ return String(code||'').trim().toUpperCase().replace(/^SCREEN_/, '').replace(/^TOP_/, '').replace(/^LEG_/, ''); }
+  function isCustomColorType(){ return !!(window.state && String(state.colorType||'').indexOf('주문')!==-1); }
+  function screenKind(catName){
+    var t = String(catName||'') + ' ' + String((window.state && (state._currentCatName || state.currentCatName || state.product || state.screenLabel)) || '');
+    if(/사이드|side/i.test(t)) return 'side';
+    if(/일자|straight/i.test(t)) return 'straight';
+    if(/L형|l형|엘|lshape/i.test(t)) return 'lshape';
+    return 'front';
+  }
+  function screenUrl(code, catName){
+    code = clean(code);
+    if(!code || code==='-' || code==='선택') return '';
+    var kind = screenKind(catName);
+
+    // 일자형/L형 스크린: PET 계열
+    if(kind === 'straight' || kind === 'lshape'){
+      if(code === '1P4B') return './images/textures/screen/' + kind + '/standard/1P4.jpg';
+      if(code === '452A' || code === 'COB') return './images/textures/screen/' + kind + '/custom/' + code + '.png';
+      if(['1P1','1P2','1P4','1P7'].indexOf(code) >= 0) return './images/textures/screen/' + kind + '/standard/' + code + '.jpg';
+      return './images/textures/screen/' + kind + '/custom/' + code + '.jpg';
+    }
+
+    // 전면/사이드 스크린: 패브릭 계열
+    var standard = ['3F1','3F2','061','064','067'];
+    var folder = (!isCustomColorType() && standard.indexOf(code) >= 0) ? 'standard' : 'custom';
+    if(code === '452A') return './images/textures/screen/' + kind + '/custom/452A.png';
+    return './images/textures/screen/' + kind + '/' + folder + '/' + code + '.jpg';
+  }
+  function topUrl(code){
+    code = clean(code);
+    var veneer=['DBL','NCE','NMOK','OB','OGG'];
+    var standard=['HW','OSG','WW'];
+    if(veneer.indexOf(code)>=0) return './images/textures/top/veneer/' + code + '.jpg';
+    if(standard.indexOf(code)>=0) return './images/textures/top/standard/' + (code==='HW'?'HW.png':code+'.jpg');
+    return './images/textures/top/laminate/' + (code==='MDB' ? 'MDB.png' : code + '.jpg');
+  }
+  function legUrl(code){
+    code = clean(code);
+    if(['DCR','TS'].indexOf(code)>=0) return './images/textures/leg/custom/' + code + '.png';
+    return './images/textures/leg/standard/' + code + '.png';
+  }
+
+  window._ffLocalTextureForCode = function(code, catName){
+    var raw = String(code||'').toUpperCase();
+    catName = String(catName||'');
+    if(raw.indexOf('LEG_')===0 || /다리/.test(catName)) return legUrl(raw);
+    if(raw.indexOf('SCREEN_')===0 || /스크린|screen/i.test(catName)) return screenUrl(raw, catName);
+    return topUrl(raw);
+  };
+
+  window.ffMaterialTextureUrl = function(code, part){
+    part = String(part||'').toLowerCase();
+    var catName = (window.state && (state._currentCatName || state.currentCatName || state.product || '')) || '';
+    if(part === 'screen') return screenUrl(code, catName);
+    if(part === 'leg') return legUrl(code);
+    return topUrl(code);
+  };
+
+  // 이미 그려진 재질 버튼/칩도 즉시 다시 칠한다.
+  function repaint(){
+    document.querySelectorAll('.material-btn').forEach(function(btn){
+      var code = btn.getAttribute('data-code') || btn.textContent;
+      var part = btn.getAttribute('data-part') || (/스크린/.test(btn.closest('.bubble')?.textContent||'') ? 'screen' : 'top');
+      var thumb = btn.querySelector('.mat-thumb');
+      if(thumb){
+        var url = window.ffMaterialTextureUrl(code, part);
+        if(url) thumb.style.backgroundImage = "url('" + url + "')";
+      }
+    });
+    document.querySelectorAll('#quick-screen-chip, .material-chip-row.active-screen em').forEach(function(el){
+      var codeEl = document.getElementById('quick-screen-code');
+      var code = codeEl ? codeEl.textContent : '';
+      var url = window.ffMaterialTextureUrl(code, 'screen');
+      if(url) el.style.backgroundImage = "url('" + url + "')";
+    });
+  }
+  document.addEventListener('DOMContentLoaded', repaint);
+  document.addEventListener('click', function(){ setTimeout(repaint, 80); }, true);
+  setTimeout(repaint, 300);
+})();
+</script>
+
+
+
+<!-- === USER HOTFIX V5: right panel order + material row layout === -->
+<style id="ff-user-hotfix-v5-right-order">
+/* 오른쪽 선택내역: 제품 선택 영역을 실사 미리보기보다 먼저 배치 */
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+  overflow-y:auto !important;
+}
+#preview-panel > h2{ order:0 !important; flex:0 0 auto !important; }
+#set-product-selector{
+  order:1 !important;
+  flex:0 0 auto !important;
+  margin:0 0 14px 0 !important;
+  position:relative !important;
+  z-index:4 !important;
+  clear:both !important;
+}
+#recommend-panel{
+  order:2 !important;
+  flex:0 0 auto !important;
+}
+#ff-dashboard-hero{
+  order:30 !important;
+  flex:0 0 auto !important;
+  margin:0 0 14px 0 !important;
+}
+#product-preview-box,
+#screen-composite-preview{
+  order:35 !important;
+  flex:0 0 auto !important;
+}
+#texture-preview.quick-preview-panel,
+#texture-preview{
+  order:40 !important;
+  flex:0 0 auto !important;
+  clear:both !important;
+}
+#pegboard-ref-panel{ order:45 !important; }
+#wip-group{ order:55 !important; }
+#preview-items{ order:60 !important; }
+#total-box{ order:80 !important; }
+
+/* 재질 선택값: 데스크는 상판/다리 한 줄, 스크린은 다음 한 줄 */
+#texture-preview .quick-materials{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:8px !important;
+  margin-top:10px !important;
+}
+#texture-preview .material-chip-row{
+  display:grid !important;
+  grid-template-columns:54px 44px minmax(0,1fr) !important;
+  align-items:center !important;
+  gap:10px !important;
+  min-height:50px !important;
+  padding:9px 11px !important;
+  border-radius:14px !important;
+  background:#0b1a29 !important;
+  border:1px solid rgba(255,255,255,.13) !important;
+}
+#texture-preview .material-chip-row span{
+  grid-column:auto !important;
+  color:#2ef2c9 !important;
+  font-size:12px !important;
+  font-weight:950 !important;
+  text-align:left !important;
+}
+#texture-preview .material-chip-row em{
+  width:42px !important;
+  height:34px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+  background-size:cover !important;
+  background-position:center !important;
+  justify-self:start !important;
+}
+#texture-preview .material-chip-row i{
+  color:#fff !important;
+  font-style:normal !important;
+  font-size:13px !important;
+  font-weight:950 !important;
+  text-align:left !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+#quick-screen-row{
+  grid-column:1 / -1 !important;
+}
+#quick-screen-row i{ max-width:none !important; }
+@media(max-width:760px){
+  #texture-preview .quick-materials{grid-template-columns:1fr !important;}
+  #quick-screen-row{grid-column:auto !important;}
+}
+</style>
+<script id="ff-user-hotfix-v5-right-order-script">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function after(ref,node){ if(ref && node && ref.nextSibling!==node) ref.parentNode.insertBefore(node, ref.nextSibling); }
+  function applyRightPanelOrder(){
+    var panel=$('preview-panel'); if(!panel) return;
+    var h2=panel.querySelector('h2');
+    var selector=$('set-product-selector');
+    var rec=$('recommend-panel');
+    var hero=$('ff-dashboard-hero');
+    /* 실제 DOM 순서도 선택내역 제목 바로 아래가 제품 선택 영역이 되도록 이동 */
+    if(h2 && selector) after(h2, selector);
+    if(selector && rec) after(selector, rec);
+    if((rec || selector) && hero) after(rec || selector, hero);
+    if(selector){
+      var title=selector.querySelector(':scope > div:first-child');
+      if(title){ title.innerHTML='추가할 제품을 선택하세요 <span style="color:#2ef2c9;font-size:12px;">(복수선택)</span>'; }
+    }
+  }
+  document.addEventListener('DOMContentLoaded',applyRightPanelOrder);
+  window.addEventListener('load',applyRightPanelOrder);
+  document.addEventListener('click',function(){setTimeout(applyRightPanelOrder,50);},true);
+  setInterval(applyRightPanelOrder,800);
+})();
+</script>
+<!-- === /USER HOTFIX V5 === -->
+<script>
+(function(){
+  function reorderRightPanel(){
+    const panel = document.getElementById('preview-panel');
+    if (!panel) return;
+
+    const title = panel.querySelector('h2');                 // 선택 내역
+    const selector = document.getElementById('set-product-selector'); // 추가할 제품 선택
+    const optionSummary = document.getElementById('ff90-option-summary'); // 데스크 옵션 이미지
+    const material = document.getElementById('texture-preview'); // 재질 선택값
+    const livePreview = document.getElementById('ff-dashboard-hero'); // 데스크 실사 미리보기
+    const total = document.getElementById('total-box');
+
+    let anchor = title ? title.nextSibling : panel.firstChild;
+
+    // 1. 선택내역 바로 아래: 추가할 제품 선택
+    if (selector) {
+      selector.style.display = 'block';
+      panel.insertBefore(selector, anchor);
+      anchor = selector.nextSibling;
+    }
+
+    // 2. 그 아래: 데스크 옵션 이미지
+    if (optionSummary) {
+      panel.insertBefore(optionSummary, anchor);
+      anchor = optionSummary.nextSibling;
+    }
+
+    // 3. 그 아래: 재질 선택값
+    if (material) {
+      panel.insertBefore(material, anchor);
+      anchor = material.nextSibling;
+    }
+
+    // 4. 실사 미리보기는 재질 선택값 아래로 이동
+    if (livePreview) {
+      panel.insertBefore(livePreview, anchor);
+      anchor = livePreview.nextSibling;
+    }
+
+    // 5. 총 견적은 맨 아래
+    if (total) {
+      panel.appendChild(total);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', reorderRightPanel);
+  window.addEventListener('load', reorderRightPanel);
+  setTimeout(reorderRightPanel, 300);
+  setTimeout(reorderRightPanel, 1000);
+  document.addEventListener('click', function(){
+    setTimeout(reorderRightPanel, 80);
+  }, true);
+})();
+</script>
 </body>
 
 
@@ -14039,7 +14304,7 @@ input::placeholder{color:#78909d !important;}
   grid-template-columns:1fr 1fr 1fr !important;
   gap:10px !important;
 }
-
+#texture-preview .quick-materials{
 </style>
 
 <script id="ff-fixed40-no-dashboard-script">
