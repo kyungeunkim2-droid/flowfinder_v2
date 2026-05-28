@@ -2258,8 +2258,15 @@ function _ffDrawActualScreenPreview(ctx, W, H, entry) {
 // }
   var tex = _ffNormalizeTextureUrl(entry.texUrl) || _ffLocalTextureForCode(screenCode, entry.type);
  // if (screenCode && prod.masks.screen_mask) {
-    _ffApplyMasked(ctx, tex, prod.masks.screen_mask, dx, dy, dw, dh, screenCode, 'screen');
-  }
+//   _ffApplyMasked(
+//     ctx,
+//     tex,
+//     prod.masks.screen_mask,
+//     dx, dy, dw, dh,
+//     screenCode,
+//     'screen'
+//   );
+// }
   // 원본 하이라이트/그림자 보존
   ctx.save();
   ctx.globalAlpha = 0.10;
@@ -13239,14 +13246,19 @@ button.material-btn{
   var DESKS=['일반형 데스크','덕트형 데스크'];
   var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
-  var SINGLE=['일자형 스크린','L형 스크린'];
-  var PRODUCT_IMG={
-    '일반형 데스크':'products/desk_standard/base/base.png','덕트형 데스크':'products/desk_duct/base/base.png',
-    '전면 스크린':'products/screen_front/base/base.png','사이드 스크린':'products/screen_side/base/base.png',
-    '일자형 스크린':'products/screen_straight/base/base.png','L형 스크린':'products/screen_lshape/base/base.png'
-  };
-  var OPTION_IMG={
-   var OPTION_IMG={
+  var SINGLE = ['일자형 스크린', 'L형 스크린'];
+
+var PRODUCT_IMG = {
+  '일반형 데스크':'products/desk_standard/base/base.png',
+  '덕트형 데스크':'products/desk_duct/base/base.png',
+  '전면 스크린':'products/screen_front/base/base.png',
+  '사이드 스크린':'products/screen_side/base/base.png',
+  '일자형 스크린':'products/screen_straight/base/base.png',
+  'L형 스크린':'products/screen_lshape/base/base.png'
+};
+
+var OPTION_IMG = {
+
   leg:{
     '사다리형 4레그':'./images/options/mobility/ladder_glide.png',
     '사다리형':'./images/options/mobility/ladder_glide.png',
