@@ -3070,7 +3070,7 @@ var DESK_COLOR_MAP = {
 var CUSTOM_VENEER_COLORS_DESK = ['OGG','OB','NCE','NMOK','DBL'];
 var CUSTOM_LAMINATE_COLORS_DESK = [
   'BGM','BKA','CC','CGY','FIV','FK','GG','IO','KAP',
-  'LD','LL','LT','MDB','NBK','NSS','OHN','RCN','TL','TRZ','UA','WP','WW'
+  'LD','LL','LT','MDB','NBK','NSS','OHN','RCN','TL','TRZ','UA','WP',
 ];
 var CUSTOM_TOP_COLORS_DESK = CUSTOM_VENEER_COLORS_DESK.concat(CUSTOM_LAMINATE_COLORS_DESK);
 var CUSTOM_LEG_COLORS = ['DCR','TS'];
@@ -12297,7 +12297,7 @@ ${map.move[move] || move}
     S().step='choose_color'; S()._deskTopItems=items; S()._deskLegItems=items;
     var isCustom=S().colorType==='주문';
     var topColors=isCustom ? (window.CUSTOM_VENEER_COLORS_DESK||[]) : ((window.DESK_TOP_COLORS&&DESK_TOP_COLORS[catName])||['WW','WWK','OCY','HW']);
-    var legColors=isCustom ? (window.CUSTOM_LEG_COLORS||[]) : ((window.DESK_LEG_COLORS&&DESK_LEG_COLORS[catName])||['WW','DSG','BKM','DCR','TS']);
+    var legColors=isCustom ? (window.CUSTOM_LEG_COLORS||[]) : ((window.DESK_LEG_COLORS&&DESK_LEG_COLORS[catName])||['WW','DSG','BKM']);
     var uid=Date.now(), topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
     function btnGroup(arr,inputId,part){var h='<div class="material-button-group">';(arr||[]).forEach(function(c){h+=window.ffMaterialBtnHtml?ffMaterialBtnHtml(c,inputId,part,catName):'<button type="button" class="material-btn" onclick="document.getElementById(\''+inputId+'\').value=\''+c+'\'">'+c+'</button>';});return h+'</div>';}
     var topHtml='';
@@ -12747,7 +12747,7 @@ ${map.move[move] || move}
     var stdTop=unique((window.DESK_TOP_COLORS && window.DESK_TOP_COLORS[catName]) || ['WW','WWK','OCY','HW']);
     var veneer=unique(window.CUSTOM_VENEER_COLORS_DESK || []);
     var laminate=unique(window.CUSTOM_LAMINATE_COLORS_DESK || []);
-    var legStd=unique((window.DESK_LEG_COLORS && window.DESK_LEG_COLORS[catName]) || ['WW','DSG','BKM','DCR','TS']);
+    var legStd=unique((window.DESK_LEG_COLORS && window.DESK_LEG_COLORS[catName]) || ['WW','DSG','BKM']);
     var legCustom=unique(window.CUSTOM_LEG_COLORS || []);
     var topHtml=''
       + colorSection('표준품 색상', stdTop, topId, 'top', catName, '상판')
