@@ -1113,6 +1113,37 @@ body.ff-dashboard-preview #preview-panel{
   gap:10px !important;
 }
 
+
+/* === FF HOTFIX === */
+.ff-hero-grid{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:24px !important;
+}
+
+.ff-hero-image-card{
+  margin-bottom:22px !important;
+  flex:none !important;
+}
+
+.ff-hero-swatches{
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1fr !important;
+  gap:12px !important;
+  margin-top:18px !important;
+  position:relative !important;
+  z-index:3 !important;
+  clear:both !important;
+}
+
+.ff-hero-thumbs{
+  display:grid !important;
+  grid-template-columns:1fr 1fr 1fr !important;
+  gap:12px !important;
+  margin-top:24px !important;
+  clear:both !important;
+}
+
 </style>
 
 
@@ -6244,7 +6275,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
   function defaultScreenH(cat){return (cat==='일자형 스크린'||cat==='L형 스크린')?590:715;}
   function currentDeskDefaultH(){return 720;}
 
-  window.updateFlowBar = function(){
+  window.updateFlowBar = function(){ window.state = window.state || {}; 
     var bar=$('flow-bar'); if(!bar) return;
     var steps=['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
     var active=0;
@@ -6428,7 +6459,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
     addMsg('bot', html);
   };
   var __oldUpdateFlowBar = window.updateFlowBar;
-  window.updateFlowBar = function(){
+  window.updateFlowBar = function(){ window.state = window.state || {}; 
     var bar=document.getElementById('flow-bar');
     if(!bar){ if(__oldUpdateFlowBar) return __oldUpdateFlowBar(); return; }
     var steps=['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
@@ -6672,7 +6703,7 @@ body.ff-dashboard-preview #preview-panel{
     if (typeof oldGoTo === 'function') return oldGoTo(targetIdx);
   };
   var oldUpdateFlow = window.updateFlowBar;
-  window.updateFlowBar = function(){
+  window.updateFlowBar = function(){ window.state = window.state || {}; 
     var bar = document.getElementById('flow-bar');
     if(!bar){ if(oldUpdateFlow) oldUpdateFlow(); return; }
     var labels = ['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
@@ -13594,7 +13625,7 @@ body{
     return active;
   };
 
-  window.updateFlowBar = function(){
+  window.updateFlowBar = function(){ window.state = window.state || {}; 
     var bar = document.getElementById('flow-bar');
     if(!bar) return;
     var steps = ['01 제품','02 옵션','03 사이즈','04 컬러','05 견적'];
