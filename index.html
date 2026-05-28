@@ -5890,10 +5890,19 @@ FF_MANIFEST = {"products":{"desk_duct":{"label":"덕트형 데스크","type":"de
     function refreshScreenOptions() {
       clearSelect(ss);
       var pk=ps.value, p=FF_MANIFEST.products[pk];
-      if (!p || p.type!=='screen') { addOpt(ss,'','데스크 제품은 스크린 재질 없음',{code:''}); ss.disabled=true; }
-      else {
-        ss.disabled=false;
-        flattenScreen(pk).forEach(function(t) { addOpt(ss,t.file,t.label,{code:t.code,group:t.group}); });
+    if(!p){
+  ss.disabled=true;
+}
+else{
+  ss.disabled=false;
+
+  flattenScreen(pk).forEach(function(t){
+    addOpt(ss,t.file,t.label,{
+      code:t.code,
+      group:t.group
+    });
+  });
+}
         if (!ss.options.length) addOpt(ss,'','등록된 스크린 재질 없음',{code:''});
       }
       var lab=$('ff-screen-label');
