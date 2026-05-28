@@ -3979,12 +3979,9 @@ function askColorTypeFirst(catName, dataType, items, productKey) {
 
 
 function ffTextureUrlForChoice(code, part, catName) {
-  var key = (part === 'leg') ? ('LEG_' + code) : code;
-  var path = '';
-  if (typeof _ffLocalTextureForCode === 'function') path = _ffLocalTextureForCode(key, catName || state._currentCatName || '');
-  if (!path) path = TEXTURE_MAP[key] || TEXTURE_MAP[code] || '';
-  if (!path) return '';
-  return path.indexOf('textures/') === 0 ? path : (GITHUB_RAW + path);
+  // FF1001: 재질 이미지 파일이 서버에 없으면 404가 폭주하므로,
+  // 브라우저 썸네일은 색상 스와치로만 표시한다. Nano 요청에는 code/color를 별도로 보낸다.
+  return '';
 }
 function ffMaterialBtnHtml(code, inputId, part, catName) {
   var url = ffTextureUrlForChoice(code, part, catName || '');
@@ -3998,15 +3995,8 @@ function ffMaterialBtnHtml(code, inputId, part, catName) {
     + '<span class="mat-thumb" style="' + bg + '"></span><span class="mat-code">' + code + '</span></button>';
 }
 function ffMaterialTextureUrl(code, part) {
-  // hover 확대 썸네일은 반드시 ZIP 안의 로컬 textures/ 경로를 우선 사용한다.
-  // 기존 TEXTURE_MAP에는 예전 GitHub 경로(desk/custom/..., textures/screen/front/custom/...)가 섞여 있어서
-  // 로컬에 넣은 재질이 hover에서 안 뜨는 문제가 있었다.
-  var path = ffTextureUrlForChoice(code, part, state._currentCatName || '');
-  var previewCode = part === 'leg' ? ('LEG_' + code) : code;
-  if (!path) path = TEXTURE_MAP[previewCode] || TEXTURE_MAP[code] || '';
-  if (!path) return '';
-  if (path.indexOf('textures/') === 0 || path.indexOf('products/') === 0 || path.indexOf('data:') === 0 || path.indexOf('http') === 0) return path;
-  return GITHUB_RAW + path;
+  // FF1001: 재질 썸네일 이미지 요청 차단. 색상 스와치 사용.
+  return '';
 }
 function ffShowMaterialHover(code, part, ev, btn) {
   var pop = document.getElementById('material-hover-preview');
@@ -11172,7 +11162,8 @@ ${map.move[move] || move}
 <!-- FF v133 asset path repair patch: inserted automatically -->
 <script id="ff-v133-asset-path-fix">
 (function(){
-  var ASSET_TEXTURES = {"LEG|DCR|custom": "images/textures/leg/custom/DCR.png", "LEG|DCR": "images/textures/leg/custom/DCR.png", "LEG|TS|custom": "images/textures/leg/custom/TS.png", "LEG|TS": "images/textures/leg/custom/TS.png", "LEG|BKM|standard": "images/textures/leg/standard/BKM.png", "LEG|BKM": "images/textures/leg/standard/BKM.png", "LEG|DSG|standard": "images/textures/leg/standard/DSG.png", "LEG|DSG": "images/textures/leg/standard/DSG.png", "LEG|WW|standard": "images/textures/leg/standard/WW.png", "LEG|WW": "images/textures/leg/standard/WW.png", "SCREEN|screen_front|001|custom": "images/textures/screen/screen_front/custom/001.jpg", "SCREEN|screen_front|001": "images/textures/screen/screen_front/custom/001.jpg", "SCREEN|001": "images/textures/screen/screen_front/custom/001.jpg", "SCREEN|screen_front|001A|custom": "images/textures/screen/screen_front/custom/001A.jpg", "SCREEN|screen_front|001A": "images/textures/screen/screen_front/custom/001A.jpg", "SCREEN|001A": "images/textures/screen/screen_front/custom/001A.jpg", "SCREEN|screen_front|001B|custom": "images/textures/screen/screen_front/custom/001B.jpg", "SCREEN|screen_front|001B": "images/textures/screen/screen_front/custom/001B.jpg", "SCREEN|001B": "images/textures/screen/screen_front/custom/001B.jpg", "SCREEN|screen_front|004|custom": "images/textures/screen/screen_front/custom/004.jpg", "SCREEN|screen_front|004": "images/textures/screen/screen_front/custom/004.jpg", "SCREEN|004": "images/textures/screen/screen_front/custom/004.jpg", "SCREEN|screen_front|004B|custom": "images/textures/screen/screen_front/custom/004B.jpg", "SCREEN|screen_front|004B": "images/textures/screen/screen_front/custom/004B.jpg", "SCREEN|004B": "images/textures/screen/screen_front/custom/004B.jpg", "SCREEN|screen_front|007|custom": "images/textures/screen/screen_front/custom/007.jpg", "SCREEN|screen_front|007": "images/textures/screen/screen_front/custom/007.jpg", "SCREEN|007": "images/textures/screen/screen_front/custom/007.jpg", "SCREEN|screen_front|007B|custom": "images/textures/screen/screen_front/custom/007B.jpg", "SCREEN|screen_front|007B": "images/textures/screen/screen_front/custom/007B.jpg", "SCREEN|007B": "images/textures/screen/screen_front/custom/007B.jpg", "SCREEN|screen_front|014|custom": "images/textures/screen/screen_front/custom/014.jpg", "SCREEN|screen_front|014": "images/textures/screen/screen_front/custom/014.jpg", "SCREEN|014": "images/textures/screen/screen_front/custom/014.jpg", "SCREEN|screen_front|014A|custom": "images/textures/screen/screen_front/custom/014A.jpg", "SCREEN|screen_front|014A": "images/textures/screen/screen_front/custom/014A.jpg", "SCREEN|014A": "images/textures/screen/screen_front/custom/014A.jpg", "SCREEN|screen_front|061|custom": "images/textures/screen/screen_front/custom/061.jpg", "SCREEN|screen_front|061": "images/textures/screen/screen_front/custom/061.jpg", "SCREEN|061": "images/textures/screen/screen_front/custom/061.jpg", "SCREEN|screen_front|064|custom": "images/textures/screen/screen_front/custom/064.jpg", "SCREEN|screen_front|064": "images/textures/screen/screen_front/custom/064.jpg", "SCREEN|064": "images/textures/screen/screen_front/custom/064.jpg", "SCREEN|screen_front|067|custom": "images/textures/screen/screen_front/custom/067.jpg", "SCREEN|screen_front|067": "images/textures/screen/screen_front/custom/067.jpg", "SCREEN|067": "images/textures/screen/screen_front/custom/067.jpg", "SCREEN|screen_front|071|custom": "images/textures/screen/screen_front/custom/071.jpg", "SCREEN|screen_front|071": "images/textures/screen/screen_front/custom/071.jpg", "SCREEN|071": "images/textures/screen/screen_front/custom/071.jpg", "SCREEN|screen_front|071A|custom": "images/textures/screen/screen_front/custom/071A.jpg", "SCREEN|screen_front|071A": "images/textures/screen/screen_front/custom/071A.jpg", "SCREEN|071A": "images/textures/screen/screen_front/custom/071A.jpg", "SCREEN|screen_front|072|custom": "images/textures/screen/screen_front/custom/072.jpg", "SCREEN|screen_front|072": "images/textures/screen/screen_front/custom/072.jpg", "SCREEN|072": "images/textures/screen/screen_front/custom/072.jpg", "SCREEN|screen_front|074|custom": "images/textures/screen/screen_front/custom/074.jpg", "SCREEN|screen_front|074": "images/textures/screen/screen_front/custom/074.jpg", "SCREEN|074": "images/textures/screen/screen_front/custom/074.jpg", "SCREEN|screen_front|2M4A|custom": "images/textures/screen/screen_front/custom/2M4A.jpg", "SCREEN|screen_front|2M4A": "images/textures/screen/screen_front/custom/2M4A.jpg", "SCREEN|2M4A": "images/textures/screen/screen_front/custom/2M4A.jpg", "SCREEN|screen_front|371|custom": "images/textures/screen/screen_front/custom/371.jpg", "SCREEN|screen_front|371": "images/textures/screen/screen_front/custom/371.jpg", "SCREEN|371": "images/textures/screen/screen_front/custom/371.jpg", "SCREEN|screen_front|3F1|custom": "images/textures/screen/screen_front/custom/3F1.jpg", "SCREEN|screen_front|3F1": "images/textures/screen/screen_front/custom/3F1.jpg", "SCREEN|3F1": "images/textures/screen/screen_front/custom/3F1.jpg", "SCREEN|screen_front|3F2|custom": "images/textures/screen/screen_front/custom/3F2.jpg", "SCREEN|screen_front|3F2": "images/textures/screen/screen_front/custom/3F2.jpg", "SCREEN|3F2": "images/textures/screen/screen_front/custom/3F2.jpg", "SCREEN|screen_front|451|custom": "images/textures/screen/screen_front/custom/451.jpg", "SCREEN|screen_front|451": "images/textures/screen/screen_front/custom/451.jpg", "SCREEN|451": "images/textures/screen/screen_front/custom/451.jpg", "SCREEN|screen_front|452A|custom": "images/textures/screen/screen_front/custom/452A.png", "SCREEN|screen_front|452A": "images/textures/screen/screen_front/custom/452A.png", "SCREEN|452A": "images/textures/screen/screen_front/custom/452A.png", "SCREEN|screen_front|452N|custom": "images/textures/screen/screen_front/custom/452N.jpg", "SCREEN|screen_front|452N": "images/textures/screen/screen_front/custom/452N.jpg", "SCREEN|452N": "images/textures/screen/screen_front/custom/452N.jpg", "SCREEN|screen_front|457|custom": "images/textures/screen/screen_front/custom/457.jpg", "SCREEN|screen_front|457": "images/textures/screen/screen_front/custom/457.jpg", "SCREEN|457": "images/textures/screen/screen_front/custom/457.jpg", "SCREEN|screen_front|457L|custom": "images/textures/screen/screen_front/custom/457L.jpg", "SCREEN|screen_front|457L": "images/textures/screen/screen_front/custom/457L.jpg", "SCREEN|457L": "images/textures/screen/screen_front/custom/457L.jpg", "SCREEN|screen_front|458|custom": "images/textures/screen/screen_front/custom/458.jpg", "SCREEN|screen_front|458": "images/textures/screen/screen_front/custom/458.jpg", "SCREEN|458": "images/textures/screen/screen_front/custom/458.jpg", "SCREEN|screen_front|061|standard": "images/textures/screen/screen_front/standard/061.jpg", "SCREEN|screen_front|064|standard": "images/textures/screen/screen_front/standard/064.jpg", "SCREEN|screen_front|067|standard": "images/textures/screen/screen_front/standard/067.jpg", "SCREEN|screen_front|3F1|standard": "images/textures/screen/screen_front/standard/3F1.jpg", "SCREEN|screen_front|3F2|standard": "images/textures/screen/screen_front/standard/3F2.jpg", "SCREEN|screen_lshape|1P5|custom": "images/textures/screen/screen_lshape/custom/1P5.jpg", "SCREEN|screen_lshape|1P5": "images/textures/screen/screen_lshape/custom/1P5.jpg", "SCREEN|1P5": "images/textures/screen/screen_lshape/custom/1P5.jpg", "SCREEN|screen_lshape|BRD|custom": "images/textures/screen/screen_lshape/custom/BRD.jpg", "SCREEN|screen_lshape|BRD": "images/textures/screen/screen_lshape/custom/BRD.jpg", "SCREEN|BRD": "images/textures/screen/screen_lshape/custom/BRD.jpg", "SCREEN|screen_lshape|COB|custom": "images/textures/screen/screen_lshape/custom/COB.png", "SCREEN|screen_lshape|COB": "images/textures/screen/screen_lshape/custom/COB.png", "SCREEN|COB": "images/textures/screen/screen_lshape/custom/COB.png", "SCREEN|screen_lshape|MBE|custom": "images/textures/screen/screen_lshape/custom/MBE.jpg", "SCREEN|screen_lshape|MBE": "images/textures/screen/screen_lshape/custom/MBE.jpg", "SCREEN|MBE": "images/textures/screen/screen_lshape/custom/MBE.jpg", "SCREEN|screen_lshape|MGR|custom": "images/textures/screen/screen_lshape/custom/MGR.jpg", "SCREEN|screen_lshape|MGR": "images/textures/screen/screen_lshape/custom/MGR.jpg", "SCREEN|MGR": "images/textures/screen/screen_lshape/custom/MGR.jpg", "SCREEN|screen_lshape|1P1|standard": "images/textures/screen/screen_lshape/standard/1P1.jpg", "SCREEN|screen_lshape|1P1": "images/textures/screen/screen_lshape/standard/1P1.jpg", "SCREEN|1P1": "images/textures/screen/screen_lshape/standard/1P1.jpg", "SCREEN|screen_lshape|1P2|standard": "images/textures/screen/screen_lshape/standard/1P2.jpg", "SCREEN|screen_lshape|1P2": "images/textures/screen/screen_lshape/standard/1P2.jpg", "SCREEN|1P2": "images/textures/screen/screen_lshape/standard/1P2.jpg", "SCREEN|screen_lshape|1P4|standard": "images/textures/screen/screen_lshape/standard/1P4.jpg", "SCREEN|screen_lshape|1P4": "images/textures/screen/screen_lshape/standard/1P4.jpg", "SCREEN|1P4": "images/textures/screen/screen_lshape/standard/1P4.jpg", "SCREEN|screen_lshape|1P7|standard": "images/textures/screen/screen_lshape/standard/1P7.jpg", "SCREEN|screen_lshape|1P7": "images/textures/screen/screen_lshape/standard/1P7.jpg", "SCREEN|1P7": "images/textures/screen/screen_lshape/standard/1P7.jpg", "SCREEN|screen_side|001|custom": "images/textures/screen/screen_side/custom/001.jpg", "SCREEN|screen_side|001": "images/textures/screen/screen_side/custom/001.jpg", "SCREEN|screen_side|001A|custom": "images/textures/screen/screen_side/custom/001A.jpg", "SCREEN|screen_side|001A": "images/textures/screen/screen_side/custom/001A.jpg", "SCREEN|screen_side|001B|custom": "images/textures/screen/screen_side/custom/001B.jpg", "SCREEN|screen_side|001B": "images/textures/screen/screen_side/custom/001B.jpg", "SCREEN|screen_side|004|custom": "images/textures/screen/screen_side/custom/004.jpg", "SCREEN|screen_side|004": "images/textures/screen/screen_side/custom/004.jpg", "SCREEN|screen_side|004B|custom": "images/textures/screen/screen_side/custom/004B.jpg", "SCREEN|screen_side|004B": "images/textures/screen/screen_side/custom/004B.jpg", "SCREEN|screen_side|007|custom": "images/textures/screen/screen_side/custom/007.jpg", "SCREEN|screen_side|007": "images/textures/screen/screen_side/custom/007.jpg", "SCREEN|screen_side|007B|custom": "images/textures/screen/screen_side/custom/007B.jpg", "SCREEN|screen_side|007B": "images/textures/screen/screen_side/custom/007B.jpg", "SCREEN|screen_side|014|custom": "images/textures/screen/screen_side/custom/014.jpg", "SCREEN|screen_side|014": "images/textures/screen/screen_side/custom/014.jpg", "SCREEN|screen_side|014A|custom": "images/textures/screen/screen_side/custom/014A.jpg", "SCREEN|screen_side|014A": "images/textures/screen/screen_side/custom/014A.jpg", "SCREEN|screen_side|061|custom": "images/textures/screen/screen_side/custom/061.jpg", "SCREEN|screen_side|061": "images/textures/screen/screen_side/custom/061.jpg", "SCREEN|screen_side|064|custom": "images/textures/screen/screen_side/custom/064.jpg", "SCREEN|screen_side|064": "images/textures/screen/screen_side/custom/064.jpg", "SCREEN|screen_side|067|custom": "images/textures/screen/screen_side/custom/067.jpg", "SCREEN|screen_side|067": "images/textures/screen/screen_side/custom/067.jpg", "SCREEN|screen_side|071|custom": "images/textures/screen/screen_side/custom/071.jpg", "SCREEN|screen_side|071": "images/textures/screen/screen_side/custom/071.jpg", "SCREEN|screen_side|071A|custom": "images/textures/screen/screen_side/custom/071A.jpg", "SCREEN|screen_side|071A": "images/textures/screen/screen_side/custom/071A.jpg", "SCREEN|screen_side|072|custom": "images/textures/screen/screen_side/custom/072.jpg", "SCREEN|screen_side|072": "images/textures/screen/screen_side/custom/072.jpg", "SCREEN|screen_side|074|custom": "images/textures/screen/screen_side/custom/074.jpg", "SCREEN|screen_side|074": "images/textures/screen/screen_side/custom/074.jpg", "SCREEN|screen_side|2M4A|custom": "images/textures/screen/screen_side/custom/2M4A.jpg", "SCREEN|screen_side|2M4A": "images/textures/screen/screen_side/custom/2M4A.jpg", "SCREEN|screen_side|371|custom": "images/textures/screen/screen_side/custom/371.jpg", "SCREEN|screen_side|371": "images/textures/screen/screen_side/custom/371.jpg", "SCREEN|screen_side|3F1|custom": "images/textures/screen/screen_side/custom/3F1.jpg", "SCREEN|screen_side|3F1": "images/textures/screen/screen_side/custom/3F1.jpg", "SCREEN|screen_side|3F2|custom": "images/textures/screen/screen_side/custom/3F2.jpg", "SCREEN|screen_side|3F2": "images/textures/screen/screen_side/custom/3F2.jpg", "SCREEN|screen_side|451|custom": "images/textures/screen/screen_side/custom/451.jpg", "SCREEN|screen_side|451": "images/textures/screen/screen_side/custom/451.jpg", "SCREEN|screen_side|452A|custom": "images/textures/screen/screen_side/custom/452A.png", "SCREEN|screen_side|452A": "images/textures/screen/screen_side/custom/452A.png", "SCREEN|screen_side|452N|custom": "images/textures/screen/screen_side/custom/452N.jpg", "SCREEN|screen_side|452N": "images/textures/screen/screen_side/custom/452N.jpg", "SCREEN|screen_side|457|custom": "images/textures/screen/screen_side/custom/457.jpg", "SCREEN|screen_side|457": "images/textures/screen/screen_side/custom/457.jpg", "SCREEN|screen_side|457L|custom": "images/textures/screen/screen_side/custom/457L.jpg", "SCREEN|screen_side|457L": "images/textures/screen/screen_side/custom/457L.jpg", "SCREEN|screen_side|458|custom": "images/textures/screen/screen_side/custom/458.jpg", "SCREEN|screen_side|458": "images/textures/screen/screen_side/custom/458.jpg", "SCREEN|screen_side|061|standard": "images/textures/screen/screen_side/standard/061.jpg", "SCREEN|screen_side|064|standard": "images/textures/screen/screen_side/standard/064.jpg", "SCREEN|screen_side|067|standard": "images/textures/screen/screen_side/standard/067.jpg", "SCREEN|screen_side|3F1|standard": "images/textures/screen/screen_side/standard/3F1.jpg", "SCREEN|screen_side|3F2|standard": "images/textures/screen/screen_side/standard/3F2.jpg", "SCREEN|screen_straight|1P5|custom": "images/textures/screen/screen_straight/custom/1P5.jpg", "SCREEN|screen_straight|1P5": "images/textures/screen/screen_straight/custom/1P5.jpg", "SCREEN|screen_straight|BRD|custom": "images/textures/screen/screen_straight/custom/BRD.jpg", "SCREEN|screen_straight|BRD": "images/textures/screen/screen_straight/custom/BRD.jpg", "SCREEN|screen_straight|COB|custom": "images/textures/screen/screen_straight/custom/COB.png", "SCREEN|screen_straight|COB": "images/textures/screen/screen_straight/custom/COB.png", "SCREEN|screen_straight|MBE|custom": "images/textures/screen/screen_straight/custom/MBE.jpg", "SCREEN|screen_straight|MBE": "images/textures/screen/screen_straight/custom/MBE.jpg", "SCREEN|screen_straight|MGR|custom": "images/textures/screen/screen_straight/custom/MGR.jpg", "SCREEN|screen_straight|MGR": "images/textures/screen/screen_straight/custom/MGR.jpg", "SCREEN|screen_straight|1P1|standard": "images/textures/screen/screen_straight/standard/1P1.jpg", "SCREEN|screen_straight|1P1": "images/textures/screen/screen_straight/standard/1P1.jpg", "SCREEN|screen_straight|1P2|standard": "images/textures/screen/screen_straight/standard/1P2.jpg", "SCREEN|screen_straight|1P2": "images/textures/screen/screen_straight/standard/1P2.jpg", "SCREEN|screen_straight|1P4|standard": "images/textures/screen/screen_straight/standard/1P4.jpg", "SCREEN|screen_straight|1P4": "images/textures/screen/screen_straight/standard/1P4.jpg", "SCREEN|screen_straight|1P7|standard": "images/textures/screen/screen_straight/standard/1P7.jpg", "SCREEN|screen_straight|1P7": "images/textures/screen/screen_straight/standard/1P7.jpg", "TOP|BGM|laminate": "images/textures/top/laminate/BGM.jpg", "TOP|BGM": "images/textures/top/laminate/BGM.jpg", "TOP|BKA|laminate": "images/textures/top/laminate/BKA.jpg", "TOP|BKA": "images/textures/top/laminate/BKA.jpg", "TOP|CC|laminate": "images/textures/top/laminate/CC.jpg", "TOP|CC": "images/textures/top/laminate/CC.jpg", "TOP|CGY|laminate": "images/textures/top/laminate/CGY.jpg", "TOP|CGY": "images/textures/top/laminate/CGY.jpg", "TOP|FIV|laminate": "images/textures/top/laminate/FIV.jpg", "TOP|FIV": "images/textures/top/laminate/FIV.jpg", "TOP|FK|laminate": "images/textures/top/laminate/FK.jpg", "TOP|FK": "images/textures/top/laminate/FK.jpg", "TOP|GG|laminate": "images/textures/top/laminate/GG.jpg", "TOP|GG": "images/textures/top/laminate/GG.jpg", "TOP|IO|laminate": "images/textures/top/laminate/IO.jpg", "TOP|IO": "images/textures/top/laminate/IO.jpg", "TOP|KAP|laminate": "images/textures/top/laminate/KAP.jpg", "TOP|KAP": "images/textures/top/laminate/KAP.jpg", "TOP|LD|laminate": "images/textures/top/laminate/LD.jpg", "TOP|LD": "images/textures/top/laminate/LD.jpg", "TOP|LL|laminate": "images/textures/top/laminate/LL.jpg", "TOP|LL": "images/textures/top/laminate/LL.jpg", "TOP|LT|laminate": "images/textures/top/laminate/LT.jpg", "TOP|LT": "images/textures/top/laminate/LT.jpg", "TOP|MDB|laminate": "images/textures/top/laminate/MDB.png", "TOP|MDB": "images/textures/top/laminate/MDB.png", "TOP|NBK|laminate": "images/textures/top/laminate/NBK.jpg", "TOP|NBK": "images/textures/top/laminate/NBK.jpg", "TOP|NSS|laminate": "images/textures/top/laminate/NSS.jpg", "TOP|NSS": "images/textures/top/laminate/NSS.jpg", "TOP|OHN|laminate": "images/textures/top/laminate/OHN.jpg", "TOP|OHN": "images/textures/top/laminate/OHN.jpg", "TOP|RCN|laminate": "images/textures/top/laminate/RCN.jpg", "TOP|RCN": "images/textures/top/laminate/RCN.jpg", "TOP|TL|laminate": "images/textures/top/laminate/TL.jpg", "TOP|TL": "images/textures/top/laminate/TL.jpg", "TOP|TRZ|laminate": "images/textures/top/laminate/TRZ.jpg", "TOP|TRZ": "images/textures/top/laminate/TRZ.jpg", "TOP|UA|laminate": "images/textures/top/laminate/UA.jpg", "TOP|UA": "images/textures/top/laminate/UA.jpg", "TOP|WP|laminate": "images/textures/top/laminate/WP.jpg", "TOP|WP": "images/textures/top/laminate/WP.jpg", "TOP|WW|laminate": "images/textures/top/laminate/WW.jpg", "TOP|WW": "images/textures/top/laminate/WW.jpg", "TOP|HW|standard": "images/textures/top/standard/HW.png", "TOP|HW": "images/textures/top/standard/HW.png", "TOP|OSG|standard": "images/textures/top/standard/OSG.jpg", "TOP|OSG": "images/textures/top/standard/OSG.jpg", "TOP|WW|standard": "images/textures/top/standard/WW.jpg", "TOP|DBL|veneer": "images/textures/top/veneer/DBL.jpg", "TOP|DBL": "images/textures/top/veneer/DBL.jpg", "TOP|NCE|veneer": "images/textures/top/veneer/NCE.jpg", "TOP|NCE": "images/textures/top/veneer/NCE.jpg", "TOP|NMOK|veneer": "images/textures/top/veneer/NMOK.jpg", "TOP|NMOK": "images/textures/top/veneer/NMOK.jpg", "TOP|OB|veneer": "images/textures/top/veneer/OB.jpg", "TOP|OB": "images/textures/top/veneer/OB.jpg", "TOP|OGG|veneer": "images/textures/top/veneer/OGG.jpg", "TOP|OGG": "images/textures/top/veneer/OGG.jpg"};
+  var ASSET_TEXTURES = {}; // FF1001: texture thumbnails disabled to prevent 404; color swatches are used instead
+
   var ASSET_PREVIEWS = ["images/previews/desk_duct/aframe_caster_round.png", "images/previews/desk_duct/aframe_caster_round_front.png", "images/previews/desk_duct/aframe_caster_round_frontside.png", "images/previews/desk_duct/aframe_caster_round_lshape.png", "images/previews/desk_duct/aframe_caster_round_lshape_R.png", "images/previews/desk_duct/aframe_caster_round_side.png", "images/previews/desk_duct/aframe_caster_round_straight.png", "images/previews/desk_duct/aframe_glide_round.png", "images/previews/desk_duct/aframe_glide_round_front.png", "images/previews/desk_duct/aframe_glide_round_frontside.png", "images/previews/desk_duct/aframe_glide_round_lshape.png", "images/previews/desk_duct/aframe_glide_round_lshape_R.png", "images/previews/desk_duct/aframe_glide_round_side.png", "images/previews/desk_duct/aframe_glide_round_straight.png", "images/previews/desk_duct/ladder_caster_rect.png", "images/previews/desk_duct/ladder_caster_rect_front.png", "images/previews/desk_duct/ladder_caster_rect_frontside.png", "images/previews/desk_duct/ladder_caster_rect_lshape.png", "images/previews/desk_duct/ladder_caster_rect_lshape_R.png", "images/previews/desk_duct/ladder_caster_rect_side.png", "images/previews/desk_duct/ladder_caster_rect_straight.png", "images/previews/desk_duct/ladder_glide_rect.png", "images/previews/desk_duct/ladder_glide_rect_front.png", "images/previews/desk_duct/ladder_glide_rect_frontside.png", "images/previews/desk_duct/ladder_glide_rect_lshape.png", "images/previews/desk_duct/ladder_glide_rect_lshape_R.png", "images/previews/desk_duct/ladder_glide_rect_side.png", "images/previews/desk_duct/ladder_glide_rect_straight.png", "images/previews/desk_duct/round_caster_round.png", "images/previews/desk_duct/round_caster_round_front.png", "images/previews/desk_duct/round_caster_round_frontside.png", "images/previews/desk_duct/round_caster_round_lshape.png", "images/previews/desk_duct/round_caster_round_lshape_R.png", "images/previews/desk_duct/round_caster_round_side.png", "images/previews/desk_duct/round_caster_round_straight.png", "images/previews/desk_duct/round_glide_round.png", "images/previews/desk_duct/round_glide_round_front.png", "images/previews/desk_duct/round_glide_round_frontside.png", "images/previews/desk_duct/round_glide_round_lshape.png", "images/previews/desk_duct/round_glide_round_lshape_R.png", "images/previews/desk_duct/round_glide_round_side.png", "images/previews/desk_duct/round_glide_round_straight.png", "images/previews/desk_standard/aframe_caster_round_front.png", "images/previews/desk_standard/aframe_caster_round_frontside.png", "images/previews/desk_standard/aframe_caster_round_lshape.png", "images/previews/desk_standard/aframe_caster_round_lshape_R.png", "images/previews/desk_standard/aframe_caster_round_side.png", "images/previews/desk_standard/aframe_caster_round_straight.png", "images/previews/desk_standard/aframe_glide_round_front.png", "images/previews/desk_standard/aframe_glide_round_frontside.png", "images/previews/desk_standard/aframe_glide_round_lshape.png", "images/previews/desk_standard/aframe_glide_round_lshape_R.png", "images/previews/desk_standard/aframe_glide_round_side.png", "images/previews/desk_standard/aframe_glide_round_straight.png", "images/previews/desk_standard/ladder_caster_rect_front.png", "images/previews/desk_standard/ladder_caster_rect_frontside.png", "images/previews/desk_standard/ladder_caster_rect_lshape.png", "images/previews/desk_standard/ladder_caster_rect_lshape_R.png", "images/previews/desk_standard/ladder_caster_rect_side.png", "images/previews/desk_standard/ladder_caster_rect_straight.png", "images/previews/desk_standard/ladder_glide_rect_front.png", "images/previews/desk_standard/ladder_glide_rect_frontside.png", "images/previews/desk_standard/ladder_glide_rect_lshape.png", "images/previews/desk_standard/ladder_glide_rect_lshape_R.png", "images/previews/desk_standard/ladder_glide_rect_side.png", "images/previews/desk_standard/ladder_glide_rect_straight.png", "images/previews/desk_standard/round_caster_round_front.png", "images/previews/desk_standard/round_caster_round_frontside.png", "images/previews/desk_standard/round_caster_round_lshape.png", "images/previews/desk_standard/round_caster_round_lshape_R.png", "images/previews/desk_standard/round_caster_round_side.png", "images/previews/desk_standard/round_caster_round_straight.png", "images/previews/desk_standard/round_glide_round_front.png", "images/previews/desk_standard/round_glide_round_frontside.png", "images/previews/desk_standard/round_glide_round_lshape.png", "images/previews/desk_standard/round_glide_round_lshape_R.png", "images/previews/desk_standard/round_glide_round_side.png", "images/previews/desk_standard/round_glide_round_straight.png"];
   var ASSET_OPTIONS = ["images/options/accessories/bag_hook.png", "images/options/accessories/monitor_arm_topmount.png", "images/options/accessories/multitap_embedded_2outlet.png", "images/options/accessories/multitap_external_3outlet.png", "images/options/accessories/multitap_sliding_3outlet.png", "images/options/accessories/pc_basic_hanging.png", "images/options/accessories/pc_hanging.png", "images/options/accessories/pc_strap.png", "images/options/combo/duct/aframe_caster.png", "images/options/combo/duct/aframe_glide.png", "images/options/combo/duct/ladder_caster.png", "images/options/combo/duct/ladder_glide.png", "images/options/combo/duct/round_caster.png", "images/options/combo/duct/round_glide.png", "images/options/combo/normal/aframe_caster.png", "images/options/combo/normal/aframe_glide.png", "images/options/combo/normal/ladder_caster.png", "images/options/combo/normal/ladder_glide.png", "images/options/combo/normal/round_caster.png", "images/options/combo/normal/round_glide.png", "images/options/leg/a_type.png", "images/options/leg/ladder.png", "images/options/leg/round.png", "images/options/mobility/aframe_caster.png", "images/options/mobility/aframe_glide.png", "images/options/mobility/ladder_caster.png", "images/options/mobility/ladder_glide.png", "images/options/mobility/round_caster.png", "images/options/mobility/round_glide.png", "images/options/top/round.png", "images/options/top/rect.png"];
 
@@ -16677,5 +16668,306 @@ var OPTION_IMG = {
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind); else bind();
   window.addEventListener('load',bind); document.addEventListener('click',function(){setTimeout(bind,80);},true); setInterval(bind,1600);
+})();
+</script>
+
+
+<!-- === FF1001: no texture 404 + material swatch 3x1 + stronger Nano material-only payload === -->
+<style id="ff1001-no404-material-3x1">
+  .material-button-group{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  .material-btn{
+    min-height:78px!important;
+    padding:8px!important;
+    flex-direction:column!important;
+    justify-content:center!important;
+    gap:6px!important;
+    border-radius:14px!important;
+  }
+  .material-btn .mat-thumb{
+    width:58px!important;
+    height:42px!important;
+    min-width:58px!important;
+    flex-basis:auto!important;
+    border-radius:10px!important;
+    background-image:none!important;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)!important;
+  }
+  .material-btn .mat-code{font-size:12px!important;max-width:100%!important;}
+  #texture-preview .quick-materials{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+  }
+  #texture-preview .material-chip-row{
+    grid-template-columns:1fr!important;
+    min-height:102px!important;
+    text-align:center!important;
+    justify-items:center!important;
+    padding:10px!important;
+  }
+  #texture-preview .material-chip-row em{
+    width:78px!important;
+    height:50px!important;
+    border-radius:11px!important;
+    background-image:none!important;
+    justify-self:center!important;
+  }
+  @media(max-width:980px){
+    #texture-preview .quick-materials{grid-template-columns:1fr!important;}
+    .material-button-group{grid-template-columns:repeat(3,minmax(0,1fr))!important;}
+  }
+</style>
+<script id="ff1001-final-no404-and-nano-payload">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function state(){return window.state||{};}
+  function norm(v){return String(v||'').trim();}
+  var COLORS={WW:'#e8e0d2',HW:'#7a5135',OSG:'#828077',OCY:'#b58b52',DSG:'#4b4c4f',DCR:'#5d5a55',TS:'#a7a7a0',BKM:'#252525',BKA:'#111111',BGM:'#36322d',MBE:'#c7b89b',MGR:'#8c928a',BRD:'#7c4a35',COB:'#b77441','1P1':'#d8d2c5','1P2':'#b9b0a0','1P4':'#8f918c','1P5':'#aaa294','1P7':'#505050','3F1':'#d7d3c9','3F2':'#9b9b96','064':'#b0aaa0','067':'#767875','071':'#b9b4aa','371':'#8c8a84','451':'#ddd8cf','452A':'#c0bab0','457':'#8b867c','457L':'#8b867c','458':'#65615a','OSG':'#828077'};
+  function codeOf(s){return norm(s).replace(/^LEG_/,'').replace(/[^A-Z0-9]/gi,'').toUpperCase();}
+  function colorFor(code){return COLORS[codeOf(code)] || '#8a8a8a';}
+  function applySwatches(root){
+    (root||document).querySelectorAll('.mat-thumb,.tex-chip,.material-chip-row em,#quick-top-chip,#quick-leg-chip,#quick-screen-chip').forEach(function(el){
+      var parent=el.closest('.material-btn,.material-chip-row')||el.parentElement;
+      var txt=parent?(parent.querySelector('.mat-code,i,b,span')||parent).textContent:'';
+      var c=codeOf(txt||el.getAttribute('data-code')||'');
+      el.style.backgroundImage='none';
+      el.style.backgroundColor=colorFor(c);
+    });
+  }
+  var mo=new MutationObserver(function(ms){ms.forEach(function(m){applySwatches(m.target);});});
+  if(document.body) mo.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+  window.ffTextureUrlForChoice=function(){return '';};
+  window.ffMaterialTextureUrl=function(){return '';};
+  window.ffMaterialTextureUrlSafe=function(){return '';};
+  window._ffLocalTextureForCode=function(){return '';};
+  window.textureResolver=function(){return '';};
+
+  function joined(){var s=state(),cur=s.current||{};return [s.product,s.currentProduct,s.currentCatName,s._currentCatName,s.screenLabel,s.screenType,s.selectedScreen,s.screenShape,s.screenOption,cur.product,(window._setSelected||[]).join(' ')].filter(Boolean).join(' ');}
+  function legKey(){var v=norm(state().legType||state().legShape||state().leg||'');if(/A|에이|a자|aframe/i.test(v))return'aframe';if(/원|라운드|round/i.test(v))return'round';return'ladder';}
+  function mobilityKey(){var v=norm(state().casterType||state().mobility||state().moveType||'');return /캐스터|caster|바퀴|이동/i.test(v)?'caster':'glide';}
+  function topKey(){var v=norm(state().topShape||state().topType||state().shape||'');return /라운드|원형|round/i.test(v)?'round':'rect';}
+  function screenSuffix(){var t=joined(),f=/전면|front/i.test(t),s=/사이드|side/i.test(t);if(/L형|l형|엘형|lshape/i.test(t)){return /우측|오른|right|_R\b/i.test(t)?'_lshape_R':'_lshape';}if(/일자|straight/i.test(t))return'_straight';if(f&&s)return'_frontside';if(s)return'_side';if(f)return'_front';return'';}
+  function deskFolder(){return /덕트|duct/i.test(joined())?'desk_duct':'desk_standard';}
+  function previewFile(){return legKey()+'_'+mobilityKey()+'_'+topKey()+screenSuffix()+'.png';}
+  function previewPath(){return './images/previews/'+deskFolder()+'/'+previewFile();}
+  function matCodes(){var s=state();return {topCode:codeOf(s.topColor||s.deskTopColor||s.color||s.topCode||''),legCode:codeOf(s.legColor||s.deskLegColor||s.legCode||''),screenCode:codeOf(s.screenColor||s.screenCode||'')};}
+  function ensureNote(){var panel=$('preview-panel');if(!panel)return null;var note=$('quick-ai-preview-note');if(!note){note=document.createElement('div');note.id='quick-ai-preview-note';panel.insertBefore(note,$('preview-items')||$('total-box')||null);}return note;}
+  window.prepareNanoBananaPreview=async function(targetType){
+    if(window.__ff1001NanoBusy)return;
+    var note=ensureNote(), base=previewPath(), suffix=screenSuffix(), mats=matCodes();
+    var screenCall=targetType==='screen'||!!suffix||!!mats.screenCode;
+    var btns=[$('quick-ai-preview-btn'),$('ai-render-btn'),$('screen-ai-btn')].filter(Boolean);
+    if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b>원본 사진에 재질 적용 중...</b><br><span style="color:#9fb1c8;font-size:11px;">원본: '+esc(base)+'<br>규칙: '+esc(previewFile())+'</span><img src="'+esc(base)+'" alt="source" onerror="this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div style=&quot;color:#fca5a5;margin-top:8px;&quot;>원본 preview 파일을 찾지 못했습니다: '+esc(base).replace(/'/g,'&#39;')+'</div>\');">';}
+    btns.forEach(function(b){b.disabled=true;b.textContent='재질 적용 중...';});
+    window.__ff1001NanoBusy=true;
+    try{
+      var prompt='Use the supplied baseImage as the exact source photo. Do NOT create a new desk or new product. Preserve the exact desk shape, leg type, mobility type, tabletop shape, screen type, camera angle, crop, background, shadows, proportions, and composition. Only identify the existing desktop top, legs, and screen if present, then apply the selected material/color to those existing surfaces only. Do not invent or alter any parts.';
+      var payload={
+        mode:'material-map-only', task:'reference_image_material_replacement_only', prompt:prompt, instruction:prompt,
+        baseImage:base, sourceImage:base, originalImage:base, previewImage:base, deskImage:base, fallbackDeskImage:base,
+        deskFolder:deskFolder(), previewFile:previewFile(), screenSelected:!!suffix, targetType:screenCall?'desk_with_screen':'desk',
+        legType:legKey(), mobility:mobilityKey(), topShape:topKey(), screenSuffix:suffix,
+        topCode:mats.topCode, legCode:mats.legCode, screenCode:mats.screenCode,
+        topColorHex:colorFor(mats.topCode), legColorHex:colorFor(mats.legCode), screenColorHex:colorFor(mats.screenCode),
+        materials:{top:{code:mats.topCode,color:colorFor(mats.topCode)},leg:{code:mats.legCode,color:colorFor(mats.legCode)},screen:{code:mats.screenCode,color:colorFor(mats.screenCode)}}
+      };
+      var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      var text=await res.text(); var data={}; try{data=JSON.parse(text||'{}');}catch(e){}
+      if(!res.ok) throw new Error((data.error||data.detail||text||('API 오류 '+res.status)).slice(0,300));
+      var src=typeof data==='string'?data:(data.imageUrl||data.image||data.url||data.output||'');
+      if(!src)throw new Error('API 응답에 이미지 URL이 없습니다.');
+      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 결과</div><img src="'+esc(src)+'" alt="result"><div style="margin-top:8px;color:#9fb1c8;font-size:11px;line-height:1.45;">원본을 유지하고 상판/다리'+(screenCall?'/스크린':'')+' 재질만 적용했습니다.<br>기준 원본: '+esc(base)+'</div>';}
+    }catch(err){
+      if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5;">재질 적용 실패</b><br><span style="color:#ddd;">'+esc(err&&err.message?err.message:err)+'</span><br><span style="color:#9fb1c8;font-size:11px;">요청 원본: '+esc(base)+'</span>';}
+      console.error('[FF1001 Nano material only]',err);
+    }finally{window.__ff1001NanoBusy=false;btns.forEach(function(b){b.disabled=false;b.textContent='✨ 원본 사진에 재질 적용';});}
+  };
+  function bind(){applySwatches(document);[['quick-ai-preview-btn','desk'],['ai-render-btn','desk'],['screen-ai-btn','screen']].forEach(function(p){var b=$(p[0]);if(b){b.textContent='✨ 원본 사진에 재질 적용';b.onclick=function(e){if(e)e.preventDefault();window.prepareNanoBananaPreview(p[1]);return false;};}});}
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind);else bind();
+  window.addEventListener('load',bind);document.addEventListener('click',function(){setTimeout(bind,60);},true);setInterval(bind,1200);
+})();
+</script>
+
+
+<!-- === FF1002: final layout separation + material summary 3x1 + strict material-mapping Nano prompt === -->
+<style id="ff1002-final-layout-material-summary-only">
+  /* 데스크 옵션 이미지는 독립 블록 */
+  #ff90-option-summary{
+    position:static!important;
+    display:block!important;
+    clear:both!important;
+    width:100%!important;
+    margin:0 0 14px!important;
+    padding:12px!important;
+    border:1px solid rgba(38,245,201,.28)!important;
+    border-radius:18px!important;
+    background:rgba(3,18,28,.72)!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+  }
+  #ff90-option-summary .ff90-title{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:#26f5c9!important;font-size:12px!important;font-weight:900!important;}
+  #ff90-option-summary .ff90-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important;}
+  #ff90-option-summary .ff90-card{position:relative!important;min-height:112px!important;border:1px solid rgba(38,245,201,.25)!important;border-radius:14px!important;background:#06151f!important;overflow:hidden!important;box-shadow:none!important;}
+  #ff90-option-summary .ff90-card-title{display:block!important;padding:7px 8px 0!important;color:#26f5c9!important;font-size:10px!important;font-weight:900!important;}
+  #ff90-option-summary .ff90-card img{display:block!important;width:100%!important;height:72px!important;object-fit:contain!important;padding:5px 8px!important;background:transparent!important;}
+  #ff90-option-summary .ff90-card b{display:block!important;color:#dffef8!important;font-size:11px!important;line-height:1.25!important;text-align:center!important;padding:0 6px 8px!important;white-space:normal!important;word-break:keep-all!important;}
+
+  /* 재질 선택값은 데스크 옵션 이미지 아래칸에 별도 표시 */
+  #texture-preview{
+    position:static!important;
+    display:block!important;
+    clear:both!important;
+    width:100%!important;
+    margin:0 0 14px!important;
+    padding:12px!important;
+    border:1px solid rgba(167,139,250,.32)!important;
+    border-radius:18px!important;
+    background:rgba(8,15,26,.78)!important;
+    box-shadow:none!important;
+    overflow:visible!important;
+    cursor:default!important;
+  }
+  #texture-preview .texture-label{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:10px!important;color:#fff!important;font-size:13px!important;font-weight:900!important;text-transform:none!important;letter-spacing:0!important;}
+  #texture-preview .quick-preview-grid{display:none!important;}
+  #texture-preview .quick-materials{
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:10px!important;
+    margin-top:0!important;
+  }
+  #texture-preview .material-chip-row{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    justify-items:center!important;
+    align-content:start!important;
+    gap:6px!important;
+    min-height:112px!important;
+    padding:11px 8px!important;
+    border:1px solid rgba(255,255,255,.12)!important;
+    border-radius:14px!important;
+    background:rgba(15,23,42,.82)!important;
+    color:#fff!important;
+    text-align:center!important;
+    overflow:visible!important;
+  }
+  #texture-preview .material-chip-row span{font-size:11px!important;font-weight:900!important;color:#26f5c9!important;}
+  #texture-preview .material-chip-row i{font-size:14px!important;font-weight:1000!important;color:#fff!important;font-style:normal!important;white-space:normal!important;word-break:break-word!important;}
+  #texture-preview .material-chip-row em{display:block!important;width:82px!important;height:54px!important;border-radius:12px!important;border:1px solid rgba(255,255,255,.22)!important;background-size:cover!important;background-position:center!important;background-image:none!important;justify-self:center!important;}
+  #texture-preview .ff-screen-list{width:100%;display:flex;flex-direction:column;gap:4px;margin-top:2px;}
+  #texture-preview .ff-screen-line{display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;font-size:11px;color:#dbeafe;background:rgba(255,255,255,.055);border-radius:8px;padding:4px 6px;}
+  #texture-preview .ff-screen-line b{font-size:12px;color:#fff;}
+
+  /* 재질 선택 버튼은 축소/6열 금지. 크게 보여주기 */
+  .material-button-group{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important;}
+  .material-btn{min-width:0!important;max-width:none!important;width:100%!important;min-height:86px!important;padding:9px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;gap:7px!important;border-radius:15px!important;font-size:12px!important;}
+  .material-btn .mat-thumb{width:66px!important;height:46px!important;min-width:66px!important;border-radius:11px!important;background-size:cover!important;background-position:center!important;}
+  .material-btn .mat-code{font-size:12px!important;max-width:100%!important;white-space:nowrap!important;}
+  .material-button-section{display:block!important;width:100%!important;}
+
+  /* 나노바나나 결과는 그 아래 독립 블록 */
+  #quick-ai-preview-note{position:static!important;display:block;clear:both!important;width:100%!important;margin:0 0 14px!important;padding:12px!important;border-radius:18px!important;border:1px solid rgba(255,122,26,.30)!important;background:rgba(8,15,26,.78)!important;color:#e5edf7!important;box-shadow:none!important;}
+  #quick-ai-preview-note img{display:block!important;width:100%!important;max-height:430px!important;object-fit:contain!important;background:#fff!important;border-radius:14px!important;margin-top:8px!important;}
+
+  @media(max-width:980px){
+    #ff90-option-summary .ff90-grid{grid-template-columns:1fr!important;}
+    #texture-preview .quick-materials{grid-template-columns:1fr!important;}
+    .material-button-group{grid-template-columns:repeat(2,minmax(0,1fr))!important;}
+  }
+</style>
+<script id="ff1002-final-layout-material-nano-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function s(){return window.state||{};}
+  function norm(v){return String(v||'').trim();}
+  function code(v){return norm(v).replace(/^LEG_/,'').replace(/[^A-Z0-9]/gi,'').toUpperCase();}
+  var COLORS={WW:'#e8e0d2',HW:'#7a5135',OSG:'#828077',OCY:'#b58b52',DSG:'#4b4c4f',DCR:'#5d5a55',TS:'#a7a7a0',BKM:'#252525',BKA:'#111',BGM:'#36322d',NSS:'#ddd7cb',MBE:'#c7b89b',MGR:'#8c928a',BRD:'#7c4a35',COB:'#b77441','1P1':'#d8d2c5','1P2':'#b9b0a0','1P4':'#8f918c','1P5':'#aaa294','1P7':'#505050','3F1':'#d7d3c9','3F2':'#9b9b96','064':'#b0aaa0','067':'#767875','071':'#b9b4aa','371':'#8c8a84','451':'#ddd8cf','452A':'#c0bab0','457':'#8b867c','457L':'#8b867c','458':'#65615a'};
+  function color(c){return COLORS[code(c)]||'#8a8a8a';}
+  function joined(){var st=s(),cur=st.current||{};return [st.product,st.currentProduct,st.currentCatName,st._currentCatName,st.screenLabel,st.screenType,st.selectedScreen,st.screenShape,st.screenOption,cur.product,(window._setSelected||[]).join(' ')].filter(Boolean).join(' ');}
+  function legKey(){var v=norm(s().legType||s().legShape||s().leg||'');if(/A|에이|a자|aframe/i.test(v))return'aframe';if(/원|라운드|round/i.test(v))return'round';return'ladder';}
+  function mobilityKey(){var v=norm(s().casterType||s().mobility||s().moveType||'');return /캐스터|caster|바퀴|이동/i.test(v)?'caster':'glide';}
+  function topKey(){var v=norm(s().topShape||s().topType||s().shape||'');return /라운드|원형|round/i.test(v)?'round':'rect';}
+  function selectedScreens(){
+    var t=joined(); var arr=[];
+    if(/전면|front/i.test(t)) arr.push(['front','전면 스크린']);
+    if(/사이드|side/i.test(t)) arr.push(['side','사이드 스크린']);
+    if(/L형|l형|엘형|lshape/i.test(t)) arr.push([/우측|오른|right|_R\b/i.test(t)?'lshape_R':'lshape',/우측|오른|right|_R\b/i.test(t)?'L형 스크린 R':'L형 스크린']);
+    if(/일자|straight/i.test(t)) arr.push(['straight','일자형 스크린']);
+    var seen={}; return arr.filter(function(x){if(seen[x[0]])return false; seen[x[0]]=1; return true;});
+  }
+  function screenSuffix(){var arr=selectedScreens();var keys=arr.map(function(x){return x[0];});if(keys.indexOf('front')>=0&&keys.indexOf('side')>=0)return'_frontside';if(keys[0]==='front')return'_front';if(keys[0]==='side')return'_side';if(keys[0]==='straight')return'_straight';if(keys[0]==='lshape_R')return'_lshape_R';if(keys[0]==='lshape')return'_lshape';return'';}
+  function deskFolder(){return /덕트|duct/i.test(joined())?'desk_duct':'desk_standard';}
+  function previewFile(){return legKey()+'_'+mobilityKey()+'_'+topKey()+screenSuffix()+'.png';}
+  function previewPath(){return './images/previews/'+deskFolder()+'/'+previewFile();}
+  function mats(){var st=s();return {top:code(st.topColor||st.deskTopColor||st.color||st.topCode||''),leg:code(st.legColor||st.deskLegColor||st.legCode||''),screen:code(st.screenColor||st.screenCode||'')};}
+  function placeBlocks(){
+    var panel=$('preview-panel'); if(!panel) return;
+    var opt=$('ff90-option-summary'), tex=$('texture-preview'), note=$('quick-ai-preview-note'), items=$('preview-items')||$('total-box');
+    if(opt&&tex&&opt.nextSibling!==tex) panel.insertBefore(tex,opt.nextSibling);
+    if(tex&&note&&tex.nextSibling!==note) panel.insertBefore(note,tex.nextSibling);
+    if(note&&items&&note.nextSibling!==items) panel.insertBefore(items,note.nextSibling);
+  }
+  window.ff90RefreshOptionSummary=function(){
+    var panel=$('preview-panel'); if(!panel) return; var box=$('ff90-option-summary');
+    if(!box){box=document.createElement('div');box.id='ff90-option-summary';panel.insertBefore(box,$('texture-preview')||$('preview-items')||$('total-box')||null);}
+    var topLabel=topKey()==='round'?'원형 상판':'직사각 상판';
+    var legLabel=({aframe:'A자 4레그',ladder:'사다리형 4레그',round:'원형 4레그'})[legKey()];
+    var mobLabel=mobilityKey()==='caster'?'캐스터':'글라이드';
+    box.innerHTML='<div class="ff90-title"><span>데스크 옵션 이미지</span><small>상판 → 다리 → 이동방식</small></div><div class="ff90-grid">'+
+      '<div class="ff90-card"><span class="ff90-card-title">상판형태</span><img src="./images/options/top/'+topKey()+'.png" onerror="this.style.visibility=\'hidden\'"><b>'+esc(topLabel)+'</b></div>'+
+      '<div class="ff90-card"><span class="ff90-card-title">다리형태</span><img src="./images/options/leg/'+legKey()+'.png" onerror="this.style.visibility=\'hidden\'"><b>'+esc(legLabel)+'</b></div>'+
+      '<div class="ff90-card"><span class="ff90-card-title">이동방식</span><img src="./images/options/mobility/'+legKey()+'_'+mobilityKey()+'.png" onerror="this.style.visibility=\'hidden\'"><b>'+esc(mobLabel)+'</b></div>'+
+      '</div>';
+    placeBlocks();
+  };
+  function updateMaterialSummary(){
+    var tex=$('texture-preview'); if(!tex) return; var m=mats(), scr=selectedScreens();
+    var screenHtml=scr.length?scr.map(function(x){return '<div class="ff-screen-line"><span>'+esc(x[1])+'</span><b>'+(m.screen||'-')+'</b></div>';}).join(''):'<div class="ff-screen-line"><span>스크린</span><b>'+(m.screen||'-')+'</b></div>';
+    tex.style.display='block';
+    tex.innerHTML='<div class="texture-label"><span>재질 선택값</span><span class="texture-name-badge">상판 · 다리 · 스크린</span></div><div class="quick-materials">'+
+      '<div class="material-chip-row active-top"><span>상판</span><em style="background-color:'+color(m.top)+'"></em><i>'+(m.top||'-')+'</i></div>'+
+      '<div class="material-chip-row active-leg"><span>다리</span><em style="background-color:'+color(m.leg)+'"></em><i>'+(m.leg||'-')+'</i></div>'+
+      '<div class="material-chip-row active-screen"><span>스크린</span><em style="background-color:'+color(m.screen)+'"></em><div class="ff-screen-list">'+screenHtml+'</div></div>'+
+      '</div>';
+    placeBlocks();
+  }
+  function ensureNote(){var panel=$('preview-panel');if(!panel)return null;var note=$('quick-ai-preview-note');if(!note){note=document.createElement('div');note.id='quick-ai-preview-note';panel.insertBefore(note,$('preview-items')||$('total-box')||null);}return note;}
+  window.prepareNanoBananaPreview=async function(targetType){
+    if(window.__ff1002NanoBusy) return;
+    var note=ensureNote(), m=mats(), base=previewPath(), screens=selectedScreens();
+    var btns=[$('quick-ai-preview-btn'),$('ai-render-btn'),$('screen-ai-btn')].filter(Boolean);
+    var strictPrompt='IMPORTANT: This is NOT new image generation. Use the supplied baseImage as the exact source/base photo. Do not create a new desk, new screen, new layout, or new background. Preserve the exact original product shape, camera angle, crop, scale, background, shadows, tabletop shape, leg structure, mobility feet/casters, screen position, and composition. Only detect the existing tabletop, legs, and screen surfaces in the base photo, then map/apply the selected materials/colors onto those existing surfaces only. Do not invent parts. Do not alter geometry. Do not change the design. Material mapping only.';
+    if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b>원본 사진에 재질만 맵핑 중...</b><br><span style="color:#9fb1c8;font-size:11px;">새 이미지 생성 금지 · base에 재질만 적용<br>원본: '+esc(base)+'</span><img src="'+esc(base)+'" alt="base" onerror="this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div style=&quot;color:#fca5a5;margin-top:8px;&quot;>원본 preview 파일을 찾지 못했습니다: '+esc(base).replace(/'/g,'&#39;')+'</div>\');">';}
+    btns.forEach(function(b){b.disabled=true;b.textContent='재질 맵핑 중...';}); window.__ff1002NanoBusy=true;
+    try{
+      var screenMaterials={}; screens.forEach(function(x){screenMaterials[x[0]]={label:x[1],code:m.screen,color:color(m.screen)};});
+      var payload={
+        mode:'material-map-only', task:'map_materials_on_existing_base_photo_only', prompt:strictPrompt, instruction:strictPrompt,
+        baseImage:base, sourceImage:base, originalImage:base, previewImage:base, deskImage:base, fallbackDeskImage:base,
+        previewFile:previewFile(), deskFolder:deskFolder(), legType:legKey(), mobility:mobilityKey(), topShape:topKey(), screenSuffix:screenSuffix(),
+        targetType:(screens.length||targetType==='screen')?'desk_with_screen':'desk', screenSelected:!!screens.length,
+        topCode:m.top, legCode:m.leg, screenCode:m.screen,
+        materials:{top:{code:m.top,color:color(m.top)},leg:{code:m.leg,color:color(m.leg)},screen:{code:m.screen,color:color(m.screen)},screens:screenMaterials},
+        constraints:{noNewImage:true,noGeneration:true,preserveBase:true,materialMappingOnly:true,preserveGeometry:true,preserveBackground:true,preserveCamera:true,preserveShadows:true}
+      };
+      var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      var text=await res.text(); var data={}; try{data=JSON.parse(text||'{}');}catch(e){}
+      if(!res.ok) throw new Error((data.error||data.detail||text||('API 오류 '+res.status)).slice(0,300));
+      var img=typeof data==='string'?data:(data.imageUrl||data.image||data.url||data.output||''); if(!img) throw new Error('API 응답에 이미지 URL이 없습니다.');
+      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 맵핑 결과</div><img src="'+esc(img)+'" alt="material mapping result"><div style="margin-top:8px;color:#9fb1c8;font-size:11px;line-height:1.45;">새 이미지 생성이 아니라 base 원본에 상판/다리'+(screens.length?'/스크린':'')+' 재질만 맵핑한 결과입니다.<br>기준 원본: '+esc(base)+'</div>';}
+    }catch(err){ if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5;">재질 맵핑 실패</b><br><span style="color:#ddd;">'+esc(err&&err.message?err.message:err)+'</span><br><span style="color:#9fb1c8;font-size:11px;">요청 원본: '+esc(base)+'</span>';} console.error('[FF1002 Nano material mapping only]',err); }
+    finally{window.__ff1002NanoBusy=false;btns.forEach(function(b){b.disabled=false;b.textContent='✨ 원본 사진에 재질 적용';});}
+  };
+  function bind(){
+    window.ff90RefreshOptionSummary(); updateMaterialSummary(); placeBlocks();
+    [['quick-ai-preview-btn','desk'],['ai-render-btn','desk'],['screen-ai-btn','screen']].forEach(function(p){var b=$(p[0]); if(b){b.textContent='✨ 원본 사진에 재질 적용'; b.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(p[1]); return false;};}});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind); else bind();
+  window.addEventListener('load',bind); document.addEventListener('click',function(){setTimeout(bind,80);},true); setInterval(bind,1200);
 })();
 </script>
