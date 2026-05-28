@@ -12214,7 +12214,31 @@ ${map.move[move] || move}
   var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
   var SINGLE=['일자형 스크린','L형 스크린'];
-  function normLeg(v){v=String(v||''); if(v.indexOf('원형')>-1)return 'round'; if(v.indexOf('A')>-1||v.indexOf('에이')>-1)return 'aframe'; return 'ladder';}
+ function normLeg(v){
+
+  v = String(v || '').toLowerCase();
+
+  // ladder
+  if(
+    v.indexOf('사다리') > -1 ||
+    v.indexOf('ladder') > -1
+  ){
+    return 'ladder';
+  }
+
+  // aframe
+  if(
+    v.indexOf('a자') > -1 ||
+    v.indexOf('a-frame') > -1 ||
+    v.indexOf('aframe') > -1 ||
+    v.indexOf('에이') > -1
+  ){
+    return 'aframe';
+  }
+
+  // round는 다리 아님
+  return window.__ffLastLegKey || 'ladder';
+}
   function normMove(v){v=String(v||''); return v.indexOf('캐스터')>-1?'caster':'glide';}
   function normDesk(){var s=S(); var p=String((s.current&&s.current.product)||s.product||s.deskLabel||''); return p.indexOf('덕트')>-1?'desk_duct':'desk_standard';}
   function combo(){return normLeg(S().legType||S().legShape)+'_'+normMove(S().casterType||S().mobility);}
@@ -13526,7 +13550,39 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
   function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
   function S(){return window.state||{};}
   function txt(v){return String(v||'').trim();}
-  function normLeg(v){v=txt(v); if(/사다리/.test(v))return 'ladder'; if(/원형|라운드|round/i.test(v))return 'round'; if(/A자|A형|A |에이|aframe/i.test(v))return 'aframe'; return 'ladder';}
+  function normLeg(v){
+
+  v = String(v || '').toLowerCase();
+
+  // ladder
+  if(
+    v.indexOf('사다리') > -1 ||
+    v.indexOf('ladder') > -1
+  ){
+    return 'ladder';
+  }
+    function normTop(v){
+  v = String(v || '').toLowerCase();
+
+  if(v.indexOf('라운드') > -1 || v.indexOf('round') > -1) return 'round';
+  if(v.indexOf('직사각') > -1 || v.indexOf('rect') > -1) return 'rect';
+
+  return window.__ffLastTopKey || 'rect';
+}
+
+  // aframe
+  if(
+    v.indexOf('a자') > -1 ||
+    v.indexOf('a-frame') > -1 ||
+    v.indexOf('aframe') > -1 ||
+    v.indexOf('에이') > -1
+  ){
+    return 'aframe';
+  }
+
+  // round는 다리 아님
+  return window.__ffLastLegKey || 'ladder';
+}
   function normMove(v){v=txt(v); return /캐스터|바퀴|이동|caster/i.test(v)?'caster':'glide';}
   function normTop(v){v=txt(v); return /라운드|원형|round/i.test(v)?'round':'rect';}
   function deskFolder(){var s=S(); var p=txt((s.current&&s.current.product)||s.product||s.deskLabel||s._currentCatName||s.currentCatName); return /덕트/.test(p)?'desk_duct':'desk_standard';}
