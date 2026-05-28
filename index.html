@@ -2109,6 +2109,12 @@ input, textarea, select, option,
 }
 </style>
 
+
+<style id="ff-final-action-buttons-css">
+#quick-ai-preview-actions button{width:100%;margin-top:0;padding:11px 10px;border-radius:12px;border:1px solid #3a1f60;background:#1a0f30;color:#c4aff5;font-size:12px;font-weight:800;cursor:pointer;}
+#quick-ai-preview-actions button:hover{border-color:#a78bfa;color:#fff;}
+#quick-ai-preview-actions button:disabled{opacity:.55;cursor:not-allowed;}
+</style>
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -2264,13 +2270,10 @@ input, textarea, select, option,
       <div class="material-chip-row" id="quick-leg-row"><span>다리</span><i id="quick-leg-code">-</i><em id="quick-leg-chip"></em></div>
       <div class="material-chip-row" id="quick-screen-row"><span>스크린</span><i id="quick-screen-code">-</i><em id="quick-screen-chip"></em></div>
     </div>
-    <button id="quick-ai-preview-btn" <button onclick="prepareNanoBananaPreview('desk')">
-  ✨ 데스크 재질 적용
-</button>
-
-<button onclick="prepareNanoBananaPreview('screen')">
-  ✨ 스크린 재질 적용
-</button>>✨ 원본 사진에 재질 적용</button>
+    <div id="quick-ai-preview-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px;">
+      <button id="quick-ai-preview-btn" type="button" onclick="prepareNanoBananaPreview('desk')">✨ 데스크 재질 적용</button>
+      <button id="quick-screen-ai-preview-btn" type="button" onclick="prepareNanoBananaPreview('screen')">✨ 스크린 재질 적용</button>
+    </div>
     <div id="quick-ai-preview-note" style="display:none;"></div>
     <canvas id="product-3d-canvas" height="1" style="display:none;"></canvas>
     <div id="texture-strip" style="display:none;"></div>
@@ -13741,7 +13744,7 @@ function topKey(){
     ensureOrder();
     var note=$('quick-ai-preview-note'), btn=$('quick-ai-preview-btn'), base=choosePreview(), m=material();
     if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b style="color:#fff">원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">Nano Banana로 보낼 원본: '+esc(base)+'</span><img src="'+esc(base)+'" alt="원본 preview">';}
-    if(btn){btn.disabled=true;btn.textContent='적용 중...';}
+    if(btn){btn.disabled=true;} if(sbtn){sbtn.disabled=true;} if(targetType==='screen' && sbtn){sbtn.textContent='적용 중...';} else if(btn){btn.textContent='적용 중...';}
     try{
       var health=await fetchJson('/api/health',{cache:'no-store'},8000).catch(function(){return null;});
       if(!health||!health.res||!health.res.ok) throw new Error('Nano Banana 서버 연결 실패: /api/health 응답 없음');
@@ -13753,7 +13756,7 @@ function topKey(){
       if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 미리보기 · 데스크</div><img src="'+esc(src)+'" alt="재질 적용 결과"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">Nano Banana API 결과입니다.</div>';}
     }catch(err){
       if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5">재질 적용 실패</b><br><span style="color:#ddd">'+esc(err&&err.name==='AbortError'?'요청 시간이 초과됐습니다. Render 서버 로그와 GEMINI_API_KEY를 확인하세요.':(err&&err.message||err))+'</span><img src="'+esc(base)+'" alt="원본 preview"><div style="margin-top:8px;color:#8fa1bb;font-size:11px;line-height:1.45;">프론트에서는 previews 원본을 정상 표시했습니다. 재질 맵핑 결과가 안 나오면 서버/API 쪽 문제입니다.</div>';}
-    }finally{window.__ffFinal3NanoBusy=false; if(btn){btn.disabled=false;btn.textContent='✨ 원본 사진에 재질 적용';} setTimeout(function(){try{ff90RefreshOptionSummary();}catch(e){}},50);}
+    }finally{window.__ffFinal3NanoBusy=false; if(btn){btn.disabled=false;btn.textContent='✨ 데스크 재질 적용';} if(sbtn){sbtn.disabled=false;sbtn.textContent='✨ 스크린 재질 적용';} setTimeout(function(){try{ff90RefreshOptionSummary();}catch(e){}},50);}
   };
 
   function bind(){try{ff90RefreshOptionSummary();ensureOrder(); var b=$('quick-ai-preview-btn'); if(b){b.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false;};}}catch(e){}}
@@ -14722,138 +14725,6 @@ window.showPanel = function(){
   };
 
   window.ffResolveScreenTextureUrl = makeScreenUrl;
-})();
-</script>
-
-
-<!-- === SAFE FINAL FIX: desk-only preview / screen preview / screen mask aliases === -->
-<script id="ff-safe-final-desk-screen-fix">
-(function(){
-  if(window.__ffSafeFinalDeskScreenFix) return;
-  window.__ffSafeFinalDeskScreenFix = true;
-
-  function txt(v){ return String(v || '').trim(); }
-
-  function getFolder(){
-    try{ return typeof deskFolder === 'function' ? deskFolder() : 'desk_standard'; }
-    catch(e){ return 'desk_standard'; }
-  }
-
-  function getDeskBase(){
-    try{
-      var leg = typeof legKey === 'function' ? legKey() : 'ladder';
-      var move = typeof moveKey === 'function' ? moveKey() : 'glide';
-      var top = typeof topKey === 'function' ? topKey() : 'rect';
-      return leg + '_' + move + '_' + top;
-    }catch(e){
-      return 'ladder_glide_rect';
-    }
-  }
-
-  function getRawScreen(){
-    var s = window.state || {};
-    return txt(
-      s.screenLabel ||
-      s.screen ||
-      s.screenType ||
-      s._currentScreenType ||
-      s._currentCatName ||
-      s.currentCatName ||
-      ''
-    );
-  }
-
-  function getScreenKind(raw){
-    raw = txt(raw);
-
-    if(/사이드|side/i.test(raw)) return 'side';
-    if(/일자|straight/i.test(raw)) return 'straight';
-    if(/L형|ㄴ형|엘|lshape/i.test(raw)) return 'lshape';
-    if(/전면|front/i.test(raw)) return 'front';
-
-    return '';
-  }
-
-  function deskOnlyPath(){
-    return './images/previews/' + getFolder() + '/' + getDeskBase() + '.png';
-  }
-
-  function screenPath(){
-    var kind = getScreenKind(getRawScreen());
-    if(!kind) return deskOnlyPath();
-    return './images/previews/' + getFolder() + '/' + getDeskBase() + '_' + kind + '.png';
-  }
-
-  function screenTexturePath(code){
-    var kind = getScreenKind(getRawScreen());
-    if(!kind || !code) return '';
-    return 'images/textures/screen/' + kind + '/standard/' + code + '.jpg';
-  }
-
-  function patchPayload(data){
-    data = data || {};
-
-    var target = txt(data.targetType || data.productType || data.mode);
-    var hasScreenCode = !!txt(data.screenCode || data.screenMaterialCode || data.screenTextureCode);
-    var wantsScreen = hasScreenCode || /screen|스크린/i.test(target);
-
-    var preview = wantsScreen ? screenPath() : deskOnlyPath();
-
-    data.baseImage = preview;
-    data.sourceImage = preview;
-    data.deskImage = preview;
-    data.fallbackDeskImage = preview;
-    data.productImage = preview;
-
-    if(wantsScreen){
-      var sc = txt(data.screenCode || data.screenMaterialCode || data.screenTextureCode);
-      var kind = getScreenKind(getRawScreen());
-
-      data.screenType = kind || data.screenType || '';
-      if(sc && kind){
-        data.screenCode = sc;
-        data.screenMaterialCode = sc;
-        data.screenTextureCode = sc;
-        data.screenTexture = screenTexturePath(sc);
-      }
-
-      // SCREEN_MASK 이름을 서버가 기대할 가능성이 있어서 별도 보존
-      if(data.MASK && !data.SCREEN_MASK) data.SCREEN_MASK = data.MASK;
-      if(data.screenMask && !data.SCREEN_MASK) data.SCREEN_MASK = data.screenMask;
-      if(data.SCREEN_MASK && !data.screenMask) data.screenMask = data.SCREEN_MASK;
-
-      var prompt = String(data.prompt || '');
-      var strong =
-        '\n스크린이 있는 이미지에서는 뒤쪽/측면 스크린 패널 영역만 screenTexture 재질로 반드시 변경하세요.' +
-        '\n검정 스크린을 그대로 두지 말고 선택한 스크린 재질의 색상과 질감으로 바꾸세요.' +
-        '\n상판은 topTexture, 다리는 legTexture, 스크린은 screenTexture를 각각 다른 영역에 적용하세요.';
-
-      if(prompt.indexOf('검정 스크린을 그대로 두지 말고') === -1){
-        data.prompt = prompt + strong;
-      }
-    }
-
-    return data;
-  }
-
-  var oldFetch = window.fetch;
-  window.fetch = function(input, init){
-    try{
-      var url = String(input || '');
-      if(url.indexOf('/api/generate-preview') > -1 && init && typeof init.body === 'string'){
-        var data = JSON.parse(init.body || '{}');
-        init = Object.assign({}, init, { body: JSON.stringify(patchPayload(data)) });
-      }
-    }catch(e){
-      console.error('[ff-safe-final-desk-screen-fix]', e);
-    }
-    return oldFetch.apply(this, arguments);
-  };
-
-  // 기존 전역 함수가 있으면, 데스크 전용/스크린 전용 경로를 안전하게 제공
-  window.__ffDeskOnlyPreviewPath = deskOnlyPath;
-  window.__ffScreenPreviewPath = screenPath;
-  window.__ffScreenTexturePath = screenTexturePath;
 })();
 </script>
 
@@ -19243,7 +19114,7 @@ var OPTION_IMG = {
   function bind(){
     ensureNoteUnderMaterial();
     var btn=$('quick-ai-preview-btn');
-    if(btn){btn.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false;};}
+    if(btn){btn.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview('desk'); return false;};} var sbtn=$('quick-screen-ai-preview-btn'); if(sbtn){sbtn.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview('screen'); return false;};}
     try{window.ff90RefreshOptionSummary();}catch(e){}
   }
   bind();
@@ -19995,6 +19866,14 @@ arr.push(
     for(var j=0;j<list.length;j++){ if(list[j].indexOf(prefix)===0)return './'+list[j]; }
     return './'+cand[0];
   }
+  function deskOnlyPreviewPath(){
+    return './images/previews/'+deskFolder()+'/'+legKey()+'_'+moveKey()+'_'+topKey()+'.png';
+  }
+  function screenPreviewPath(){
+    var sk=screenKey();
+    if(!sk) return deskOnlyPreviewPath();
+    return './images/previews/'+deskFolder()+'/'+legKey()+'_'+moveKey()+'_'+topKey()+'_'+sk+'.png';
+  }
   window.__ffChooseDeskPreviewPath=choosePreview;
   window.ffChooseDeskPreview=choosePreview;
   function bgUrl(id){var el=$(id); if(!el)return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
@@ -20055,9 +19934,10 @@ arr.push(
   };
   async function fetchJson(url,opt,ms){var c=new AbortController(); var t=setTimeout(function(){c.abort();},ms||60000); try{opt=opt||{}; opt.signal=c.signal; var r=await fetch(url,opt); var d=await r.json().catch(function(){return {};}); return {res:r,data:d};} finally{clearTimeout(t);} }
   window.prepareNanoBananaPreview=async function(targetType){
-    var note=$('quick-ai-preview-note'), btn=$('quick-ai-preview-btn'), texture=$('texture-preview'); if(texture&&btn&&btn.parentNode!==texture)texture.appendChild(btn); if(texture&&note&&note.parentNode!==texture)texture.appendChild(note);
+    var note=$('quick-ai-preview-note'), btn=$('quick-ai-preview-btn'), sbtn=$('quick-screen-ai-preview-btn'), texture=$('texture-preview'); if(texture&&btn&&btn.parentNode!==texture)texture.appendChild(btn); if(texture&&note&&note.parentNode!==texture)texture.appendChild(note);
     if(window.__ffFinal2NanoBusy)return; window.__ffFinal2NanoBusy=true;
-    var base=choosePreview(), m=material(), hasScreen=!!screenKey();
+    var m=material(), skNow=screenKey(), hasScreen=(targetType==='screen' && !!skNow);
+    var base=hasScreen ? screenPreviewPath() : deskOnlyPreviewPath();
     if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b style="color:#fff">원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">Nano Banana API 호출 중입니다.<br>원본: '+esc(base)+'</span><img src="'+esc(base)+'" alt="원본 preview" style="margin-top:8px">';}
     if(btn){btn.disabled=true;btn.textContent='적용 중...';}
     try{
@@ -20070,9 +19950,9 @@ arr.push(
         targetType:hasScreen?'desk_screen':'desk',
         productType:hasScreen?'desk_screen':'desk',
         sourceImage:base, baseImage:base, deskImage:base, fallbackDeskImage:base,
-        topTexture:m.topTexture, legTexture:m.legTexture, screenTexture:m.screenTexture,
-        topCode:m.topCode, legCode:m.legCode, screenCode:m.screenCode,
-        topShape:topLabel(), legType:legLabel(), casterType:moveLabel(), screenType:screenKey(),
+        topTexture:m.topTexture, legTexture:m.legTexture, screenTexture:hasScreen?m.screenTexture:'',
+        topCode:m.topCode, legCode:m.legCode, screenCode:hasScreen?m.screenCode:'',
+        topShape:topLabel(), legType:legLabel(), casterType:moveLabel(), screenType:hasScreen?skNow:'',
         prompt:'원본 제품 사진의 형태, 각도, 배경, 그림자, 크롭은 유지하세요. 상판에는 topTexture/topCode 재질만, 다리에는 legTexture/legCode 재질만, 스크린이 있으면 스크린에는 screenTexture/screenCode 재질만 자연스럽게 맵핑하세요. 새 제품을 만들지 말고 재질만 교체하세요.'
       };
       if(payload.screenCode){
