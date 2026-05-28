@@ -14726,169 +14726,134 @@ window.showPanel = function(){
 </script>
 
 
-<!-- === FINAL DESK/SCREEN PREVIEW FIX === -->
-<script id="ff-final-desk-screen-preview-fix">
+<!-- === SAFE FINAL FIX: desk-only preview / screen preview / screen mask aliases === -->
+<script id="ff-safe-final-desk-screen-fix">
 (function(){
-  if(window.__ffDeskScreenPreviewFix) return;
-  window.__ffDeskScreenPreviewFix = true;
+  if(window.__ffSafeFinalDeskScreenFix) return;
+  window.__ffSafeFinalDeskScreenFix = true;
 
-  function safe(v){ return String(v||'').trim(); }
+  function txt(v){ return String(v || '').trim(); }
 
-  function currentDeskBase(){
+  function getFolder(){
+    try{ return typeof deskFolder === 'function' ? deskFolder() : 'desk_standard'; }
+    catch(e){ return 'desk_standard'; }
+  }
+
+  function getDeskBase(){
     try{
-      var leg = (typeof legKey==='function') ? legKey() : 'ladder';
-      var move = (typeof moveKey==='function') ? moveKey() : 'glide';
-      var top = (typeof topKey==='function') ? topKey() : 'rect';
+      var leg = typeof legKey === 'function' ? legKey() : 'ladder';
+      var move = typeof moveKey === 'function' ? moveKey() : 'glide';
+      var top = typeof topKey === 'function' ? topKey() : 'rect';
       return leg + '_' + move + '_' + top;
     }catch(e){
       return 'ladder_glide_rect';
     }
   }
 
-  function currentFolder(){
-    try{
-      return (typeof deskFolder==='function') ? deskFolder() : 'desk_standard';
-    }catch(e){
-      return 'desk_standard';
-    }
+  function getRawScreen(){
+    var s = window.state || {};
+    return txt(
+      s.screenLabel ||
+      s.screen ||
+      s.screenType ||
+      s._currentScreenType ||
+      s._currentCatName ||
+      s.currentCatName ||
+      ''
+    );
   }
 
-  function fixedScreenKind(raw){
-    raw = safe(raw);
+  function getScreenKind(raw){
+    raw = txt(raw);
 
     if(/사이드|side/i.test(raw)) return 'side';
     if(/일자|straight/i.test(raw)) return 'straight';
     if(/L형|ㄴ형|엘|lshape/i.test(raw)) return 'lshape';
     if(/전면|front/i.test(raw)) return 'front';
 
-    var s = window.state || {};
-    var r = safe(
-      s.screenLabel ||
-      s.screen ||
-      s._currentScreenType ||
-      s._currentCatName ||
-      s.currentCatName
-    );
-
-    if(/사이드|side/i.test(r)) return 'side';
-    if(/일자|straight/i.test(r)) return 'straight';
-    if(/L형|ㄴ형|엘|lshape/i.test(r)) return 'lshape';
-    if(/전면|front/i.test(r)) return 'front';
-
-    return 'straight';
+    return '';
   }
 
-  window.screenKind = fixedScreenKind;
-
-  function deskOnlyPreviewPath(){
-    return './images/previews/' + currentFolder() + '/' + currentDeskBase() + '.png';
+  function deskOnlyPath(){
+    return './images/previews/' + getFolder() + '/' + getDeskBase() + '.png';
   }
 
-  function screenPreviewPath(){
-    var s = window.state || {};
-
-    var raw = safe(
-      s.screenLabel ||
-      s.screen ||
-      s._currentScreenType ||
-      s._currentCatName ||
-      s.currentCatName
-    );
-
-    var type = fixedScreenKind(raw);
-
-    return './images/previews/' +
-      currentFolder() + '/' +
-      currentDeskBase() + '_' + type + '.png';
+  function screenPath(){
+    var kind = getScreenKind(getRawScreen());
+    if(!kind) return deskOnlyPath();
+    return './images/previews/' + getFolder() + '/' + getDeskBase() + '_' + kind + '.png';
   }
 
-  function currentScreenTexture(){
-    var s = window.state || {};
+  function screenTexturePath(code){
+    var kind = getScreenKind(getRawScreen());
+    if(!kind || !code) return '';
+    return 'images/textures/screen/' + kind + '/standard/' + code + '.jpg';
+  }
 
-    var code = safe(
-      s.screenCode ||
-      s.screenMaterialCode ||
-      s._screenMaterialCode ||
-      document.getElementById('quick-screen-code')?.textContent
-    );
+  function patchPayload(data){
+    data = data || {};
 
-    var type = fixedScreenKind(
-      s.screenLabel ||
-      s.screen ||
-      s._currentScreenType ||
-      s._currentCatName ||
-      s.currentCatName
-    );
+    var target = txt(data.targetType || data.productType || data.mode);
+    var hasScreenCode = !!txt(data.screenCode || data.screenMaterialCode || data.screenTextureCode);
+    var wantsScreen = hasScreenCode || /screen|스크린/i.test(target);
 
-    if(!code) return '';
+    var preview = wantsScreen ? screenPath() : deskOnlyPath();
 
-    return 'images/textures/screen/' + type + '/standard/' + code + '.jpg';
+    data.baseImage = preview;
+    data.sourceImage = preview;
+    data.deskImage = preview;
+    data.fallbackDeskImage = preview;
+    data.productImage = preview;
+
+    if(wantsScreen){
+      var sc = txt(data.screenCode || data.screenMaterialCode || data.screenTextureCode);
+      var kind = getScreenKind(getRawScreen());
+
+      data.screenType = kind || data.screenType || '';
+      if(sc && kind){
+        data.screenCode = sc;
+        data.screenMaterialCode = sc;
+        data.screenTextureCode = sc;
+        data.screenTexture = screenTexturePath(sc);
+      }
+
+      // SCREEN_MASK 이름을 서버가 기대할 가능성이 있어서 별도 보존
+      if(data.MASK && !data.SCREEN_MASK) data.SCREEN_MASK = data.MASK;
+      if(data.screenMask && !data.SCREEN_MASK) data.SCREEN_MASK = data.screenMask;
+      if(data.SCREEN_MASK && !data.screenMask) data.screenMask = data.SCREEN_MASK;
+
+      var prompt = String(data.prompt || '');
+      var strong =
+        '\n스크린이 있는 이미지에서는 뒤쪽/측면 스크린 패널 영역만 screenTexture 재질로 반드시 변경하세요.' +
+        '\n검정 스크린을 그대로 두지 말고 선택한 스크린 재질의 색상과 질감으로 바꾸세요.' +
+        '\n상판은 topTexture, 다리는 legTexture, 스크린은 screenTexture를 각각 다른 영역에 적용하세요.';
+
+      if(prompt.indexOf('검정 스크린을 그대로 두지 말고') === -1){
+        data.prompt = prompt + strong;
+      }
+    }
+
+    return data;
   }
 
   var oldFetch = window.fetch;
-
   window.fetch = function(input, init){
     try{
       var url = String(input || '');
-
-      if(
-        url.indexOf('/api/generate-preview') > -1 &&
-        init &&
-        typeof init.body === 'string'
-      ){
+      if(url.indexOf('/api/generate-preview') > -1 && init && typeof init.body === 'string'){
         var data = JSON.parse(init.body || '{}');
-
-        var hasScreen =
-          !!(data.screenCode || data.screenMaterialCode);
-
-        var previewPath = hasScreen
-          ? screenPreviewPath()
-          : deskOnlyPreviewPath();
-
-        data.baseImage = previewPath;
-        data.sourceImage = previewPath;
-        data.deskImage = previewPath;
-        data.fallbackDeskImage = previewPath;
-        data.productImage = previewPath;
-
-        if(hasScreen){
-          var tex = currentScreenTexture();
-
-          data.screenTexture = tex;
-          data.screenType = fixedScreenKind(
-            (window.state||{}).screenLabel ||
-            (window.state||{}).screen ||
-            (window.state||{})._currentScreenType ||
-            (window.state||{})._currentCatName ||
-            (window.state||{}).currentCatName
-          );
-
-          var line1 =
-            '\\n뒤쪽 스크린 패널 영역 전체에 반드시 ' +
-            data.screenCode +
-            ' 재질을 적용해줘.';
-
-          var line2 =
-            '\\n상판이나 다리가 아니라 스크린 보드 부분만 변경해줘.';
-
-          var line3 =
-            '\\n스크린 패널은 단색 검정이 아니라 선택된 패브릭/패널 재질로 표현해줘.';
-
-          data.prompt = String(data.prompt || '');
-
-          if(data.prompt.indexOf(line1) === -1) data.prompt += line1;
-          if(data.prompt.indexOf(line2) === -1) data.prompt += line2;
-          if(data.prompt.indexOf(line3) === -1) data.prompt += line3;
-        }
-
-        init.body = JSON.stringify(data);
+        init = Object.assign({}, init, { body: JSON.stringify(patchPayload(data)) });
       }
     }catch(e){
-      console.error(e);
+      console.error('[ff-safe-final-desk-screen-fix]', e);
     }
-
     return oldFetch.apply(this, arguments);
   };
+
+  // 기존 전역 함수가 있으면, 데스크 전용/스크린 전용 경로를 안전하게 제공
+  window.__ffDeskOnlyPreviewPath = deskOnlyPath;
+  window.__ffScreenPreviewPath = screenPath;
+  window.__ffScreenTexturePath = screenTexturePath;
 })();
 </script>
 
