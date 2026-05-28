@@ -14333,6 +14333,89 @@ window.showPanel = function(){
   return false;
 };
 </script>
+
+
+<!-- === USER FINAL HOTFIX: color filters + screen top defaults === -->
+<style id="ff-user-final-color-size-fix">
+/* 중복 실사 미리보기는 숨기고 재질 적용 미리보기만 사용 */
+#ff-dashboard-hero,
+#ff-desk-ai-result-panel,
+#ff-screen-ai-result-panel{
+  display:none !important;
+}
+</style>
+<script id="ff-user-final-color-size-fix-script">
+(function(){
+  function txt(el){ return (el && (el.textContent || '') || '').replace(/\s+/g,' ').trim(); }
+  function codeOf(btn){
+    var v = (btn && (btn.dataset.code || btn.dataset.value || btn.getAttribute('data-code') || btn.getAttribute('data-value') || txt(btn)) || '');
+    return String(v).trim().toUpperCase();
+  }
+  function sectionTitle(sec){
+    var title = sec && sec.querySelector('.material-button-section-title,label,.product-select-title,b,strong');
+    return txt(title || sec);
+  }
+  function hideButton(btn){
+    if(!btn) return;
+    btn.style.display = 'none';
+    btn.setAttribute('aria-hidden','true');
+    btn.disabled = true;
+  }
+  function normalizeColorButtonsFinal(){
+    var sections = Array.prototype.slice.call(document.querySelectorAll('.material-button-section,.color-pair-grid > div,.btn-group'));
+    sections.forEach(function(sec){
+      var title = sectionTitle(sec);
+      var whole = txt(sec);
+      var isLeg = /다리/.test(title + ' ' + whole);
+      var isStandard = /표준/.test(title);
+      var isLaminate = /라미네이트/.test(title + ' ' + whole);
+      var btns = Array.prototype.slice.call(sec.querySelectorAll('.material-btn,.choice-btn,button'));
+      btns.forEach(function(btn){
+        var code = codeOf(btn);
+        if(isLeg && isStandard && (code === 'DCR' || code === 'TS')) hideButton(btn);
+        if(isLaminate && code === 'WW') hideButton(btn);
+      });
+    });
+  }
+
+  function screenDefaultByCat(cat){
+    cat = String(cat || '');
+    if(/일자형\s*스크린|L형\s*스크린|ㄴ형\s*스크린/i.test(cat)) return { total:590, above:350 };
+    if(/전면\s*스크린|사이드\s*스크린/i.test(cat)) return { total:715, above:405 };
+    return { total:715, above:405 };
+  }
+
+  // 기존 여러 버전의 상판위 입력창이 생성된 뒤에도 기본값을 강제 보정
+  function normalizeScreenTopInputs(){
+    var s = window.state || {};
+    var cat = s._currentCatName || (s.current && s.current.name) || '';
+    var def = screenDefaultByCat(cat);
+    var inputs = Array.prototype.slice.call(document.querySelectorAll('input[id^="screen-top-"]'));
+    inputs.forEach(function(input){
+      if(input.dataset.ffDefaultFixed === '1') return;
+      var max = parseInt(input.max,10) || ((s._screenNewH || s.h || def.total) - 1);
+      var val = Math.min(def.above, Math.max(1, max));
+      input.value = val;
+      input.dataset.ffDefaultFixed = '1';
+    });
+  }
+
+  function applyFinalFix(){
+    normalizeColorButtonsFinal();
+    normalizeScreenTopInputs();
+  }
+
+  document.addEventListener('DOMContentLoaded', applyFinalFix);
+  window.addEventListener('load', applyFinalFix);
+  document.addEventListener('click', function(){ setTimeout(applyFinalFix, 60); setTimeout(applyFinalFix, 250); }, true);
+  document.addEventListener('change', function(){ setTimeout(applyFinalFix, 60); }, true);
+  if(window.MutationObserver){
+    new MutationObserver(function(){ setTimeout(applyFinalFix, 30); }).observe(document.documentElement, { childList:true, subtree:true });
+  }
+})();
+</script>
+<!-- === /USER FINAL HOTFIX === -->
+
 </body>
 
 
@@ -17174,6 +17257,7 @@ var OPTION_IMG = {
     var isLineOrL = (catName === '일자형 스크린' || catName === 'L형 스크린');
     var baseH = isLineOrL ? 590 : 715;
     var diff = newH - baseH;
+    var defaultAbove = Math.min(isLineOrL ? 350 : 405, Math.max(1, newH-1));
     var diffStr = diff > 0 ? '(+'+diff+'mm 늘림)' : diff < 0 ? '('+diff+'mm 줄임)' : '(기준값)';
     window.state = window.state || {};
     state._screenNewH = newH;
@@ -17190,7 +17274,7 @@ var OPTION_IMG = {
       + '<span style="font-size:12px;color:#26f5c9;font-weight:950;">상판 위</span>'
       + '<div class="ff-size-control">'
       + '<button type="button" onclick="ff98StepTopGap('+fid+',-50)">−</button>'
-      + '<input id="screen-top-'+fid+'" type="number" value="'+Math.min(300, Math.max(1, newH-1))+'" min="1" max="'+(newH-1)+'" onkeydown="if(event.key===\'Enter\')ff98SubmitTopGap('+fid+')">'
+      + '<input id="screen-top-'+fid+'" type="number" value="'+defaultAbove+'" min="1" max="'+(newH-1)+'" onkeydown="if(event.key===\'Enter\')ff98SubmitTopGap('+fid+')">'
       + '<button type="button" onclick="ff98StepTopGap('+fid+',50)">+</button>'
       + '</div><span style="font-size:10px;color:#7fa8a0;">mm</span></div></div>'
       + '<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">· 상판 위 값은 전체 H보다 작아야 합니다.<br>· 나머지는 자동으로 상판 아래 값으로 계산됩니다.</span>'
@@ -19374,72 +19458,95 @@ arr.push(
   function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
   function st(){return window.state||{};}
   function val(v){return String(v||'').trim();}
+  function stateText(){
+    var s=st(), c=s.current||{};
+    return [
+      s.legType,s.legShape,s._legLabel,s.selectedLeg,s.currentLegType,window.selectedLegType,window.currentLegType,
+      s.casterType,s.mobility,s.caster,s.moveType,s.selectedMove,window.selectedMoveType,window.currentMoveType,
+      s.topShape,s.topType,s.topLabel,s.selectedTop,window.selectedTopShape,window.currentTopShape,
+      c.legLabel,c.topShape,c.product,c.name,c.detail,
+      s.screenLabel,s.screen,s._currentScreenType,s._currentCatName,s.currentCatName,
+      (window._setSelected||[]).join(' ')
+    ].filter(Boolean).join(' ');
+  }
   function normLeg(v){
-  v = val(v);
-
-  if(v.indexOf('A자') > -1 || v.indexOf('A') > -1 || v.indexOf('에이') > -1) return 'aframe';
-  if(v.indexOf('사각') > -1 || v.indexOf('4레그') > -1 || v.indexOf('4LEG') > -1) return 'aframe';
-  if(v.indexOf('사다리') > -1 || v.indexOf('래더') > -1) return 'ladder';
-
-  return 'aframe';
-}
-  function normMove(v){v=val(v); return (v.indexOf('캐스터')>-1||v.indexOf('바퀴')>-1||v.indexOf('이동')>-1)?'caster':'glide';}
-  function normTop(v){v=val(v); return (v.indexOf('라운드')>-1||v.indexOf('원형')>-1)?'round':'rect';}
-  function deskFolder(){var s=st(); var p=val((s.current&&s.current.product)||s.product||s.deskLabel||s._currentCatName||s.currentCatName); return p.indexOf('덕트')>-1?'desk_duct':'desk_standard';}
-  function legKey(){return normLeg(st().legType||st().legShape||st()._legLabel);}
-  function moveKey(){return normMove(st().casterType||st().mobility||st().caster||st().moveType);}
-  function topKey(){return normTop(st().topShape||st().topType||st().topLabel);}
-  function topLabel(){var t=val(st().topShape||st().topType||st().topLabel)||'직사각 상판'; return t.replace(/스퀘어/g,'직사각').replace(/Square/gi,'직사각');}
-  function legLabel(){return val(st().legType||st().legShape||st()._legLabel)||'다리형태';}
-  function moveLabel(){return val(st().casterType||st().mobility||st().caster||st().moveType)||'이동방식';}
+    v = val(v).toLowerCase();
+    if(/사다리|ladder|래더/.test(v)) return 'ladder';
+    if(/원형|round\s*leg|round_leg/.test(v)) return 'round';
+    if(/a자|a형|a-frame|aframe|에이/.test(v)) return 'aframe';
+    return '';
+  }
+  function normMove(v){
+    v = val(v).toLowerCase();
+    if(/캐스터|바퀴|caster/.test(v)) return 'caster';
+    if(/글라이드|고정|glide/.test(v)) return 'glide';
+    return '';
+  }
+  function normTop(v){
+    v = val(v).toLowerCase();
+    if(/라운드|round/.test(v)) return 'round';
+    if(/직사각|직각|스퀘어|square|rect/.test(v)) return 'rect';
+    return '';
+  }
+  function deskFolder(){
+    var s=st(), c=s.current||{};
+    var p=val((c&&c.product)||s.product||s.deskLabel||s._currentCatName||s.currentCatName);
+    return /덕트|duct/i.test(p)?'desk_duct':'desk_standard';
+  }
+  function legKey(){
+    var s=st(), c=s.current||{};
+    var raw = s.legType || s.legShape || s.selectedLeg || s.currentLegType || window.selectedLegType || window.currentLegType || c.legLabel || s._legLabel || '';
+    var key = normLeg(raw) || normLeg(stateText()) || window.__ffLastLegKey || 'ladder';
+    window.__ffLastLegKey = key;
+    return key;
+  }
+  function moveKey(){
+    var s=st(), c=s.current||{};
+    var raw = s.casterType || s.mobility || s.caster || s.moveType || s.selectedMove || window.selectedMoveType || window.currentMoveType || c.legLabel || s._legLabel || '';
+    var key = normMove(raw) || normMove(stateText()) || window.__ffLastMoveKey || 'glide';
+    window.__ffLastMoveKey = key;
+    return key;
+  }
+  function topKey(){
+    var s=st(), c=s.current||{};
+    var raw = s.topShape || s.topType || s.topLabel || s.selectedTop || window.selectedTopShape || window.currentTopShape || c.topShape || '';
+    var key = normTop(raw) || normTop(stateText()) || window.__ffLastTopKey || 'rect';
+    window.__ffLastTopKey = key;
+    return key;
+  }
+  function screenKey(){
+    var s=st(), c=s.current||{};
+    var raw = val([
+      s.screenLabel,s.screen,s.screenType,s.selectedScreen,s._currentScreenType,s._currentCatName,s.currentCatName,
+      c.screenLabel,c.screen,c.product,c.name,c.detail,
+      (window._setSelected||[]).join(' ')
+    ].filter(Boolean).join(' '));
+    var hasFront=/전면|front/i.test(raw);
+    var hasSide=/사이드|side/i.test(raw);
+    if(hasFront && hasSide) return 'frontside';
+    if(hasFront) return 'front';
+    if(hasSide) return 'side';
+    if(/일자|straight/i.test(raw)) return 'straight';
+    if(/L형|ㄴ형|lshape|l-shape/i.test(raw)) return 'lshape';
+    return '';
+  }
+  function topLabel(){var s=st(),c=s.current||{}; var t=val(s.topShape||s.topType||s.topLabel||c.topShape)||'직사각 상판'; return t.replace(/스퀘어/g,'직사각').replace(/Square/gi,'직사각');}
+  function legLabel(){var s=st(),c=s.current||{}; return val(s.legType||s.legShape||s.selectedLeg||c.legLabel||s._legLabel)||'다리형태';}
+  function moveLabel(){var s=st(),c=s.current||{}; return val(s.casterType||s.mobility||s.caster||s.moveType||c.legLabel||s._legLabel)||'이동방식';}
   function topImage(){return './images/options/top/'+topKey()+'.png';}
   function legImage(){return './images/options/mobility/'+legKey()+'_glide.png';}
   function moveImage(){return './images/options/mobility/'+legKey()+'_'+moveKey()+'.png';}
-function previewCandidates(){
-
-  var folder = deskFolder();
-  var base = legKey() + '_' + moveKey() + '_' + topKey();
-
-  window.__ffCurrentDeskBase = base;
-  window.__ffLastDeskBase = base;
-
-  var raw = val(
-    st().screenLabel ||
-    st().screen ||
-    st()._currentScreenType ||
-    st()._currentCatName ||
-    st().currentCatName
-  );
-
-  var hasFront = /전면/.test(raw);
-  var hasSide = /사이드/.test(raw);
-
-  var screen = '';
-
-  if(hasFront && hasSide) screen = 'frontside';
-  else if(hasFront) screen = 'front';
-  else if(hasSide) screen = 'side';
-  else if(/일자/.test(raw)) screen = 'straight';
-  else if(/L형|ㄴ형/.test(raw)) screen = 'lshape';
-
-  var a = [];
-
-  if(screen){
-    a.push(
-      'images/previews/' +
-      folder + '/' +
-      base + '_' + screen + '.png'
-    );
+  function previewCandidates(){
+    var folder=deskFolder();
+    var base=legKey()+'_'+moveKey()+'_'+topKey();
+    window.__ffCurrentDeskBase=base;
+    window.__ffLastDeskBase=base;
+    var screen=screenKey();
+    var a=[];
+    if(screen) a.push('images/previews/'+folder+'/'+base+'_'+screen+'.png');
+    a.push('images/previews/'+folder+'/'+base+'.png');
+    return a;
   }
-
-  a.push(
-    'images/previews/' +
-    folder + '/' +
-    base + '.png'
-  );
-
-  return a;
-}
   function choosePreview(){
     var list=window.ASSET_PREVIEWS||[], cand=previewCandidates();
     for(var i=0;i<cand.length;i++){ if(list.indexOf(cand[i])>-1)return './'+cand[i]; }
@@ -19447,13 +19554,15 @@ function previewCandidates(){
     for(var j=0;j<list.length;j++){ if(list[j].indexOf(prefix)===0)return './'+list[j]; }
     return './'+cand[0];
   }
+  window.__ffChooseDeskPreviewPath=choosePreview;
+  window.ffChooseDeskPreview=choosePreview;
   function bgUrl(id){var el=$(id); if(!el)return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
-  function text(id){var el=$(id); return el?val(el.textContent):'';}
+  function textById(id){var el=$(id); return el?val(el.textContent):'';}
   function cleanCode(v){v=val(v); return v==='-'?'':v;}
   function material(){var s=st(); return {
-    topCode:cleanCode(text('quick-top-code')||s.topCode||s.topColor||s.top||''),
-    legCode:cleanCode(text('quick-leg-code')||s.legCode||s.legColor||s.leg||''),
-    screenCode:cleanCode(text('quick-screen-code')||s.screenCode||s.screenColor||s.screen||''),
+    topCode:cleanCode(textById('quick-top-code')||s.topCode||s.topColor||s.top||''),
+    legCode:cleanCode(textById('quick-leg-code')||s.legCode||s.legColor||s.leg||''),
+    screenCode:cleanCode(textById('quick-screen-code')||s.screenCode||s.screenColor||s.screen||''),
     topTexture:bgUrl('quick-top-chip')||s.topTexture||s.topTex||'',
     legTexture:bgUrl('quick-leg-chip')||s.legTexture||s.legTex||'',
     screenTexture:bgUrl('quick-screen-chip')||s.screenTexture||s.screenTex||''
@@ -19477,28 +19586,29 @@ function previewCandidates(){
   window.prepareNanoBananaPreview=async function(targetType){
     var note=$('quick-ai-preview-note'), btn=$('quick-ai-preview-btn'), texture=$('texture-preview'); if(texture&&btn&&btn.parentNode!==texture)texture.appendChild(btn); if(texture&&note&&note.parentNode!==texture)texture.appendChild(note);
     if(window.__ffFinal2NanoBusy)return; window.__ffFinal2NanoBusy=true;
-    var base=choosePreview(), m=material();
+    var base=choosePreview(), m=material(), hasScreen=!!screenKey();
     if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b style="color:#fff">원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">Nano Banana API 호출 중입니다.<br>원본: '+esc(base)+'</span><img src="'+esc(base)+'" alt="원본 preview" style="margin-top:8px">';}
     if(btn){btn.disabled=true;btn.textContent='적용 중...';}
     try{
       var health=await fetchJson('/api/health',{cache:'no-store'},8000).catch(function(){return null;});
       if(!health||!health.res||!health.res.ok) throw new Error('Nano Banana 서버 연결 실패: /api/health가 응답하지 않습니다. Render 서버 또는 GEMINI_API_KEY를 확인하세요.');
       var payload={
-        mode:'strict-desk-material-map-preview-final2',
+        mode:'strict-desk-screen-material-map-preview-final2',
         materialEditOnly:true,
         preserveSourceImage:true,
-        targetType:'desk', productType:'desk',
+        targetType:hasScreen?'desk_screen':'desk',
+        productType:hasScreen?'desk_screen':'desk',
         sourceImage:base, baseImage:base, deskImage:base, fallbackDeskImage:base,
-        topTexture:m.topTexture, legTexture:m.legTexture,
-        topCode:m.topCode, legCode:m.legCode,
-        topShape:topLabel(), legType:legLabel(), casterType:moveLabel(),
-        prompt:'원본 제품 사진의 형태, 각도, 배경, 그림자, 크롭은 유지하고 상판에는 topTexture/topCode 재질만, 다리에는 legTexture/legCode 재질만 자연스럽게 맵핑하세요. 새 제품을 만들지 말고 재질만 교체하세요.'
+        topTexture:m.topTexture, legTexture:m.legTexture, screenTexture:m.screenTexture,
+        topCode:m.topCode, legCode:m.legCode, screenCode:m.screenCode,
+        topShape:topLabel(), legType:legLabel(), casterType:moveLabel(), screenType:screenKey(),
+        prompt:'원본 제품 사진의 형태, 각도, 배경, 그림자, 크롭은 유지하세요. 상판에는 topTexture/topCode 재질만, 다리에는 legTexture/legCode 재질만, 스크린이 있으면 스크린에는 screenTexture/screenCode 재질만 자연스럽게 맵핑하세요. 새 제품을 만들지 말고 재질만 교체하세요.'
       };
       var out=await fetchJson('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},90000);
       if(!out.res.ok) throw new Error(out.data.error||out.data.detail||('/api/generate-preview '+out.res.status));
       var src=(typeof out.data==='string')?out.data:(out.data.imageUrl||out.data.image||out.data.url||'');
       if(!src) throw new Error('Nano Banana 결과 이미지 URL을 받지 못했습니다.');
-      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 미리보기 · 데스크</div><img src="'+esc(src)+'" alt="재질 적용 결과"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">Nano Banana API 결과입니다.</div>';}
+      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 미리보기'+(hasScreen?' · 데스크 + 스크린':' · 데스크')+'</div><img src="'+esc(src)+'" alt="재질 적용 결과"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">Nano Banana API 결과입니다.</div>';}
     }catch(err){
       if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5">재질 적용 실패</b><br><span style="color:#ddd">'+esc(err&&err.message?err.message:err)+'</span><br><span style="color:#8fa1bb;font-size:11px">HTML은 API를 호출하도록 수정했습니다. 여기서 실패하면 프론트가 아니라 서버/API 키/Render 로그 문제입니다.</span>';}
     }finally{window.__ffFinal2NanoBusy=false; if(btn){btn.disabled=false;btn.textContent='✨ 원본 사진에 재질 적용';} setTimeout(function(){try{ff90RefreshOptionSummary();}catch(e){}},50);}
