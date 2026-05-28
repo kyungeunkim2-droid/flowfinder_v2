@@ -1114,18 +1114,17 @@ body.ff-dashboard-preview #preview-panel{
 }
 
 
-/* === FF HOTFIX === */
+/* === FF SAFE HOTFIX: right panel separation === */
 .ff-hero-grid{
   display:flex !important;
   flex-direction:column !important;
   gap:24px !important;
+  align-items:stretch !important;
 }
-
 .ff-hero-image-card{
   margin-bottom:22px !important;
   flex:none !important;
 }
-
 .ff-hero-swatches{
   display:grid !important;
   grid-template-columns:1fr 1fr 1fr !important;
@@ -1135,7 +1134,6 @@ body.ff-dashboard-preview #preview-panel{
   z-index:3 !important;
   clear:both !important;
 }
-
 .ff-hero-thumbs{
   display:grid !important;
   grid-template-columns:1fr 1fr 1fr !important;
@@ -6275,7 +6273,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
   function defaultScreenH(cat){return (cat==='일자형 스크린'||cat==='L형 스크린')?590:715;}
   function currentDeskDefaultH(){return 720;}
 
-  window.updateFlowBar = function(){ window.state = window.state || {}; 
+  window.updateFlowBar = function(){
     var bar=$('flow-bar'); if(!bar) return;
     var steps=['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
     var active=0;
@@ -6459,7 +6457,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
     addMsg('bot', html);
   };
   var __oldUpdateFlowBar = window.updateFlowBar;
-  window.updateFlowBar = function(){ window.state = window.state || {}; 
+  window.updateFlowBar = function(){
     var bar=document.getElementById('flow-bar');
     if(!bar){ if(__oldUpdateFlowBar) return __oldUpdateFlowBar(); return; }
     var steps=['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
@@ -6703,7 +6701,7 @@ body.ff-dashboard-preview #preview-panel{
     if (typeof oldGoTo === 'function') return oldGoTo(targetIdx);
   };
   var oldUpdateFlow = window.updateFlowBar;
-  window.updateFlowBar = function(){ window.state = window.state || {}; 
+  window.updateFlowBar = function(){
     var bar = document.getElementById('flow-bar');
     if(!bar){ if(oldUpdateFlow) oldUpdateFlow(); return; }
     var labels = ['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
@@ -13259,6 +13257,30 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
 })();
 </script>
 
+
+<script id="ff-safe-hotfix-js">
+(function(){
+  // state가 지역 스코프에만 있거나 깨졌을 때 화면 전체가 죽지 않도록 최소 방어
+  if (!window.state) window.state = {};
+  window.NANO_BANANA_RULES =
+    '새로운 이미지를 생성하지 마라.\n' +
+    'previews 폴더의 원본 이미지를 그대로 사용한다.\n' +
+    'textures 재질만 해당 영역(top/leg/screen)에 맵핑한다.\n' +
+    '카메라 각도, 형태, 다리 구조, 스크린 구조, 배경을 변경하지 마라.\n' +
+    '결과는 원본 preview 이미지 기반 재질 맵핑 결과여야 한다.';
+
+  // updateFlowBar가 state 때문에 죽는 것만 방어
+  var oldUpdate = window.updateFlowBar;
+  window.updateFlowBar = function(){
+    try {
+      if (typeof oldUpdate === 'function') return oldUpdate.apply(this, arguments);
+    } catch(e) {
+      console.warn('[FF safe hotfix] updateFlowBar skipped:', e);
+    }
+  };
+})();
+</script>
+
 </body>
 
 
@@ -13625,7 +13647,7 @@ body{
     return active;
   };
 
-  window.updateFlowBar = function(){ window.state = window.state || {}; 
+  window.updateFlowBar = function(){
     var bar = document.getElementById('flow-bar');
     if(!bar) return;
     var steps = ['01 제품','02 옵션','03 사이즈','04 컬러','05 견적'];
