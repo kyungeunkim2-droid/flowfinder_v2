@@ -2226,7 +2226,13 @@ body.ff-dashboard-preview #preview-panel,
       <div class="material-chip-row" id="quick-leg-row"><span>다리</span><i id="quick-leg-code">-</i><em id="quick-leg-chip"></em></div>
       <div class="material-chip-row" id="quick-screen-row"><span>스크린</span><i id="quick-screen-code">-</i><em id="quick-screen-chip"></em></div>
     </div>
-    <button id="quick-ai-preview-btn" onclick="prepareNanoBananaPreview()">✨ 원본 사진에 재질 적용</button>
+    <button id="quick-ai-preview-btn" <button onclick="prepareNanoBananaPreview('desk')">
+  ✨ 데스크 재질 적용
+</button>
+
+<button onclick="prepareNanoBananaPreview('screen')">
+  ✨ 스크린 재질 적용
+</button>>✨ 원본 사진에 재질 적용</button>
     <div id="quick-ai-preview-note" style="display:none;"></div>
     <canvas id="product-3d-canvas" height="1" style="display:none;"></canvas>
     <div id="texture-strip" style="display:none;"></div>
@@ -14149,6 +14155,90 @@ document.addEventListener('click', function(){
   setTimeout(renderMaterialPreviews, 100);
 }, true);
 </script>
+  <style>
+#ff-desk-ai-result-panel,
+#ff-screen-ai-result-panel,
+#ff-dashboard-hero,
+#screen-composite-preview,
+#product-preview-box,
+#ff-live-preview {
+  display:none !important;
+  visibility:hidden !important;
+  height:0 !important;
+  overflow:hidden !important;
+}
+</style>
+
+<script>
+(function(){
+  function $(id){ return document.getElementById(id); }
+
+  function removeOldPreviewPanels(){
+    ['ff-desk-ai-result-panel','ff-screen-ai-result-panel'].forEach(function(id){
+      var el = $(id);
+      if(el && el.parentNode) el.parentNode.removeChild(el);
+    });
+  }
+
+  // 기존 showPanel이 스크린 패널에 데스크 이미지를 꽂는 걸 차단
+  window.showPanel = function(){ return false; };
+
+  // 기존 ensureAiPanels가 다시 패널 만드는 것도 차단
+  window.ensureAiPanels = function(){
+    removeOldPreviewPanels();
+    return { desk:null, screen:null };
+  };
+
+  function renameMaterialPreview(){
+    var note = $('quick-ai-preview-note');
+    if(!note) return;
+
+    var hasScreen = !!(
+      $('quick-screen-code') &&
+      $('quick-screen-code').textContent.trim() &&
+      $('quick-screen-code').textContent.trim() !== '-'
+    );
+
+    var title = hasScreen
+      ? '재질 적용 미리보기 · 데스크 + 스크린'
+      : '재질 적용 미리보기 · 데스크';
+
+    var oldTitle = note.querySelector('.ff-clean-preview-title');
+    if(!oldTitle){
+      oldTitle = document.createElement('div');
+      oldTitle.className = 'ff-clean-preview-title';
+      oldTitle.style.cssText = 'font-weight:900;color:#fff;margin-bottom:8px;';
+      note.prepend(oldTitle);
+    }
+    oldTitle.textContent = title;
+  }
+
+  function clean(){
+    removeOldPreviewPanels();
+    renameMaterialPreview();
+  }
+
+  document.addEventListener('DOMContentLoaded', clean);
+  window.addEventListener('load', clean);
+  document.addEventListener('click', function(){ setTimeout(clean, 80); }, true);
+  setInterval(clean, 1000);
+})();
+</script>
+  <style>
+#ff-desk-ai-result-panel,
+#ff-screen-ai-result-panel {
+  display:none !important;
+}
+</style>
+
+<script>
+window.ensureAiPanels = function(){
+  return { desk:null, screen:null };
+};
+window.showPanel = function(){
+  return false;
+};
+</script>
 </body>
 
 
@@ -18460,7 +18550,16 @@ var OPTION_IMG = {
     if(p.indexOf('L')>-1 || p.indexOf('엘')>-1) return 'lshape';
     return 'front';
   }
-  function productImage(key){return 'products/'+key+'/base/base.png';}
+  function productImage(key){
+  key = String(key || '');
+
+  if (key === 'front') key = 'screen_front';
+  if (key === 'side') key = 'screen_side';
+  if (key === 'straight') key = 'screen_straight';
+  if (key === 'lshape') key = 'screen_lshape';
+
+  return key ? '/products/' + key + '/base/base.png' : '';
+}
   function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key]||key;}
   function materialState(){
     var s=st();
