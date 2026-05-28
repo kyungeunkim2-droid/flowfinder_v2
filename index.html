@@ -4739,6 +4739,16 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
     input.style.borderColor = '';
   }
 
+  if (btn) {
+    Array.from(btn.parentElement.children).forEach(function(b) {
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
+  }
+
+  return true;
+}
+
   var group = btn && btn.parentElement;
 
   // 상판은 표준품/무늬목/라미네이트 전체에서 1개만 선택
@@ -4756,7 +4766,6 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
 
   if (btn) btn.classList.add('active');
 
-  // 선택값 저장 후 미리보기 갱신
   ffHoverMaterial(inputId, code, part);
 
   if (part === 'top' || part === 'leg') {
@@ -4770,8 +4779,6 @@ function ffSelectMaterialButton(inputId, code, part, btn) {
   } else {
     stdColorPreview(code);
   }
-
-  return true;
 }
 
 
@@ -14990,6 +14997,185 @@ window.showPanel = function(){
 </script>
 <!-- === /FF FINAL HOTFIX === -->
 
+
+
+<!-- === USER FINAL HOTFIX: DCR/TS leg selection + screen material flow + no AI generation === -->
+<style id="ff-final-user-hotfix-dcr-screen-noai-style">
+  /* 주문품 다리색상 안내 문구에서 '해당 시 선택' 제거 */
+  .ff-color-category-title small:empty{display:none!important;}
+  /* AI/Nano Banana 생성 버튼은 더 이상 노출하지 않음: 재질 맵핑만 사용 */
+  #quick-ai-preview-btn,
+  #quick-screen-ai-preview-btn,
+  #screen-ai-btn,
+  #ai-render-btn{
+    display:none!important;
+  }
+</style>
+<script id="ff-final-user-hotfix-dcr-screen-noai-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function qsa(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
+  function txt(el){return (el && el.textContent || '').trim();}
+  function isScreenCat(cat){
+    cat=String(cat||'');
+    try{ if(window.USER_CATEGORIES && USER_CATEGORIES[cat] && USER_CATEGORIES[cat].isScreen) return true; }catch(e){}
+    return /스크린/.test(cat);
+  }
+  function dataPack(cat){
+    var info=(window.USER_CATEGORIES && USER_CATEGORIES[cat]) || {};
+    var mode=(typeof window.ffDataTypeForMode==='function') ? window.ffDataTypeForMode(info) : (info.type||'unit');
+    var keys=(typeof window.ffUnitKeysForMode==='function') ? window.ffUnitKeysForMode(cat, info.keys) : (info.keys||[]);
+    var key=keys[0];
+    var data=mode==='set' ? window.SET_DATA : window.UNIT_DATA;
+    return {mode:mode,key:key,items:(data&&data[key])||[]};
+  }
+
+  // 1) 다리 DCR/TS 버튼이 어떤 뒤쪽 패치에도 막히지 않도록 최종 선택 함수를 다시 고정
+  window.ffSelectMaterialButton = function(inputId, code, part, btn){
+    code=String(code||'').trim();
+    part=String(part||'');
+    var input=$(inputId);
+    if(input){
+      input.value=code;
+      input.setAttribute('value',code);
+      input.style.borderColor='';
+      try{input.dispatchEvent(new Event('input',{bubbles:true}));}catch(e){}
+      try{input.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}
+    }
+
+    // 같은 hidden input을 쓰는 버튼 전체에서 하나만 active
+    qsa('.material-btn[data-input="'+String(inputId).replace(/"/g,'\\"')+'"]').forEach(function(b){
+      b.classList.remove('active','selected','multi-selected');
+      b.removeAttribute('aria-pressed');
+    });
+    if(btn){
+      btn.classList.add('active','selected');
+      btn.setAttribute('aria-pressed','true');
+    }
+
+    window.state=window.state||{};
+    state.current=state.current||{};
+    if(part==='top'){
+      state._deskTopColor=code;
+      state.current.topColor=code;
+    }else if(part==='leg'){
+      state._deskLegColor=code;
+      state.current.legColor=code;
+      state.legColor=code;
+    }else if(part==='screen'){
+      state.color=code;
+      state.current.color=code;
+      state.screenColor=code;
+    }else{
+      state.color=code;
+      state.current.color=code;
+    }
+
+    try{
+      if(part==='top'||part==='leg'){
+        var peer=input && input.getAttribute('data-peer');
+        if(peer && typeof window.deskColorPairPreview==='function'){
+          window.deskColorPairPreview(part==='top'?inputId:peer, part==='leg'?inputId:peer);
+        }
+      }else if(typeof window.stdColorPreview==='function'){
+        window.stdColorPreview(code);
+      }
+    }catch(e){}
+
+    try{ if(typeof window.showTexturePreview==='function') window.showTexturePreview(part==='leg'?'LEG_'+code:code); }catch(e){}
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    try{ if(typeof window.ff90RefreshOptionSummary==='function') window.ff90RefreshOptionSummary(); }catch(e){}
+    return false;
+  };
+  try{ ffSelectMaterialButton = window.ffSelectMaterialButton; }catch(e){}
+
+  // 2) 다리색상 주문품 영역 문구 정리: '해당 시 선택' 삭제
+  function cleanLegLabels(){
+    qsa('.ff-color-category-title').forEach(function(title){
+      var label=title.querySelector('span');
+      var small=title.querySelector('small');
+      var t=txt(title);
+      if(/주문품/.test(t) && /DCR|TS|다리|해당 시 선택/.test(t)){
+        if(label) label.textContent='주문품색상';
+        if(small) small.textContent='';
+      }
+      if(small && /해당 시 선택/.test(txt(small))) small.textContent='';
+    });
+    qsa('label').forEach(function(label){
+      if(txt(label)==='다리 색상') label.innerHTML='다리색상';
+    });
+  }
+
+  // 3) 스크린: 사이즈 입력 다음에는 끝내지 말고 무조건 재질/색상 선택으로 이동
+  var prevAfter=window.afterSizeInput;
+  window.afterSizeInput = function(parsed){
+    window.state=window.state||{};
+    var cat=state._currentCatName || state.currentCatName || '';
+    if(isScreenCat(cat)){
+      parsed=parsed||{};
+      state.w=parsed.w; state.d=parsed.d; state.h=parsed.h;
+      state.current=state.current||{};
+      var size=[];
+      if(parsed.w) size.push('W'+parsed.w);
+      if(parsed.d) size.push('D'+parsed.d);
+      if(parsed.h) size.push('H'+parsed.h);
+      if(size.length) state.current.size=size.join(' ');
+      try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+      try{ if(typeof window.addMsg==='function') window.addMsg('bot','이제 스크린 재질/색상을 선택해주세요.'); }catch(e){}
+      var pack=state._flowColorPack || dataPack(cat);
+      if(typeof window.askColorTypeFirst==='function'){
+        window.askColorTypeFirst(cat, pack.mode, pack.items, pack.key);
+        setTimeout(cleanLegLabels,30);
+        return false;
+      }
+    }
+    return (typeof prevAfter==='function') ? prevAfter.apply(this,arguments) : undefined;
+  };
+  try{ afterSizeInput = window.afterSizeInput; }catch(e){}
+
+  // 구버전 상판위 높이 입력 경로로 들어가도 바로 재질/색상 선택으로 전환
+  window.ffFinalSubmitTopGap = function(){
+    window.state=window.state||{};
+    var cat=state._currentCatName || state.currentCatName || '';
+    if(isScreenCat(cat)){
+      var pack=state._flowColorPack || dataPack(cat);
+      try{ if(typeof window.addMsg==='function') window.addMsg('bot','이제 스크린 재질/색상을 선택해주세요.'); }catch(e){}
+      if(typeof window.askColorTypeFirst==='function') window.askColorTypeFirst(cat, pack.mode, pack.items, pack.key);
+      return false;
+    }
+    return false;
+  };
+
+  // 4) Nano/API 이미지 생성 완전 차단: 기존 preview 위 재질맵핑만 사용
+  window.prepareNanoBananaPreview = function(){
+    try{ if(typeof window.ff90RefreshOptionSummary==='function') window.ff90RefreshOptionSummary(); }catch(e){}
+    var note=$('quick-ai-preview-note');
+    if(note){
+      note.style.display='block';
+      note.innerHTML='<b>재질맵핑 방식으로 고정됨</b><br><span>새 이미지는 생성하지 않고 현재 preview 이미지에 선택 재질만 반영합니다.</span>';
+    }
+    return false;
+  };
+  var oldFetch=window.fetch;
+  if(oldFetch && !window.__ffNoGenerateFetchPatch){
+    window.__ffNoGenerateFetchPatch=true;
+    window.fetch=function(url,opts){
+      var u=String(url&&url.url || url || '');
+      if(u.indexOf('/api/generate-preview')>-1 || u.indexOf('generate-preview')>-1){
+        return Promise.resolve(new Response(JSON.stringify({ok:false,blocked:true,message:'Image generation disabled; material mapping only.'}),{status:200,headers:{'Content-Type':'application/json'}}));
+      }
+      return oldFetch.apply(this,arguments);
+    };
+  }
+
+  function apply(){ cleanLegLabels(); }
+  document.addEventListener('DOMContentLoaded',apply);
+  window.addEventListener('load',apply);
+  document.addEventListener('click',function(){setTimeout(apply,50);},true);
+  setInterval(apply,1200);
+})();
+</script>
+<!-- === /USER FINAL HOTFIX === -->
 </body>
 
 
