@@ -12701,13 +12701,7 @@ ${map.move[move] || move}
   function catInfo(cat){return (window.USER_CATEGORIES && USER_CATEGORIES[cat]) || {};}
   function isScreenCat(cat){return !!catInfo(cat).isScreen || /스크린/.test(String(cat||''));}
   function isDeskCat(cat){return !!catInfo(cat).isDesk || /데스크/.test(String(cat||''));}
-  function screenKind(cat){
-    cat=String(cat||'');
-    if(/사이드/.test(cat)) return 'side';
-    if(/일자/.test(cat)) return 'straight';
-    if(/L형|엘형|l형/i.test(cat)) return 'lshape';
-    return 'front';
-  }
+
   function screenDefaults(cat){
     var k=screenKind(cat);
     if(k==='straight' || k==='lshape') return {total:590, above:350};
@@ -13943,13 +13937,32 @@ function topKey(){
 (function(){
   function clean(code){ return String(code||'').trim().toUpperCase().replace(/^SCREEN_/, '').replace(/^TOP_/, '').replace(/^LEG_/, ''); }
   function isCustomColorType(){ return !!(window.state && String(state.colorType||'').indexOf('주문')!==-1); }
-  function screenKind(catName){
-    var t = String(catName||'') + ' ' + String((window.state && (state._currentCatName || state.currentCatName || state.product || state.screenLabel)) || '');
-    if(/사이드|side/i.test(t)) return 'side';
-    if(/일자|straight/i.test(t)) return 'straight';
-    if(/L형|l형|엘|lshape/i.test(t)) return 'lshape';
-    return 'front';
-  }
+function screenKind(cat){
+  cat = String(cat || '');
+
+  if(/사이드|side/i.test(cat)) return 'side';
+  if(/일자|straight/i.test(cat)) return 'straight';
+  if(/L형|ㄴ형|엘|lshape/i.test(cat)) return 'lshape';
+  if(/전면|front/i.test(cat)) return 'front';
+
+  var s = window.state || {};
+  var raw = String(
+    s.screenLabel ||
+    s.screen ||
+    s._currentScreenType ||
+    s._currentCatName ||
+    s.currentCatName ||
+    ''
+  );
+
+  if(/사이드|side/i.test(raw)) return 'side';
+  if(/일자|straight/i.test(raw)) return 'straight';
+  if(/L형|ㄴ형|엘|lshape/i.test(raw)) return 'lshape';
+  if(/전면|front/i.test(raw)) return 'front';
+
+  return 'straight';
+}
+
   function screenUrl(code, catName){
     code = clean(code);
     if(!code || code==='-' || code==='선택') return '';
