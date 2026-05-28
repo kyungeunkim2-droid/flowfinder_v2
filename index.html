@@ -3760,47 +3760,54 @@ function getProductAssetKeyByName(name) {
   return '';
 }
 
-function getProductBasePathByKey(key) {
-
+function getProductBasePathByKey(key){
   key = String(key || '');
 
-  var folder = deskFolder();
+  // products/.../base/base.png 경로 금지.
+  // 현재 데스크 옵션 + 스크린 타입 조합으로 images/previews 사용.
+  var folder = (typeof deskFolder === 'function') ? deskFolder() : 'desk_standard';
 
- var currentDeskBase =
-  window.__ffCurrentDeskBase ||
-  window.__ffLastDeskBase ||
-  '';
+  var base = '';
+  try{
+    base = (typeof legKey === 'function' ? legKey() : 'ladder') + '_' +
+           (typeof moveKey === 'function' ? moveKey() : 'glide') + '_' +
+           (typeof topKey === 'function' ? topKey() : 'rect');
+  }catch(e){
+    base = window.__ffLastDeskBase || 'ladder_glide_rect';
+  }
 
-var base = currentDeskBase || (
-  legKey() + '_' +
-  moveKey() + '_' +
-  topKey()
-);
+  var raw = '';
+  try{
+    var s = (typeof st === 'function') ? st() : (window.state || {});
+    raw = String(
+      s.screenLabel ||
+      s.screen ||
+      s._currentScreenType ||
+      s._currentCatName ||
+      s.currentCatName ||
+      key ||
+      ''
+    );
+  }catch(e){
+    raw = key;
+  }
 
-window.__ffLastDeskBase = base;
-
-  var raw = text(
-    st().screenLabel ||
-    st().screen ||
-    st()._currentScreenType ||
-    st()._currentCatName ||
-    st().currentCatName
-  );
-
-  var hasFront = /전면/.test(raw);
-  var hasSide = /사이드/.test(raw);
+  var hasFront = /전면|front/.test(raw);
+  var hasSide = /사이드|side/.test(raw);
 
   var screen = '';
-
   if(hasFront && hasSide) screen = 'frontside';
   else if(hasFront) screen = 'front';
   else if(hasSide) screen = 'side';
-  else if(/일자/.test(raw)) screen = 'straight';
-  else if(/L형|ㄴ형/.test(raw)) screen = 'lshape';
+  else if(/일자|straight/.test(raw)) screen = 'straight';
+  else if(/L형|ㄴ형|lshape/.test(raw)) screen = 'lshape';
 
-  return screen
-    ? 'images/previews/' + folder + '/' + base + '_' + screen + '.png'
-    : 'images/previews/' + folder + '/' + base + '.png';
+  window.__ffLastDeskBase = base;
+
+  if(screen){
+    return 'images/previews/' + folder + '/' + base + '_' + screen + '.png';
+  }
+  return 'images/previews/' + folder + '/' + base + '.png';
 }
 function loadPreviewImage(src) {
   return new Promise(function(resolve) {
@@ -14576,6 +14583,96 @@ window.showPanel = function(){
   document.addEventListener('change', function(){ setTimeout(applyAll, 30); }, true);
   setTimeout(applyAll, 500);
   setTimeout(applyAll, 1200);
+})();
+</script>
+
+
+<!-- === FINAL PATCH: remove products/base fallback + force screen material payload === -->
+<script id="ff-final-screen-material-and-base-patch">
+(function(){
+  if(window.__ffFinalScreenMaterialAndBasePatch) return;
+  window.__ffFinalScreenMaterialAndBasePatch = true;
+
+  function textOf(id){
+    var el = document.getElementById(id);
+    return el ? (el.textContent || el.innerText || '').trim() : '';
+  }
+
+  function getScreenCode(){
+    var v =
+      textOf('quick-screen-code') ||
+      textOf('screen-material-code') ||
+      textOf('ff-screen-code');
+
+    if(v && v !== '-') return v;
+
+    var s = window.state || {};
+    v =
+      s.screenColor ||
+      s.screenMaterial ||
+      s.screenMaterialCode ||
+      s._screenMaterialCode ||
+      (s.current && (s.current.screenColor || s.current.screenMaterial || s.current.screenMaterialCode)) ||
+      '';
+
+    return String(v || '').trim();
+  }
+
+  function currentPreviewPath(){
+    try{
+      if(typeof choosePreview === 'function'){
+        var p = choosePreview();
+        if(p && String(p).indexOf('products/') === -1) return p;
+      }
+    }catch(e){}
+
+    try{
+      if(typeof getProductBasePathByKey === 'function'){
+        var p2 = getProductBasePathByKey((window.state && (state.screen || state._currentScreenType)) || '');
+        if(p2) return p2;
+      }
+    }catch(e){}
+
+    var folder = 'desk_standard';
+    try{
+      if(typeof deskFolder === 'function') folder = deskFolder();
+    }catch(e){}
+
+    var base = window.__ffLastDeskBase || 'ladder_glide_rect';
+    return 'images/previews/' + folder + '/' + base + '.png';
+  }
+
+  var oldFetch = window.fetch;
+  window.fetch = function(input, init){
+    try{
+      var url = String(input || '');
+      if(url.indexOf('/api/generate-preview') > -1 && init && typeof init.body === 'string'){
+        var data = JSON.parse(init.body);
+
+        var preview = currentPreviewPath();
+
+        ['sourceImage','baseImage','deskImage','fallbackDeskImage','productImage'].forEach(function(k){
+          if(!data[k] || String(data[k]).indexOf('products/') > -1){
+            data[k] = preview;
+          }
+        });
+
+        var screenCode = getScreenCode();
+        if(screenCode && screenCode !== '-'){
+          var line = '\n스크린 파트에는 ' + screenCode + ' 재질을 적용해줘.';
+          data.screenMaterialCode = screenCode;
+          data.screenTextureCode = screenCode;
+          data.screenInstruction = '스크린 파트에는 ' + screenCode + ' 재질을 적용해줘.';
+          if(typeof data.prompt === 'string' && data.prompt.indexOf(line) === -1){
+            data.prompt += line;
+          }
+        }
+
+        init = Object.assign({}, init, { body: JSON.stringify(data) });
+      }
+    }catch(e){}
+    return oldFetch.apply(this, arguments);
+  };
 })();
 </script>
 
