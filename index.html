@@ -5890,21 +5890,22 @@ FF_MANIFEST = {"products":{"desk_duct":{"label":"덕트형 데스크","type":"de
     function refreshScreenOptions() {
       clearSelect(ss);
       var pk=ps.value, p=FF_MANIFEST.products[pk];
-    if(!p){
-  ss.disabled=true;
-}
-else{
-  ss.disabled=false;
 
-  flattenScreen(pk).forEach(function(t){
-    addOpt(ss,t.file,t.label,{
-      code:t.code,
-      group:t.group
-    });
-  });
-}
-        if (!ss.options.length) addOpt(ss,'','등록된 스크린 재질 없음',{code:''});
+      if(!p){
+        ss.disabled = true;
+      } else {
+        ss.disabled = false;
+
+        flattenScreen(pk).forEach(function(t){
+          addOpt(ss, t.file, t.label, {
+            code: t.code,
+            group: t.group
+          });
+        });
       }
+
+      if (!ss.options.length) addOpt(ss,'','등록된 스크린 재질 없음',{code:''});
+
       var lab=$('ff-screen-label');
       if (lab) lab.textContent = (p && p.type==='screen' && (pk==='front'||pk==='side')) ? '스크린 재질 · 패브릭' : (p && p.type==='screen' ? '스크린 재질 · PET' : '스크린 재질');
     }
@@ -6225,6 +6226,8 @@ function setPreviewGlow(part) {
         legTexture: PREVIEW.legTex || '',
         topCode: PREVIEW.top || '',
         legCode: PREVIEW.leg || '',
+        screenMaterialCode: (document.getElementById('quick-screen-code') && document.getElementById('quick-screen-code').textContent ? document.getElementById('quick-screen-code').textContent.trim() : ''),
+        screenInstruction: '스크린에는 선택된 스크린 재질을 적용하세요.',
         deskLabel: productLabel(PREVIEW.deskKey),
         legType: (state.legType || ''),
         casterType: (state.casterType || ''),
@@ -6235,9 +6238,6 @@ function setPreviewGlow(part) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
-        screenMaterialCode: document.getElementById('quick-screen-code')?.textContent?.trim(),
-screenTexture: document.querySelector('#quick-screen-swatch')?.style?.backgroundImage || '',
-screenInstruction: '스크린에는 선택된 스크린 재질을 적용하세요.'
       });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || '재질 적용 실패');
