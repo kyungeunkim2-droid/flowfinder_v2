@@ -14189,29 +14189,22 @@ document.addEventListener('click', function(){
     return { desk:null, screen:null };
   };
 
-  function renameMaterialPreview(){
-    var note = $('quick-ai-preview-note');
-    if(!note) return;
+function renameMaterialPreview(){
+  var note = document.getElementById('quick-ai-preview-note');
+  if(!note) return;
 
-    var hasScreen = !!(
-      $('quick-screen-code') &&
-      $('quick-screen-code').textContent.trim() &&
-      $('quick-screen-code').textContent.trim() !== '-'
-    );
+  // 이미 생긴 중복 제목 전부 제거
+  note.querySelectorAll('.ff-clean-preview-title').forEach(function(el){
+    el.remove();
+  });
 
-    var title = hasScreen
-      ? '재질 적용 미리보기 · 데스크 + 스크린'
-      : '재질 적용 미리보기 · 데스크';
+  var title = document.createElement('div');
+  title.className = 'ff-clean-preview-title';
+  title.style.cssText = 'font-weight:900;color:#fff;margin-bottom:8px;';
+  title.textContent = '재질 적용 미리보기';
 
-    var oldTitle = note.querySelector('.ff-clean-preview-title');
-    if(!oldTitle){
-      oldTitle = document.createElement('div');
-      oldTitle.className = 'ff-clean-preview-title';
-      oldTitle.style.cssText = 'font-weight:900;color:#fff;margin-bottom:8px;';
-      note.prepend(oldTitle);
-    }
-    oldTitle.textContent = title;
-  }
+  note.prepend(title);
+}
 
   function clean(){
     removeOldPreviewPanels();
@@ -14221,7 +14214,7 @@ document.addEventListener('click', function(){
   document.addEventListener('DOMContentLoaded', clean);
   window.addEventListener('load', clean);
   document.addEventListener('click', function(){ setTimeout(clean, 80); }, true);
-  setInterval(clean, 1000);
+  
 })();
 </script>
   <style>
