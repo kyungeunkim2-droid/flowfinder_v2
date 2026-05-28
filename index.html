@@ -1755,6 +1755,8 @@ var GITHUB_RAW = 'https://raw.githubusercontent.com/kyungeunkim2-droid/flowfinde
 var TEXTURE_MAP = {
   // 표준 데스크
   'HW': 'textures/top/standard/HW.png', 'OSG': 'textures/top/standard/OSG.jpg', 'OCY': 'textures/top/standard/OSG.jpg', 'WW': 'textures/top/standard/WW.jpg', 'WWK': 'textures/top/standard/WW.jpg',
+  'HWBKM': 'textures/top/standard/HW.png', 'WWWW': 'textures/top/standard/WW.jpg', 'WWDSG': 'textures/top/standard/WW.jpg', 'WWKBKM': 'textures/top/standard/WW.jpg',
+  'OCYWW': 'textures/top/standard/OSG.jpg', 'OCYDSG': 'textures/top/standard/OSG.jpg',
 
   // 표준 스크린 기본값: 일자형 기준. 전면/사이드는 _ffLocalTextureForCode에서 세부 경로로 보정됨.
   '1P1': 'textures/screen/straight/standard/1P1.jpg', '1P2': 'textures/screen/straight/standard/1P2.jpg',
@@ -16476,5 +16478,204 @@ var OPTION_IMG = {
   window.addEventListener('load',boot);
   document.addEventListener('click',function(){setTimeout(boot,80);},true);
   setInterval(boot,1600);
+})();
+</script>
+
+<!-- === FF1000: material buttons large + 3x1 material sections + screen Nano binding === -->
+<style id="ff1000-material-large-3x1-screen-nano">
+  /* 재질 선택 영역: 6열 축소 취소, 상판/다리/스크린 3칸 가로 배치 */
+  .color-pair-grid,
+  .material-picker-grid,
+  .ff-material-parts,
+  .quick-materials.ff-material-parts{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:14px !important;
+    align-items:start !important;
+  }
+  .color-pair-grid > div,
+  .material-button-section{
+    min-width:0 !important;
+    width:100% !important;
+  }
+  .material-button-section{
+    margin-top:0 !important;
+    padding:10px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    border-radius:16px !important;
+    background:rgba(8,15,26,.52) !important;
+  }
+  .material-button-section-title{
+    font-size:12px !important;
+    color:#fff !important;
+    margin:0 0 9px !important;
+    line-height:1.25 !important;
+  }
+
+  /* 버튼은 크게: 재질 이미지가 보이도록 */
+  .material-button-group{
+    display:grid !important;
+    grid-template-columns:repeat(2,minmax(0,1fr)) !important;
+    gap:9px !important;
+    align-items:stretch !important;
+  }
+  .material-btn{
+    min-width:0 !important;
+    max-width:none !important;
+    width:100% !important;
+    min-height:74px !important;
+    padding:8px 7px !important;
+    gap:6px !important;
+    border-radius:13px !important;
+    font-size:12px !important;
+    justify-content:center !important;
+    flex-direction:column !important;
+    text-align:center !important;
+  }
+  .material-btn .mat-thumb{
+    width:48px !important;
+    height:38px !important;
+    border-radius:9px !important;
+    background-size:cover !important;
+    background-position:center !important;
+  }
+  .material-btn .mat-code{
+    max-width:100% !important;
+    font-size:12px !important;
+    line-height:1.15 !important;
+  }
+
+  /* 오른쪽 선택값 요약도 상판/다리/스크린 3x1 */
+  #texture-preview .quick-materials{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:10px !important;
+  }
+  #texture-preview .material-chip-row{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    grid-template-rows:auto auto auto !important;
+    min-height:94px !important;
+    padding:10px !important;
+    text-align:center !important;
+    align-items:center !important;
+    justify-items:center !important;
+  }
+  #texture-preview .material-chip-row span{
+    font-size:11px !important;
+    color:#9fb1c8 !important;
+  }
+  #texture-preview .material-chip-row i{
+    font-size:13px !important;
+    font-weight:900 !important;
+    color:#fff !important;
+    white-space:normal !important;
+  }
+  #texture-preview .material-chip-row em{
+    width:72px !important;
+    height:46px !important;
+    border-radius:10px !important;
+    justify-self:center !important;
+    background-size:cover !important;
+    background-position:center !important;
+  }
+
+  @media(max-width:1100px){
+    .color-pair-grid,
+    .material-picker-grid,
+    .ff-material-parts,
+    .quick-materials.ff-material-parts{
+      grid-template-columns:1fr !important;
+    }
+    .material-button-group{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+    #texture-preview .quick-materials{grid-template-columns:1fr !important;}
+  }
+</style>
+<script id="ff1000-screen-nano-bind-and-payload">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function st(){return window.state || {};}
+  function norm(v){return String(v||'').trim();}
+  function joinedStateText(){
+    var s=st(), cur=s.current||{};
+    return [s.product,s.currentProduct,s.currentCatName,s._currentCatName,s.screenLabel,s.screenType,s.selectedScreen,s.screenShape,s.screenOption,cur.product,(window._setSelected||[]).join(' ')].filter(Boolean).join(' ');
+  }
+  function legKey(){var v=norm(st().legType||st().legShape||st().leg||''); if(/A|에이|a자|aframe/i.test(v))return'aframe'; if(/원|라운드|round/i.test(v))return'round'; return'ladder';}
+  function mobilityKey(){var v=norm(st().casterType||st().mobility||st().moveType||''); return /캐스터|caster|바퀴|이동/i.test(v)?'caster':'glide';}
+  function topKey(){var v=norm(st().topShape||st().topType||st().shape||''); return /라운드|원형|round/i.test(v)?'round':'rect';}
+  function screenSuffix(){
+    var t=joinedStateText(); var hasFront=/전면|front/i.test(t); var hasSide=/사이드|side/i.test(t);
+    if(/L형|l형|엘형|lshape/i.test(t)){ if(/우측|오른|right|_R\b/i.test(t))return'_lshape_R'; return'_lshape'; }
+    if(/일자|straight/i.test(t))return'_straight';
+    if(hasFront&&hasSide)return'_frontside'; if(hasSide)return'_side'; if(hasFront)return'_front'; return'';
+  }
+  function deskFolder(){return /덕트|duct/i.test(joinedStateText())?'desk_duct':'desk_standard';}
+  function previewFileName(){return legKey()+'_'+mobilityKey()+'_'+topKey()+screenSuffix()+'.png';}
+  function previewPath(){return './images/previews/'+deskFolder()+'/'+previewFileName();}
+  function matCodes(){var s=st(); return {topCode:norm(s.topColor||s.deskTopColor||s.color||s.topCode||''), legCode:norm(s.legColor||s.deskLegColor||s.legCode||''), screenCode:norm(s.screenColor||s.screenCode||'')};}
+  function ensureNanoNote(){
+    var panel=$('preview-panel'); if(!panel)return null;
+    var note=$('quick-ai-preview-note');
+    if(!note){note=document.createElement('div'); note.id='quick-ai-preview-note'; panel.insertBefore(note,$('preview-items')||$('total-box')||null);}
+    return note;
+  }
+  window.ff1000PreviewPath=previewPath;
+  window.ff1000ScreenSuffix=screenSuffix;
+
+  window.prepareNanoBananaPreview=async function(targetType){
+    if(window.__ff1000NanoBusy)return;
+    var note=ensureNanoNote(); var base=previewPath(); var suffix=screenSuffix(); var mats=matCodes();
+    var isScreenCall = targetType==='screen' || (this && this.id==='screen-ai-btn') || !!suffix;
+    var parts=['desktop top','legs']; if(suffix || mats.screenCode) parts.push('screen');
+    var btns=[$('quick-ai-preview-btn'),$('ai-render-btn'),$('screen-ai-btn')].filter(Boolean);
+    if(note){
+      note.className='ai-loading'; note.style.display='block';
+      note.innerHTML='<b>원본 사진에 재질 적용 중...</b><br><span style="color:#9fb1c8;font-size:11px;">사용 원본: '+esc(base)+'<br>렌더링 대상: '+(isScreenCall?'데스크 + 스크린':'데스크')+'</span><img src="'+esc(base)+'" alt="사용 원본 preview" onerror="this.style.display=\'none\';this.insertAdjacentHTML(\'afterend\',\'<div style=&quot;color:#fca5a5;margin-top:8px;&quot;>원본 preview 파일을 찾지 못했습니다: '+esc(base).replace(/'/g,'&#39;')+'</div>\');">';
+    }
+    btns.forEach(function(b){b.disabled=true; b.textContent='재질 적용 중...';});
+    window.__ff1000NanoBusy=true;
+    try{
+      var payload={
+        mode:'material-map-only',
+        task:'apply_materials_to_existing_preview_image',
+        targetType:isScreenCall?'desk_with_screen':'desk',
+        baseImage:base, deskImage:base, previewImage:base, sourceImage:base, originalImage:base,
+        deskFolder:deskFolder(), previewFile:previewFileName(),
+        legType:legKey(), mobility:mobilityKey(), topShape:topKey(), screenSuffix:suffix,
+        screenSelected:!!suffix,
+        renderParts:parts,
+        topCode:mats.topCode, legCode:mats.legCode, screenCode:mats.screenCode,
+        instruction:[
+          'Do not generate a new product.',
+          'Use the provided baseImage as the exact source photo.',
+          'Preserve the original desk shape, screen shape, camera angle, scale, background, shadows, and composition.',
+          'Only detect the existing desktop top, legs, and screen if present.',
+          'Apply the selected material/color only to those existing surfaces.',
+          'Do not invent parts. Do not change the desk leg type, mobility type, top shape, or screen type.',
+          'For screen rendering, keep the exact existing screen position and only change its surface material.'
+        ].join(' ')
+      };
+      var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      var data=await res.json().catch(function(){return {};});
+      if(!res.ok)throw new Error(data.error||data.detail||('API 오류 '+res.status));
+      var src=typeof data==='string'?data:(data.imageUrl||data.image||data.url||data.output||'');
+      if(!src)throw new Error('API 응답에 이미지 URL이 없습니다.');
+      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 결과 · '+(isScreenCall?'데스크/스크린':'데스크')+'</div><img src="'+esc(src)+'" alt="재질 적용 결과"><div style="margin-top:8px;color:#9fb1c8;font-size:11px;line-height:1.45;">원본 preview를 유지하고 '+esc(parts.join(', '))+' 재질만 적용한 결과입니다.<br>기준 원본: '+esc(base)+'</div>';}
+    }catch(err){
+      if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5;">재질 적용 실패</b><br><span style="color:#ddd;">'+esc(err&&err.message?err.message:err)+'</span><br><span style="color:#9fb1c8;font-size:11px;">요청 원본: '+esc(base)+'</span>';}
+      console.error('[FF1000 Nano screen/material]',err);
+    }finally{
+      window.__ff1000NanoBusy=false;
+      btns.forEach(function(b){b.disabled=false; b.textContent='✨ 원본 사진에 재질 적용';});
+    }
+  };
+  function bind(){
+    [['quick-ai-preview-btn','desk'],['ai-render-btn','desk'],['screen-ai-btn','screen']].forEach(function(pair){
+      var b=$(pair[0]); if(!b)return; b.textContent='✨ 원본 사진에 재질 적용'; b.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(pair[1]); return false;};
+    });
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind); else bind();
+  window.addEventListener('load',bind); document.addEventListener('click',function(){setTimeout(bind,80);},true); setInterval(bind,1600);
 })();
 </script>
