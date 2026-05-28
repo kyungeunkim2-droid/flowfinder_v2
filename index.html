@@ -11668,6 +11668,166 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
 })();
 </script>
 
+
+
+<!-- === FF FINAL 3: leg-folder images + 6x8 colors + robust preview/nano fallback === -->
+<style id="ff-final3-user-request-fix">
+  /* 색상: 6열 고정, 버튼 축소 */
+  .material-button-group{
+    display:grid !important;
+    grid-template-columns:repeat(6,minmax(0,1fr)) !important;
+    gap:4px !important;
+  }
+  .material-btn{
+    min-width:0 !important;
+    width:100% !important;
+    min-height:28px !important;
+    padding:3px 4px !important;
+    border-radius:8px !important;
+    font-size:9px !important;
+    gap:3px !important;
+    box-shadow:none !important;
+  }
+  .material-btn .mat-thumb{width:16px!important;height:16px!important;border-radius:4px!important;}
+  .material-btn .mat-code{font-size:9px!important;line-height:1!important;}
+  .material-button-section-title{font-size:9px!important;margin:5px 0 3px!important;}
+
+  /* 데스크 옵션 / 재질 / 렌더링 결과 완전 분리 */
+  #ff90-option-summary,#texture-preview,#quick-ai-preview-btn,#quick-ai-preview-note{
+    position:static!important; float:none!important; clear:both!important; transform:none!important; inset:auto!important;
+    width:100%!important; max-width:100%!important; box-sizing:border-box!important; z-index:auto!important;
+  }
+  #ff90-option-summary{margin:12px 0 14px!important;}
+  #texture-preview{margin:14px 0 0!important; padding:12px!important; display:flex!important; flex-direction:column!important; gap:8px!important; overflow:visible!important;}
+  #quick-ai-preview-btn{margin:10px 0 0!important; min-height:40px!important;}
+  #quick-ai-preview-note{margin:10px 0 0!important; display:none;}
+  #quick-ai-preview-note.ai-loading,#quick-ai-preview-note.ai-result,#quick-ai-preview-note.ai-error{display:block!important;}
+
+  #ff90-option-summary .ff90-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important;}
+  #ff90-option-summary .ff90-card{height:124px!important;min-height:124px!important;padding:6px!important;display:grid!important;grid-template-rows:18px 72px 24px!important;gap:4px!important;overflow:hidden!important;border-radius:12px!important;}
+  #ff90-option-summary .ff90-card-title{font-size:10px!important;line-height:18px!important;text-align:center!important;margin:0!important;padding:0!important;}
+  #ff90-option-summary .ff90-card img{width:100%!important;height:72px!important;max-height:72px!important;object-fit:contain!important;object-position:center!important;background:transparent!important;padding:2px!important;margin:0!important;}
+  #ff90-option-summary .ff90-card b{font-size:10px!important;line-height:1.15!important;display:flex!important;align-items:center!important;justify-content:center!important;text-align:center!important;}
+  #quick-ai-preview-note img{display:block!important;width:100%!important;max-height:380px!important;object-fit:contain!important;background:#fff!important;border-radius:12px!important;margin-top:8px!important;}
+</style>
+<script id="ff-final3-user-request-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function S(){return window.state||{};}
+  function txt(v){return String(v||'').trim();}
+  function normLeg(v){v=txt(v); if(/사다리/.test(v))return 'ladder'; if(/원형|라운드|round/i.test(v))return 'round'; if(/A자|A형|A |에이|aframe/i.test(v))return 'aframe'; return 'ladder';}
+  function normMove(v){v=txt(v); return /캐스터|바퀴|이동|caster/i.test(v)?'caster':'glide';}
+  function normTop(v){v=txt(v); return /라운드|원형|round/i.test(v)?'round':'rect';}
+  function deskFolder(){var s=S(); var p=txt((s.current&&s.current.product)||s.product||s.deskLabel||s._currentCatName||s.currentCatName); return /덕트/.test(p)?'desk_duct':'desk_standard';}
+  function legKey(){return normLeg(S().legType||S().legShape||S()._legLabel||S().legLabel);}
+  function moveKey(){return normMove(S().casterType||S().mobility||S().caster||S().moveType);}
+  function topKey(){return normTop(S().topShape||S().topType||S().topLabel);}
+  function topLabel(){return (txt(S().topShape||S().topType||S().topLabel)||'직사각 상판').replace(/스퀘어/g,'직사각').replace(/Square/gi,'직사각');}
+  function legLabel(){return txt(S().legType||S().legShape||S()._legLabel||S().legLabel)||'다리형태';}
+  function moveLabel(){return txt(S().casterType||S().mobility||S().caster||S().moveType)||'이동방식';}
+
+  /* 요청사항: 다리형태는 images/options/leg, 이동방식은 images/options/mobility */
+  function topImage(){return './images/options/top/'+topKey()+'.png';}
+  function legImage(){return './images/options/leg/'+legKey()+'.png';}
+  function moveImage(){return './images/options/mobility/'+legKey()+'_'+moveKey()+'.png';}
+
+  function previewCandidates(){
+    var folder=deskFolder(), base=legKey()+'_'+moveKey()+'_'+topKey();
+    var raw=txt(S().screenLabel||S().screen||S()._currentScreenType||S()._currentCatName||S().currentCatName), screen='';
+    if(/전면/.test(raw))screen='front'; else if(/사이드/.test(raw))screen='side'; else if(/일자/.test(raw))screen='straight'; else if(/L형|l형|엘/.test(raw))screen='lshape';
+    var a=[];
+    if(screen)a.push('images/previews/'+folder+'/'+base+'_'+screen+'.png');
+    a.push('images/previews/'+folder+'/'+base+'.png');
+    a.push('images/previews/'+folder+'/'+base+'_front.png');
+    a.push('images/previews/'+folder+'/'+base+'_side.png');
+    return a;
+  }
+  function choosePreview(){
+    var list=window.ASSET_PREVIEWS||[], cand=previewCandidates();
+    for(var i=0;i<cand.length;i++){ if(list.indexOf(cand[i])>-1) return './'+cand[i]; }
+    var prefix='images/previews/'+deskFolder()+'/'+legKey()+'_'+moveKey()+'_'+topKey();
+    for(var j=0;j<list.length;j++){ if(list[j].indexOf(prefix)===0) return './'+list[j]; }
+    /* 최종 fallback: 실제 목록에 있는 첫 desk preview */
+    for(var k=0;k<list.length;k++){ if(list[k].indexOf('images/previews/'+deskFolder()+'/')===0) return './'+list[k]; }
+    return './'+cand[0];
+  }
+  window.ffChooseDeskPreview = choosePreview;
+
+  function ensureOrder(){
+    var panel=$('preview-panel'), box=$('ff90-option-summary'), texture=$('texture-preview'); if(!panel) return;
+    if(box && texture && box.nextSibling!==texture) panel.insertBefore(box, texture);
+    var btn=$('quick-ai-preview-btn'), note=$('quick-ai-preview-note');
+    if(texture&&btn&&btn.parentNode!==texture) texture.appendChild(btn);
+    if(texture&&note&&note.parentNode!==texture) texture.appendChild(note);
+  }
+
+  window.ff90RefreshOptionSummary=function(){
+    var panel=$('preview-panel'); if(!panel)return;
+    var texture=$('texture-preview')||$('preview-items')||panel.firstChild;
+    var box=$('ff90-option-summary'); if(!box){box=document.createElement('div'); box.id='ff90-option-summary';}
+    panel.insertBefore(box, texture||null);
+    var cards=[['상판형태',topLabel(),topImage()],['다리형태',legLabel(),legImage()],['이동방식',moveLabel(),moveImage()]];
+    box.innerHTML='<div class="ff90-title"><span>데스크 옵션 이미지</span><small>선택내역</small></div><div class="ff90-grid">'+cards.map(function(r){return '<div class="ff90-card"><span class="ff90-card-title">'+esc(r[0])+'</span><img src="'+esc(r[2])+'" alt="'+esc(r[0])+'" onerror="this.style.visibility=\'hidden\';"><b>'+esc(r[1])+'</b></div>';}).join('')+'</div>';
+    ensureOrder();
+  };
+
+  function bgUrl(id){var el=$(id); if(!el)return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
+  function nodeText(id){var el=$(id); return el?txt(el.textContent):'';}
+  function code(v){v=txt(v); return v==='-'?'':v;}
+  function material(){var s=S();return{
+    topCode:code(nodeText('quick-top-code')||s.topCode||s.topColor||s.top||''),
+    legCode:code(nodeText('quick-leg-code')||s.legCode||s.legColor||s.leg||''),
+    screenCode:code(nodeText('quick-screen-code')||s.screenCode||s.screenColor||s.screen||''),
+    topTexture:bgUrl('quick-top-chip')||s.topTexture||s.topTex||'',
+    legTexture:bgUrl('quick-leg-chip')||s.legTexture||s.legTex||'',
+    screenTexture:bgUrl('quick-screen-chip')||s.screenTexture||s.screenTex||''
+  };}
+  async function fetchJson(url,opt,ms){var c=new AbortController(); var t=setTimeout(function(){c.abort();},ms||90000); try{opt=opt||{}; opt.signal=c.signal; var r=await fetch(url,opt); var d=await r.json().catch(function(){return {};}); return {res:r,data:d};} finally{clearTimeout(t);}}
+
+  /* 모든 /api/generate-preview 요청의 source 이미지를 previews 폴더의 실제 후보로 강제 교정 */
+  if(!window.__ffFinal3FetchPatch){
+    window.__ffFinal3FetchPatch=true;
+    var oldFetch=window.fetch;
+    window.fetch=function(input,init){
+      try{
+        var u=String(input||'');
+        if(u.indexOf('/api/generate-preview')>-1 && init && typeof init.body==='string'){
+          var d=JSON.parse(init.body), base=choosePreview();
+          d.sourceImage=base; d.baseImage=base; d.deskImage=base; d.fallbackDeskImage=base; d.composedPreview='';
+          d.materialEditOnly=true; d.preserveSourceImage=true; d.targetType='desk'; d.productType='desk';
+          init=Object.assign({},init,{body:JSON.stringify(d)});
+        }
+      }catch(e){}
+      return oldFetch.apply(this,arguments.length>1?[input,init]:[input]);
+    };
+  }
+
+  window.prepareNanoBananaPreview=async function(targetType){
+    if(window.__ffFinal3NanoBusy)return; window.__ffFinal3NanoBusy=true;
+    ensureOrder();
+    var note=$('quick-ai-preview-note'), btn=$('quick-ai-preview-btn'), base=choosePreview(), m=material();
+    if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b style="color:#fff">원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">Nano Banana로 보낼 원본: '+esc(base)+'</span><img src="'+esc(base)+'" alt="원본 preview">';}
+    if(btn){btn.disabled=true;btn.textContent='적용 중...';}
+    try{
+      var health=await fetchJson('/api/health',{cache:'no-store'},8000).catch(function(){return null;});
+      if(!health||!health.res||!health.res.ok) throw new Error('Nano Banana 서버 연결 실패: /api/health 응답 없음');
+      var payload={mode:'strict-material-map-original-only-final3',materialEditOnly:true,preserveSourceImage:true,noSideBySide:true,targetType:'desk',productType:'desk',sourceImage:base,baseImage:base,deskImage:base,fallbackDeskImage:base,topTexture:m.topTexture,legTexture:m.legTexture,topCode:m.topCode,legCode:m.legCode,topShape:topLabel(),legType:legLabel(),casterType:moveLabel(),prompt:'원본 제품 사진의 형태, 각도, 배경, 그림자, 크롭은 유지하고 상판에는 선택 상판 재질만, 다리에는 선택 다리 재질만 자연스럽게 맵핑하세요. 새 제품 생성 금지, 재질 교체만 수행.'};
+      var out=await fetchJson('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},90000);
+      if(!out.res.ok) throw new Error(out.data.error||out.data.detail||('/api/generate-preview '+out.res.status));
+      var src=(typeof out.data==='string')?out.data:(out.data.imageUrl||out.data.image||out.data.url||'');
+      if(!src) throw new Error('Nano Banana 결과 이미지 URL 없음');
+      if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 미리보기 · 데스크</div><img src="'+esc(src)+'" alt="재질 적용 결과"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">Nano Banana API 결과입니다.</div>';}
+    }catch(err){
+      if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5">재질 적용 실패</b><br><span style="color:#ddd">'+esc(err&&err.name==='AbortError'?'요청 시간이 초과됐습니다. Render 서버 로그와 GEMINI_API_KEY를 확인하세요.':(err&&err.message||err))+'</span><img src="'+esc(base)+'" alt="원본 preview"><div style="margin-top:8px;color:#8fa1bb;font-size:11px;line-height:1.45;">프론트에서는 previews 원본을 정상 표시했습니다. 재질 맵핑 결과가 안 나오면 서버/API 쪽 문제입니다.</div>';}
+    }finally{window.__ffFinal3NanoBusy=false; if(btn){btn.disabled=false;btn.textContent='✨ 원본 사진에 재질 적용';} setTimeout(function(){try{ff90RefreshOptionSummary();}catch(e){}},50);}
+  };
+
+  function bind(){try{ff90RefreshOptionSummary();ensureOrder(); var b=$('quick-ai-preview-btn'); if(b){b.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false;};}}catch(e){}}
+  bind(); document.addEventListener('DOMContentLoaded',bind); window.addEventListener('load',bind); document.addEventListener('click',function(){setTimeout(bind,60);},true); setInterval(bind,1200);
+})();
+</script>
+
 </body>
 
 
