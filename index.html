@@ -13582,24 +13582,7 @@ function topKey(){
   };}
   async function fetchJson(url,opt,ms){var c=new AbortController(); var t=setTimeout(function(){c.abort();},ms||90000); try{opt=opt||{}; opt.signal=c.signal; var r=await fetch(url,opt); var d=await r.json().catch(function(){return {};}); return {res:r,data:d};} finally{clearTimeout(t);}}
 
-  /* 모든 /api/generate-preview 요청의 source 이미지를 previews 폴더의 실제 후보로 강제 교정 */
-  if(!window.__ffFinal3FetchPatch){
-    window.__ffFinal3FetchPatch=true;
-    var oldFetch=window.fetch;
-    window.fetch=function(input,init){
-      try{
-        var u=String(input||'');
-        if(u.indexOf('/api/generate-preview')>-1 && init && typeof init.body==='string'){
-          var d=JSON.parse(init.body), base=choosePreview();
-          d.sourceImage=base; d.baseImage=base; d.deskImage=base; d.fallbackDeskImage=base; d.composedPreview='';
-          d.materialEditOnly=true; d.preserveSourceImage=true; d.targetType='desk'; d.productType='desk';
-          init=Object.assign({},init,{body:JSON.stringify(d)});
-        }
-      }catch(e){}
-      return oldFetch.apply(this,arguments.length>1?[input,init]:[input]);
-    };
-  }
-
+ 
   window.prepareNanoBananaPreview=async function(targetType){
     if(window.__ffFinal3NanoBusy)return; window.__ffFinal3NanoBusy=true;
     ensureOrder();
