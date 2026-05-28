@@ -1236,6 +1236,103 @@ body.ff-dashboard-preview #preview-panel{
   display:block !important;
 }
 
+
+
+/* === FF LAYOUT V3: 제품선택/옵션이미지 우선 + 재질값 가로정렬 고정 === */
+body.ff-dashboard-preview #preview-panel,
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+  align-items:stretch !important;
+  gap:14px !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+/* 맨 위에 실사 미리보기가 먼저 뜨지 않도록 순서 재배치 */
+#set-product-selector{ order:1 !important; }
+#product-preview-box{ order:1 !important; }
+#screen-composite-preview{ order:1 !important; }
+#texture-preview{ order:2 !important; }
+#ff-dashboard-hero{ order:3 !important; }
+#preview-items{ order:4 !important; }
+#total-box{ order:5 !important; }
+
+/* 세트/옵션 이미지 영역은 항상 재질선택값 위에서 한 블록으로 */
+#set-product-selector{
+  position:relative !important;
+  display:none;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 !important;
+  clear:both !important;
+  float:none !important;
+  z-index:1 !important;
+}
+
+/* 재질 선택값 영역은 절대/sticky 영향 제거 */
+#texture-preview,
+.quick-preview-panel#texture-preview{
+  position:relative !important;
+  clear:both !important;
+  float:none !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 !important;
+  z-index:0 !important;
+  transform:none !important;
+}
+
+/* 데스크: 상판/다리 한 줄, 스크린: 한 줄 - ID 기준으로 강제 */
+#texture-preview .quick-materials{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:10px !important;
+  align-items:stretch !important;
+}
+#quick-top-row{
+  grid-column:1 !important;
+  grid-row:1 !important;
+}
+#quick-leg-row{
+  grid-column:2 !important;
+  grid-row:1 !important;
+}
+#quick-screen-row{
+  grid-column:1 / -1 !important;
+  grid-row:2 !important;
+}
+#texture-preview .material-chip-row{
+  display:grid !important;
+  grid-template-columns:auto 44px minmax(0,1fr) !important;
+  align-items:center !important;
+  column-gap:16px !important;
+  min-height:58px !important;
+}
+#texture-preview .material-chip-row span{
+  min-width:48px !important;
+  text-align:left !important;
+}
+#texture-preview .material-chip-row i{
+  text-align:left !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+/* 버튼은 재질 행 아래 전체폭 */
+#quick-ai-preview-btn,
+#quick-ai-preview-note,
+#product-3d-canvas,
+#texture-strip{
+  grid-column:1 / -1 !important;
+}
+
+@media(max-width:980px){
+  #texture-preview .quick-materials{ grid-template-columns:1fr !important; }
+  #quick-top-row,#quick-leg-row,#quick-screen-row{ grid-column:1 !important; grid-row:auto !important; }
+}
+
 </style>
 
 
@@ -1825,6 +1922,155 @@ body.ff-dashboard-preview #messages::-webkit-scrollbar-track,
 }
 
 </style>
+
+<style id="ff-layout-v2-final-fix">
+/* === FF LAYOUT V2: 데스크 옵션 이미지 / 재질 선택값 완전 분리 === */
+body.ff-dashboard-preview #preview-panel,
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+#ff-dashboard-hero{ order:1 !important; flex:0 0 auto !important; margin:0 0 0 !important; }
+#set-product-selector{
+  order:2 !important;
+  position:static !important;
+  clear:both !important;
+  float:none !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 !important;
+  padding:18px !important;
+  border:1px solid rgba(45,245,210,.38) !important;
+  border-radius:22px !important;
+  background:linear-gradient(180deg,rgba(8,22,36,.96),rgba(5,16,28,.98)) !important;
+  box-shadow:none !important;
+  z-index:1 !important;
+}
+#set-product-selector[style*="display: block"],
+#set-product-selector[style*="display:block"],
+#set-product-selector[style*="display: grid"],
+#set-product-selector[style*="display:grid"],
+#set-product-selector[data-visible="true"],
+#set-product-selector.ff-visible{
+  display:block !important;
+}
+#texture-preview,
+.quick-preview-panel#texture-preview{
+  order:3 !important;
+  position:static !important;
+  clear:both !important;
+  float:none !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 !important;
+  padding:18px !important;
+  border:1px solid rgba(45,245,210,.38) !important;
+  border-radius:22px !important;
+  background:linear-gradient(180deg,rgba(8,22,36,.98),rgba(5,16,28,.98)) !important;
+  box-shadow:none !important;
+  z-index:1 !important;
+  overflow:visible !important;
+}
+#total-box{ order:4 !important; flex:0 0 auto !important; margin-top:0 !important; }
+
+/* 데스크 옵션 이미지: 이미지 크게, 카드 3열 유지 */
+#desk-grid, #screen-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+#set-product-selector [data-set-name]{
+  min-height:138px !important;
+  max-height:none !important;
+  padding:0 !important;
+  border-radius:16px !important;
+  border:1px solid rgba(45,245,210,.22) !important;
+  background:linear-gradient(180deg,#ffffff,#eef3f8) !important;
+  overflow:hidden !important;
+}
+#set-product-selector [data-set-name] img,
+#desk-grid img,
+#screen-grid img{
+  width:100% !important;
+  height:118px !important;
+  max-height:118px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  padding:8px 10px 26px !important;
+  background:#fff !important;
+}
+#set-product-selector [data-set-name] > div:not(.set-check-badge){
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  padding:7px 8px !important;
+  background:linear-gradient(180deg,rgba(3,8,20,.1),rgba(3,8,20,.82)) !important;
+  color:#2df5d2 !important;
+  font-size:13px !important;
+  font-weight:1000 !important;
+  text-align:center !important;
+  border-radius:0 !important;
+}
+
+/* 재질 선택값: 데스크는 상판/다리 한 줄, 스크린은 한 줄 */
+#texture-preview .quick-preview-grid{ display:none !important; }
+#texture-preview .quick-materials{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  margin-top:12px !important;
+}
+#texture-preview .material-chip-row{
+  min-height:58px !important;
+  display:grid !important;
+  grid-template-columns:78px 42px 1fr !important;
+  align-items:center !important;
+  gap:12px !important;
+  padding:10px 12px !important;
+  border-radius:14px !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  background:rgba(15,32,49,.82) !important;
+}
+#texture-preview .material-chip-row.active-top{ grid-column:1 !important; }
+#texture-preview .material-chip-row.active-leg{ grid-column:2 !important; }
+#texture-preview .material-chip-row.active-screen{ grid-column:1 / -1 !important; }
+#texture-preview .material-chip-row span{
+  color:#2df5d2 !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
+}
+#texture-preview .material-chip-row em{
+  width:42px !important;
+  height:36px !important;
+  border-radius:9px !important;
+  justify-self:center !important;
+}
+#texture-preview .material-chip-row i{
+  color:#fff !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
+  text-align:left !important;
+}
+#quick-ai-preview-btn{
+  width:100% !important;
+  margin-top:12px !important;
+  min-height:54px !important;
+  border-radius:16px !important;
+}
+
+@media(max-width:1100px){
+  #desk-grid,#screen-grid{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  #texture-preview .quick-materials{grid-template-columns:1fr !important;}
+  #texture-preview .material-chip-row.active-top,
+  #texture-preview .material-chip-row.active-leg,
+  #texture-preview .material-chip-row.active-screen{grid-column:1 !important;}
+}
+</style>
+
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -18681,3 +18927,246 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 - 창의적 생성 금지.
 - 원본 preview 이미지 위에 재질만 입힌다.
 
+
+
+<!-- === USER HOTFIX 2026-05-28: material panel / desk option image separation + label cleanup === -->
+<style id="ff-user-hotfix-layout-material-option-separation">
+/* 오른쪽 패널 전체: 절대 겹치지 않도록 세로 스택 고정 */
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+#preview-panel > *{
+  position:relative !important;
+  flex:0 0 auto !important;
+  float:none !important;
+  clear:both !important;
+  z-index:auto !important;
+}
+
+/* 데스크 옵션 이미지 영역 */
+#ff90-option-summary,
+#ff136-option-summary{
+  order:30 !important;
+  display:block !important;
+  width:100% !important;
+  margin:0 0 16px 0 !important;
+  padding:16px !important;
+  border-radius:20px !important;
+  background:#071722 !important;
+  border:1px solid rgba(46,242,201,.32) !important;
+  box-shadow:none !important;
+  overflow:visible !important;
+  isolation:isolate !important;
+}
+#ff90-option-summary .ff90-title,
+#ff136-option-summary .ff90-title{
+  display:flex !important;
+  justify-content:space-between !important;
+  align-items:center !important;
+  margin-bottom:12px !important;
+  color:#2ef2c9 !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
+}
+#ff90-option-summary .ff90-grid,
+#ff136-option-summary .ff90-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+#ff90-option-summary .ff90-card,
+#ff136-option-summary .ff90-card{
+  height:180px !important;
+  min-height:180px !important;
+  padding:10px !important;
+  display:grid !important;
+  grid-template-rows:22px 112px 26px !important;
+  gap:6px !important;
+  overflow:hidden !important;
+  border-radius:16px !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+  background:#0b1a29 !important;
+}
+#ff90-option-summary .ff90-card-title,
+#ff136-option-summary .ff90-card-title{
+  color:#2ef2c9 !important;
+  font-size:12px !important;
+  font-weight:1000 !important;
+  line-height:22px !important;
+  text-align:center !important;
+  padding:0 !important;
+  margin:0 !important;
+}
+#ff90-option-summary .ff90-card img,
+#ff136-option-summary .ff90-card img{
+  width:100% !important;
+  height:112px !important;
+  max-height:112px !important;
+  object-fit:contain !important;
+  object-position:center !important;
+  background:#fff !important;
+  border-radius:12px !important;
+  padding:6px !important;
+  margin:0 !important;
+  display:block !important;
+}
+#ff90-option-summary .ff90-card b,
+#ff136-option-summary .ff90-card b{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  color:#fff !important;
+  font-size:12px !important;
+  line-height:1.2 !important;
+  padding:0 !important;
+  margin:0 !important;
+  white-space:normal !important;
+  overflow:visible !important;
+}
+
+/* 재질선택값/재질적용 버튼 칸: 데스크 옵션 이미지 아래에 별도 카드로 고정 */
+#texture-preview.quick-preview-panel,
+#texture-preview{
+  order:40 !important;
+  display:block !important;
+  width:100% !important;
+  margin:0 0 16px 0 !important;
+  padding:16px !important;
+  border-radius:20px !important;
+  background:#071120 !important;
+  border:1px solid rgba(46,242,201,.26) !important;
+  box-shadow:none !important;
+  clear:both !important;
+  overflow:visible !important;
+  transform:none !important;
+  z-index:1 !important;
+}
+#texture-preview .quick-preview-grid{display:none !important;}
+#texture-preview .quick-materials{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:8px !important;
+  margin-top:10px !important;
+}
+#texture-preview .material-chip-row{
+  display:grid !important;
+  grid-template-columns:58px 1fr 48px !important;
+  min-height:46px !important;
+  padding:8px 10px !important;
+  border-radius:13px !important;
+  background:#0b1a29 !important;
+  border:1px solid rgba(255,255,255,.12) !important;
+}
+#quick-ai-preview-btn{
+  display:block !important;
+  width:100% !important;
+  margin-top:12px !important;
+  min-height:46px !important;
+}
+#quick-ai-preview-note{
+  display:none;
+  width:100% !important;
+  clear:both !important;
+  margin-top:12px !important;
+  overflow:hidden !important;
+}
+#quick-ai-preview-note img{
+  width:100% !important;
+  max-height:360px !important;
+  object-fit:contain !important;
+  display:block !important;
+  background:#fff !important;
+  border-radius:14px !important;
+}
+
+/* 고해상도 미리보기는 위, 옵션이미지/재질값은 아래 */
+#ff-dashboard-hero{order:10 !important;}
+#recommend-panel,#preview-items,#total-box{order:60 !important;}
+
+/* 데스크 옵션 선택 카드 이미지가 너무 작아지는 문제 복구 */
+#desk-grid img,
+#screen-grid img,
+#set-product-selector [data-set-name] img{
+  height:128px !important;
+  max-height:128px !important;
+  object-fit:contain !important;
+  padding:8px !important;
+  background:#fff !important;
+}
+#set-product-selector [data-set-name]{
+  min-height:168px !important;
+  max-height:none !important;
+}
+
+@media(max-width:1180px){
+  #ff90-option-summary .ff90-grid,
+  #ff136-option-summary .ff90-grid{grid-template-columns:1fr !important;}
+  #ff90-option-summary .ff90-card,
+  #ff136-option-summary .ff90-card{height:auto !important;min-height:170px !important;}
+}
+</style>
+<script id="ff-user-hotfix-labels-and-screen-copy">
+(function(){
+  function $(id){return document.getElementById(id)}
+  function txt(el){return (el&&el.textContent||'').trim()}
+  function walkText(root, from, to){
+    if(!root) return;
+    var w=document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    var n; while(n=w.nextNode()){ if(n.nodeValue && n.nodeValue.trim()===from) n.nodeValue=to; }
+  }
+  function normalizeMaterialLabels(){
+    var labels=[].slice.call(document.querySelectorAll('.material-button-section-title,label,.product-select-title,div,span'));
+    labels.forEach(function(el){
+      var t=txt(el);
+      if(t==='무늬목') el.textContent='주문품색상 무늬목';
+      if(t==='라미네이트') el.textContent='주문품색상 라미네이트';
+      if(t==='주문품색상') el.textContent='주문품색상 무늬목';
+    });
+    walkText(document.body,'표준 색상','표준품색상');
+    walkText(document.body,'표준품','표준품색상');
+  }
+  function normalizeLegButtons(){
+    // 다리색상 버튼은 표준품색상 WW/DSG/BKM, 주문품색상 DCR/TS만 보이도록 정리
+    var sections=[].slice.call(document.querySelectorAll('.color-pair-grid > div, .material-button-section'));
+    sections.forEach(function(sec){
+      var head=txt(sec.querySelector('label,.material-button-section-title'));
+      var allText=txt(sec);
+      if(!/다리/.test(head+allText)) return;
+      var btns=[].slice.call(sec.querySelectorAll('.material-btn,.choice-btn,button'));
+      btns.forEach(function(btn){
+        var code=(btn.dataset.code||btn.dataset.value||txt(btn)).trim().toUpperCase();
+        if(code==='DCR'||code==='TS'){
+          var title=sec.querySelector('.material-button-section-title');
+          if(title && /표준/.test(txt(title))) btn.style.display='none';
+        }
+      });
+    });
+  }
+  function screenSizeCopy(){
+    [].slice.call(document.querySelectorAll('.bubble,.msg,.ff-flow-note,div')).forEach(function(el){
+      if(el.children && el.children.length>6) return;
+      var s=txt(el);
+      if(s==='원하시는 사이즈를 확인/조절해주세요:' || s==='원하시는 사이즈를 확인/조절해주세요.'){
+        el.innerHTML='<b>&lt;@@스크린 사이즈입력&gt;</b><br>원하시는 사이즈를 확인/조절해주세요.';
+      }
+    });
+  }
+  function ensureNoOverlap(){
+    var panel=$('preview-panel'), opt=$('ff90-option-summary')||$('ff136-option-summary'), tex=$('texture-preview');
+    if(panel && opt && tex && opt.nextElementSibling!==tex){ panel.insertBefore(opt, tex); }
+    if(opt){ opt.style.position='relative'; opt.style.clear='both'; opt.style.zIndex='2'; }
+    if(tex){ tex.style.position='relative'; tex.style.clear='both'; tex.style.zIndex='1'; }
+  }
+  function apply(){ normalizeMaterialLabels(); normalizeLegButtons(); screenSizeCopy(); ensureNoOverlap(); }
+  document.addEventListener('DOMContentLoaded',apply);
+  window.addEventListener('load',apply);
+  document.addEventListener('click',function(){setTimeout(apply,80);},true);
+  setInterval(apply,1200);
+})();
+</script>
+<!-- === /USER HOTFIX === -->
