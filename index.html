@@ -3769,10 +3769,18 @@ function getProductBasePathByKey(key) {
 
   var folder = deskFolder();
 
-  var base =
-    legKey() + '_' +
-    moveKey() + '_' +
-    topKey();
+ var currentDeskBase =
+  window.__ffCurrentDeskBase ||
+  window.__ffLastDeskBase ||
+  '';
+
+var base = currentDeskBase || (
+  legKey() + '_' +
+  moveKey() + '_' +
+  topKey()
+);
+
+window.__ffLastDeskBase = base;
 
   var raw = text(
     st().screenLabel ||
@@ -19331,13 +19339,51 @@ arr.push(
   function topImage(){return './images/options/top/'+topKey()+'.png';}
   function legImage(){return './images/options/mobility/'+legKey()+'_glide.png';}
   function moveImage(){return './images/options/mobility/'+legKey()+'_'+moveKey()+'.png';}
-  function previewCandidates(){
-    var folder=deskFolder(), base=legKey()+'_'+moveKey()+'_'+topKey(), raw=val(st().screenLabel||st().screen||st()._currentScreenType||st()._currentCatName||st().currentCatName), screen='';
-    if(/전면/.test(raw))screen='front'; else if(/사이드/.test(raw))screen='side'; else if(/일자/.test(raw))screen='straight'; else if(/L형|l형|엘/.test(raw))screen='lshape';
-    var a=[]; if(screen)a.push('images/previews/'+folder+'/'+base+'_'+screen+'.png'); a.push('images/previews/'+folder+'/'+base+'.png');
-    a.push('images/previews/'+folder+'/'+base+'_front.png'); a.push('images/previews/'+folder+'/'+base+'_side.png');
-    return a;
+function previewCandidates(){
+
+  var folder = deskFolder();
+  var base = legKey() + '_' + moveKey() + '_' + topKey();
+
+  window.__ffCurrentDeskBase = base;
+  window.__ffLastDeskBase = base;
+
+  var raw = val(
+    st().screenLabel ||
+    st().screen ||
+    st()._currentScreenType ||
+    st()._currentCatName ||
+    st().currentCatName
+  );
+
+  var hasFront = /전면/.test(raw);
+  var hasSide = /사이드/.test(raw);
+
+  var screen = '';
+
+  if(hasFront && hasSide) screen = 'frontside';
+  else if(hasFront) screen = 'front';
+  else if(hasSide) screen = 'side';
+  else if(/일자/.test(raw)) screen = 'straight';
+  else if(/L형|ㄴ형/.test(raw)) screen = 'lshape';
+
+  var a = [];
+
+  if(screen){
+    a.push(
+      'images/previews/' +
+      folder + '/' +
+      base + '_' + screen + '.png'
+    );
   }
+
+  a.push(
+    'images/previews/' +
+    folder + '/' +
+    base + '.png'
+  );
+
+  return a;
+}
   function choosePreview(){
     var list=window.ASSET_PREVIEWS||[], cand=previewCandidates();
     for(var i=0;i<cand.length;i++){ if(list.indexOf(cand[i])>-1)return './'+cand[i]; }
