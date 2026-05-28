@@ -4733,10 +4733,21 @@ function ffHoverMaterial(inputId, code, part, ev, btn) {
 }
 function ffSelectMaterialButton(inputId, code, part, btn) {
   var input = document.getElementById(inputId);
+
   if (input) {
     input.value = code;
     input.style.borderColor = '';
   }
+
+  if (btn) {
+    Array.from(btn.parentElement.children).forEach(function(b) {
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
+  }
+
+  return true;
+}
 
   var group = btn && btn.parentElement;
 
