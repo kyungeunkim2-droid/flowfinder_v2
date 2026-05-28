@@ -6235,6 +6235,9 @@ function setPreviewGlow(part) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
+        screenMaterialCode: document.getElementById('quick-screen-code')?.textContent?.trim(),
+screenTexture: document.querySelector('#quick-screen-swatch')?.style?.backgroundImage || '',
+screenInstruction: '스크린에는 선택된 스크린 재질을 적용하세요.'
       });
       var data = await res.json();
       if (!res.ok) throw new Error(data.error || '재질 적용 실패');
