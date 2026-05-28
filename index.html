@@ -13504,17 +13504,42 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
   function legImage(){return './images/options/leg/'+legKey()+'.png';}
   function moveImage(){return './images/options/mobility/'+legKey()+'_'+moveKey()+'.png';}
 
-  function previewCandidates(){
-    var folder=deskFolder(), base=legKey()+'_'+moveKey()+'_'+topKey();
-    var raw=txt(S().screenLabel||S().screen||S()._currentScreenType||S()._currentCatName||S().currentCatName), screen='';
-    if(/전면/.test(raw))screen='front'; else if(/사이드/.test(raw))screen='side'; else if(/일자/.test(raw))screen='straight'; else if(/L형|l형|엘/.test(raw))screen='lshape';
-    var a=[];
-    if(screen)a.push('images/previews/'+folder+'/'+base+'_'+screen+'.png');
-    a.push('images/previews/'+folder+'/'+base+'.png');
-    a.push('images/previews/'+folder+'/'+base+'_front.png');
-    a.push('images/previews/'+folder+'/'+base+'_side.png');
-    return a;
-  }
+function legKey(){
+  var s = window.state || {};
+  var v =
+    s.legType ||
+    s.legShape ||
+    s.selectedLeg ||
+    s._legLabel ||
+    '';
+
+  return normLeg(v);
+}
+
+function moveKey(){
+  var s = window.state || {};
+  var v =
+    s.casterType ||
+    s.mobility ||
+    s.moveType ||
+    s.selectedMove ||
+    s.caster ||
+    '';
+
+  return normMove(v);
+}
+
+function topKey(){
+  var s = window.state || {};
+  var v =
+    s.topShape ||
+    s.topType ||
+    s.selectedTop ||
+    s.topLabel ||
+    '';
+
+  return normTop(v);
+}
   function choosePreview(){
     var list=window.ASSET_PREVIEWS||[], cand=previewCandidates();
     for(var i=0;i<cand.length;i++){ if(list.indexOf(cand[i])>-1) return './'+cand[i]; }
@@ -14193,7 +14218,6 @@ function renameMaterialPreview(){
   var note = document.getElementById('quick-ai-preview-note');
   if(!note) return;
 
-  // 이미 생긴 중복 제목 전부 제거
   note.querySelectorAll('.ff-clean-preview-title').forEach(function(el){
     el.remove();
   });
@@ -19038,11 +19062,31 @@ var OPTION_IMG = {
     var folder=deskFolder();
     var screen='';
     var s=st(); var raw=text(s.screenLabel||s.screen||s._currentScreenType||s._currentCatName||s.currentCatName);
-    if(/전면/.test(raw)) screen='front'; else if(/사이드/.test(raw)) screen='side'; else if(/일자/.test(raw)) screen='straight'; else if(/L형|l형|엘/.test(raw)) screen='lshape';
+var hasFront = /전면/.test(raw);
+var hasSide = /사이드/.test(raw);
+
+if(hasFront && hasSide) screen = 'frontside';
+else if(hasFront) screen = 'front';
+else if(hasSide) screen = 'side';
+else if(/일자/.test(raw)) screen = 'straight';
+else if(/L형|ㄴ형/.test(raw)) screen = 'lshape';
     var arr=[];
-    if(screen) arr.push('images/previews/'+folder+'/'+base+'_'+screen+'.png');
-    arr.push('images/previews/'+folder+'/'+base+'.png');
-    arr.push('images/previews/'+folder+'/'+legKey()+'_'+moveKey()+'.png');
+    
+// 정확한 스크린 타입 우선
+if(screen){
+  arr.push(
+    'images/previews/' +
+    folder + '/' +
+    base + '_' + screen + '.png'
+  );
+}
+
+// desk only fallback
+arr.push(
+  'images/previews/' +
+  folder + '/' +
+  base + '.png'
+);
     return arr;
   }
   function choosePreview(){
@@ -19253,7 +19297,15 @@ var OPTION_IMG = {
   function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
   function st(){return window.state||{};}
   function val(v){return String(v||'').trim();}
-  function normLeg(v){v=val(v); if(v.indexOf('사다리')>-1)return 'ladder'; if(v.indexOf('원형')>-1||v.indexOf('라운드')>-1)return 'round'; if(v.indexOf('A')>-1||v.indexOf('에이')>-1)return 'aframe'; return 'ladder';}
+  function normLeg(v){
+  v = val(v);
+
+  if(v.indexOf('A자') > -1 || v.indexOf('A') > -1 || v.indexOf('에이') > -1) return 'aframe';
+  if(v.indexOf('사각') > -1 || v.indexOf('4레그') > -1 || v.indexOf('4LEG') > -1) return 'aframe';
+  if(v.indexOf('사다리') > -1 || v.indexOf('래더') > -1) return 'ladder';
+
+  return 'aframe';
+}
   function normMove(v){v=val(v); return (v.indexOf('캐스터')>-1||v.indexOf('바퀴')>-1||v.indexOf('이동')>-1)?'caster':'glide';}
   function normTop(v){v=val(v); return (v.indexOf('라운드')>-1||v.indexOf('원형')>-1)?'round':'rect';}
   function deskFolder(){var s=st(); var p=val((s.current&&s.current.product)||s.product||s.deskLabel||s._currentCatName||s.currentCatName); return p.indexOf('덕트')>-1?'desk_duct':'desk_standard';}
@@ -19630,10 +19682,9 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   z-index:1 !important;
 }
 #ff-dashboard-hero,
-body.ff-dashboard-preview #ff-dashboard-hero{
-  order:40 !important;
-  width:100% !important;
-  margin:0 0 16px 0 !important;
+#ff-desk-ai-result-panel,
+#ff-screen-ai-result-panel{
+  display:none !important;
 }
 #preview-items,
 #recommend-panel{ order:50 !important; }
@@ -19672,6 +19723,25 @@ body.ff-dashboard-preview #ff-dashboard-hero{
 #ff-screen-ai-result-panel{
   display:none !important;
 }
+
+#ff-dashboard-hero,
+#ff-desk-ai-result-panel,
+#ff-screen-ai-result-panel{
+  display:none !important;
+}
+
+#set-product-selector,
+#ff90-option-summary,
+#texture-preview,
+#quick-ai-preview-note,
+#total-box{
+  position:relative !important;
+  top:auto !important;
+  transform:none !important;
+  z-index:auto !important;
+  margin:0 0 16px 0 !important;
+}
+  
 </style>
 <script id="ff-final-right-panel-order-override-script">
 (function(){
