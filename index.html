@@ -15508,3 +15508,216 @@ var OPTION_IMG = {
   }
 })();
 </script>
+
+
+<!-- FF FINAL: separate desk option images from material preview + use mobility/previews paths -->
+<style id="ff-final-option-preview-layout-fix">
+  #ff90-option-summary{
+    display:block !important;
+    position:static !important;
+    clear:both !important;
+    width:100% !important;
+    margin:14px 0 14px !important;
+    padding:10px !important;
+    border:1px solid rgba(38,245,201,.42) !important;
+    border-radius:14px !important;
+    background:rgba(2,12,22,.55) !important;
+    z-index:auto !important;
+  }
+  #ff90-option-summary .ff90-title{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    margin-bottom:8px !important;
+    color:#26f5c9 !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+  }
+  #ff90-option-summary .ff90-title small{color:#8fa1bb!important;font-size:10px!important;}
+  #ff90-option-summary .ff90-grid{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  #ff90-option-summary .ff90-card{
+    position:relative !important;
+    min-height:126px !important;
+    height:auto !important;
+    padding:8px !important;
+    border:1px solid rgba(38,245,201,.22) !important;
+    border-radius:12px !important;
+    background:rgba(10,24,38,.85) !important;
+    overflow:hidden !important;
+    text-align:center !important;
+  }
+  #ff90-option-summary .ff90-card-title{
+    display:block !important;
+    color:#26f5c9 !important;
+    font-size:10px !important;
+    font-weight:900 !important;
+    margin-bottom:5px !important;
+  }
+  #ff90-option-summary .ff90-card img{
+    display:block !important;
+    width:100% !important;
+    height:76px !important;
+    max-height:76px !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    background:transparent !important;
+    opacity:1 !important;
+    margin:0 auto 5px !important;
+  }
+  #ff90-option-summary .ff90-card b{
+    display:block !important;
+    color:#dbeafe !important;
+    font-size:10px !important;
+    line-height:1.25 !important;
+    white-space:normal !important;
+  }
+  #texture-preview{
+    position:static !important;
+    clear:both !important;
+    margin:14px 0 !important;
+    z-index:auto !important;
+  }
+  #ff-desk-ai-result-panel,
+  #ff-screen-ai-result-panel,
+  #quick-ai-preview-note{
+    position:static !important;
+    clear:both !important;
+    width:100% !important;
+    margin:12px 0 0 !important;
+    z-index:auto !important;
+  }
+  #ff-desk-ai-result-panel img,
+  #ff-screen-ai-result-panel img,
+  #quick-ai-preview-note img{
+    display:block !important;
+    width:100% !important;
+    max-height:320px !important;
+    object-fit:contain !important;
+    background:#f7f7f7 !important;
+    border-radius:12px !important;
+  }
+</style>
+<script id="ff-final-option-preview-layout-fix-js">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function st(){return window.state||{};}
+  function text(v){return String(v||'');}
+  function normLeg(v){v=text(v); if(v.indexOf('사다리')>-1) return 'ladder'; if(v.indexOf('원형')>-1 || v.indexOf('라운드')>-1) return 'round'; if(v.indexOf('A')>-1 || v.indexOf('에이')>-1) return 'aframe'; return 'ladder';}
+  function normMove(v){v=text(v); return v.indexOf('캐스터')>-1 ? 'caster' : 'glide';}
+  function normTop(v){v=text(v); return (v.indexOf('라운드')>-1 || v.indexOf('원형')>-1) ? 'round' : 'rect';}
+  function deskFolder(){var s=st(); var p=text((s.current&&s.current.product)||s.product||s.deskLabel||s._currentCatName||s.currentCatName); return p.indexOf('덕트')>-1?'desk_duct':'desk_standard';}
+  function legKey(){return normLeg(st().legType||st().legShape||st()._legLabel);}
+  function moveKey(){return normMove(st().casterType||st().mobility||st().caster||st().moveType);}
+  function topKey(){return normTop(st().topShape||st().topType||st().topLabel);}
+  function optionComboSrc(){return './images/options/mobility/'+legKey()+'_'+moveKey()+'.png';}
+  function topSrc(){return './images/options/top/'+topKey()+'.png';}
+  function labelTop(){var v=text(st().topShape||st().topType||st().topLabel); if(!v) v='직사각 상판'; return v.replace(/스퀘어/g,'직사각').replace(/Square/gi,'직사각');}
+  function labelLeg(){return text(st().legType||st().legShape||st()._legLabel)||'다리형태';}
+  function labelMove(){return text(st().casterType||st().mobility||st().caster||st().moveType)||'이동방식';}
+  function previewCandidates(){
+    var base=legKey()+'_'+moveKey()+'_'+topKey();
+    var folder=deskFolder();
+    var screen='';
+    var s=st(); var raw=text(s.screenLabel||s.screen||s._currentScreenType||s._currentCatName||s.currentCatName);
+    if(/전면/.test(raw)) screen='front'; else if(/사이드/.test(raw)) screen='side'; else if(/일자/.test(raw)) screen='straight'; else if(/L형|l형|엘/.test(raw)) screen='lshape';
+    var arr=[];
+    if(screen) arr.push('images/previews/'+folder+'/'+base+'_'+screen+'.png');
+    arr.push('images/previews/'+folder+'/'+base+'.png');
+    arr.push('images/previews/'+folder+'/'+legKey()+'_'+moveKey()+'.png');
+    return arr;
+  }
+  function choosePreview(){
+    var list=window.ASSET_PREVIEWS||[];
+    var cand=previewCandidates();
+    for(var i=0;i<cand.length;i++){ if(list.indexOf(cand[i])>-1) return './'+cand[i]; }
+    for(var j=0;j<list.length;j++){
+      if(list[j].indexOf('images/previews/'+deskFolder()+'/'+legKey()+'_'+moveKey()+'_'+topKey())===0) return './'+list[j];
+    }
+    return './'+cand[0];
+  }
+  window.__ffChooseDeskPreviewPath=choosePreview;
+  window.__ffChooseDeskOptionImagePath=optionComboSrc;
+  window.ff90RefreshOptionSummary=function(){
+    var panel=$('preview-panel'); if(!panel) return;
+    var box=$('ff90-option-summary');
+    if(!box){box=document.createElement('div'); box.id='ff90-option-summary';}
+    var texture=$('texture-preview')||$('preview-items')||panel.firstChild;
+    if(texture && box.parentNode!==panel) panel.insertBefore(box,texture);
+    else if(texture && box.nextSibling!==texture) panel.insertBefore(box,texture);
+    else if(!box.parentNode) panel.appendChild(box);
+    var cards=[
+      ['상판형태',labelTop(),topSrc()],
+      ['다리형태',labelLeg(),optionComboSrc()],
+      ['이동방식',labelMove(),optionComboSrc()]
+    ];
+    box.innerHTML='<div class="ff90-title"><span>데스크 옵션 이미지</span><small>선택내역</small></div><div class="ff90-grid">'+cards.map(function(r){
+      return '<div class="ff90-card"><span class="ff90-card-title">'+esc(r[0])+'</span><img src="'+esc(r[2])+'" alt="'+esc(r[0])+'" onerror="this.style.visibility=\'hidden\';"><b>'+esc(r[1])+'</b></div>';
+    }).join('')+'</div>';
+    relocateAiPanels();
+  };
+  function relocateAiPanels(){
+    var panel=$('preview-panel'); if(!panel) return;
+    var texture=$('texture-preview');
+    var desk=$('ff-desk-ai-result-panel');
+    var screen=$('ff-screen-ai-result-panel');
+    if(texture){
+      if(desk && desk.parentNode!==panel) panel.insertBefore(desk, texture.nextSibling);
+      if(desk && desk.previousSibling!==texture) panel.insertBefore(desk, texture.nextSibling);
+      if(screen && desk) panel.insertBefore(screen, desk.nextSibling);
+    }
+  }
+  var oldPrepare=window.prepareNanoBananaPreview;
+  window.prepareNanoBananaPreview=async function(targetType){
+    if(window.__ffFinalNanoBusy) return;
+    var note=$('quick-ai-preview-note');
+    var btn=$('quick-ai-preview-btn');
+    var preview=choosePreview();
+    // 화면상 즉시 원본 preview 경로를 보여줘서, API 실패 시에도 어떤 원본을 쓰는지 확인 가능
+    if(note){
+      note.className='ai-loading'; note.style.display='block';
+      note.innerHTML='<b style="color:#fff">원본 사진 확인</b><br><span style="color:#9fb3bd">Nano Banana에 보낼 원본: '+esc(preview)+'</span><img src="'+esc(preview)+'" alt="원본 데스크 미리보기" style="margin-top:8px">';
+    }
+    relocateAiPanels();
+    try{
+      window.__ffFinalNanoBusy=true;
+      var r = await oldPrepare.call(this,targetType);
+      return r;
+    } finally {
+      window.__ffFinalNanoBusy=false;
+      setTimeout(function(){try{window.ff90RefreshOptionSummary();relocateAiPanels();}catch(e){}},80);
+    }
+  };
+  // fetch payload의 deskImage가 잘못된 옵션 이미지로 들어가면 previews 경로로 교정
+  var oldFetch=window.fetch;
+  if(oldFetch && !window.__ffFinalPreviewFetchPatch){
+    window.__ffFinalPreviewFetchPatch=true;
+    window.fetch=function(input,init){
+      try{
+        var url=String(input||'');
+        if(url.indexOf('/api/generate-preview')>-1 && init && typeof init.body==='string'){
+          var data=JSON.parse(init.body);
+          if(data && (data.targetType==='desk' || data.productType==='desk' || !data.targetType)){
+            data.deskImage=choosePreview();
+            data.fallbackDeskImage=choosePreview();
+            data.sourceImage=choosePreview();
+            data.baseImage=choosePreview();
+            init=Object.assign({},init,{body:JSON.stringify(data)});
+          }
+        }
+      }catch(e){}
+      return oldFetch.call(this,input,init);
+    };
+  }
+  function apply(){try{window.ff90RefreshOptionSummary();relocateAiPanels();}catch(e){}}
+  document.addEventListener('DOMContentLoaded',apply);
+  window.addEventListener('load',apply);
+  document.addEventListener('click',function(){setTimeout(apply,80);},true);
+  setInterval(apply,1200);
+})();
+</script>
