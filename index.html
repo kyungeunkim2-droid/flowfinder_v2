@@ -1114,7 +1114,7 @@ body.ff-dashboard-preview #preview-panel{
 }
 
 
-/* === FF SAFE HOTFIX: right panel separation === */
+/* === FF PATCH: separate option image and material values === */
 .ff-hero-grid{
   display:flex !important;
   flex-direction:column !important;
@@ -2732,7 +2732,7 @@ var CUSTOM_LAMINATE_COLORS_DESK = [
   'LD','LL','LT','MDB','NBK','NSS','OHN','RCN','TL','TRZ','UA','WP','WW'
 ];
 var CUSTOM_TOP_COLORS_DESK = CUSTOM_VENEER_COLORS_DESK.concat(CUSTOM_LAMINATE_COLORS_DESK);
-var CUSTOM_LEG_COLORS = ['WW','DSG','BKM','DCR','TS'];
+var CUSTOM_LEG_COLORS = ['DCR','TS'];
 var FRONT_SCREEN_PRICE_DATA = [{"code": "FDF0012N", "color": "3F1", "factory": "안성상품", "price": 116000}, {"code": "FDF0012N", "color": "3F2", "factory": "안성상품", "price": 116000}, {"code": "FDF0012N", "color": "061", "factory": "안성상품", "price": 116000}, {"code": "FDF0012N", "color": "064", "factory": "안성상품", "price": 116000}, {"code": "FDF0012N", "color": "067", "factory": "안성상품", "price": 116000}, {"code": "FDF0014N", "color": "3F1", "factory": "안성상품", "price": 135000}, {"code": "FDF0014N", "color": "3F2", "factory": "안성상품", "price": 135000}, {"code": "FDF0014N", "color": "061", "factory": "안성상품", "price": 135000}, {"code": "FDF0014N", "color": "064", "factory": "안성상품", "price": 135000}, {"code": "FDF0014N", "color": "067", "factory": "안성상품", "price": 135000}, {"code": "FDF0016N", "color": "3F1", "factory": "안성상품", "price": 153000}, {"code": "FDF0016N", "color": "3F2", "factory": "안성상품", "price": 153000}, {"code": "FDF0016N", "color": "061", "factory": "안성상품", "price": 153000}, {"code": "FDF0016N", "color": "064", "factory": "안성상품", "price": 153000}, {"code": "FDF0016N", "color": "067", "factory": "안성상품", "price": 153000}, {"code": "FDF0018N", "color": "3F1", "factory": "안성상품", "price": 167000}, {"code": "FDF0018N", "color": "3F2", "factory": "안성상품", "price": 167000}, {"code": "FDF0018N", "color": "061", "factory": "안성상품", "price": 167000}, {"code": "FDF0018N", "color": "064", "factory": "안성상품", "price": 167000}, {"code": "FDF0018N", "color": "067", "factory": "안성상품", "price": 167000}];
 var CUSTOM_FABRIC_COLORS_SCREEN = [
   '001','001A','001B','004','004B','007','007B','014','014A',
@@ -4303,44 +4303,44 @@ function ffHoverMaterial(inputId, code, part, ev, btn) {
 }
 function ffSelectMaterialButton(inputId, code, part, btn) {
   var input = document.getElementById(inputId);
-  if (input) { input.value = code; input.style.borderColor = ''; }
+  if (input) {
+    input.value = code;
+    input.style.borderColor = '';
+  }
+
   var group = btn && btn.parentElement;
-  if(part === 'top'){
 
-  Array.prototype.forEach.call(
-    document.querySelectorAll('.material-btn[data-part="top"]'),
-    function(b){
-      b.classList.remove('active');
-    }
-  );
+  // 상판은 표준품/무늬목/라미네이트 전체에서 1개만 선택
+  if (part === 'top') {
+    Array.prototype.forEach.call(
+      document.querySelectorAll('.material-btn[data-part="top"]'),
+      function(b) { b.classList.remove('active'); }
+    );
+  } else if (group) {
+    Array.prototype.forEach.call(
+      group.querySelectorAll('.material-btn'),
+      function(b) { b.classList.remove('active'); }
+    );
+  }
 
-}else if(group){
-
-  Array.prototype.forEach.call(
-    group.querySelectorAll('.material-btn'),
-    function(b){
-      b.classList.remove('active');
-    }
-  );
-
-}
   if (btn) btn.classList.add('active');
+
   ffHoverMaterial(inputId, code, part);
-  if(part === 'top'){
-  Array.prototype.forEach.call(
-    document.querySelectorAll('.material-btn[data-part="top"]'),
-    function(b){
-      b.classList.remove('active');
+
+  if (part === 'top' || part === 'leg') {
+    var peer = input && input.getAttribute('data-peer');
+    if (peer) {
+      deskColorPairPreview(
+        part === 'top' ? inputId : peer,
+        part === 'leg' ? inputId : peer
+      );
     }
-  );
-}else if(group){
-  Array.prototype.forEach.call(
-    group.querySelectorAll('.material-btn'),
-    function(b){
-      b.classList.remove('active');
-    }
-  );
+  } else {
+    stdColorPreview(code);
+  }
 }
+
+
 
 // ── 데스크 상판 색상 선택 (표준/주문 통합 드롭다운) ──
 function askDeskTopColorDrop(catName, dataType, items, productKey) {
@@ -4354,7 +4354,7 @@ function askDeskColorPairDrop(catName, dataType, items, productKey) {
   state._deskLegItems = items;
   var isCustom = state.colorType === '주문';
   var topColors = isCustom ? CUSTOM_TOP_COLORS_DESK : (DESK_TOP_COLORS[catName] || ['WW','WWK','OCY','HW']);
-  var legColors = isCustom ? CUSTOM_LEG_COLORS : (DESK_LEG_COLORS[catName] || ['WW','DSG','BKM','DCR','TS']);
+  var legColors = isCustom ? ['DCR','TS'] : ['WW','DSG','BKM'];
   var uid = Date.now();
   var topId = 'desk-top-sel-' + uid;
   var legId = 'desk-leg-sel-' + uid;
@@ -13258,26 +13258,14 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
 </script>
 
 
-<script id="ff-safe-hotfix-js">
+<script id="ff-nano-rules-safe">
 (function(){
-  // state가 지역 스코프에만 있거나 깨졌을 때 화면 전체가 죽지 않도록 최소 방어
-  if (!window.state) window.state = {};
   window.NANO_BANANA_RULES =
     '새로운 이미지를 생성하지 마라.\n' +
     'previews 폴더의 원본 이미지를 그대로 사용한다.\n' +
     'textures 재질만 해당 영역(top/leg/screen)에 맵핑한다.\n' +
     '카메라 각도, 형태, 다리 구조, 스크린 구조, 배경을 변경하지 마라.\n' +
     '결과는 원본 preview 이미지 기반 재질 맵핑 결과여야 한다.';
-
-  // updateFlowBar가 state 때문에 죽는 것만 방어
-  var oldUpdate = window.updateFlowBar;
-  window.updateFlowBar = function(){
-    try {
-      if (typeof oldUpdate === 'function') return oldUpdate.apply(this, arguments);
-    } catch(e) {
-      console.warn('[FF safe hotfix] updateFlowBar skipped:', e);
-    }
-  };
 })();
 </script>
 
