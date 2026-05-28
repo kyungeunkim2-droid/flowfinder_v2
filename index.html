@@ -13370,6 +13370,204 @@ if(/images\/options\/combo\/(normal|duct)\/([^/?#]+)/i.test(s)) {
 })();
 </script>
 
+
+
+<!-- === FF-KK: final layout/flow/accessory compact/quote render patch === -->
+<style id="ff-kk-final-compact-layout-style">
+  /* 단계바 명칭/중요도 정리: 옵션추가는 부가 단계처럼 작게 */
+  #flow-bar .flow-step{font-size:12px!important;letter-spacing:-.35px!important;}
+  #flow-bar .flow-step.ff-flow-accessory{
+    font-size:10px!important;
+    opacity:.82!important;
+    padding-left:18px!important;
+    padding-right:16px!important;
+    background:#1b2637!important;
+    color:#92a2b8!important;
+  }
+  #flow-bar .flow-step.ff-flow-accessory.active{
+    opacity:1!important;
+    background:linear-gradient(135deg,#324158,#1c293d)!important;
+    color:#dbeafe!important;
+    box-shadow:0 0 0 2px rgba(148,163,184,.18)!important;
+  }
+  #flow-bar .flow-step.ff-flow-accessory.done{background:#182537!important;color:#9fb1c8!important;}
+
+  /* 옵션추가 화면은 부가 선택이므로 한눈에 들어오게 compact 처리 */
+  .ff102-options-card{
+    max-width:min(96%,680px)!important;
+    padding:12px!important;
+    border-radius:16px!important;
+    border:1px solid rgba(148,163,184,.26)!important;
+    background:rgba(7,18,30,.72)!important;
+  }
+  .ff102-options-card h3{
+    font-size:15px!important;
+    margin:0 0 4px!important;
+    color:#dbeafe!important;
+    letter-spacing:-.25px!important;
+  }
+  .ff102-options-card p{
+    font-size:11px!important;
+    line-height:1.35!important;
+    margin:0 0 8px!important;
+    color:#94a3b8!important;
+  }
+  .ff102-cat{margin-top:9px!important;}
+  .ff102-cat-title{margin:0 0 5px!important;gap:6px!important;}
+  .ff102-cat-title span{font-size:12px!important;color:#b7c6d9!important;}
+  .ff102-cat-title small{font-size:9px!important;color:#74839a!important;}
+  .ff102-option-list{gap:6px!important;}
+  .ff102-option-row{
+    grid-template-columns:42px minmax(0,1fr)!important;
+    min-height:58px!important;
+    gap:8px!important;
+    padding:7px!important;
+    border-radius:12px!important;
+    background:#0b1624!important;
+    border-color:rgba(148,163,184,.18)!important;
+  }
+  .ff102-option-row.active{
+    border-color:#94a3b8!important;
+    background:#111d2d!important;
+    box-shadow:0 0 0 1px rgba(148,163,184,.18)!important;
+  }
+  .ff107-option-img{width:42px!important;height:42px!important;border-radius:9px!important;padding:3px!important;}
+  .ff107-option-main{gap:5px!important;}
+  .ff102-pick{
+    min-height:28px!important;
+    padding:5px 8px!important;
+    border-radius:10px!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+    font-weight:800!important;
+    background:#111827!important;
+  }
+  .ff102-option-row.active .ff102-pick{background:#243247!important;color:#fff!important;border-color:#94a3b8!important;}
+  .ff107-controls{grid-template-columns:88px 96px!important;gap:6px!important;justify-content:start!important;}
+  .ff102-field label{font-size:9px!important;margin-bottom:2px!important;color:#9fb1c8!important;}
+  .ff102-field select{height:28px!important;border-radius:8px!important;font-size:11px!important;padding:0 6px!important;}
+  .ff102-qty{height:28px!important;border-radius:8px!important;grid-template-columns:26px 1fr 26px!important;}
+  .ff102-qty button{font-size:13px!important;}
+  .ff102-qty input{font-size:11px!important;}
+  .ff102-actions{margin-top:10px!important;gap:7px!important;}
+  .ff102-actions button{min-height:32px!important;padding:7px 11px!important;font-size:11px!important;border-radius:999px!important;}
+  .ff102-actions button.primary{background:#334155!important;color:#f8fafc!important;border:1px solid rgba(255,255,255,.16)!important;}
+
+  /* 최종견적서 렌더링 이미지 */
+  .final-render-shot{
+    background:#111827;
+    border:1px solid #3d4556;
+    border-radius:16px;
+    padding:14px;
+    margin:0 0 16px;
+  }
+  .final-render-shot h4{margin:0 0 10px;color:#e5e7eb;font-size:13px;font-weight:900;}
+  .final-render-shot img{display:block;width:100%;max-height:360px;object-fit:contain;background:#f8fafc;border-radius:12px;}
+  .final-render-shot small{display:block;margin-top:7px;color:#9ca3af;font-size:10px;}
+
+  @media(max-width:620px){
+    .ff107-controls{grid-template-columns:1fr 1fr!important;}
+    .ff102-option-row{grid-template-columns:38px minmax(0,1fr)!important;}
+    .ff107-option-img{width:38px!important;height:38px!important;}
+  }
+</style>
+<script id="ff-kk-final-compact-layout-script">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function scrollChat(){setTimeout(function(){var m=$('messages'); if(m){m.scrollTop=m.scrollHeight;} var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'});},70);}
+
+  /* 데스크 없이 스크린만 선택해도 진행 가능하게: 제품 선택은 1개 이상이면 OK */
+  var oldConfirmProducts=window.ff71ConfirmProducts;
+  window.ff71ConfirmProducts=function(){
+    var sel=(window._setSelected||[]).slice();
+    if(!sel.length){
+      if(typeof addMsg==='function') addMsg('bot','<div class="warning-box">제품을 1개 이상 선택해주세요.</div>');
+      return false;
+    }
+    if(typeof window.ff96AskAddOptions==='function') return window.ff96AskAddOptions();
+    if(typeof oldConfirmProducts==='function') return oldConfirmProducts.apply(this,arguments);
+    return false;
+  };
+  var oldAskOptions=window.ff96AskAddOptions;
+  window.ff96AskAddOptions=function(){
+    var sel=(window._setSelected||[]).slice();
+    if(!sel.length){
+      if(typeof addMsg==='function') addMsg('bot','<div class="warning-box">제품을 1개 이상 선택해주세요.</div>');
+      return false;
+    }
+    if(window.state){state.step='size';}
+    if(typeof confirmSetSelection==='function'){
+      confirmSetSelection();
+      scrollChat();
+      return false;
+    }
+    if(typeof oldAskOptions==='function') return oldAskOptions.apply(this,arguments);
+    return false;
+  };
+
+  /* 단계바 문구 고정: 제품선택 > 사이즈선택 > 재질선택 > 옵션추가 > 견적확인 */
+  window.updateFlowBar=function(){
+    var bar=$('flow-bar'); if(!bar || !window.state) return;
+    var steps=['01 제품선택','02 사이즈선택','03 재질선택','04 옵션추가','05 견적확인'];
+    var active=0, c=state.current||{};
+    if(c.product || (state.selectedCategories&&state.selectedCategories.length) || (window._setSelected&&window._setSelected.length)) active=1;
+    if(c.size || state.w || state.d || state.h) active=2;
+    if(c.color || state.color || state._deskTopColor || state._deskLegColor || state.colorType || state.topMaterial || state.legMaterial) active=3;
+    if(state.step==='final_options' || state._ff102OptionsVisible || state._ff102OptionsHandled || state.extraOptionItems) active=4;
+    if(state.step==='continue' || state.step==='done' || state.step==='finish_menu' || state.step==='next_actions') active=4;
+    state._maxFlowIndex=Math.max(state._maxFlowIndex||0,active);
+    var maxReachable=Math.max(active,state._maxFlowIndex||active);
+    bar.innerHTML='';
+    steps.forEach(function(label,i){
+      var sp=document.createElement('button'); sp.type='button';
+      var cls='flow-step';
+      if(i===3) cls+=' ff-flow-accessory';
+      if(i<active) cls+=' done clickable'; else if(i===active) cls+=' active clickable'; else if(i<=maxReachable) cls+=' pending clickable'; else cls+=' pending';
+      sp.className=cls; sp.textContent=label; sp.title=label+' 단계';
+      if(i<=maxReachable && typeof goToFlowStep==='function'){sp.disabled=false; sp.onclick=function(){goToFlowStep(i);};} else {sp.disabled=true;}
+      bar.appendChild(sp);
+    });
+  };
+
+  function pickRenderedImage(){
+    try{ if(window.FlowFinderHeroComposer && typeof FlowFinderHeroComposer.render==='function') FlowFinderHeroComposer.render(); }catch(e){}
+    try{ if(window.FlowFinderMaskPreview && typeof FlowFinderMaskPreview.render==='function') FlowFinderMaskPreview.render(); }catch(e){}
+    var ids=['ff-hero-canvas','ff-render-canvas','set-composite-canvas','screen-composite-canvas','product-3d-canvas'];
+    for(var i=0;i<ids.length;i++){
+      var n=$(ids[i]);
+      if(n && n.tagName && n.tagName.toLowerCase()==='canvas' && n.width>20 && n.height>20){try{return n.toDataURL('image/png');}catch(e){}}
+    }
+    var imgIds=['ff-hero-img','product-preview-img','screen-composite-img'];
+    for(var j=0;j<imgIds.length;j++){
+      var im=$(imgIds[j]);
+      if(im && im.src) return im.src;
+    }
+    return '';
+  }
+  function injectRenderToFinalQuote(){
+    var modal=$('final-quote-modal'); if(!modal) return;
+    if(modal.querySelector('.final-render-shot')) return;
+    var img=pickRenderedImage(); if(!img) return;
+    var wrap=modal.querySelector('.final-quote-wrap'); if(!wrap) return;
+    var summary=wrap.querySelector('.final-summary-grid');
+    var block=document.createElement('div');
+    block.className='final-render-shot';
+    block.innerHTML='<h4>렌더링 미리보기</h4><img src="'+esc(img)+'" alt="렌더링 미리보기"><small>현재 오른쪽 미리보기의 렌더링 이미지를 견적서에 반영했습니다.</small>';
+    if(summary && summary.nextSibling) wrap.insertBefore(block,summary.nextSibling); else wrap.insertBefore(block,wrap.firstChild);
+  }
+  var baseShow=window.showFinalQuote;
+  window.showFinalQuote=function(){
+    var r;
+    if(typeof baseShow==='function') r=baseShow.apply(this,arguments);
+    setTimeout(injectRenderToFinalQuote,120);
+    return r;
+  };
+  document.addEventListener('click',function(){setTimeout(function(){if(typeof updateFlowBar==='function') updateFlowBar(); scrollChat();},80);},true);
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){if(typeof updateFlowBar==='function') updateFlowBar();},500);});
+})();
+</script>
+
 </body>
 
 
