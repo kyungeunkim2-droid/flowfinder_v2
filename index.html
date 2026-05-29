@@ -15125,17 +15125,7 @@ window.showPanel = function(){
     }
     return false;
   };
-  var oldFetch=window.fetch;
-  if(oldFetch && !window.__ffNoGenerateFetchPatch){
-    window.__ffNoGenerateFetchPatch=true;
-    window.fetch=function(url,opts){
-      var u=String(url&&url.url || url || '');
-      if(u.indexOf('/api/generate-preview')>-1 || u.indexOf('generate-preview')>-1){
-        return Promise.resolve(new Response(JSON.stringify({ok:false,blocked:true,message:'Image generation disabled; material mapping only.'}),{status:200,headers:{'Content-Type':'application/json'}}));
-      }
-      return oldFetch.apply(this,arguments);
-    };
-  }
+  // Nano/Render API fetch is not blocked here. Final prepareNanoBananaPreview handles material-only payload.
 
   function apply(){ cleanLegLabels(); }
   document.addEventListener('DOMContentLoaded',apply);
@@ -15455,6 +15445,168 @@ window.showPanel = function(){
 })();
 </script>
 <!-- === /EMERGENCY FINAL HOTFIX === -->
+
+<script id="ff-final-user-hotfix-screen-color-dcr-nano">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function qsa(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function txt(el){ return (el && (el.textContent||el.innerText) || '').trim(); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function stateObj(){ window.state=window.state||{}; state.current=state.current||{}; return state; }
+  function catInfo(cat){ return (window.USER_CATEGORIES && USER_CATEGORIES[cat]) || {}; }
+  function isScreenCat(cat){ return !!catInfo(cat).isScreen || /스크린/.test(String(cat||'')); }
+  function isDeskCat(cat){ return !!catInfo(cat).isDesk || /데스크/.test(String(cat||'')); }
+  function unique(arr){ var out=[]; (arr||[]).forEach(function(x){ x=String(x||'').trim(); if(x && out.indexOf(x)<0) out.push(x); }); return out; }
+  function colorFallback(code){
+    code=String(code||'').toUpperCase();
+    var map={DCR:'#4b4038',TS:'#9b8d7a',WW:'#f5f5f1',WWK:'#f4eee2',OCY:'#d5a55f',HW:'#caa875',W:'#f7f7f4',DSG:'#777b80',BKM:'#161616',BK:'#111'};
+    return map[code.replace(/^LEG_/,'')] || map[code] || '#999';
+  }
+  function texUrl(code, part, cat){
+    try{ if(typeof window.ffTextureUrlForChoice==='function'){ var u=window.ffTextureUrlForChoice(code,part,cat); if(u) return u; } }catch(e){}
+    try{ if(typeof window._ffLocalTextureForCode==='function'){ var u2=window._ffLocalTextureForCode(part==='leg'?'LEG_'+code:code, cat||''); if(u2) return u2; } }catch(e){}
+    try{ var k=(part==='leg'?'LEG_':'')+code; var p=(window.TEXTURE_MAP&&(TEXTURE_MAP[k]||TEXTURE_MAP[code]))||''; if(p) return p.indexOf('textures/')===0 || p.indexOf('products/')===0 || p.indexOf('data:')===0 || p.indexOf('http')===0 ? p : ((window.GITHUB_RAW||'')+p); }catch(e){}
+    return '';
+  }
+  function materialButton(code,inputId,part,cat){
+    var u=texUrl(code,part,cat);
+    var bg=u ? "background-image:url('"+esc(u)+"')" : ('background:'+colorFallback((part==='leg'?'LEG_':'')+code));
+    return '<button type="button" class="material-btn" data-input="'+esc(inputId)+'" data-part="'+esc(part)+'" data-code="'+esc(code)+'" onclick="ffSelectMaterialButton(\''+esc(inputId)+'\',\''+esc(code)+'\',\''+esc(part)+'\',this)"><span class="mat-thumb" style="'+bg+'"></span><span class="mat-code">'+esc(code)+'</span></button>';
+  }
+  function section(title, arr, inputId, part, cat){
+    arr=unique(arr); if(!arr.length) return '';
+    return '<div class="ff-color-category-card"><div class="ff-color-category-title"><span>'+esc(title)+'</span></div><div class="material-button-group">'+arr.map(function(c){return materialButton(c,inputId,part,cat);}).join('')+'</div></div>';
+  }
+  function getPack(cat){
+    var info=catInfo(cat), mode='unit', keys=[];
+    try{ mode=(typeof window.ffDataTypeForMode==='function') ? window.ffDataTypeForMode(info) : (info.type||'unit'); }catch(e){ mode=info.type||'unit'; }
+    try{ keys=(typeof window.ffUnitKeysForMode==='function') ? window.ffUnitKeysForMode(cat, info.keys) : (info.keys||[]); }catch(e){ keys=info.keys||[]; }
+    var key=(stateObj().subKey && keys.indexOf(state.subKey)>-1) ? state.subKey : keys[0];
+    var data=mode==='set' ? window.SET_DATA : window.UNIT_DATA;
+    return {mode:mode,key:key,items:(data&&data[key])||[]};
+  }
+
+  // 1) DCR/TS가 어떤 뒤쪽 패치에도 막히지 않게 최종 선택 함수를 고정
+  window.CUSTOM_LEG_COLORS = unique((window.CUSTOM_LEG_COLORS||[]).concat(['DCR','TS']));
+  window.ffSelectMaterialButton = function(inputId, code, part, btn){
+    var s=stateObj();
+    var input=$(inputId);
+    if(input){ input.value=code; input.style.borderColor=''; }
+    qsa('.material-btn[data-input="'+String(inputId).replace(/"/g,'\\"')+'"]').forEach(function(b){ b.classList.remove('active','selected'); });
+    if(btn){ btn.classList.add('active'); btn.classList.add('selected'); }
+    if(part==='leg'){ s._deskLegColor=code; s.legColor=code; s.current.legColor=code; }
+    if(part==='top'){ s._deskTopColor=code; s.topColor=code; s.current.topColor=code; }
+    if(part==='screen'){ s.screenCode=code; s.screenColor=code; s.color=code; s.current.color=code; }
+    if(typeof window.updateCurrent==='function'){ try{ window.updateCurrent(); }catch(e){} }
+    if(typeof window.ff90RefreshOptionSummary==='function'){ try{ window.ff90RefreshOptionSummary(); }catch(e){} }
+    return false;
+  };
+  try{ window.ffMaterialBtnHtml=function(code,inputId,part,catName){ return materialButton(code,inputId,part,catName); }; }catch(e){}
+
+  // 2) 스크린 색상창을 직접 그리는 안전 함수
+  window.ffUserAskScreenColor = function(catName){
+    var s=stateObj(); catName=catName || s._currentCatName || s.currentCatName || (s.current&&s.current.product) || '스크린';
+    s.step='choose_color'; s._currentCatName=catName;
+    var pack=getPack(catName), items=pack.items||[];
+    s._currentItems=items; s._currentDataType=pack.mode; s._currentProductKey=pack.key;
+    var selId='screen-color-sel-'+Date.now();
+    var standard=[];
+    if(window.STD_COLORS && window.STD_COLORS[catName]) standard=window.STD_COLORS[catName].slice();
+    items.forEach(function(i){ if(i && i.color && standard.indexOf(i.color)<0) standard.push(i.color); });
+    var custom=(catName==='일자형 스크린'||catName==='L형 스크린') ? (window.CUSTOM_PET_COLORS_SCREEN||[]) : (window.CUSTOM_FABRIC_COLORS_SCREEN||[]);
+    var html='<b>'+esc(catName)+'</b> 스크린 색상을 선택해주세요:'
+      + '<input class="material-hidden-input" id="'+selId+'" value="">'
+      + section('표준품 색상', standard, selId, 'screen', catName)
+      + section((catName==='일자형 스크린'||catName==='L형 스크린')?'PET 주문품 색상':'패브릭 주문품 색상', custom, selId, 'screen', catName)
+      + '<button class="confirm-btn" style="margin-top:10px" onclick="confirmStdColorDrop(\''+esc(catName)+'\',\''+esc(pack.mode)+'\',\''+esc(pack.key)+'\',\''+esc(selId)+'\')">색상 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    if(typeof window.scrollBottom==='function') window.scrollBottom();
+    if(typeof window.updateFlowBar==='function') window.updateFlowBar();
+    return false;
+  };
+
+  // 3) 스크린 top-gap 확인 후 색상창이 안 뜨는 문제 최종 복구
+  function showScreenColorAfterSummary(cat){
+    setTimeout(function(){
+      var bubbles=qsa('.msg.bot .bubble');
+      var last=bubbles[bubbles.length-1];
+      var hasRecentColor=qsa('.msg.bot .bubble .material-btn[data-part="screen"]').length>0;
+      if(!hasRecentColor) window.ffUserAskScreenColor(cat);
+    },80);
+  }
+  window.ff98SubmitTopGap = function(fid){
+    var s=stateObj();
+    var el=$('screen-top-'+fid);
+    var newH=s._screenNewH || s.h || 715;
+    var val=el ? parseInt(el.value,10) : (s._screenTopGap||405);
+    if(!val || val<1){ if(el){el.style.borderColor='#f87171'; el.focus();} return false; }
+    if(val>=newH){ if(el){el.style.borderColor='#f87171'; el.focus();} if(typeof addMsg==='function') addMsg('bot','<span class="error-msg">상판 위 값이 전체 H보다 작아야 합니다.</span>'); return false; }
+    if(el) el.disabled=true;
+    var btn=document.querySelector('[onclick="ff98SubmitTopGap('+fid+')"]'); if(btn) btn.disabled=true;
+    s._screenTopGap=val; s.screenTopGap=val; s.current=s.current||{}; s.current.screenTopGap=val;
+    s.current.size=(s.current.size||('H'+newH))+' / 상판위 '+val+'mm';
+    if(typeof updateCurrent==='function') updateCurrent();
+    if(typeof addMsg==='function') addMsg('user','상판 위 '+val+'mm');
+    var below=newH-val, cat=s._currentCatName || s.currentCatName || '스크린';
+    if(typeof addMsg==='function') addMsg('bot','📐 스크린 사이즈 정리:<br>· 전체 H: <b>'+newH+'mm</b><br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+below+'mm</b><br><br>이제 스크린 색상을 선택해주세요.');
+    var inputEl=$('user-input'); if(inputEl){ inputEl.disabled=false; inputEl.placeholder='입력하세요...'; }
+    showScreenColorAfterSummary(cat);
+    return false;
+  };
+
+  var prevAfter=window.afterSizeInput;
+  window.afterSizeInput = function(parsed){
+    var s=stateObj(); parsed=parsed||{};
+    var cat=s._currentCatName || s.currentCatName || '';
+    if(isScreenCat(cat)){
+      s.w=parsed.w; s.d=parsed.d; s.h=parsed.h; s.current=s.current||{};
+      var size=[]; if(parsed.w) size.push('W'+parsed.w); if(parsed.d) size.push('D'+parsed.d); if(parsed.h) size.push('H'+parsed.h); if(size.length) s.current.size=size.join(' ');
+      if(typeof updateCurrent==='function') updateCurrent();
+      // 기존 ff98 top-gap UI가 있으면 사용하고, 없거나 요약만 뜨면 observer가 색상창을 보완한다.
+      if(parsed.h && typeof window.ff98StepTopGap==='function'){
+        try{
+          var def=/일자형|L형/.test(cat)?350:405, max=Math.max(1,parsed.h-1), fid=Date.now(); s._screenNewH=parsed.h; s._topFormId=fid;
+          var v=Math.min(def,max);
+          var html='📐 변경 H: <b>'+parsed.h+'mm</b><br><br>책상 <b>상판 위</b> 높이(mm)를 입력해주세요:'
+            + '<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;"><div class="ff-size-control"><button type="button" onclick="ff98StepTopGap('+fid+',-50)">−</button><input id="screen-top-'+fid+'" type="number" value="'+v+'" min="1" max="'+max+'" onkeydown="if(event.key===\'Enter\')ff98SubmitTopGap('+fid+')"><button type="button" onclick="ff98StepTopGap('+fid+',50)">+</button></div><span style="font-size:10px;color:#7fa8a0;">mm</span></div>'
+            + '<button class="confirm-btn" style="margin-top:10px;" onclick="ff98SubmitTopGap('+fid+')">상판 위 값 확인 ✓</button>';
+          if(typeof addMsg==='function') addMsg('bot',html);
+          var inputEl=$('user-input'); if(inputEl){ inputEl.disabled=true; inputEl.placeholder='위 칸에 입력해주세요'; }
+          return false;
+        }catch(e){}
+      }
+      window.ffUserAskScreenColor(cat); return false;
+    }
+    return (typeof prevAfter==='function') ? prevAfter.apply(this,arguments) : undefined;
+  };
+  try{ afterSizeInput=window.afterSizeInput; }catch(e){}
+
+  // 4) 혹시 기존 코드가 '사이즈 정리' 메시지만 남기고 멈추면 자동으로 색상창 복구
+  function monitorScreenSummary(){
+    var s=stateObj(); var cat=s._currentCatName||s.currentCatName||''; if(!isScreenCat(cat)) return;
+    var bubbles=qsa('.msg.bot .bubble'); var last=bubbles[bubbles.length-1]; if(!last) return;
+    var t=txt(last);
+    if(/스크린 사이즈 정리|이제 스크린 색상/.test(t) && !last.__ffColorChecked){
+      last.__ffColorChecked=true;
+      setTimeout(function(){ if(qsa('.msg.bot .bubble .material-btn[data-part="screen"]').length===0) window.ffUserAskScreenColor(cat); },150);
+    }
+  }
+  try{ new MutationObserver(monitorScreenSummary).observe($('messages')||document.body,{childList:true,subtree:true}); }catch(e){}
+  setInterval(function(){
+    qsa('.ff-color-category-title small').forEach(function(sm){ if(/해당 시 선택/.test(txt(sm))) sm.textContent=''; });
+    qsa('.material-btn').forEach(function(b){ b.disabled=false; b.style.pointerEvents='auto'; });
+  },700);
+
+  // 5) Nano/Render 버튼은 숨기거나 차단하지 않고, 최종 material-only API 호출 함수가 살아있게 버튼을 다시 연결
+  function bindNanoButtons(){
+    var btn=$('quick-ai-preview-btn'), sbtn=$('quick-screen-ai-preview-btn');
+    if(btn){ btn.style.display='block'; btn.disabled=false; btn.onclick=function(e){ if(e)e.preventDefault(); if(typeof window.prepareNanoBananaPreview==='function') return window.prepareNanoBananaPreview('desk'); return false; }; }
+    if(sbtn){ sbtn.style.display='block'; sbtn.disabled=false; sbtn.onclick=function(e){ if(e)e.preventDefault(); if(typeof window.prepareNanoBananaPreview==='function') return window.prepareNanoBananaPreview('screen'); return false; }; }
+  }
+  document.addEventListener('DOMContentLoaded',bindNanoButtons); window.addEventListener('load',bindNanoButtons); document.addEventListener('click',function(){setTimeout(bindNanoButtons,80);},true); setInterval(bindNanoButtons,1600);
+})();
+</script>
 
 </body>
 
@@ -20707,20 +20859,7 @@ arr.push(
 })();
 </script>
 
-const STANDARD_LEG_COLORS=['WW','DSG','BKM'];
-
-const ORDER_LEG_COLORS=['DCR','TS'];
-
-
-[FlowFinder NanoBanana Rules]
-- 새로운 이미지를 생성하지 마라.
-- previews 폴더의 원본 이미지를 그대로 사용한다.
-- textures 재질만 해당 영역(top/leg/screen)에 맵핑한다.
-- 책상 형태, 구도, 다리 구조, 스크린 구조를 변경하지 마라.
-- 창의적 생성 금지.
-- 원본 preview 이미지 위에 재질만 입힌다.
-
-
+<!-- FlowFinder NanoBanana Rules: material-only mapping; preserve source preview image and apply textures only. -->
 
 <!-- === USER HOTFIX 2026-05-28: material panel / desk option image separation + label cleanup === -->
 <style id="ff-user-hotfix-layout-material-option-separation">
@@ -21139,3 +21278,174 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 <!-- === /FINAL RIGHT PANEL ORDER OVERRIDE === -->
+
+
+<!-- === FF FINAL PATCH: screen selected-name label + size-to-material recovery === -->
+<script id="ff-final-screen-name-material-recovery">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function qsa(sel, root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function text(el){ return (el && (el.textContent || el.innerText) || '').trim(); }
+  function S(){ window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state; }
+  function info(cat){ return (window.USER_CATEGORIES && window.USER_CATEGORIES[cat]) || {}; }
+  function isScreenName(v){ return /스크린/.test(String(v||'')); }
+  function isScreenCat(cat){ var i=info(cat); return !!i.isScreen || isScreenName(cat); }
+  function labelForKey(key){
+    key=String(key||'').toLowerCase();
+    var map={front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',l:'L형 스크린'};
+    return map[key] || '';
+  }
+  function selectedScreenName(){
+    var s=S();
+    var candidates=[
+      s.screenLabel, s.selectedScreenLabel, s._currentCatName, s.currentCatName,
+      s.current && s.current.product, s.current && s.current.name,
+      s.screenType, s.selectedScreen, s.screen, labelForKey(s.screenKey || s.selectedScreenKey)
+    ];
+    for(var i=0;i<candidates.length;i++){
+      var v=String(candidates[i]||'').trim();
+      if(isScreenName(v) && !/^<*@@/.test(v)) return v;
+    }
+    return '스크린';
+  }
+  function cleanScreenPlaceholders(root){
+    root=root||document.body;
+    qsa('.bubble,.msg,.ff-flow-note,div,span,b', root).forEach(function(el){
+      if(!el || (el.children && el.children.length>8)) return;
+      var html=el.innerHTML;
+      if(!html || html.indexOf('@@스크린')<0) return;
+      var name=selectedScreenName();
+      html=html
+        .replace(/&lt;@@스크린\s*사이즈입력&gt;/g,'&lt;'+esc(name)+' 사이즈입력&gt;')
+        .replace(/<@@스크린\s*사이즈입력>/g,'&lt;'+esc(name)+' 사이즈입력&gt;')
+        .replace(/@@스크린/g, esc(name));
+      el.innerHTML=html;
+    });
+  }
+  function unique(arr){ var out=[]; (arr||[]).forEach(function(x){ x=String(x||'').trim(); if(x && out.indexOf(x)<0) out.push(x); }); return out; }
+  function getPack(cat){
+    var i=info(cat), mode=i.type || 'unit', keys=i.keys || [];
+    try{ if(typeof window.ffDataTypeForMode==='function') mode=window.ffDataTypeForMode(i); }catch(e){}
+    try{ if(typeof window.ffUnitKeysForMode==='function') keys=window.ffUnitKeysForMode(cat, keys); }catch(e){}
+    var s=S();
+    var key=(s.subKey && keys.indexOf(s.subKey)>-1) ? s.subKey : keys[0];
+    var data=(mode==='set') ? window.SET_DATA : window.UNIT_DATA;
+    return {mode:mode, key:key, items:(data && data[key]) || []};
+  }
+  function texUrl(code, part, cat){
+    try{ if(typeof window.ffTextureUrlForChoice==='function'){ var u=window.ffTextureUrlForChoice(code,part,cat); if(u) return u; } }catch(e){}
+    try{ if(typeof window._ffLocalTextureForCode==='function'){ var u2=window._ffLocalTextureForCode(code,cat); if(u2) return u2; } }catch(e){}
+    try{ var m=window.TEXTURE_MAP||{}; return m[code] || m['SCREEN_'+code] || ''; }catch(e){}
+    return '';
+  }
+  function colorFallback(code){
+    var m={WW:'#f5f2e9',WWK:'#eee5d6',W:'#f8f8f4',OCY:'#d0a261',HW:'#c59d69',DCR:'#4b4038',TS:'#9b8d7a',DSG:'#777b80',BKM:'#161616',BK:'#111'};
+    return m[String(code||'').toUpperCase()] || '#9aa3af';
+  }
+  function materialBtn(code, inputId, cat){
+    var u=texUrl(code,'screen',cat);
+    var bg=u ? "background-image:url('"+esc(u)+"')" : 'background:'+colorFallback(code);
+    return '<button type="button" class="material-btn" data-input="'+esc(inputId)+'" data-part="screen" data-code="'+esc(code)+'" onclick="ffSelectMaterialButton(\''+esc(inputId)+'\',\''+esc(code)+'\',\'screen\',this)"><span class="mat-thumb" style="'+bg+'"></span><span class="mat-code">'+esc(code)+'</span></button>';
+  }
+  function section(title, arr, inputId, cat){
+    arr=unique(arr); if(!arr.length) return '';
+    return '<div class="material-button-section"><div class="material-button-section-title">'+esc(title)+'</div><div class="material-button-group">'+arr.map(function(c){return materialBtn(c,inputId,cat);}).join('')+'</div></div>';
+  }
+  function screenMaterialAlreadyVisible(){
+    var bubbles=qsa('#messages .msg.bot .bubble');
+    for(var i=Math.max(0,bubbles.length-4); i<bubbles.length; i++){
+      if(bubbles[i] && bubbles[i].querySelector('.material-btn[data-part="screen"]')) return true;
+    }
+    return false;
+  }
+  function askScreenMaterial(cat){
+    cat=cat || selectedScreenName();
+    if(!isScreenCat(cat)) cat=selectedScreenName();
+    var s=S();
+    s._currentCatName=cat; s.currentCatName=cat; s.current=s.current||{}; s.current.product=s.current.product||cat;
+    if(screenMaterialAlreadyVisible()) return false;
+    var pack=getPack(cat), items=pack.items||[];
+    s._currentItems=items; s._currentDataType=pack.mode; s._currentProductKey=pack.key;
+    var standard=[];
+    try{ if(window.STD_COLORS && window.STD_COLORS[cat]) standard=window.STD_COLORS[cat].slice(); }catch(e){}
+    items.forEach(function(it){ if(it && it.color && standard.indexOf(it.color)<0) standard.push(it.color); });
+    var isPet=/일자형|L형/i.test(cat);
+    var custom=[];
+    try{ custom=(isPet ? (window.CUSTOM_PET_COLORS_SCREEN||[]) : (window.CUSTOM_FABRIC_COLORS_SCREEN||[])).slice(); }catch(e){}
+    if(!standard.length && !custom.length){ standard=['WW','WWK','OCY','HW']; }
+    var inputId='screen-color-force-'+Date.now();
+    var html='<b>'+esc(cat)+'</b> 재질/색상을 선택해주세요.'
+      + '<input class="material-hidden-input" id="'+inputId+'" value="">'
+      + section('표준품색상', standard, inputId, cat)
+      + section(isPet ? 'PET 주문품색상' : '패브릭 주문품색상', custom, inputId, cat)
+      + '<button class="confirm-btn" style="margin-top:10px" onclick="confirmStdColorDrop(\''+esc(cat)+'\',\''+esc(pack.mode)+'\',\''+esc(pack.key)+'\',\''+esc(inputId)+'\')">색상 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot', html);
+    if(typeof window.scrollBottom==='function') window.scrollBottom();
+    return false;
+  }
+  window.ffForceAskScreenMaterial = askScreenMaterial;
+
+  var previousSelect=window.ffSelectMaterialButton;
+  window.ffSelectMaterialButton=function(inputId, code, part, btn){
+    var ret=false;
+    try{ if(typeof previousSelect==='function') ret=previousSelect.apply(this,arguments); }catch(e){}
+    var input=$(inputId); if(input) input.value=code;
+    qsa('.material-btn[data-input="'+String(inputId).replace(/"/g,'\\"')+'"]').forEach(function(b){ b.classList.remove('active','selected'); });
+    if(btn){ btn.classList.add('active'); btn.classList.add('selected'); }
+    var s=S();
+    if(part==='screen'){ s.color=code; s.screenCode=code; s.screenColor=code; s.current.color=code; }
+    if(part==='leg'){ s.legColor=code; s._deskLegColor=code; s.current.legColor=code; }
+    if(part==='top'){ s.topColor=code; s._deskTopColor=code; s.current.topColor=code; }
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    return ret || false;
+  };
+
+  var oldAfter=window.afterSizeInput;
+  window.afterSizeInput=function(parsed){
+    var s=S();
+    var cat=s._currentCatName || s.currentCatName || selectedScreenName();
+    if(isScreenCat(cat)){
+      var r;
+      try{ if(typeof oldAfter==='function') r=oldAfter.apply(this,arguments); }catch(e){}
+      setTimeout(function(){
+        cleanScreenPlaceholders(document.body);
+        var hasTopInput=!!document.querySelector('input[id^="screen-top-"]:not(:disabled)');
+        if(!hasTopInput && !screenMaterialAlreadyVisible()) askScreenMaterial(cat);
+      },250);
+      return r;
+    }
+    return (typeof oldAfter==='function') ? oldAfter.apply(this,arguments) : undefined;
+  };
+  try{ afterSizeInput=window.afterSizeInput; }catch(e){}
+
+  var oldSubmit=window.ff98SubmitTopGap;
+  window.ff98SubmitTopGap=function(fid){
+    var s=S(), cat=s._currentCatName || s.currentCatName || selectedScreenName();
+    var r;
+    try{ if(typeof oldSubmit==='function') r=oldSubmit.apply(this,arguments); }catch(e){}
+    setTimeout(function(){ cleanScreenPlaceholders(document.body); if(isScreenCat(cat) && !screenMaterialAlreadyVisible()) askScreenMaterial(cat); },180);
+    return r || false;
+  };
+
+  function recoverFromMessages(){
+    cleanScreenPlaceholders(document.body);
+    var s=S(), cat=s._currentCatName || s.currentCatName || selectedScreenName();
+    if(!isScreenCat(cat)) return;
+    var bubbles=qsa('#messages .msg.bot .bubble');
+    var last=bubbles[bubbles.length-1]; if(!last) return;
+    var t=text(last);
+    var hasTopInput=!!document.querySelector('input[id^="screen-top-"]:not(:disabled)');
+    if(/스크린 사이즈 정리|색상을 선택|재질\/색상|사이즈입력/.test(t) && !hasTopInput && !screenMaterialAlreadyVisible()){
+      setTimeout(function(){ if(!screenMaterialAlreadyVisible()) askScreenMaterial(cat); },120);
+    }
+  }
+  try{ new MutationObserver(recoverFromMessages).observe($('messages')||document.body,{childList:true,subtree:true,characterData:true}); }catch(e){}
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(recoverFromMessages,200);});
+  window.addEventListener('load',function(){setTimeout(recoverFromMessages,500);});
+  document.addEventListener('click',function(){setTimeout(recoverFromMessages,120);},true);
+  document.addEventListener('change',function(){setTimeout(recoverFromMessages,120);},true);
+})();
+</script>
+<!-- === /FF FINAL PATCH === -->
