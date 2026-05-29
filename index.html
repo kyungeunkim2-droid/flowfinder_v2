@@ -19049,7 +19049,35 @@ var OPTION_IMG = {
   grid-template-columns:1fr 1fr 1fr !important;
   gap:10px !important;
 }
+.ff102-option-row{
+  display:grid !important;
+  grid-template-columns:78px 1fr !important;
+  gap:10px !important;
+  align-items:center !important;
+}
 
+.ff107-option-img{
+  width:72px !important;
+  height:58px !important;
+  object-fit:contain !important;
+  display:block !important;
+  background:#fff !important;
+  border-radius:10px !important;
+  padding:6px !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+}
+
+.ff102-option-main{
+  min-width:0 !important;
+}
+
+.ff102-option-row.ff107-no-img{
+  grid-template-columns:1fr !important;
+}
+
+.ff102-option-row.ff107-no-img .ff107-option-img{
+  display:none !important;
+}
 </style>
 <script id="ff102-final-patch-script">
 (function(){
