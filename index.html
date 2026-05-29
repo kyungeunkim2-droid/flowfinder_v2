@@ -21591,3 +21591,198 @@ el.innerHTML='<b>&lt;' + screenName + ' 사이즈입력&gt;</b><br>원하시는 
 })();
 </script>
 <!-- === /FINAL RIGHT PANEL ORDER OVERRIDE === -->
+
+
+<!-- === FF FINAL OPTION UI RECOVERY PATCH v3 === -->
+<style id="ff-final-option-ui-recovery-css">
+.ff102-options-card,.ff96-option-ask,.ff96-options-card{
+  max-width: 440px !important;
+  width: min(440px, 100%) !important;
+  margin: 0 !important;
+  padding: 16px !important;
+  border: 1px solid rgba(32,245,197,.35) !important;
+  border-radius: 18px !important;
+  background: rgba(9,20,34,.96) !important;
+  box-shadow: 0 18px 44px rgba(0,0,0,.28) !important;
+}
+.ff102-options-card h3,.ff96-option-ask h3,.ff96-options-card h3{
+  margin:0 0 8px !important;
+  color:#20f5c5 !important;
+  font-size:20px !important;
+  line-height:1.2 !important;
+}
+.ff102-options-card p,.ff96-option-ask p,.ff96-options-card p{
+  margin:0 0 12px !important;
+  color:#b6c9d5 !important;
+  font-size:12px !important;
+  line-height:1.45 !important;
+}
+.ff102-cat{margin:10px 0 12px !important;}
+.ff102-cat-title{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  margin: 0 0 6px !important;
+  gap:10px !important;
+}
+.ff102-cat-title span{font-size:15px !important;font-weight:900 !important;color:#20f5c5 !important;}
+.ff102-cat-title small{font-size:10px !important;font-weight:800 !important;color:#c9a4ff !important;white-space:nowrap !important;}
+.ff102-option-list{display:flex !important;flex-direction:column !important;gap:6px !important;}
+.ff102-option-row{
+  display:grid !important;
+  grid-template-columns:44px minmax(0,1fr) 62px !important;
+  gap:8px !important;
+  align-items:center !important;
+  min-height:50px !important;
+  padding:6px 8px !important;
+  border-radius:13px !important;
+  border:1px solid rgba(32,245,197,.22) !important;
+  background:rgba(10,24,38,.92) !important;
+}
+.ff102-option-row.active{border-color:#20f5c5 !important;background:rgba(32,245,197,.10) !important;box-shadow:0 0 0 1px rgba(32,245,197,.18),0 0 16px rgba(32,245,197,.14) !important;}
+.ff107-option-img{width:38px !important;height:38px !important;object-fit:contain !important;display:block !important;background:#fff !important;border-radius:9px !important;padding:4px !important;grid-column:1 !important;}
+.ff102-option-row.ff107-no-img{grid-template-columns:minmax(0,1fr) 62px !important;}
+.ff102-option-row.ff107-no-img .ff107-option-img{display:none !important;}
+.ff102-pick{
+  grid-column:2 !important;
+  min-width:0 !important;
+  width:100% !important;
+  height:32px !important;
+  padding:0 10px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,255,255,.16) !important;
+  background:#121c2b !important;
+  color:#fff !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  text-align:left !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  cursor:pointer !important;
+}
+.ff102-pick.selected{background:#20f5c5 !important;color:#00131d !important;border-color:#20f5c5 !important;}
+.ff107-controls{grid-column:3 !important;display:flex !important;align-items:center !important;justify-content:flex-end !important;}
+.ff102-field{margin:0 !important;display:flex !important;align-items:center !important;}
+.ff102-field label{display:none !important;}
+.ff102-field select{width:58px !important;height:30px !important;padding:2px 6px !important;font-size:11px !important;font-weight:900 !important;border-radius:9px !important;border:1px solid rgba(32,245,197,.55) !important;background:#062033 !important;color:#fff !important;}
+.ff102-actions,.ff96-actions{display:flex !important;gap:8px !important;margin-top:12px !important;flex-wrap:wrap !important;}
+.ff102-actions button,.ff96-actions button{height:36px !important;padding:0 14px !important;border-radius:12px !important;border:1px solid rgba(32,245,197,.38) !important;background:#0b2030 !important;color:#eafffb !important;font-size:12px !important;font-weight:900 !important;cursor:pointer !important;}
+.ff102-actions .primary,.ff96-actions .primary{background:#20f5c5 !important;color:#00131d !important;border-color:#20f5c5 !important;}
+</style>
+<script id="ff-final-option-ui-recovery-js">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function bot(html){
+    if(typeof window.addMsg==='function') return window.addMsg('bot',html);
+    if(typeof window.msg==='function') return window.msg(html);
+    var m=document.getElementById('messages');
+    if(m){var d=document.createElement('div');d.className='msg bot';d.innerHTML='<div class="bubble">'+html+'</div>';m.appendChild(d);m.scrollTop=m.scrollHeight;}
+  }
+  function user(html){
+    if(typeof window.addMsg==='function') return window.addMsg('user',html);
+    var m=document.getElementById('messages');
+    if(m){var d=document.createElement('div');d.className='msg user';d.innerHTML='<div class="bubble">'+html+'</div>';m.appendChild(d);m.scrollTop=m.scrollHeight;}
+  }
+  var OPTIONS=[
+    {cat:'멀티탭',note:'상판 주문품 요율 적용 가능',items:[
+      {name:'외장 3구 멀티탭',colors:['WW','BK'],img:'images/options/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭',colors:['WW','BK'],img:'images/options/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭',colors:['WW','BK'],img:'images/options/accessories/multitap_embedded_2outlet.png'}
+    ]},
+    {cat:'PC홀더',note:'',items:[
+      {name:'행잉 PC홀더',colors:['WH','BK'],img:'images/options/accessories/pc_hanging.png'},
+      {name:'스트랩 PC홀더',colors:['BK'],img:'images/options/accessories/pc_strap.png'},
+      {name:'보급형 행잉 PC홀더',colors:['BK'],img:'images/options/accessories/pc_basic_hanging.png'}
+    ]},
+    {cat:'기타',note:'상판 주문품 요율 적용 가능',items:[
+      {name:'가방걸이',colors:['XX(투명)'],img:'images/options/accessories/bag_hook.png'},
+      {name:'탑마운트 모니터 암',colors:['BK'],img:'images/options/accessories/monitor_arm_topmount.png'}
+    ]}
+  ];
+  window.ff102AccessoryOptions=OPTIONS;
+
+  var originalFinalQuote = window.showFinalQuote;
+  function setDoneFlags(){
+    window.state = window.state || {};
+    state._ff102OptionsHandled=true;
+    state._ff102OptionsVisible=false;
+    state._ff97FinalOptionsAsked=true;
+    state._ff96OptionsAsked=true;
+    state._ff100OptionsDone=true;
+    state._ff90OptionsAsked=true;
+    state._ff97FinalOptionsAsked=true;
+  }
+  function openFinalQuote(){
+    setDoneFlags();
+    if(typeof originalFinalQuote==='function') return originalFinalQuote();
+    if(typeof window.generateFinalQuote==='function') return window.generateFinalQuote();
+  }
+  window.ff102ToggleOption=function(rowId){
+    var row=document.getElementById(rowId); if(!row) return;
+    row.classList.toggle('active');
+    var btn=row.querySelector('.ff102-pick');
+    if(btn) btn.classList.toggle('selected', row.classList.contains('active'));
+  };
+  window.ff102ShowOptions=function(){
+    window.state = window.state || {};
+    state.step='final_options';
+    state._ff102OptionsVisible=true;
+    if(typeof window.updateFlowBar==='function') try{window.updateFlowBar();}catch(e){}
+    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션은 제품명 버튼으로 선택하고 색상만 지정해주세요. 선택한 항목은 각 1개로 견적에 반영됩니다.</p>';
+    OPTIONS.forEach(function(group,gi){
+      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
+      (group.items||[]).forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii, colors=(item.colors&&item.colors.length)?item.colors:[''];
+        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
+          +'<img class="ff107-option-img" src="'+esc(item.img||'')+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff102-option-row\').classList.add(\'ff107-no-img\');this.remove();">'
+          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
+          +'<div class="ff107-controls"><div class="ff102-field"><select id="'+id+'_color">'
+          +colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')
+          +'</select></div></div></div>';
+      });
+      html+='</div></div>';
+    });
+    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
+    bot(html);
+  };
+  window.ff102ApplyOptions=function(){
+    var chosen=[];
+    OPTIONS.forEach(function(group,gi){
+      (group.items||[]).forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii, row=document.getElementById('ff102row_'+gi+'_'+ii);
+        if(row && row.classList.contains('active')){
+          var color=(document.getElementById(id+'_color')||{}).value||'';
+          chosen.push({category:group.cat,name:item.name,color:color,qty:1});
+        }
+      });
+    });
+    window.state = window.state || {};
+    state.extraOptionItems=chosen;
+    setDoneFlags();
+    user(chosen.length ? chosen.map(function(x){return esc(x.name)+' / '+esc(x.color)+' / 1개';}).join('<br>') : '추가 옵션 없음');
+    openFinalQuote();
+  };
+  window.ff102SkipOptions=function(){
+    window.state = window.state || {};
+    state.extraOptionItems=[];
+    setDoneFlags();
+    user('추가 옵션 없음');
+    openFinalQuote();
+  };
+  window.ff96ShowOptions=window.ff102ShowOptions;
+  window.ff96ApplyOptions=window.ff102ApplyOptions;
+  window.ff97SkipFinalOptions=window.ff102SkipOptions;
+  window.showFinalQuote=function(){
+    window.state = window.state || {};
+    if(!state._ff102OptionsHandled){ window.ff102ShowOptions(); return; }
+    return openFinalQuote();
+  };
+  window.askContinue=function(){
+    window.state = window.state || {};
+    if(!state._ff102OptionsHandled){ window.ff102ShowOptions(); return; }
+    return openFinalQuote();
+  };
+})();
+</script>
+<!-- === /FF FINAL OPTION UI RECOVERY PATCH v3 === -->
