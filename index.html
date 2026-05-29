@@ -21519,6 +21519,122 @@ el.innerHTML='<b>&lt;' + screenName + ' 사이즈입력&gt;</b><br>원하시는 
   min-height:168px !important;
 }
  <style>
+  /* ===== FINAL RIGHT PANEL LAYOUT ===== */
+
+body.ff-dashboard-preview #preview-panel,
+#preview-panel{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:18px !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    align-items:stretch !important;
+}
+
+/* 1. 큰 제품 미리보기 */
+#ff-dashboard-hero{
+    order:1 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:16px !important;
+    flex:0 0 auto !important;
+    min-height:auto !important;
+}
+
+/* 큰 이미지 */
+.ff-hero-image-card{
+    width:100% !important;
+    min-height:320px !important;
+    max-height:none !important;
+    flex:none !important;
+    overflow:hidden !important;
+}
+
+#ff-hero-img,
+#ff-hero-canvas{
+    width:100% !important;
+    height:auto !important;
+    max-height:420px !important;
+    object-fit:contain !important;
+}
+
+/* 2. 선택 요약 */
+.ff-hero-info{
+    order:2 !important;
+    width:100% !important;
+    min-height:120px !important;
+}
+
+/* 3. 재질 요약 */
+#texture-preview{
+    order:3 !important;
+    width:100% !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:10px !important;
+    min-height:120px !important;
+    overflow:visible !important;
+}
+
+/* 재질칩 */
+.quick-materials,
+.material-chip-row{
+    width:100% !important;
+    flex-wrap:wrap !important;
+}
+
+/* 4. 옵션 요약 */
+#option-summary,
+#ff-option-summary,
+#material-selection-values{
+    order:4 !important;
+    width:100% !important;
+    min-height:80px !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:8px !important;
+}
+
+/* 5. 총 견적 */
+#total-box{
+    order:5 !important;
+    width:100% !important;
+    flex:none !important;
+    min-height:140px !important;
+    margin-top:0 !important;
+}
+
+/* 카드끼리 겹침 방지 */
+#ff-dashboard-hero,
+#texture-preview,
+#total-box,
+.ff-hero-info,
+.material-selection-panel{
+    position:relative !important;
+    clear:both !important;
+    float:none !important;
+}
+
+/* 반응형 */
+@media (max-width:1200px){
+
+    body.ff-dashboard-preview{
+        flex-direction:column !important;
+        overflow:auto !important;
+        height:auto !important;
+    }
+
+    #chat-panel,
+    #preview-panel{
+        width:100% !important;
+        min-width:0 !important;
+        max-width:none !important;
+    }
+
+    .ff-hero-image-card{
+        min-height:260px !important;
+    }
+}
 #ff-dashboard-hero,
 #ff-desk-ai-result-panel,
 #ff-screen-ai-result-panel{
