@@ -16427,6 +16427,116 @@ window.showPanel = function(){
 })();
 </script>
 
+
+
+<!-- === FF KIM HARD FIX: RESTORE DESK COLOR COMBO GROUP BUTTONS === -->
+<style id="ff-kim-restore-color-combo-css">
+.ff-kim-color-wrap{margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+.ff-kim-color-col{min-width:0;}
+.ff-kim-color-col>label{display:block;color:#2ef2c9!important;font-size:12px!important;font-weight:1000!important;margin:0 0 7px!important;}
+.ff-kim-color-section{border:1px solid rgba(46,242,201,.22);background:rgba(0,0,0,.18);border-radius:14px;padding:10px;margin:0 0 10px;}
+.ff-kim-color-title{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;color:#fff;font-size:12px;font-weight:1000;line-height:1.2;}
+.ff-kim-color-title small{color:#9fb1c8;font-size:10px;font-weight:800;white-space:nowrap;}
+.ff-kim-mat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:7px;}
+.ff-kim-mat-btn{height:40px;min-width:0;border:1px solid rgba(255,255,255,.16);background:#091827;color:#fff;border-radius:11px;padding:4px 7px;display:flex;align-items:center;gap:6px;cursor:pointer;font-size:11px;font-weight:900;overflow:hidden;}
+.ff-kim-mat-btn:hover{border-color:#2ef2c9;box-shadow:0 0 0 2px rgba(46,242,201,.12);}
+.ff-kim-mat-btn.active,.ff-kim-mat-btn.selected{background:linear-gradient(135deg,#16d6b5,#7c3aed);border-color:#2ef2c9;color:#fff;}
+.ff-kim-mat-thumb{width:20px;height:20px;min-width:20px;border-radius:6px;border:1px solid rgba(255,255,255,.28);background:#64748b center/cover no-repeat;}
+.ff-kim-mat-code{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ff-kim-combo-preview{margin-top:6px;color:#a7f3d0;font-size:12px;font-weight:800;line-height:1.5;}
+@media(max-width:900px){.ff-kim-color-wrap{grid-template-columns:1fr}.ff-kim-mat-grid{grid-template-columns:repeat(auto-fit,minmax(68px,1fr));}.ff-kim-mat-btn{font-size:10px;padding:4px 5px;}}
+</style>
+<script id="ff-kim-restore-color-combo-js">
+(function(){
+  'use strict';
+  function S(){ window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state; }
+  function esc(v){ return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function unique(arr){ var out=[]; (arr||[]).forEach(function(x){ x=String(x||'').trim(); if(x && out.indexOf(x)<0) out.push(x); }); return out; }
+  function isDeskCat(cat){ var i=(window.USER_CATEGORIES&&window.USER_CATEGORIES[cat])||{}; return /데스크/.test(String(cat||'')) || (!i.isScreen && /desk/i.test(String(i.type||''))); }
+  function colorFallback(code){
+    var m={WW:'#f5f2e9',WWK:'#eee5d6',W:'#f7f7f2',WH:'#f7f7f2',OCY:'#d3a565',HW:'#c59d69',DBI:'#75665f',DBL:'#4b4038',OGG:'#8a796c',OB:'#7a5b42',NCE:'#c6a47d',NMOK:'#9f7d55',BGM:'#a69b8f',DCR:'#955044',TS:'#8d8170',DSG:'#777b80',BKM:'#151515',BK:'#111'};
+    return m[String(code||'').toUpperCase()] || '#9aa3af';
+  }
+  function texUrl(code, part, cat){
+    try{ if(typeof window.ffTextureUrlForChoice==='function'){ var u=window.ffTextureUrlForChoice(code,part,cat); if(u) return u; } }catch(e){}
+    try{ var key=(part==='leg'?'LEG_':'')+code; var m=window.TEXTURE_MAP||{}; return m[key] || m[code] || ''; }catch(e){}
+    return '';
+  }
+  function matBtn(code,inputId,part,cat){
+    var u=texUrl(code,part,cat), bg=u?"background-image:url('"+esc(u)+"')":'background:'+colorFallback((part==='leg'?'LEG_':'')+code);
+    return '<button type="button" class="ff-kim-mat-btn material-btn" data-input="'+esc(inputId)+'" data-part="'+esc(part)+'" data-code="'+esc(code)+'" onclick="ffKimSelectColor(\''+esc(inputId)+'\',\''+esc(code)+'\',\''+esc(part)+'\',this)"><span class="ff-kim-mat-thumb mat-thumb" style="'+bg+'"></span><span class="ff-kim-mat-code mat-code">'+esc(code)+'</span></button>';
+  }
+  function section(title, subtitle, arr, inputId, part, cat){
+    arr=unique(arr); if(!arr.length) return '';
+    return '<div class="ff-kim-color-section"><div class="ff-kim-color-title"><span>'+title+'</span>'+(subtitle?'<small>'+subtitle+'</small>':'')+'</div><div class="ff-kim-mat-grid">'+arr.map(function(c){return matBtn(c,inputId,part,cat);}).join('')+'</div></div>';
+  }
+  window.ffKimSelectColor=function(inputId, code, part, btn){
+    var input=document.getElementById(inputId); if(input) input.value=code;
+    [].slice.call(document.querySelectorAll('[data-input="'+String(inputId).replace(/"/g,'\\"')+'"][data-code]')).forEach(function(b){ b.classList.remove('active','selected'); });
+    if(btn){ btn.classList.add('active'); btn.classList.add('selected'); }
+    var s=S();
+    if(part==='top'){ s.topColor=code; s._deskTopColor=code; s.current.topColor=code; }
+    if(part==='leg'){ s.legColor=code; s._deskLegColor=code; s.current.legColor=code; }
+    var peer=input && input.getAttribute('data-peer');
+    var topId=part==='top'?inputId:peer, legId=part==='leg'?inputId:peer;
+    var top=document.getElementById(topId), leg=document.getElementById(legId);
+    var prev=document.getElementById('desk-color-combo-'+(topId||'').replace('desk-top-sel-','')) || document.getElementById('desk-color-combo-'+(legId||'').replace('desk-leg-sel-',''));
+    if(prev) prev.innerHTML='상판: <b>'+esc(top&&top.value||'-')+'</b> / 다리: <b>'+esc(leg&&leg.value||'-')+'</b>';
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    return false;
+  };
+  function dataPack(cat){
+    var info=(window.USER_CATEGORIES&&window.USER_CATEGORIES[cat])||{};
+    var mode=info.type||'unit', keys=info.keys||[];
+    try{ if(typeof window.ffDataTypeForMode==='function') mode=window.ffDataTypeForMode(info); }catch(e){}
+    try{ if(typeof window.ffUnitKeysForMode==='function') keys=window.ffUnitKeysForMode(cat,keys); }catch(e){}
+    var key=keys[0], data=(mode==='set')?window.SET_DATA:window.UNIT_DATA;
+    return {mode:mode,key:key,items:(data&&data[key])||[]};
+  }
+  window.askDeskColorPairDrop=function(catName,dataType,items,productKey){
+    var s=S(); s.step='choose_color'; s._currentCatName=catName; s.currentCatName=catName; s._deskTopItems=items||[]; s._deskLegItems=items||[];
+    var uid=Date.now(); var topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
+    var stdTop=unique((window.DESK_TOP_COLORS&&window.DESK_TOP_COLORS[catName])||['WW','WWK','OCY','HW']);
+    var veneer=unique(window.CUSTOM_VENEER_COLORS_DESK||['OGG','OB','NCE','NMOK','DBL']);
+    var laminate=unique(window.CUSTOM_LAMINATE_COLORS_DESK||['BGM']);
+    var legStd=unique((window.DESK_LEG_COLORS&&window.DESK_LEG_COLORS[catName])||['W','DSG','BKM']);
+    var legCustom=unique(window.CUSTOM_LEG_COLORS||['DCR','TS']);
+    var html='📌 <b>색상 조합을 선택해주세요.</b>'
+      + '<input class="material-hidden-input" id="'+topId+'" data-peer="'+legId+'" value="">'
+      + '<input class="material-hidden-input" id="'+legId+'" data-peer="'+topId+'" value="">'
+      + '<div class="ff-kim-color-wrap">'
+      + '<div class="ff-kim-color-col"><label>상판 색상</label>'
+      + section('표준품색상','상판',stdTop,topId,'top',catName)
+      + section('주문품색상 무늬목','상판',veneer,topId,'top',catName)
+      + section('주문품색상 라미네이트','상판',laminate,topId,'top',catName)
+      + '</div>'
+      + '<div class="ff-kim-color-col"><label>다리 색상</label>'
+      + section('표준품색상','다리',legStd,legId,'leg',catName)
+      + section('<span>주문품색상</span>','DCR / TS',legCustom,legId,'leg',catName)
+      + '</div></div>'
+      + '<div id="desk-color-combo-'+uid+'" class="ff-kim-combo-preview color-combo-preview">상판과 다리 색상을 각각 1개씩 선택해주세요.</div>'
+      + '<button class="confirm-btn" style="margin-top:10px;" onclick="confirmDeskColorPairDrop(\''+esc(catName)+'\',\''+esc(dataType||'unit')+'\',\''+esc(productKey||'')+'\',\''+topId+'\',\''+legId+'\')">색상 조합 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    try{ if(typeof window.scrollBottom==='function') window.scrollBottom(); }catch(e){}
+    try{ if(typeof window.updateFlowBar==='function') window.updateFlowBar(); }catch(e){}
+  };
+  window.askColorTypeFirst=function(catName,dataType,items,productKey){
+    var s=S(); s.colorType='전체'; s._currentItems=items; s._currentDataType=dataType; s._currentProductKey=productKey; s._currentCatName=catName;
+    if(isDeskCat(catName)) return window.askDeskColorPairDrop(catName,dataType,items,productKey);
+    if(typeof window.askStdColorDrop==='function') return window.askStdColorDrop(catName,dataType,items,productKey);
+  };
+  function fixExistingCards(){
+    [].slice.call(document.querySelectorAll('.ff-kim-color-title')).forEach(function(el){
+      var t=(el.textContent||'').trim();
+      if(t==='주문품색상 무늬목DCR / TS' || (t.indexOf('DCR / TS')>-1 && t.indexOf('무늬목')>-1)) el.innerHTML='<span>주문품색상</span><small>DCR / TS</small>';
+    });
+  }
+  document.addEventListener('click',function(){setTimeout(fixExistingCards,40);},true);
+  window.addEventListener('load',fixExistingCards);
+  setInterval(fixExistingCards,500);
+})();
+</script>
+<!-- === /FF KIM HARD FIX === -->
 </body>
 
 
