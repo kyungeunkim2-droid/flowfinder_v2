@@ -10,6 +10,23 @@
 
 <title>FlowFinder AI 견적상담</title>
 
+<script id="ff-global-product-images-fix">
+window.productImages = window.productImages || {
+  desk_standard: 'https://planning-cdn.fursys.com/upload/product_info/1051/923/fixed_block/product_main_block/product_main_image.origin_img.png?_=1769673918078',
+  desk_duct: 'https://planning-cdn.fursys.com/upload/product_info/1052/924/fixed_block/product_main_block/product_main_image.origin_img.png?_=1770183829953',
+  front: 'https://planning-cdn.fursys.com/upload/product_info/11/129/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774415218404',
+  side: 'https://planning-cdn.fursys.com/upload/product_info/129/130/fixed_block/product_main_block/product_main_image.origin_img.png?_=1763017300488',
+  straight: 'https://planning-cdn.fursys.com/upload/product_info/1053/933/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774426828523',
+  lshape: 'https://planning-cdn.fursys.com/upload/product_info/1054/931/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774261195654'
+};
+window.productImages.screen_front = window.productImages.front;
+window.productImages.screen_side = window.productImages.side;
+window.productImages.screen_straight = window.productImages.straight;
+window.productImages.screen_lshape = window.productImages.lshape;
+var productImages = window.productImages;
+</script>
+
+
 
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -6362,7 +6379,12 @@ return {
     : '',
 
   sceneImg: sceneFor(screenKey),
-  ...
+  top: s.top || s.topCode || s.topColor || '-',
+  leg: s.leg || s.legCode || s.legColor || '-',
+  screen: s.screen || s.screenCode || s.screenColor || '-',
+  topTex: s.topTex || s.topTexture || s.topMaterialImg || '',
+  legTex: s.legTex || s.legTexture || s.legMaterialImg || '',
+  screenTex: s.screenTex || s.screenTexture || s.screenMaterialImg || ''
 };
   }
   function setBg(id,url,fallback){
@@ -7709,10 +7731,10 @@ input[type="number"]::placeholder,#user-input::placeholder{color:#6d8f89!importa
 </style>
 <script id="ff37-flow-option-size-color">
 (function(){
-  var oldStartCategoryFlow = window.startCategoryFlow || startCategoryFlow;
-  var oldAfterSizeInput = window.afterSizeInput || afterSizeInput;
-  var oldAskSizeInput = window.askSizeInput || askSizeInput;
-  var oldSubmitSizeForm = window.submitSizeForm || submitSizeForm;
+  var oldStartCategoryFlow = window.startCategoryFlow || (typeof startCategoryFlow === 'function' ? startCategoryFlow : null);
+  var oldAfterSizeInput = window.afterSizeInput || (typeof afterSizeInput === 'function' ? afterSizeInput : null);
+  var oldAskSizeInput = window.askSizeInput || (typeof askSizeInput === 'function' ? askSizeInput : null);
+  var oldSubmitSizeForm = window.submitSizeForm || (typeof submitSizeForm === 'function' ? submitSizeForm : null);
   var oldShowFinalQuote = window.showFinalQuote;
   var oldPrintFinalQuote = window.printFinalQuote;
 
@@ -14932,6 +14954,7 @@ async function drawTextureCanvas(target){
   };
 
   function bindScreenButton(){
+    var state = window.state || window.appState || {};
     var b=$('quick-screen-ai-preview-btn'); if(b) b.onclick=function(e){e.preventDefault(); window.prepareNanoBananaPreview('screen');};
     var b2=$('quick-ai-preview-btn'); if(b2 && isScreen(state&&state._currentCatName)) b2.onclick=function(e){e.preventDefault(); window.prepareNanoBananaPreview('screen');};
   }
@@ -19914,15 +19937,10 @@ function productImage(key){
     return 'front';
   }
   function productImage(key){
-  key = String(key || '');
-
-  if (key === 'front') key = 'screen_front';
-  if (key === 'side') key = 'screen_side';
-  if (key === 'straight') key = 'screen_straight';
-  if (key === 'lshape') key = 'screen_lshape';
-
-return productImages[key] || '';
-  function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key]||key;}
+    key = String(key || '');
+    return (window.productImages && (window.productImages[key] || window.productImages[key.replace(/^screen_/, '')])) || '';
+  }
+  function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key]||key;}
   function materialState(){
     var s=st();
     return {
