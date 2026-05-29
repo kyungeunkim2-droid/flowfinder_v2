@@ -15615,6 +15615,167 @@ async function drawTextureCanvas(target){
 })();
 </script>
 
+
+
+<!-- === FF FINAL HOTFIX: material chips + Nano Banana working payload === -->
+<script id="ff-final-material-nano-hotfix">
+(function(){
+  function $(id){return document.getElementById(id);}
+  function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function st(){window.state=window.state||{};return window.state;}
+  function pv(){
+    window.FlowFinderFastPreview=window.FlowFinderFastPreview||{};
+    window.FlowFinderFastPreview.state=window.FlowFinderFastPreview.state||{};
+    return window.FlowFinderFastPreview.state;
+  }
+  window.productImages=window.productImages||{};
+  var PI=window.productImages;
+  if(!PI.desk_standard) PI.desk_standard='https://planning-cdn.fursys.com/upload/product_info/1051/923/fixed_block/product_main_block/product_main_image.origin_img.png?_=1769673918078';
+  if(!PI.desk_duct) PI.desk_duct='https://planning-cdn.fursys.com/upload/product_info/1052/924/fixed_block/product_main_block/product_main_image.origin_img.png?_=1770183829953';
+  if(!PI.front) PI.front='https://planning-cdn.fursys.com/upload/product_info/11/129/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774415218404';
+  if(!PI.side) PI.side='https://planning-cdn.fursys.com/upload/product_info/129/130/fixed_block/product_main_block/product_main_image.origin_img.png?_=1763017300488';
+  if(!PI.straight) PI.straight='https://planning-cdn.fursys.com/upload/product_info/1053/933/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774426828523';
+  if(!PI.lshape) PI.lshape='https://planning-cdn.fursys.com/upload/product_info/1054/931/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774261195654';
+  PI.screen_front=PI.screen_front||PI.front; PI.screen_side=PI.screen_side||PI.side; PI.screen_straight=PI.screen_straight||PI.straight; PI.screen_lshape=PI.screen_lshape||PI.lshape;
+
+  function keyFromName(name){
+    name=String(name||'');
+    if(/덕트/.test(name)) return 'desk_duct';
+    if(/일반형|데스크|책상/.test(name)) return 'desk_standard';
+    if(/전면/.test(name)) return 'front';
+    if(/사이드/.test(name)) return 'side';
+    if(/일자형/.test(name)) return 'straight';
+    if(/L형|엘형/.test(name)) return 'lshape';
+    return '';
+  }
+  function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key]||key||'';}
+  function productImage(key){key=String(key||'').replace(/^screen_/,'');return PI[key]||'';}
+  window.productImage=productImage;
+
+  function textureUrl(code,part){
+    code=String(code||'').trim(); if(!code) return '';
+    var cat=(st()._currentCatName||st().product||'');
+    try{ if(typeof window._ffLocalTextureForCode==='function'){ var p=window._ffLocalTextureForCode(part==='leg'?'LEG_'+code:code, cat); if(p) return p; } }catch(e){}
+    try{ if(typeof window.ffTextureUrlForChoice==='function'){ var u=window.ffTextureUrlForChoice(code,part,cat); if(u) return u; } }catch(e){}
+    var maps=[window.TEXTURE_MAP||{}, window.textureMap||{}];
+    for(var i=0;i<maps.length;i++){
+      var m=maps[i]; var v=m[part==='leg'?'LEG_'+code:code]||m[code]; if(v) return v;
+    }
+    return '';
+  }
+  function setChip(part, code, tex){
+    var map={top:['quick-top-row','quick-top-code','quick-top-chip'],leg:['quick-leg-row','quick-leg-code','quick-leg-chip'],screen:['quick-screen-row','quick-screen-code','quick-screen-chip']};
+    var a=map[part]; if(!a) return;
+    var row=$(a[0]), codeEl=$(a[1]), chip=$(a[2]);
+    if(codeEl) codeEl.textContent=code||'-';
+    if(chip){
+      chip.style.backgroundImage=tex?'url("'+tex+'")':'';
+      chip.style.backgroundColor=tex?'#222':'#d1d5db';
+    }
+    if(row){
+      row.classList.remove('active-top','active-leg','active-screen');
+      row.classList.add(part==='top'?'active-top':part==='leg'?'active-leg':'active-screen');
+    }
+    var box=$('texture-preview'); if(box) box.style.display='block';
+  }
+  function saveMaterial(part,code){
+    var S=st(), P=pv(), tex=textureUrl(code,part), cat=S._currentCatName||S.product||'';
+    if(part==='top'){
+      P.top=S.top=S.topCode=S.topColor=code; P.topTex=S.topTex=S.topTexture=S.topMaterialImg=tex;
+      P.deskKey=P.deskKey||keyFromName(cat)||'desk_standard';
+    }else if(part==='leg'){
+      P.leg=S.leg=S.legCode=S.legColor=code; P.legTex=S.legTex=S.legTexture=S.legMaterialImg=tex;
+      P.deskKey=P.deskKey||keyFromName(cat)||'desk_standard';
+    }else{
+      P.screen=S.screen=S.screenCode=S.screenColor=S.color=code; P.screenTex=S.screenTex=S.screenTexture=S.screenMaterialImg=tex;
+      P.screenKey=P.screenKey||keyFromName(cat)||'front';
+    }
+    setChip(part,code,tex);
+    try{ if(window.FlowFinderFastPreview && typeof window.FlowFinderFastPreview.render==='function') window.FlowFinderFastPreview.render(part); }catch(e){}
+  }
+
+  var previousSelect=window.ffSelectMaterialButton;
+  window.ffSelectMaterialButton=function(inputId,code,part,btn){
+    part=part||((inputId||'').indexOf('leg')>-1?'leg':(String(st()._currentCatName||'').indexOf('스크린')>-1?'screen':'top'));
+    if(btn){
+      var group=btn.closest&&btn.closest('.material-button-group');
+      if(group) group.querySelectorAll('.material-btn').forEach(function(b){b.classList.remove('active','selected');});
+      btn.classList.add('active','selected');
+    }
+    var input=$(inputId); if(input){input.value=code; input.setAttribute('value',code); try{input.dispatchEvent(new Event('change',{bubbles:true}));}catch(e){}}
+    saveMaterial(part,code);
+    try{ if(typeof previousSelect==='function') previousSelect(inputId,code,part,btn); }catch(e){console.warn('[material previousSelect skipped]',e);} 
+    saveMaterial(part,code);
+    return false;
+  };
+
+  document.addEventListener('click',function(e){
+    var b=e.target&&e.target.closest&&e.target.closest('.material-btn');
+    if(!b) return;
+    var code=b.getAttribute('data-code')||b.dataset.code||b.textContent.trim();
+    var part=b.getAttribute('data-part')||b.dataset.part||'';
+    var input=b.getAttribute('data-input')||b.dataset.input||'';
+    if(code){ window.ffSelectMaterialButton(input,code,part,b); }
+  },true);
+
+  function inferTarget(t){
+    if(t==='desk'||t==='screen') return t;
+    if(window.__ffNanoTarget==='screen'||window.__ffNanoTarget==='desk') return window.__ffNanoTarget;
+    return (String(st()._currentCatName||st().product||'').indexOf('스크린')>-1)?'screen':'desk';
+  }
+  function selectedDeskKey(){var S=st(),P=pv();return P.deskKey||S.deskKey||S.selectedDeskKey||keyFromName(S.product||S._currentCatName)||'desk_standard';}
+  function selectedScreenKey(){var S=st(),P=pv();return P.screenKey||S.screenKey||S.selectedScreenKey||keyFromName(S.product||S._currentCatName)||'front';}
+  function noteBox(){var n=$('quick-ai-preview-note'); if(n){n.style.display='block';} return n;}
+  function timeoutFetch(url,opt,ms){var c=new AbortController();var t=setTimeout(function(){c.abort();},ms||90000);opt=opt||{};opt.signal=c.signal;return fetch(url,opt).finally(function(){clearTimeout(t);});}
+
+  window.prepareNanoBananaPreview=async function(targetType){
+    var target=inferTarget(targetType), S=st(), P=pv(), note=noteBox(), btn= target==='screen' ? ($('quick-screen-ai-preview-btn')||$('quick-ai-preview-btn')) : $('quick-ai-preview-btn');
+    var deskKey=selectedDeskKey(), screenKey=selectedScreenKey();
+    var mainKey=target==='screen'?screenKey:deskKey;
+    var mainImage=productImage(mainKey)||productImage(target==='screen'?'front':'desk_standard');
+    var payload={
+      mode: target==='screen'?'nano-banana-screen-only-final':'nano-banana-desk-only-final',
+      targetType:target, productType:target,
+      deskImage:mainImage, fallbackDeskImage:mainImage,
+      deskLabel:target==='desk'?labelForKey(deskKey):'',
+      screenSelected:target==='screen', screenLabel:target==='screen'?labelForKey(screenKey):'', screenImage:target==='screen'?mainImage:'',
+      topTexture:target==='desk'?(P.topTex||S.topTex||S.topTexture||''):'',
+      legTexture:target==='desk'?(P.legTex||S.legTex||S.legTexture||''):'',
+      screenTexture:target==='screen'?(P.screenTex||S.screenTex||S.screenTexture||''):'',
+      topCode:target==='desk'?(P.top||S.topCode||S.topColor||''):'',
+      legCode:target==='desk'?(P.leg||S.legCode||S.legColor||''):'',
+      screenCode:target==='screen'?(P.screen||S.screenCode||S.screenColor||S.color||''):'',
+      legType:S.legType||S.legShape||P.legType||P.legShape||'', casterType:S.casterType||S.mobility||P.casterType||P.mobility||'', topShape:S.topShape||P.topShape||'',
+      size:{w:S.w||P.w||'',d:S.d||P.d||'',h:S.h||P.h||'',screenH:S.screenH||P.screenH||'',screenTopGap:S.screenTopGap||P.screenTopGap||''}
+    };
+    if(note){note.className='ai-loading';note.innerHTML='<b>원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd;">'+(target==='screen'?'스크린':'데스크')+' 원본 사진과 선택 재질을 서버로 보내는 중입니다.</span>';}
+    if(btn){btn.disabled=true;btn.textContent='생성 중...';}
+    try{
+      var health=await timeoutFetch('/api/health',{cache:'no-store'},8000).catch(function(){return null;});
+      if(!health||!health.ok) throw new Error('서버 연결 실패: Render 배포 또는 npm run dev 후 localhost:3000에서 열어야 합니다.');
+      var res=await timeoutFetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},120000);
+      var data=await res.json().catch(function(){return {};});
+      if(!res.ok) throw new Error(data.error||data.detail||'재질 적용 실패');
+      var img=(typeof data==='string')?data:(data.imageUrl||data.image||data.url||'');
+      if(!img) throw new Error('이미지 결과를 받지 못했습니다.');
+      if(note){note.className='ai-result';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 적용 미리보기 · '+(target==='screen'?'스크린':'데스크')+'</div><img src="'+esc(img)+'" alt="AI 실사 미리보기" style="width:100%;border-radius:16px;border:1px solid rgba(46,242,201,.22);background:#fff;display:block;max-height:560px;object-fit:contain;">';}
+    }catch(err){
+      var msg=(err&&err.name==='AbortError')?'응답 시간이 길어 자동 중단되었습니다.':(err&&err.message?err.message:String(err));
+      if(note){note.className='ai-error';note.innerHTML='<b style="color:#fca5a5;">재질 적용 실패</b><br><span style="color:#ddd;">'+esc(msg)+'</span>';}
+      console.error('[final material nano]',err,payload);
+    }finally{ if(btn){btn.disabled=false;btn.textContent=target==='screen'?'✨ 스크린 재질 적용':'✨ 데스크 재질 적용';} }
+  };
+
+  function bindNanoButtons(){
+    var d=$('quick-ai-preview-btn'), s=$('quick-screen-ai-preview-btn');
+    if(d){d.onclick=function(e){if(e)e.preventDefault();window.__ffNanoTarget='desk';window.prepareNanoBananaPreview('desk');return false;};}
+    if(s){s.onclick=function(e){if(e)e.preventDefault();window.__ffNanoTarget='screen';window.prepareNanoBananaPreview('screen');return false;};}
+  }
+  document.addEventListener('DOMContentLoaded',bindNanoButtons); window.addEventListener('load',bindNanoButtons); setInterval(bindNanoButtons,700); setTimeout(bindNanoButtons,50);
+})();
+</script>
+<!-- === /FF FINAL HOTFIX === -->
+
 </body>
 
 
