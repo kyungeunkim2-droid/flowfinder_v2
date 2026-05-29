@@ -4778,8 +4778,8 @@ function askDeskColorPairDrop(catName, dataType, items, productKey) {
   }
   function topButtons() {
     if (!isCustom) return btnGroup(topColors, topId, 'top');
-    var h = '<div class="material-button-section"><div class="material-button-section-title">주문품색상 무늬목</div>' + btnGroup(CUSTOM_VENEER_COLORS_DESK, topId, 'top') + '</div>';
-    h += '<div class="material-button-section"><div class="material-button-section-title">주문품색상 라미네이트</div>' + btnGroup(CUSTOM_LAMINATE_COLORS_DESK, topId, 'top') + '</div>';
+    var h = '<div class="material-button-section"><div class="material-button-section-title">무늬목</div>' + btnGroup(CUSTOM_VENEER_COLORS_DESK, topId, 'top') + '</div>';
+    h += '<div class="material-button-section"><div class="material-button-section-title">라미네이트</div>' + btnGroup(CUSTOM_LAMINATE_COLORS_DESK, topId, 'top') + '</div>';
     return h;
   }
 
@@ -4898,8 +4898,8 @@ function askStdColorDrop(catName, dataType, items, productKey) {
   var html = label + ' ' + badge + materialNote + ':<br>'
     + '<input class="material-hidden-input" id="' + selId + '" value="">';
   if (isCustom && !catInfo.isScreen) {
-    html += '<div class="material-button-section"><div class="material-button-section-title">주문품색상 무늬목</div>' + btnGroup(CUSTOM_VENEER_COLORS_DESK, part) + '</div>';
-    html += '<div class="material-button-section"><div class="material-button-section-title">주문품색상 라미네이트</div>' + btnGroup(CUSTOM_LAMINATE_COLORS_DESK, part) + '</div>';
+    html += '<div class="material-button-section"><div class="material-button-section-title">무늬목</div>' + btnGroup(CUSTOM_VENEER_COLORS_DESK, part) + '</div>';
+    html += '<div class="material-button-section"><div class="material-button-section-title">라미네이트</div>' + btnGroup(CUSTOM_LAMINATE_COLORS_DESK, part) + '</div>';
   } else {
     html += btnGroup(colors, part);
   }
@@ -12837,7 +12837,7 @@ ${map.move[move] || move}
       + '<input class="material-hidden-input" id="'+selId+'" value="">'
       + colorSection('표준품 색상', unique(standard), selId, part, catName, '')
       + (isScreenCat(catName)
-          ? colorSection((catName==='일자형 스크린'||catName==='L형 스크린')?'주문품 색상 PET':'주문품 색상 패브릭', unique(custom), selId, part, catName, '')
+          ? colorSection((catName==='일자형 스크린'||catName==='L형 스크린')?'주문품 PET 색상':'주문품 패브릭 색상', unique(custom), selId, part, catName, '')
           : colorSection('주문품 색상', unique(custom), selId, part, catName, ''))
       + '<div class="material-picker-hint">표준품/주문품 선택 버튼 없이 전체 색상을 카테고리별로 보여줍니다.</div>'
       + '<br><button class="confirm-btn" style="margin-top:10px;" onclick="confirmStdColorDrop(\''+catName+'\',\''+dataType+'\',\''+productKey+'\',\''+selId+'\')">색상 확인 ✓</button>';
@@ -14746,7 +14746,7 @@ window.showPanel = function(){
       if(t==='상판 색상 무늬목 / 라미네이트' || t==='상판 색상') el.innerHTML='상판색상 <span class="ff-kim-label-note">표준품색상 / 주문품색상 무늬목 / 주문품색상 라미네이트</span>';
       else if(t==='무늬목') el.textContent='주문품색상 무늬목';
       else if(t==='라미네이트') el.textContent='주문품색상 라미네이트';
-      else if(t==='주문품색상') el.textContent='주문품색상';
+      else if(t==='주문품색상') el.textContent='주문품색상 무늬목';
       else if(t==='표준 색상' || t==='표준품') el.textContent='표준품색상';
       else if(t==='다리 색상') el.innerHTML='다리색상 <span class="ff-kim-label-note">표준품색상 WW / DSG / BKM · 주문품색상 DCR / TS</span>';
     });
@@ -15518,7 +15518,7 @@ window.showPanel = function(){
     var html='<b>'+esc(catName)+'</b> 스크린 색상을 선택해주세요:'
       + '<input class="material-hidden-input" id="'+selId+'" value="">'
       + section('표준품 색상', standard, selId, 'screen', catName)
-      + section((catName==='일자형 스크린'||catName==='L형 스크린')?'주문품 색상 PET':'주문품 색상 패브릭 ', custom, selId, 'screen', catName)
+      + section((catName==='일자형 스크린'||catName==='L형 스크린')?'PET 주문품 색상':'주문품 패브릭 색상', custom, selId, 'screen', catName)
       + '<button class="confirm-btn" style="margin-top:10px" onclick="confirmStdColorDrop(\''+esc(catName)+'\',\''+esc(pack.mode)+'\',\''+esc(pack.key)+'\',\''+esc(selId)+'\')">색상 확인 ✓</button>';
     if(typeof window.addMsg==='function') window.addMsg('bot',html);
     if(typeof window.scrollBottom==='function') window.scrollBottom();
@@ -15605,198 +15605,6 @@ window.showPanel = function(){
     if(sbtn){ sbtn.style.display='block'; sbtn.disabled=false; sbtn.onclick=function(e){ if(e)e.preventDefault(); if(typeof window.prepareNanoBananaPreview==='function') return window.prepareNanoBananaPreview('screen'); return false; }; }
   }
   document.addEventListener('DOMContentLoaded',bindNanoButtons); window.addEventListener('load',bindNanoButtons); document.addEventListener('click',function(){setTimeout(bindNanoButtons,80);},true); setInterval(bindNanoButtons,1600);
-})();
-</script>
-
-<!-- === FF_SAFE_FINAL: master correction patch - minimal / no API blocking === -->
-<style id="ff-safe-final-style">
-  .ff-safe-note{font-size:11px;color:#9fb1c8;font-weight:800;margin-left:6px;}
-  .material-button-section-title{color:#2ef2c9!important;font-weight:1000!important;font-size:12px!important;margin:10px 0 6px!important;}
-  .ff102-options-card{max-width:min(96%,720px)!important;padding:14px!important;border-radius:18px!important;}
-  .ff102-options-card h3{font-size:17px!important;margin-bottom:6px!important;}
-  .ff102-options-card p{font-size:12px!important;margin-bottom:10px!important;line-height:1.45!important;}
-  .ff102-cat{margin-top:12px!important;}
-  .ff102-cat-title{font-size:13px!important;margin-bottom:7px!important;}
-  .ff102-cat-title small{font-size:10px!important;}
-  .ff102-option-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;}
-  .ff102-option-row{display:grid!important;grid-template-columns:56px minmax(0,1fr)!important;gap:8px!important;align-items:center!important;padding:8px!important;min-width:0!important;border-radius:13px!important;}
-  .ff102-option-row.ff107-no-img{grid-template-columns:minmax(0,1fr)!important;}
-  .ff107-option-img{width:56px!important;height:56px!important;object-fit:contain!important;background:#fff!important;border-radius:10px!important;padding:5px!important;}
-  .ff107-option-main{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:6px!important;min-width:0!important;}
-  .ff102-pick{font-size:12px!important;min-height:34px!important;padding:7px 9px!important;line-height:1.25!important;white-space:normal!important;word-break:keep-all!important;overflow-wrap:anywhere!important;text-overflow:unset!important;}
-  .ff107-controls{display:grid!important;grid-template-columns:1fr!important;gap:5px!important;}
-  .ff102-field label{font-size:10px!important;margin-bottom:3px!important;}
-  .ff102-field select{height:32px!important;font-size:12px!important;border-radius:9px!important;}
-  .ff102-qty,.ff99-qty-wrap{display:none!important;}
-  .ff102-actions{margin-top:12px!important;gap:8px!important;}
-  .ff102-actions button{min-height:36px!important;padding:9px 13px!important;font-size:12px!important;}
-  .ff-color-pair-wrap{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px;}
-  .ff-color-panel{border:1px solid rgba(46,242,201,.18);background:rgba(7,23,34,.55);border-radius:16px;padding:12px;min-width:0;}
-  .ff-color-panel>label{display:block;color:#fff!important;font-size:13px!important;font-weight:1000!important;margin-bottom:8px!important;}
-  @media(max-width:720px){.ff102-option-list{grid-template-columns:1fr!important}.ff-color-pair-wrap{grid-template-columns:1fr!important}}
-</style>
-<script id="ff-safe-final-js">
-(function(){
-  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
-  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
-  function user(html){ if(typeof addMsg==='function') addMsg('user', html); }
-  function isScreen(cat){ return /스크린/.test(String(cat||'')); }
-  function packFor(cat){
-    var info=(window.USER_CATEGORIES&&USER_CATEGORIES[cat])||{};
-    var mode=(typeof ffDataTypeForMode==='function') ? ffDataTypeForMode(info) : (info.type||'unit');
-    var keys=(typeof ffUnitKeysForMode==='function') ? ffUnitKeysForMode(cat, info.keys) : (info.keys||[]);
-    var key=keys[0];
-    var data=mode==='set'?window.SET_DATA:window.UNIT_DATA;
-    return {mode:mode,key:key,items:(data&&data[key])||[]};
-  }
-  function fixLabels(root){
-    root=root||document;
-    Array.prototype.forEach.call(root.querySelectorAll('.material-button-section-title,label,.product-select-title,span,div'),function(el){
-      var t=(el.textContent||'').trim();
-      if(t==='무늬목') el.textContent='주문품색상 무늬목';
-      if(t==='라미네이트') el.textContent='주문품색상 라미네이트';
-      if(t==='주문품색상 무늬목' && /DCR|TS/.test((el.parentElement&&el.parentElement.textContent)||'')) el.textContent='주문품색상';
-    });
-  }
-  window.ffSafeFinalFixLabels=fixLabels;
-
-  // 스크린 사이즈 문구: <@@스크린> 대신 선택한 스크린명 적용
-  window.patchScreenSizeBubble=function(){
-    var cat=(window.state&&state._currentCatName)||'';
-    if(!isScreen(cat)) return;
-    var bubbles=document.querySelectorAll('.msg.bot .bubble');
-    var b=bubbles[bubbles.length-1]; if(!b) return;
-    var text=(b.textContent||'');
-    if(text.indexOf('원하시는 사이즈를')<0 && !b.querySelector('.ff-screen-size-title')) return;
-    var old=b.querySelector('.ff-screen-size-title');
-    if(old){ old.innerHTML='&lt;'+esc(cat)+' 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.'; return; }
-    var walker=document.createTreeWalker(b,NodeFilter.SHOW_TEXT,null); var n;
-    while((n=walker.nextNode())){ if(n.nodeValue && n.nodeValue.indexOf('원하시는 사이즈를')>-1){ n.nodeValue=''; break; } }
-    var title=document.createElement('div');
-    title.className='ff-screen-size-title';
-    title.style.cssText='font-weight:900;color:#2ef2c9;margin-bottom:8px;line-height:1.55;';
-    title.innerHTML='&lt;'+esc(cat)+' 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
-    b.insertBefore(title,b.firstChild);
-  };
-
-  // 데스크 색상 조합창: 상판/다리 라벨과 버튼 그룹을 원래 버튼형으로 복구
-  if(typeof window.ffMaterialBtnHtml==='function'){
-    window.askDeskColorPairDrop=askDeskColorPairDrop=function(catName,dataType,items,productKey){
-      state.step='choose_color';
-      state._deskTopItems=items; state._deskLegItems=items;
-      var isCustom=state.colorType==='주문';
-      var topColors=isCustom ? (window.CUSTOM_TOP_COLORS_DESK||[]) : ((window.DESK_TOP_COLORS&&DESK_TOP_COLORS[catName]) || ['WW','WWK','OCY','HW']);
-      var legColors=isCustom ? ['DCR','TS'] : ['WW','DSG','BKM'];
-      var uid=Date.now();
-      var topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
-      function btnGroup(arr,inputId,part){
-        var h='<div class="material-button-group">';
-        (arr||[]).forEach(function(c){ h+=ffMaterialBtnHtml(c,inputId,part,catName); });
-        return h+'</div>';
-      }
-      function topButtons(){
-        if(!isCustom) return '<div class="material-button-section"><div class="material-button-section-title">표준품색상</div>'+btnGroup(topColors,topId,'top')+'</div>';
-        var h='<div class="material-button-section"><div class="material-button-section-title">주문품색상 무늬목</div>'+btnGroup(window.CUSTOM_VENEER_COLORS_DESK||[],topId,'top')+'</div>';
-        h+='<div class="material-button-section"><div class="material-button-section-title">주문품색상 라미네이트</div>'+btnGroup(window.CUSTOM_LAMINATE_COLORS_DESK||[],topId,'top')+'</div>';
-        return h;
-      }
-      var legTitle=isCustom?'주문품색상':'표준품색상';
-      var html='📌 <b>색상 조합</b>을 선택해주세요'
-        + '<input class="material-hidden-input" id="'+topId+'" data-peer="'+legId+'" value="">'
-        + '<input class="material-hidden-input" id="'+legId+'" data-peer="'+topId+'" value="">'
-        + '<div class="ff-color-pair-wrap">'
-        + '<div class="ff-color-panel"><label>상판색상 <span class="ff-safe-note">표준품색상 / 주문품색상 무늬목 / 주문품색상 라미네이트</span></label>'+topButtons()+'</div>'
-        + '<div class="ff-color-panel"><label>다리색상 <span class="ff-safe-note">'+(isCustom?'주문품색상 DCR / TS':'표준품색상 WW / DSG / BKM')+'</span></label>'
-        + '<div class="material-button-section"><div class="material-button-section-title">'+legTitle+'</div>'+btnGroup(legColors,legId,'leg')+'</div></div>'
-        + '</div>'
-        + '<div id="desk-color-combo-'+uid+'" class="color-combo-preview">버튼에 마우스를 올리면 재질 썸네일을 미리 볼 수 있습니다.</div>'
-        + '<div class="material-picker-hint">클릭하면 선택되고, 오른쪽 미리보기에는 선택한 원본사진과 재질칩이 표시됩니다.</div>'
-        + '<button class="confirm-btn" style="margin-top:10px;" onclick="confirmDeskColorPairDrop(\''+esc(catName).replace(/'/g,"\\'")+'\',\''+esc(dataType).replace(/'/g,"\\'")+'\',\''+esc(productKey).replace(/'/g,"\\'")+'\',\''+topId+'\',\''+legId+'\')">색상 조합 확인 ✓</button>';
-      bot(html);
-      var b=(typeof getLastBubble==='function')?getLastBubble():null;
-      if(b){ var bb=document.createElement('button'); bb.className='back-btn'; bb.textContent='← 이전 단계로'; bb.onclick=function(){bb.disabled=true; if(typeof goBack==='function')goBack();}; b.appendChild(bb); if(typeof scrollBottom==='function')scrollBottom(); }
-      if(typeof updateFlowBar==='function') updateFlowBar();
-      setTimeout(function(){fixLabels();},0);
-    };
-  }
-
-  // 스크린: 사이즈 → 상판 위 사이즈 → 스크린 색상 선택 순서 강제
-  window.submitTopGapForm=submitTopGapForm=function(fid2){
-    var el=document.getElementById('screen-top-'+fid2); if(!el||el.disabled) return;
-    var val=parseInt(el.value,10), newH=state._screenNewH||590;
-    if(!val||val<1){el.style.borderColor='#f87171';el.focus();return;}
-    if(val>=newH){el.style.borderColor='#f87171'; bot('<span class="error-msg">상판 위 값('+val+')이 전체 H('+newH+')보다 크거나 같을 수 없어요.</span>'); el.focus(); return;}
-    el.disabled=true; var btn=document.querySelector('[onclick="submitTopGapForm('+fid2+')"]'); if(btn)btn.disabled=true;
-    user('상판 위 '+val+'mm');
-    var inputEl=document.getElementById('user-input'); if(inputEl){inputEl.disabled=false; inputEl.placeholder='입력하세요...';}
-    var cat=state._currentCatName, isLineOrL=(cat==='일자형 스크린'||cat==='L형 스크린'), baseH=isLineOrL?590:715, diff=newH-baseH, below=newH-val;
-    state._screenTopGap=val;
-    state.current=state.current||{}; state.current.size=(state.current.size||('H'+newH))+' / 상판위 '+val+'mm';
-    if(typeof updateCurrent==='function') updateCurrent();
-    bot('📐 스크린 사이즈 정리:<br>· 변경 H: <b>'+newH+'mm</b>'+(diff!==0?' <span style="color:#888;font-size:11px;">(기준 '+baseH+' 대비 '+(diff>0?'+':'')+diff+'mm)</span>':'')+'<br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+below+'mm</b>');
-    var p=packFor(cat);
-    if(typeof askColorTypeFirst==='function') askColorTypeFirst(cat,p.mode,p.items,p.key);
-  };
-
-  // 옵션창: 수량 제거, 제품명+색상만, 이미지 유지, 한눈에 보이게 압축
-  var OPTIONS=[
-    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_external_3outlet.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_sliding_3outlet.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_embedded_2outlet.png'}]},
-    {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'images/options/accessories/pc_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'images/options/accessories/pc_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'images/options/accessories/pc_basic_hanging.png'}]},
-    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)'], img:'images/options/accessories/bag_hook.png'},
-      {name:'탑마운트 모니터 암', colors:['BK'], img:'images/options/accessories/monitor_arm_topmount.png'}]}
-  ];
-  window.ff102ToggleOption=function(rowId){var row=document.getElementById(rowId); if(row) row.classList.toggle('active');};
-  window.ff102SyncRow=function(rowId){var row=document.getElementById(rowId); if(row) row.classList.add('active');};
-  window.ff102StepQty=function(rowId,delta){var row=document.getElementById(rowId); if(row) row.classList.toggle('active', (delta||0)>0);};
-  window.ff102ShowOptions=window.ff96ShowOptions=function(){
-    if(window.state){state.step='final_options';state._ff102OptionsVisible=true;}
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션을 선택하고 색상만 지정해주세요.</p>';
-    OPTIONS.forEach(function(group,gi){
-      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
-      group.items.forEach(function(item,ii){
-        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
-        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
-          +'<img class="ff107-option-img" src="'+esc(item.img)+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff102-option-row\').classList.add(\'ff107-no-img\');this.remove();">'
-          +'<div class="ff107-option-main"><button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
-          +'<div class="ff107-controls"><div class="ff102-field"><label>색상</label><select id="'+id+'_color" onchange="ff102SyncRow(\''+rowId+'\')">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div></div>'
-          +'</div></div>';
-      });
-      html+='</div></div>';
-    });
-    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
-    bot(html);
-  };
-  window.ff102ApplyOptions=window.ff96ApplyOptions=function(){
-    var chosen=[];
-    OPTIONS.forEach(function(group,gi){group.items.forEach(function(item,ii){
-      var row=document.getElementById('ff102row_'+gi+'_'+ii); if(!row||!row.classList.contains('active')) return;
-      var color=(document.getElementById('ff102_'+gi+'_'+ii+'_color')||{}).value||'';
-      chosen.push({category:group.cat,name:item.name,color:color,qty:1});
-    });});
-    if(window.state){state.extraOptionItems=chosen; state._ff96OptionsAsked=true; state._ff102OptionsAsked=true;}
-    user(chosen.length ? chosen.map(function(x){return esc(x.name)+' / '+esc(x.color);}).join('<br>') : '추가 옵션 없음');
-    if(window._ff97OpenFinalQuote) window._ff97OpenFinalQuote();
-    else if(window._ff99OldShowFinalQuote) window._ff99OldShowFinalQuote();
-    else if(typeof showFinalQuote==='function') showFinalQuote();
-  };
-  window.ff102SkipOptions=window.ff97SkipFinalOptions=function(){
-    if(window.state){state.extraOptionItems=[];state._ff96OptionsAsked=true;state._ff102OptionsAsked=true;}
-    user('추가 옵션 없음');
-    if(window._ff97OpenFinalQuote) window._ff97OpenFinalQuote();
-    else if(window._ff99OldShowFinalQuote) window._ff99OldShowFinalQuote();
-    else if(typeof showFinalQuote==='function') showFinalQuote();
-  };
-
-  document.addEventListener('click',function(){setTimeout(function(){fixLabels();},0);},true);
-  document.addEventListener('DOMContentLoaded',function(){setTimeout(function(){fixLabels(); if(window.patchScreenSizeBubble) patchScreenSizeBubble();},500);});
 })();
 </script>
 
