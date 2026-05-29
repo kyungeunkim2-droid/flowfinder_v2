@@ -2669,7 +2669,15 @@ function drawProductCanvas(colorCode, texUrl) {
   canvas.width=W; canvas.height=300;
   var ctx=canvas.getContext('2d'); ctx.clearRect(0,0,W,300);
   var ptype=getProductTypeFromState();
+var nanoTarget = window.activeMaterialTarget = 'desk';
+window._ffNanoTarget = 'desk';
 
+if(/screen|front|side|straight|lshape/.test(String(nanoTarget))) {
+  ptype = 'screen';
+}
+  console.log('ptype=', ptype);
+console.log('nanoTarget=', nanoTarget);
+console.log('state=', state);
   if(ptype==='desk') {
     var isDuct=(state._currentCatName||'').indexOf('덕트')!==-1;
     var catKey=isDuct?'덕트형 데스크':'일반형 데스크';
