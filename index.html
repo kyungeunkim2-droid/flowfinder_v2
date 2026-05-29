@@ -14746,8 +14746,7 @@ window.showPanel = function(){
       if(t==='상판 색상 무늬목 / 라미네이트' || t==='상판 색상') el.innerHTML='상판색상 <span class="ff-kim-label-note">표준품색상 / 주문품색상 무늬목 / 주문품색상 라미네이트</span>';
       else if(t==='무늬목') el.textContent='주문품색상 무늬목';
       else if(t==='라미네이트') el.textContent='주문품색상 라미네이트';
-      else if(t==='주문품색상 무늬목' || t==='주문품색상 라미네이트') el.textContent='주문품색상';
-      else if(t==='주문품색상') el.textContent='주문품색상';
+      else if(t==='주문품색상') el.textContent='주문품색상 무늬목';
       else if(t==='표준 색상' || t==='표준품') el.textContent='표준품색상';
       else if(t==='다리 색상') el.innerHTML='다리색상 <span class="ff-kim-label-note">표준품색상 WW / DSG / BKM · 주문품색상 DCR / TS</span>';
     });
@@ -14782,8 +14781,7 @@ window.showPanel = function(){
     var title=document.createElement('div');
     title.className='ff-screen-size-title';
     title.style.cssText='font-weight:900;color:#2ef2c9;margin-bottom:8px;line-height:1.55;';
-    var screenName=((window.state&&state._currentCatName)||'스크린');
-    title.innerHTML='&lt;'+screenName+' 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
+    title.innerHTML='&lt;@@스크린 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
     b.insertBefore(title,b.firstChild);
   }
 
@@ -15607,6 +15605,160 @@ window.showPanel = function(){
     if(sbtn){ sbtn.style.display='block'; sbtn.disabled=false; sbtn.onclick=function(e){ if(e)e.preventDefault(); if(typeof window.prepareNanoBananaPreview==='function') return window.prepareNanoBananaPreview('screen'); return false; }; }
   }
   document.addEventListener('DOMContentLoaded',bindNanoButtons); window.addEventListener('load',bindNanoButtons); document.addEventListener('click',function(){setTimeout(bindNanoButtons,80);},true); setInterval(bindNanoButtons,1600);
+})();
+</script>
+
+
+
+<!-- === FF HOTFIX 2026-05-29: screen order, material labels, screen material button === -->
+<style id="ff-hotfix-screen-material-labels-style">
+  #quick-ai-preview-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:9px!important;}
+  #quick-screen-ai-preview-btn{display:block!important;width:100%!important;margin:0!important;padding:9px!important;border-radius:9px!important;border:1px solid #3a1f60!important;background:#1a0f30!important;color:#c4aff5!important;font-size:12px!important;font-weight:900!important;cursor:pointer!important;white-space:normal!important;line-height:1.25!important;}
+  #quick-screen-ai-preview-btn:hover{border-color:#60a5fa!important;color:#fff!important;}
+</style>
+<script id="ff-hotfix-screen-material-labels">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function qsa(sel,root){ return Array.prototype.slice.call((root||document).querySelectorAll(sel)); }
+  function isScreenCat(cat){ return /스크린/.test(String(cat||'')); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function S(){ return window.state || {}; }
+  function currentScreenName(){
+    var s=S();
+    return s._currentCatName || s.currentCatName || (s.current && s.current.product) || s.product || '스크린';
+  }
+
+  // 1) 스크린 흐름: 사이즈 입력 -> 상판위 입력 -> 스크린 색상/재질 선택 -> 견적 완료
+  window.submitTopGapForm = function(fid2){
+    var el = $('screen-top-' + fid2);
+    if(!el || el.disabled) return;
+    var val = parseInt(el.value,10);
+    var s = S();
+    var newH = parseInt(s._screenNewH || s.h || 590,10);
+    if(!val || val < 1){ el.style.borderColor='#f87171'; el.focus(); return; }
+    if(val >= newH){
+      el.style.borderColor='#f87171';
+      if(typeof window.addMsg==='function') window.addMsg('bot','<span class="error-msg">상판 위 값(' + val + ')이 전체 H(' + newH + ')보다 크거나 같을 수 없어요.</span>');
+      el.focus(); return;
+    }
+    el.disabled = true;
+    var btn = document.querySelector('[onclick="submitTopGapForm(' + fid2 + ')"]');
+    if(btn) btn.disabled = true;
+    if(typeof window.addMsg==='function') window.addMsg('user','상판 위 ' + val + 'mm');
+    if(window.input){ window.input.disabled=false; window.input.placeholder='입력하세요...'; }
+
+    var cat = currentScreenName();
+    s._currentCatName = cat;
+    var below = newH - val;
+    var isLineOrL = /일자형|L형/.test(cat);
+    var baseH = isLineOrL ? 590 : 715;
+    var diff = newH - baseH;
+    s._screenTopGap = val;
+    s.current = s.current || {};
+    var baseSize = s.current.size || (s.h ? ('H' + s.h) : ('H' + newH));
+    baseSize = String(baseSize).replace(/\s*\/\s*상판위\s*\d+mm/g,'');
+    s.current.size = baseSize + ' / 상판위 ' + val + 'mm';
+    if(typeof window.updateCurrent==='function') window.updateCurrent();
+
+    if(typeof window.addMsg==='function'){
+      window.addMsg('bot','📐 스크린 사이즈 정리:<br>'
+        + '· 변경 H: <b>' + newH + 'mm</b>'
+        + (diff !== 0 ? ' <span style="color:#888;font-size:11px;">(기준 ' + baseH + ' 대비 ' + (diff > 0 ? '+' : '') + diff + 'mm)</span>' : '') + '<br>'
+        + '· 상판 위: <b>' + val + 'mm</b><br>'
+        + '· 상판 아래: <b>' + below + 'mm</b><br><br>'
+        + '다음 단계로 <b>스크린 색상</b>을 선택해주세요.');
+    }
+
+    setTimeout(function(){
+      if(typeof window.ffForceAskScreenMaterial==='function') window.ffForceAskScreenMaterial(cat);
+      else if(typeof window.askStdColorDrop==='function'){
+        var info=(window.USER_CATEGORIES&&window.USER_CATEGORIES[cat])||{};
+        var mode=info.type||'set';
+        var key=(info.keys&&info.keys[0])||cat;
+        var data=mode==='unit'?window.UNIT_DATA:window.SET_DATA;
+        var items=(data&&data[key])||[];
+        window.askStdColorDrop(cat,mode,items,key);
+      }
+    },80);
+  };
+
+  // 2) 스크린 색상 확인은 다시 사이즈 입력으로 되돌아가지 않고 바로 완료로 이동
+  var oldConfirm = window.confirmStdColorDrop;
+  window.confirmStdColorDrop = function(catName,dataType,productKey,selId){
+    var s=S();
+    var cat = catName || currentScreenName();
+    if(isScreenCat(cat) && String(selId||'').indexOf('screen-color-force-')===0){
+      var sel=$(selId);
+      var val=(sel && sel.value) || '';
+      if(!val){ if(sel) sel.style.borderColor='#f87171'; return; }
+      if(sel) sel.disabled=true;
+      var btn=document.querySelector('[onclick*="'+selId.replace(/"/g,'\\"')+'"]');
+      if(btn) btn.disabled=true;
+      s.color=val; s.screenColor=val; s.screenCode=val; s.current=s.current||{}; s.current.color=val;
+      if(typeof window.updateCurrent==='function') window.updateCurrent();
+      if(typeof window.showTexturePreview==='function') window.showTexturePreview(val);
+      if(typeof window.setPreviewGlow==='function') window.setPreviewGlow('screen');
+      if(window.FlowFinderMaskPreview && typeof window.FlowFinderMaskPreview.sync==='function') window.FlowFinderMaskPreview.sync({catName:cat,screen:val});
+      if(typeof window.addMsg==='function') window.addMsg('user',val);
+      if(typeof window.calcAndFinish==='function') window.calcAndFinish(cat);
+      return;
+    }
+    if(typeof oldConfirm==='function') return oldConfirm.apply(this,arguments);
+  };
+
+  // 3) 표시명 정리: 다리는 주문품색상 / 상판은 주문품색상 무늬목, 주문품색상 라미네이트
+  function normalizeLabels(root){
+    root=root||document;
+    qsa('.material-button-section-title,label,.product-select-title,span,div',root).forEach(function(el){
+      if(!el || el.children.length>2) return;
+      var t=(el.textContent||'').trim();
+      if(!t) return;
+      if(t==='다리 색상 무늬목 / 라미네이트' || t==='다리 색상 주문품색상 무늬목' || t==='다리 색상 주문품색상 라미네이트'){
+        el.textContent='다리 색상 주문품색상';
+      }
+      if(t==='무늬목') el.textContent='주문품색상 무늬목';
+      if(t==='라미네이트') el.textContent='주문품색상 라미네이트';
+      if(t==='PET 주문품색상') el.textContent='주문품색상';
+      if(t==='패브릭 주문품색상') el.textContent='주문품색상';
+    });
+    // 다리 색상 영역 안에 잘못 들어간 무늬목/라미네이트 문구만 주문품색상으로 보정
+    qsa('label',root).forEach(function(label){
+      if(/다리 색상/.test(label.textContent||'')){
+        label.innerHTML='다리 색상 <span style="color:#a78bfa;font-size:11px;">주문품색상</span>';
+      }
+    });
+  }
+  window.ffKimNormalizeMaterialLabels = normalizeLabels;
+  var mo = new MutationObserver(function(ms){ ms.forEach(function(m){ normalizeLabels(m.target); }); });
+  if(document.body) mo.observe(document.body,{childList:true,subtree:true});
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',function(){ normalizeLabels(document); ensureScreenButton(); });
+  else { normalizeLabels(document); setTimeout(function(){ normalizeLabels(document); ensureScreenButton(); },100); }
+
+  // 4) 스크린 재질 적용 버튼이 사라졌을 때 복구
+  function ensureScreenButton(){
+    var actions=$('quick-ai-preview-actions');
+    if(!actions){
+      var panel=$('texture-preview');
+      if(panel){
+        actions=document.createElement('div');
+        actions.id='quick-ai-preview-actions';
+        actions.style.cssText='display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:9px;';
+        panel.appendChild(actions);
+      }
+    }
+    if(actions && !$('quick-screen-ai-preview-btn')){
+      var b=document.createElement('button');
+      b.id='quick-screen-ai-preview-btn';
+      b.type='button';
+      b.textContent='✨ 스크린 재질 적용';
+      b.onclick=function(){ if(typeof window.prepareNanoBananaPreview==='function') return window.prepareNanoBananaPreview('screen'); };
+      actions.appendChild(b);
+    }
+    var sb=$('quick-screen-ai-preview-btn');
+    if(sb){ sb.style.display='block'; sb.onclick=function(){ if(typeof window.prepareNanoBananaPreview==='function') return window.prepareNanoBananaPreview('screen'); }; }
+  }
+  setInterval(ensureScreenButton,1500);
 })();
 </script>
 
