@@ -11072,6 +11072,38 @@ button.material-btn{
     try{
       var health=await fetchWithTimeout('/api/health',{cache:'no-store'},8000).catch(function(){return null;});
       if(!health || !health.ok) throw new Error('서버가 실행 중이 아니거나 /api/health 연결이 안 됩니다. npm run dev 후 http://localhost:3000에서 열어주세요.');
+      var screenText = String(
+  payload.screenKey ||
+  (payload.selectedScreens || []).join('-') ||
+  payload.screenInstruction ||
+  ''
+).toLowerCase();
+
+if (
+  screenText.indexOf('front') > -1 &&
+  screenText.indexOf('side') > -1
+) {
+  payload.guideImage = '/images/guides/frontside_guide.png';
+  payload.screenInstruction =
+    (payload.screenInstruction || '') +
+    '\nUse the guide image: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching panel.';
+}
+     var screenText = String(
+  payload.screenKey ||
+  (payload.selectedScreens || []).join('-') ||
+  payload.screenInstruction ||
+  ''
+).toLowerCase();
+
+if (
+  screenText.indexOf('front') > -1 &&
+  screenText.indexOf('side') > -1
+) {
+  payload.guideImage = '/images/guides/frontside_guide.png';
+  payload.screenInstruction =
+    (payload.screenInstruction || '') +
+    '\nUse the guide image: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching panel.';
+}
       var res=await fetchWithTimeout('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},120000);
       var data=await res.json().catch(function(){return {};});
       if(!res.ok) throw new Error(data.error || data.detail || '재질 적용 실패');
