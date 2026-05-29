@@ -10923,8 +10923,7 @@ button.material-btn{
           +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
           +'<div class="ff107-controls">'
           +'<div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>'
-          +'<div class="ff102-field"><label>수량</label><div class="ff102-qty"><button type="button" onclick="ff102StepQty(\''+rowId+'\',-1)">−</button><input id="'+id+'_qty" type="number" min="0" value="0" oninput="ff102SyncRow(\''+rowId+'\')"><button type="button" onclick="ff102StepQty(\''+rowId+'\',1)">+</button></div></div>'
-          +'</div></div></div>';
+         ;
       });
       html+='</div></div>';
     });
@@ -15272,11 +15271,15 @@ async function drawTextureCanvas(target){
     {cat:'PC홀더', note:'', items:[{name:'행잉 PC홀더', colors:['WH','BK']},{name:'스트랩 PC홀더', colors:['BK']},{name:'보급형 행잉 PC홀더', colors:['BK']}]},
     {cat:'기타', note:'', items:[{name:'가방걸이', colors:['XX(투명)']},{name:'탑마운트 모니터 암', colors:['BK']}]}
   ]);
-  window.ff102ToggleOption=function(rowId){
-    var row=document.getElementById(rowId); if(!row) return;
-    row.classList.toggle('active');
-    var input=row.querySelector('input[type="number"]'); if(input) input.value=row.classList.contains('active')?'1':'0';
-  };
+window.ff102ToggleOption=function(rowId){
+  var row=document.getElementById(rowId); 
+  if(!row) return;
+
+  row.classList.toggle('active');
+
+  var btn = row.querySelector('.ff102-pick');
+  if(btn) btn.classList.toggle('selected', row.classList.contains('active'));
+};
   window.ff102SyncRow=function(rowId){
     var row=document.getElementById(rowId); if(!row) return;
     var input=row.querySelector('input[type="number"]');
@@ -15295,8 +15298,8 @@ async function drawTextureCanvas(target){
         var colors=(item.colors&&item.colors.length?item.colors:['']);
         html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
           +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
-          +'<div class="ff107-controls"><div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div><input id="'+id+'_qty" type="hidden" value="0"></div>'
-          +'</div>';
+          +'<div class="ff107-controls"><div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>+'</select></div></div>'
++'</div>';
       });
       html+='</div></div>';
     });
@@ -19078,6 +19081,46 @@ var OPTION_IMG = {
 .ff102-option-row.ff107-no-img .ff107-option-img{
   display:none !important;
 }
+  .ff102-option-row{
+  display:grid !important;
+  grid-template-columns:44px 1fr auto !important;
+  gap:8px !important;
+  align-items:center !important;
+  min-height:48px !important;
+  padding:6px 8px !important;
+}
+
+.ff107-option-img{
+  width:38px !important;
+  height:38px !important;
+  object-fit:contain !important;
+  background:#fff !important;
+  border-radius:8px !important;
+  padding:4px !important;
+}
+
+.ff102-pick{
+  font-size:11px !important;
+  padding:6px 8px !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+}
+
+.ff107-controls{
+  display:flex !important;
+  align-items:center !important;
+}
+
+.ff102-field label{
+  display:none !important;
+}
+
+.ff102-field select{
+  width:58px !important;
+  height:28px !important;
+  font-size:11px !important;
+}
 </style>
 <script id="ff102-final-patch-script">
 (function(){
@@ -19160,10 +19203,18 @@ var OPTION_IMG = {
     var chosen=[];
     OPTIONS.forEach(function(group,gi){group.items.forEach(function(item,ii){
       var id='ff102_'+gi+'_'+ii;
-      var color=(document.getElementById(id+'_color')||{}).value||'';
-      var qty=Math.max(0,parseInt((document.getElementById(id+'_qty')||{}).value||'0',10)||0);
-      if(qty>0) chosen.push({category:group.cat,name:item.name,color:color,qty:qty});
-    });});
+     var color=(document.getElementById(id+'_color')||{}).value||'';
+
+var row=document.getElementById('ff102row_'+gi+'_'+ii);
+
+if(row && row.classList.contains('active')){
+  chosen.push({
+    category:group.cat,
+    name:item.name,
+    color:color,
+    qty:1
+  });
+}
     saveChosen(chosen);
     user(chosen.length?chosen.map(function(x){return esc(x.name)+' / '+esc(x.color)+' / '+x.qty+'개';}).join('<br>'):'추가 옵션 없음');
     nextActions();
