@@ -16322,6 +16322,111 @@ window.showPanel = function(){
 })();
 </script>
 
+
+
+<!-- KIM FINAL PATCH: restore full desk material groups; no single-word custom label -->
+<style id="kim-final-material-groups-css">
+.ff-kim-material-card{margin-top:8px;padding:14px;border:1px solid rgba(46,242,201,.35);background:#061821;border-radius:18px;color:#eafffb;}
+.ff-kim-material-card .ff-kim-material-title{font-size:14px;font-weight:1000;margin-bottom:10px;color:#fff;}
+.ff-kim-material-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start;}
+.ff-kim-material-col{min-width:0;border:1px solid rgba(255,255,255,.12);border-radius:14px;padding:10px;background:rgba(5,13,25,.58);}
+.ff-kim-material-col-title{font-size:12px;font-weight:1000;color:#2ef2c9;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
+.ff-kim-material-section{margin:8px 0 10px;}
+.ff-kim-material-section-title{font-size:11px;font-weight:1000;color:#f8fafc;margin:0 0 6px;padding:4px 8px;border-radius:999px;background:rgba(46,242,201,.12);display:inline-flex;max-width:100%;white-space:normal;line-height:1.25;}
+.ff-kim-material-buttons{display:flex;flex-wrap:wrap;gap:7px;}
+.ff-kim-material-card .material-btn{min-width:68px!important;max-width:112px!important;height:36px!important;padding:5px 8px!important;font-size:11px!important;border-radius:11px!important;overflow:hidden;}
+.ff-kim-material-card .material-btn .mat-thumb{width:20px!important;height:20px!important;border-radius:6px!important;}
+.ff-kim-material-card .material-btn .mat-code{font-size:11px!important;max-width:56px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.ff-kim-combo-live{margin-top:10px;padding:9px 10px;border:1px dashed rgba(46,242,201,.45);border-radius:12px;color:#b7fff2;font-size:12px;line-height:1.45;background:rgba(46,242,201,.06);}
+@media(max-width:900px){.ff-kim-material-layout{grid-template-columns:1fr}.ff-kim-material-card .material-btn{min-width:64px!important}}
+</style>
+<script id="kim-final-material-groups-fix">
+(function(){
+  function $(id){return document.getElementById(id);} 
+  function qsa(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];});}
+  function uniq(a){var out=[];(a||[]).forEach(function(x){if(x && out.indexOf(x)<0) out.push(x);});return out;}
+  function fallbackColor(code){
+    var m={WW:'#f4f4ef',W:'#f6f6f2',WH:'#f6f6f2',HW:'#d8c2a1',WWK:'#eee8d8',OCY:'#d8b270',BKM:'#202020',BGM:'#595959',DSG:'#777',DCR:'#8d4b3e',TS:'#8b7a6f',OGG:'#8b735b',OB:'#4b342c',NCE:'#cbb89f',NMOK:'#b99a72',DBL:'#7a5a42'};
+    return m[code]||'#2b3340';
+  }
+  function texUrl(code,part,cat){
+    try{
+      if(typeof window.ffTextureUrlForChoice==='function') return window.ffTextureUrlForChoice(code,part,cat||((window.state&&state._currentCatName)||''))||'';
+      if(typeof window.ffMaterialTextureUrl==='function') return window.ffMaterialTextureUrl(code,part)||'';
+    }catch(e){}
+    return '';
+  }
+  function btn(code,inputId,part,cat){
+    var url=texUrl(code,part,cat);
+    var bg=url ? "background-image:url('"+esc(url)+"');" : 'background-color:'+fallbackColor(code)+';';
+    return '<button type="button" class="material-btn" data-input="'+esc(inputId)+'" data-part="'+esc(part)+'" data-code="'+esc(code)+'" onclick="ffSelectMaterialButton(\''+esc(inputId)+'\',\''+esc(code)+'\',\''+esc(part)+'\',this)"><span class="mat-thumb" style="'+bg+'"></span><span class="mat-code">'+esc(code)+'</span></button>';
+  }
+  function section(title,arr,inputId,part,cat){
+    arr=uniq(arr);
+    if(!arr.length) return '';
+    return '<div class="ff-kim-material-section"><div class="ff-kim-material-section-title">'+esc(title)+'</div><div class="ff-kim-material-buttons">'+arr.map(function(c){return btn(c,inputId,part,cat);}).join('')+'</div></div>';
+  }
+  function say(html){
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    else if(typeof window.bot==='function') window.bot(html);
+  }
+  window.ffSelectMaterialButton=function(inputId,code,part,button){
+    var input=$(inputId);
+    if(input){input.value=code; input.style.borderColor='';}
+    if(button && button.parentElement){qsa('.material-btn',button.parentElement).forEach(function(b){b.classList.remove('active','selected');}); button.classList.add('active','selected');}
+    var peerId=input && input.getAttribute('data-peer');
+    var bubble=button && button.closest ? button.closest('.bubble') : null;
+    var combo=bubble ? bubble.querySelector('.ff-kim-combo-live,.color-combo-preview') : null;
+    if(combo){
+      var peer=peerId?$(peerId):null;
+      var top=(part==='top'?code:(peer?peer.value:''))||'';
+      var leg=(part==='leg'?code:(peer?peer.value:''))||'';
+      combo.innerHTML='상판 선택값: <b>'+esc(top||'-')+'</b> &nbsp; / &nbsp; 다리 선택값: <b>'+esc(leg||'-')+'</b>';
+    }
+    try{
+      if(part==='top') window.__ffPreviewTop=code;
+      if(part==='leg') window.__ffPreviewLeg=code;
+      if(part==='screen') window.__ffPreviewScreen=code;
+      if(typeof window.showTexturePreview==='function') window.showTexturePreview(part==='leg'?'LEG_'+code:code);
+      if(window.FlowFinderMaskPreview&&typeof window.FlowFinderMaskPreview.sync==='function') window.FlowFinderMaskPreview.sync({catName:(window.state&&state._currentCatName)||'',top:window.__ffPreviewTop||'',leg:window.__ffPreviewLeg||'',screen:window.__ffPreviewScreen||''});
+    }catch(e){}
+    return true;
+  };
+  window.askDeskTopColorDrop=function(catName,dataType,items,productKey){return window.askDeskColorPairDrop(catName,dataType,items,productKey);};
+  window.askDeskColorPairDrop=function(catName,dataType,items,productKey){
+    if(window.state){state.step='choose_color'; state._deskTopItems=items; state._deskLegItems=items; state._currentCatName=catName;}
+    var isCustom=(window.state&&state.colorType)==='주문';
+    var topStandard=uniq((window.DESK_TOP_COLORS&&window.DESK_TOP_COLORS[catName])||['WW','WWK','OCY','HW']);
+    var legStandard=uniq((window.DESK_LEG_COLORS&&window.DESK_LEG_COLORS[catName])||['WW','DSG','BKM']);
+    var veneer=uniq(window.CUSTOM_VENEER_COLORS_DESK||['OGG','OB','NCE','NMOK','DBL']);
+    var laminate=uniq(window.CUSTOM_LAMINATE_COLORS_DESK||['BGM','BGP','BGA','BGE']);
+    var legCustom=uniq(window.CUSTOM_LEG_COLORS||['DCR','TS']);
+    var uid=Date.now()+'_'+Math.floor(Math.random()*1000), topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
+    var topHtml=isCustom
+      ? section('주문품색상 무늬목',veneer,topId,'top',catName)+section('주문품색상 라미네이트',laminate,topId,'top',catName)
+      : section('표준품색상',topStandard,topId,'top',catName);
+    var legHtml=isCustom
+      ? section('주문품색상',legCustom,legId,'leg',catName)
+      : section('표준품색상',legStandard,legId,'leg',catName);
+    var html='<div class="ff-kim-material-card"><div class="ff-kim-material-title">📌 색상 조합을 선택해주세요</div>'
+      +'<input class="material-hidden-input" id="'+topId+'" data-peer="'+legId+'" value="">'
+      +'<input class="material-hidden-input" id="'+legId+'" data-peer="'+topId+'" value="">'
+      +'<div class="ff-kim-material-layout"><div class="ff-kim-material-col"><div class="ff-kim-material-col-title">상판 색상</div>'+topHtml+'</div><div class="ff-kim-material-col"><div class="ff-kim-material-col-title">다리 색상</div>'+legHtml+'</div></div>'
+      +'<div class="ff-kim-combo-live">상판 선택값: <b>-</b> &nbsp; / &nbsp; 다리 선택값: <b>-</b></div>'
+      +'<button type="button" class="confirm-btn" style="margin-top:10px;" onclick="confirmDeskColorPairDrop(\''+esc(catName)+'\',\''+esc(dataType)+'\',\''+esc(productKey)+'\',\''+topId+'\',\''+legId+'\')">색상 조합 확인 ✓</button>'
+      +'</div>';
+    say(html);
+    try{
+      var b=(typeof window.getLastBubble==='function')?window.getLastBubble():null;
+      if(b){var back=document.createElement('button'); back.className='back-btn'; back.textContent='← 이전 단계로'; back.onclick=function(){ if(typeof window.goBack==='function') window.goBack(); }; b.appendChild(back);}
+      if(typeof window.updateFlowBar==='function') window.updateFlowBar();
+      if(typeof window.scrollToBottom==='function') window.scrollToBottom();
+    }catch(e){}
+  };
+})();
+</script>
+
 </body>
 
 
