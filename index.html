@@ -4733,10 +4733,21 @@ function ffHoverMaterial(inputId, code, part, ev, btn) {
 }
 function ffSelectMaterialButton(inputId, code, part, btn) {
   var input = document.getElementById(inputId);
+
   if (input) {
     input.value = code;
     input.style.borderColor = '';
   }
+
+  if (btn) {
+    Array.from(btn.parentElement.children).forEach(function(b) {
+      b.classList.remove('active');
+    });
+    btn.classList.add('active');
+  }
+
+  return true;
+}
 
   var group = btn && btn.parentElement;
 
@@ -12361,7 +12372,11 @@ ${map.move[move] || move}
     S().step='choose_color'; S()._deskTopItems=items; S()._deskLegItems=items;
     var isCustom=S().colorType==='주문';
     var topColors=isCustom ? (window.CUSTOM_VENEER_COLORS_DESK||[]) : ((window.DESK_TOP_COLORS&&DESK_TOP_COLORS[catName])||['WW','WWK','OCY','HW']);
-    var legColors=isCustom ? (window.CUSTOM_LEG_COLORS||[]) : ((window.DESK_LEG_COLORS&&DESK_LEG_COLORS[catName])||['WW','DSG','BKM']);
+   var legColors = isCustom
+  ? ((window.CUSTOM_LEG_COLORS && window.CUSTOM_LEG_COLORS.length)
+      ? window.CUSTOM_LEG_COLORS
+      : ['DCR','TS'])
+  : ((window.DESK_LEG_COLORS && window.DESK_LEG_COLORS[catName]) || ['WW','DSG','BKM']);
     var uid=Date.now(), topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
     function btnGroup(arr,inputId,part){var h='<div class="material-button-group">';(arr||[]).forEach(function(c){h+=window.ffMaterialBtnHtml?ffMaterialBtnHtml(c,inputId,part,catName):'<button type="button" class="material-btn" onclick="document.getElementById(\''+inputId+'\').value=\''+c+'\'">'+c+'</button>';});return h+'</div>';}
     var topHtml='';
