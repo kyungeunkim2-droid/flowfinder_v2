@@ -12837,7 +12837,7 @@ ${map.move[move] || move}
       + '<input class="material-hidden-input" id="'+selId+'" value="">'
       + colorSection('표준품 색상', unique(standard), selId, part, catName, '')
       + (isScreenCat(catName)
-          ? colorSection((catName==='일자형 스크린'||catName==='L형 스크린')?'PET 주문품 색상':'패브릭 주문품 색상', unique(custom), selId, part, catName, '')
+          ? colorSection((catName==='일자형 스크린'||catName==='L형 스크린')?'주문품 색상 PET':'주문품 색상 패브릭', unique(custom), selId, part, catName, '')
           : colorSection('주문품 색상', unique(custom), selId, part, catName, ''))
       + '<div class="material-picker-hint">표준품/주문품 선택 버튼 없이 전체 색상을 카테고리별로 보여줍니다.</div>'
       + '<br><button class="confirm-btn" style="margin-top:10px;" onclick="confirmStdColorDrop(\''+catName+'\',\''+dataType+'\',\''+productKey+'\',\''+selId+'\')">색상 확인 ✓</button>';
@@ -15518,7 +15518,7 @@ window.showPanel = function(){
     var html='<b>'+esc(catName)+'</b> 스크린 색상을 선택해주세요:'
       + '<input class="material-hidden-input" id="'+selId+'" value="">'
       + section('표준품 색상', standard, selId, 'screen', catName)
-      + section((catName==='일자형 스크린'||catName==='L형 스크린')?'PET 주문품 색상':'패브릭 주문품 색상', custom, selId, 'screen', catName)
+      + section((catName==='일자형 스크린'||catName==='L형 스크린')?'주문품 색상 PET':'주문품 색상 패브릭 ', custom, selId, 'screen', catName)
       + '<button class="confirm-btn" style="margin-top:10px" onclick="confirmStdColorDrop(\''+esc(catName)+'\',\''+esc(pack.mode)+'\',\''+esc(pack.key)+'\',\''+esc(selId)+'\')">색상 확인 ✓</button>';
     if(typeof window.addMsg==='function') window.addMsg('bot',html);
     if(typeof window.scrollBottom==='function') window.scrollBottom();
