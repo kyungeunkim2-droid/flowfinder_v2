@@ -160,7 +160,7 @@ app.post('/api/generate-preview', async (req, res) => {
         casterType ? `Selected bottom support: ${casterType}. Preserve it if visible.` : '',
         topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
         size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
-        'Create one photorealistic office furniture catalog render.'
+        'Create one photorealistic office furniture catalog render.',
         guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching labeled panel.' : '',
       ].filter(Boolean).join('\n'),
     });
