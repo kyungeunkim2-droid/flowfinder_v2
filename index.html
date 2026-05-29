@@ -5515,26 +5515,35 @@ function calcAndFinish(catName) {
     var dChanged = !!(state.d && stdDval && state.d !== stdDval);
     var hChanged = !!(state.h && state.h !== 720);
 
-    var topRate = 1, pipeRate = 1, legRate = 1;
-    var labels = [];
+  var topRate = 1;
+var pipeRate = 1;
+var legRate = 1;
 
-    if (wChanged) {
-      topRate = Math.max(topRate, ffRateForFactory(topUnit && topUnit.factory, 'shrink'));
-      pipeRate = Math.max(pipeRate, ffRateForFactory(pipeUnit && pipeUnit.factory, 'shrink'));
-      labels.push('W변경');
-    }
-    if (dChanged) {
-      topRate = Math.max(topRate, ffRateForFactory(topUnit && topUnit.factory, 'shrink'));
-      if (isCircleOrLadder) {
-        legRate = Math.max(legRate, ffRateForFactory(legUnit && legUnit.factory, 'shrink'));
-      }
-      labels.push('D변경');
-    }
-    if (hChanged) {
-      legRate = Math.max(legRate, ffRateForFactory(legUnit && legUnit.factory, 'shrink'));
-      labels.push('H변경');
-    }
+var isAleg = state.legType === 'A자 4레그';
+var isCircleOrLadder =
+  state.legType === '사다리형 4레그' ||
+  state.legType === '원형 4레그';
 
+if (wChanged) {
+  topRate = Math.max(topRate, 1.15);
+  pipeRate = Math.max(pipeRate, state.w > stdW ? 1.5 : 1.3);
+  labels.push('W변경');
+}
+
+if (dChanged) {
+  topRate = Math.max(topRate, 1.15);
+
+  if (isCircleOrLadder) {
+    legRate = Math.max(legRate, state.d > stdD ? 1.5 : 1.3);
+  }
+
+  labels.push('D변경');
+}
+
+if (hChanged) {
+  legRate = Math.max(legRate, state.h > stdH ? 1.5 : 1.3);
+  labels.push('H변경');
+}
     // 주문 상판 색상은 상판에만, DCR/TS 주문 다리색은 사다리형/원형 다리에만 적용
     var topColor = state._deskTopColor || state.color || '';
     var isBKA = topColor.indexOf('BKA') !== -1;
@@ -5562,15 +5571,19 @@ if (state.topShape === '라운드 상판') {
     var isFrontOrSide = (catName === '전면 스크린' || catName === '사이드 스크린');
     var isLineOrL = (catName === '일자형 스크린' || catName === 'L형 스크린');
     var screenBaseH = isLineOrL ? 590 : 715;
-    if (catInfo.isScreen && state.h && state.h !== screenBaseH) {
+   if (isFrontOrSide && state.h && state.h !== screenBaseH)
       var hRate = state.h < screenBaseH ? 1.3 : 1.5;
       finalPrice = Math.floor(finalPrice * hRate / 1000) * 1000;
       rateLabel = state.h < screenBaseH ? 'H줄임' : 'H늘림';
     }
 
-    if (isFrontOrSide) {
-      // 전면/사이드: 인에이블 요율표 적용 (shrink)
-      if (state.colorType === '주문') {
+   if (isFrontOrSide) {
+
+  var hChanged =
+      state.h &&
+      state.h !== screenBaseH;
+
+  if (!hChanged && state.colorType === '주문') {
         finalPrice = Math.floor(finalPrice * RATE_TABLE[rateKey].shrink / 1000) * 1000;
         rateLabel = '주문품';
       }
@@ -5590,7 +5603,7 @@ if (state.topShape === '라운드 상판') {
         finalPrice = Math.floor(finalPrice * 1.1 / 1000) * 1000;
         rateLabel = '패브릭';
       }
-      if (state.colorType === '주문') {
+     if (!hChanged && state.colorType === '주문')
         var scrRate = RATE_TABLE[rateKey].color;
         finalPrice = Math.floor(finalPrice * scrRate / 1000) * 1000;
         rateLabel = rateLabel ? rateLabel + '+주문품' : '주문품';
