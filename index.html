@@ -14888,8 +14888,11 @@ window.showPanel = function(){
     var title=document.createElement('div');
     title.className='ff-screen-size-title';
     title.style.cssText='font-weight:900;color:#2ef2c9;margin-bottom:8px;line-height:1.55;';
-    title.innerHTML='&lt;@@스크린 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
-    b.insertBefore(title,b.firstChild);
+  var screenName =
+  (window.state && (state.screenLabel || state.screenName || state.screen || state._currentCatName)) ||
+  '스크린';
+
+title.innerHTML='<b>' + screenName + ' 사이즈입력</b><br>원하시는 사이즈를 확인/조절해주세요.';
   }
 
   // askSizeInput 최종 오버라이드: 스크린 사이즈 문구 고정
@@ -21378,7 +21381,11 @@ arr.push(
       if(el.children && el.children.length>6) return;
       var s=txt(el);
       if(s==='원하시는 사이즈를 확인/조절해주세요:' || s==='원하시는 사이즈를 확인/조절해주세요.'){
-        el.innerHTML='<b>&lt;@@스크린 사이즈입력&gt;</b><br>원하시는 사이즈를 확인/조절해주세요.';
+       var screenName =
+  (window.state && (state.screenLabel || state.screenName || state.screen || state._currentCatName)) ||
+  '스크린';
+
+el.innerHTML='<b>&lt;' + screenName + ' 사이즈입력&gt;</b><br>원하시는 사이즈를 확인/조절해주세요.';
       }
     });
   }
