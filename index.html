@@ -10887,51 +10887,7 @@ button.material-btn{
 }
 
 </style>
-<script id="ff107-compact-options-script">
-(function(){
-  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
-  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
-  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
-  var OPTIONS=[
-    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_external_3outlet.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_sliding_3outlet.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_embedded_2outlet.png'}
-    ]},
-    {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'images/options/accessories/pc_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'images/options/accessories/pc_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'images/options/accessories/pc_basic_hanging.png'}
-    ]},
-    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)'], img:'images/options/accessories/bag_hook.png'},
-      {name:'탑마운트 모니터 암', colors:['BK'], img:'images/options/accessories/monitor_arm_topmount.png'}
-    ]}
-  ];
-  window.ff107AccessoryOptions=OPTIONS;
-  window.ff102ShowOptions=function(){
-    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션을 선택하고 색상과 수량을 지정해주세요. 수량이 0이면 선택하지 않은 것으로 처리됩니다.</p>';
-    OPTIONS.forEach(function(group,gi){
-      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
-      group.items.forEach(function(item,ii){
-        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
-        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
-          +'<img class="ff107-option-img" src="'+esc(item.img)+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff102-option-row\').classList.add(\'ff107-no-img\');this.remove();">'
-          +'<div class="ff107-option-main">'
-          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
-          +'<div class="ff107-controls">'
-          +'<div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>'
-         ;
-      });
-      html+='</div></div>';
-    });
-    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
-    bot(html); scrollLatest();
-  };
-})();
-</script>
+<!-- removed broken duplicate ff107-compact-options-script; replaced by ff-options-compact-stable -->
 
 
 
@@ -15260,102 +15216,7 @@ async function drawTextureCanvas(target){
   .ff102-actions button{min-height:36px !important;padding:8px 12px !important;border-radius:12px !important;font-size:12px !important;font-weight:950 !important;}
   @media(max-width:760px){.ff102-option-list{grid-template-columns:1fr !important}.ff102-options-card{max-width:100% !important}}
 </style>
-<script id="ff-final-compact-options-js">
-(function(){
-  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
-  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
-  function user(html){ if(typeof addMsg==='function') addMsg('user', html); }
-  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
-  var OPTIONS=(window.ff108AccessoryOptions||window.ff107AccessoryOptions||[
-    {cat:'멀티탭', note:'', items:[{name:'외장 3구 멀티탭', colors:['WW','BK']},{name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK']},{name:'매립형 2구 멀티탭', colors:['WW','BK']}]},
-    {cat:'PC홀더', note:'', items:[{name:'행잉 PC홀더', colors:['WH','BK']},{name:'스트랩 PC홀더', colors:['BK']},{name:'보급형 행잉 PC홀더', colors:['BK']}]},
-    {cat:'기타', note:'', items:[{name:'가방걸이', colors:['XX(투명)']},{name:'탑마운트 모니터 암', colors:['BK']}]}
-  ]);
-window.ff102ToggleOption=function(rowId){
-  var row=document.getElementById(rowId); 
-  if(!row) return;
-
-  row.classList.toggle('active');
-
-  var btn = row.querySelector('.ff102-pick');
-  if(btn) btn.classList.toggle('selected', row.classList.contains('active'));
-};
-  window.ff102SyncRow=function(rowId){
-    var row=document.getElementById(rowId); if(!row) return;
-    var input=row.querySelector('input[type="number"]');
-    var q=input ? (parseInt(input.value||'0',10)||0) : (row.classList.contains('active') ? 1 : 0);
-    row.classList.toggle('active', q>0);
-  };
-  window.ff102StepQty=function(rowId,delta){ window.ff102ToggleOption(rowId); };
-  window.ff102ShowOptions=function(){
-    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>제품명과 색상만 선택하세요. 선택한 항목은 각 1개로 견적에 반영됩니다.</p>';
-    OPTIONS.forEach(function(group,gi){
-      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
-      (group.items||[]).forEach(function(item,ii){
-        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
-        var colors=(item.colors&&item.colors.length?item.colors:['']);
-        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
-          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
-          +'<div class="ff107-controls"><div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>+'</select></div></div>'
-+'</div>';
-      });
-      html+='</div></div>';
-    });
-    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
-    bot(html); scrollLatest();
-  };
-  function saveChosen(chosen){
-    if(window.state){
-      state.extraOptionItems=chosen;
-      state._ff102OptionsHandled=true;
-      state._ff101OptionsHandled=true;
-      state._ff100OptionsDone=true;
-      state._ff96OptionsAsked=true;
-      state._ff97FinalOptionsAsked=true;
-    }
-  }
-  function nextActions(){
-    if(window.state){ state.step='next_actions'; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
-    scrollLatest();
-  }
-  window.ff102ApplyOptions=function(){
-    var chosen=[];
-    OPTIONS.forEach(function(group,gi){(group.items||[]).forEach(function(item,ii){
-      var row=document.getElementById('ff102row_'+gi+'_'+ii);
-      if(row && row.classList.contains('active')){
-        var color=(document.getElementById('ff102_'+gi+'_'+ii+'_color')||{}).value||'';
-        chosen.push({category:group.cat,name:item.name,color:color,qty:1});
-      }
-    });});
-    saveChosen(chosen);
-    user(chosen.length?chosen.map(function(x){return esc(x.name)+' / '+esc(x.color);}).join('<br>'):'추가 옵션 없음');
-    nextActions();
-  };
-  window.ff102SkipOptions=function(){ saveChosen([]); user('추가 옵션 없음'); nextActions(); };
-
-  // DCR/TS 포함 모든 재질 버튼은 이미지 경로 유무와 관계없이 선택되도록 마지막에 복구
-  window.ffSelectMaterialButton=function(inputId, code, part, btn){
-    var input=document.getElementById(inputId);
-    if(input){ input.value=code; input.style.borderColor=''; }
-    var scope = part==='top' ? document : (btn && btn.parentElement ? btn.parentElement : document);
-    var selector = part==='top' ? '.material-btn[data-part="top"]' : '.material-btn';
-    Array.prototype.forEach.call(scope.querySelectorAll(selector), function(b){ b.classList.remove('active','selected'); });
-    if(btn){ btn.classList.add('active','selected'); }
-    try{ if(typeof ffHoverMaterial==='function') ffHoverMaterial(inputId, code, part); }catch(e){}
-    try{
-      if(part==='top' || part==='leg'){
-        var peer=input && input.getAttribute('data-peer');
-        if(peer && typeof deskColorPairPreview==='function') deskColorPairPreview(part==='top'?inputId:peer, part==='leg'?inputId:peer);
-      }else if(typeof stdColorPreview==='function') stdColorPreview(code);
-    }catch(e){}
-    return true;
-  };
-})();
-</script>
+<!-- removed broken duplicate ff-final-compact-options-js; replaced by ff-options-compact-stable -->
 <!-- === /FINAL HOTFIX === -->
 
 
@@ -15839,6 +15700,290 @@ window.ff102ToggleOption=function(rowId){
 })();
 </script>
 <!-- === /FF FINAL HOTFIX === -->
+
+
+<!-- === FF OPTIONS COMPACT STABLE PATCH === -->
+<style id="ff-options-compact-stable-css">
+.ff102-options-card{
+  width:min(100%, 460px) !important;
+  max-width:460px !important;
+  padding:16px !important;
+  border-radius:18px !important;
+  background:#0f172a !important;
+  border:1px solid rgba(45,212,191,.30) !important;
+  color:#e5f7ff !important;
+}
+.ff102-options-card h3{
+  margin:0 0 8px !important;
+  font-size:22px !important;
+  color:#2fffd2 !important;
+  line-height:1.2 !important;
+}
+.ff102-options-card p{
+  margin:0 0 12px !important;
+  font-size:12px !important;
+  line-height:1.55 !important;
+  color:#cbd5e1 !important;
+}
+.ff102-cat{margin:10px 0 12px !important;}
+.ff102-cat-title{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  margin:0 0 6px !important;
+}
+.ff102-cat-title span{
+  font-size:16px !important;
+  font-weight:900 !important;
+  color:#2fffd2 !important;
+}
+.ff102-cat-title small{
+  font-size:10px !important;
+  color:#c084fc !important;
+  font-weight:800 !important;
+}
+.ff102-option-list{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:6px !important;
+}
+.ff102-option-row{
+  display:grid !important;
+  grid-template-columns:42px minmax(0,1fr) 64px !important;
+  gap:8px !important;
+  align-items:center !important;
+  min-height:50px !important;
+  padding:6px 8px !important;
+  border-radius:13px !important;
+  border:1px solid rgba(45,212,191,.35) !important;
+  background:rgba(15,23,42,.72) !important;
+}
+.ff102-option-row.active{
+  border-color:#2fffd2 !important;
+  background:rgba(20,83,45,.28) !important;
+  box-shadow:0 0 0 2px rgba(45,212,191,.14),0 0 18px rgba(45,212,191,.18) !important;
+}
+.ff107-option-img{
+  width:38px !important;
+  height:38px !important;
+  object-fit:contain !important;
+  display:block !important;
+  background:#fff !important;
+  border-radius:8px !important;
+  padding:4px !important;
+  border:1px solid rgba(255,255,255,.22) !important;
+}
+.ff102-pick{
+  width:100% !important;
+  min-width:0 !important;
+  height:32px !important;
+  padding:0 10px !important;
+  border-radius:10px !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  background:rgba(15,23,42,.95) !important;
+  color:#f8fafc !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  text-align:left !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:ellipsis !important;
+  cursor:pointer !important;
+}
+.ff102-pick.selected,
+.ff102-option-row.active .ff102-pick{
+  background:#2fffd2 !important;
+  color:#00131d !important;
+  border-color:#2fffd2 !important;
+}
+.ff107-controls{display:flex !important;align-items:center !important;justify-content:flex-end !important;}
+.ff102-field{margin:0 !important;}
+.ff102-field label{display:none !important;}
+.ff102-field select{
+  width:62px !important;
+  height:30px !important;
+  padding:3px 6px !important;
+  border-radius:9px !important;
+  border:1px solid rgba(45,212,191,.55) !important;
+  background:#082f36 !important;
+  color:#fff !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+}
+.ff102-actions{
+  display:flex !important;
+  gap:8px !important;
+  margin-top:12px !important;
+}
+.ff102-actions button{
+  height:36px !important;
+  padding:0 12px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+  cursor:pointer !important;
+}
+.ff102-actions button.primary{
+  background:linear-gradient(135deg,#ff7a1a,#ff4d00) !important;
+  color:#fff !important;
+  border-color:#ff7a1a !important;
+}
+.ff102-option-row.ff107-no-img{
+  grid-template-columns:minmax(0,1fr) 64px !important;
+}
+.ff102-option-row.ff107-no-img .ff107-option-img{display:none !important;}
+</style>
+<script id="ff-options-compact-stable-js">
+(function(){
+  function esc(s){
+    return String(s==null?'':s).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function bot(html){
+    if(typeof addMsg==='function') addMsg('bot', html);
+    else {
+      var m=document.getElementById('messages');
+      if(m){ var d=document.createElement('div'); d.className='msg bot'; d.innerHTML='<div class="bubble">'+html+'</div>'; m.appendChild(d); }
+    }
+  }
+  function user(html){
+    if(typeof addMsg==='function') addMsg('user', html);
+    else {
+      var m=document.getElementById('messages');
+      if(m){ var d=document.createElement('div'); d.className='msg user'; d.innerHTML='<div class="bubble">'+html+'</div>'; m.appendChild(d); }
+    }
+  }
+  function scrollLatest(){
+    var m=document.getElementById('messages');
+    if(m) setTimeout(function(){ m.scrollTop=m.scrollHeight; }, 0);
+  }
+
+  var OPTIONS = window.ff107AccessoryOptions || window.ff108AccessoryOptions || [
+    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_embedded_2outlet.png'}
+    ]},
+    {cat:'PC홀더', note:'', items:[
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'images/options/accessories/pc_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'images/options/accessories/pc_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'images/options/accessories/pc_basic_hanging.png'}
+    ]},
+    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'가방걸이', colors:['XX(투명)'], img:'images/options/accessories/bag_hook.png'},
+      {name:'탑마운트 모니터 암', colors:['BK'], img:'images/options/accessories/monitor_arm_topmount.png'}
+    ]}
+  ];
+  window.ff107AccessoryOptions = OPTIONS;
+  window.ff108AccessoryOptions = OPTIONS;
+
+  window.ff102ToggleOption=function(rowId){
+    var row=document.getElementById(rowId);
+    if(!row) return;
+    row.classList.toggle('active');
+    var btn=row.querySelector('.ff102-pick');
+    if(btn) btn.classList.toggle('selected', row.classList.contains('active'));
+  };
+
+  window.ff102SyncRow=function(rowId){
+    var row=document.getElementById(rowId);
+    if(!row) return;
+    var input=row.querySelector('input[type="number"]');
+    var q=input ? (parseInt(input.value||'0',10)||0) : (row.classList.contains('active')?1:0);
+    row.classList.toggle('active', q>0);
+    var btn=row.querySelector('.ff102-pick');
+    if(btn) btn.classList.toggle('selected', row.classList.contains('active'));
+  };
+
+  window.ff102StepQty=function(rowId,delta){
+    window.ff102ToggleOption(rowId);
+  };
+
+  window.ff102ShowOptions=function(){
+    if(window.state){
+      state.step='final_options';
+      state._ff102OptionsVisible=true;
+    }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+
+    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션은 제품명 버튼으로 선택하고 색상만 지정해주세요. 선택한 항목은 각 1개로 견적에 반영됩니다.</p>';
+
+    OPTIONS.forEach(function(group,gi){
+      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
+      (group.items||[]).forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii;
+        var rowId='ff102row_'+gi+'_'+ii;
+        var colors=(item.colors&&item.colors.length)?item.colors:[''];
+        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
+          +'<img class="ff107-option-img" src="'+esc(item.img||'')+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff102-option-row\').classList.add(\'ff107-no-img\');this.remove();">'
+          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
+          +'<div class="ff107-controls"><div class="ff102-field"><select id="'+id+'_color">'
+          +colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')
+          +'</select></div></div>'
+          +'</div>';
+      });
+      html+='</div></div>';
+    });
+
+    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
+    bot(html);
+    scrollLatest();
+  };
+
+  function saveChosen(chosen){
+    if(window.state){
+      state.extraOptionItems=chosen;
+      state._ff102OptionsHandled=true;
+      state._ff101OptionsHandled=true;
+      state._ff100OptionsDone=true;
+      state._ff96OptionsAsked=true;
+      state._ff97FinalOptionsAsked=true;
+    }
+  }
+
+  function nextActions(){
+    if(window.state){ state.step='next_actions'; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
+    scrollLatest();
+  }
+
+  window.ff102ApplyOptions=function(){
+    var chosen=[];
+    OPTIONS.forEach(function(group,gi){
+      (group.items||[]).forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii;
+        var row=document.getElementById('ff102row_'+gi+'_'+ii);
+        if(row && row.classList.contains('active')){
+          var color=(document.getElementById(id+'_color')||{}).value||'';
+          chosen.push({category:group.cat,name:item.name,color:color,qty:1});
+        }
+      });
+    });
+    saveChosen(chosen);
+    user(chosen.length ? chosen.map(function(x){return esc(x.name)+' / '+esc(x.color)+' / 1개';}).join('<br>') : '추가 옵션 없음');
+    nextActions();
+  };
+
+  window.ff102SkipOptions=function(){
+    saveChosen([]);
+    user('추가 옵션 없음');
+    nextActions();
+  };
+
+  window.ff102ShowNextActions=nextActions;
+  window.askContinue=function(){
+    if(window.state && !state._ff102OptionsHandled){
+      window.ff102ShowOptions();
+      return;
+    }
+    nextActions();
+  };
+})();
+</script>
+<!-- === /FF OPTIONS COMPACT STABLE PATCH === -->
 
 </body>
 
@@ -19122,138 +19267,7 @@ var OPTION_IMG = {
   font-size:11px !important;
 }
 </style>
-<script id="ff102-final-patch-script">
-(function(){
-  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
-  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
-  function user(html){ if(typeof addMsg==='function') addMsg('user', html); }
-  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },80); }
-  var OPTIONS=[
-    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK']},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK']},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK']}
-    ]},
-    {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK']},
-      {name:'스트랩 PC홀더', colors:['BK']},
-      {name:'보급형 행잉 PC홀더', colors:['BK']}
-    ]},
-    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)']},
-      {name:'탑마운트 모니터 암', colors:['BK']}
-    ]}
-  ];
-  function saveChosen(chosen){
-    if(window.state){
-      state.extraOptionItems=chosen;
-      state._ff102OptionsHandled=true;
-      state._ff101OptionsHandled=true;
-      state._ff100OptionsDone=true;
-      state._ff96OptionsAsked=true;
-      state._ff97FinalOptionsAsked=true;
-    }
-  }
-  function nextActions(){
-    if(window.state){ state.step='next_actions'; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
-    scrollLatest();
-  }
-  window.ff102ToggleOption=function(rowId){
-    var row=document.getElementById(rowId); if(!row) return;
-    var input=row.querySelector('input[type="number"]'); if(!input) return;
-    var q=Math.max(0,parseInt(input.value||'0',10)||0);
-    input.value=q>0?0:1;
-    window.ff102SyncRow(rowId);
-  };
-  window.ff102StepQty=function(rowId,delta){
-    var row=document.getElementById(rowId); if(!row) return;
-    var input=row.querySelector('input[type="number"]'); if(!input) return;
-    var q=Math.max(0,parseInt(input.value||'0',10)||0);
-    input.value=Math.max(0,q+(delta||0));
-    window.ff102SyncRow(rowId);
-  };
-  window.ff102SyncRow=function(rowId){
-    var row=document.getElementById(rowId); if(!row) return;
-    var input=row.querySelector('input[type="number"]');
-    var q=Math.max(0,parseInt((input&&input.value)||'0',10)||0);
-    row.classList.toggle('active',q>0);
-  };
-  window.ff102ShowOptions=function(){
-    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션을 버튼으로 선택하고, 색상과 수량을 지정해주세요. 수량이 0이면 선택하지 않은 것으로 처리됩니다.</p>';
-    OPTIONS.forEach(function(group,gi){
-      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
-      group.items.forEach(function(item,ii){
-        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
-        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
-          +'<button type="button" class="ff102-pick" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
-          +'<div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>'
-          +'<div class="ff102-field"><label>수량</label><div class="ff102-qty"><button type="button" onclick="ff102StepQty(\''+rowId+'\',-1)">−</button><input id="'+id+'_qty" type="number" min="0" value="0" oninput="ff102SyncRow(\''+rowId+'\')"><button type="button" onclick="ff102StepQty(\''+rowId+'\',1)">+</button></div></div>'
-          +'</div>';
-      });
-      html+='</div></div>';
-    });
-    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
-    bot(html); scrollLatest();
-  };
-  window.ff102ApplyOptions=function(){
-    var chosen=[];
-    OPTIONS.forEach(function(group,gi){group.items.forEach(function(item,ii){
-      var id='ff102_'+gi+'_'+ii;
-     var color=(document.getElementById(id+'_color')||{}).value||'';
-
-var row=document.getElementById('ff102row_'+gi+'_'+ii);
-
-if(row && row.classList.contains('active')){
-  chosen.push({
-    category:group.cat,
-    name:item.name,
-    color:color,
-    qty:1
-  });
-}
-    saveChosen(chosen);
-    user(chosen.length?chosen.map(function(x){return esc(x.name)+' / '+esc(x.color)+' / '+x.qty+'개';}).join('<br>'):'추가 옵션 없음');
-    nextActions();
-  };
-  window.ff102SkipOptions=function(){ saveChosen([]); user('추가 옵션 없음'); nextActions(); };
-  window.ff102ShowNextActions=nextActions;
-  window.askContinue=function(){
-    if(window.state && !state._ff102OptionsHandled){ window.ff102ShowOptions(); return; }
-    nextActions();
-  };
-  var baseShowFinalQuote=window.showFinalQuote;
-  window.showFinalQuote=function(){
-    if(window.state && !state._ff102OptionsHandled){ window.ff102ShowOptions(); return; }
-    if(typeof baseShowFinalQuote==='function') return baseShowFinalQuote.apply(this, arguments);
-  };
-  window.ffFinishBundleNow=function(){ if(window.state) state.currentCatIdx=(state.selectedCategories||[]).length; window.askContinue(); };
-  window.ffFinishBundleNow46=window.ffFinishBundleNow;
-  window.ffSkipRemainingBundle=window.ffFinishBundleNow;
-  window.showFinishDecision=function(catName){
-    if(window.state){ state.step='finish_decision'; state._currentCatName=catName; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    var safe=String(catName||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    bot('<div class="ff-finish-menu"><b>견적을 확인하시겠습니까?</b><p>현재 선택한 제품 구성이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="calcAndFinish && calcAndFinish(\''+safe+'\')">견적확인하기</button><button onclick="goBack && goBack()">이전단계</button></div></div>');
-    scrollLatest();
-  };
-  function reorderButtons(){
-    document.querySelectorAll('.ff-menu-btns').forEach(function(box){
-      var btns=Array.prototype.slice.call(box.querySelectorAll('button'));
-      if(btns.length<2) return;
-      var cont=btns.find(function(b){return /이어하기|견적확인하기|옵션 선택 완료|최종 견적서 보기/.test((b.textContent||''));});
-      var prev=btns.find(function(b){return /이전단계/.test((b.textContent||''));});
-      if(cont && prev && box.firstElementChild!==cont){ box.insertBefore(cont, box.firstElementChild); box.appendChild(prev); }
-    });
-  }
-  document.addEventListener('click',function(){setTimeout(reorderButtons,30);},true);
-  if(document.body){ new MutationObserver(function(){reorderButtons();}).observe(document.body,{childList:true,subtree:true}); }
-  setTimeout(reorderButtons,100);
-})();
-</script>
+<!-- removed broken duplicate ff102-final-patch-script; replaced by ff-options-compact-stable -->
 
 
 <!-- === FF108: readable accessory option cards - final override === -->
@@ -19490,53 +19504,7 @@ if(row && row.classList.contains('active')){
 }
 
 </style>
-<script id="ff108-readable-accessory-options-script">
-(function(){
-  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
-  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
-  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
-  var OPTIONS=[
-    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_external_3outlet.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_sliding_3outlet.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'images/options/accessories/multitap_embedded_2outlet.png'}
-    ]},
-    {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'images/options/accessories/pc_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'images/options/accessories/pc_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'images/options/accessories/pc_basic_hanging.png'}
-    ]},
-    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)'], img:'images/options/accessories/bag_hook.png'},
-      {name:'탑마운트 모니터 암', colors:['BK'], img:'images/options/accessories/monitor_arm_topmount.png'}
-    ]}
-  ];
-  window.ff107AccessoryOptions=OPTIONS;
-  window.ff108AccessoryOptions=OPTIONS;
-  window.ff102ShowOptions=function(){
-    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
-    if(typeof updateFlowBar==='function') updateFlowBar();
-    var html='<div class="ff102-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션을 선택하고 색상과 수량을 지정해주세요.<br>수량이 0이면 선택하지 않은 것으로 처리됩니다.</p>';
-    OPTIONS.forEach(function(group,gi){
-      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
-      group.items.forEach(function(item,ii){
-        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
-        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
-          +'<img class="ff107-option-img" src="'+esc(item.img)+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff102-option-row\').classList.add(\'ff107-no-img\');this.remove();">'
-          +'<div class="ff107-option-main">'
-          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
-          +'<div class="ff107-controls">'
-          +'<div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>'
-          +'<div class="ff102-field"><label>수량</label><div class="ff102-qty"><button type="button" onclick="ff102StepQty(\''+rowId+'\',-1)">−</button><input id="'+id+'_qty" type="number" min="0" value="0" oninput="ff102SyncRow(\''+rowId+'\')"><button type="button" onclick="ff102StepQty(\''+rowId+'\',1)">+</button></div></div>'
-          +'</div></div></div>';
-      });
-      html+='</div></div>';
-    });
-    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
-    bot(html); scrollLatest();
-  };
-})();
-</script>
+<!-- removed broken duplicate ff108-readable-accessory-options-script; replaced by ff-options-compact-stable -->
 
 <!-- === FF111: AI result under material preview + lightweight Nano payload === -->
 <style id="ff111-ai-under-material-css">
