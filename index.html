@@ -5547,10 +5547,12 @@ function calcAndFinish(catName) {
       labels.push('다리 ' + state._deskLegColor);
     }
 
-    if (state.topShape === '라운드 상판') {
-      topRate = Math.max(topRate, topRate * 1.2);
-      labels.push('R값');
-    }
+   /*
+if (state.topShape === '라운드 상판') {
+    topRate = Math.max(topRate, topRate * 1.2);
+    labels.push('R값');
+}
+*/
 
     finalPrice = ffRound1000(topBasePart * topRate + pipeBasePart * pipeRate + legBasePart * legRate);
     rateLabel = labels.length ? labels.join('+') : null;
