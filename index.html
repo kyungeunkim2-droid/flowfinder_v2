@@ -15762,6 +15762,354 @@ window.showPanel = function(){
 })();
 </script>
 
+
+
+<!-- === FF FINAL HOTFIX: material values + compact accessory options + label cleanup === -->
+<style id="ff-final-material-options-hotfix-css">
+  /* 재질 선택값 카드: 보라색 '다리 선택' 배지 제거하고 실제 선택값 중심으로 표시 */
+  #texture-preview .texture-name-badge,
+  #texture-name{
+    background:#0b2a33 !important;
+    border:1px solid rgba(46,242,201,.35) !important;
+    color:#dffef8 !important;
+  }
+  #texture-preview .quick-materials{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:8px !important;
+  }
+  #texture-preview .material-chip-row{
+    min-width:0 !important;
+    grid-template-columns:52px 1fr 34px !important;
+    padding:8px !important;
+    min-height:44px !important;
+    overflow:hidden !important;
+  }
+  #texture-preview .material-chip-row span,
+  #texture-preview .material-chip-row i{
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+  #texture-preview .material-chip-row i{
+    color:#fff !important;
+    font-weight:1000 !important;
+    text-align:left !important;
+  }
+  #texture-preview .material-chip-row em{
+    width:30px !important;
+    height:28px !important;
+    border-radius:8px !important;
+  }
+
+  /* 옵션 추가창: 멀티탭 / PC홀더 / 기타가 한눈에 보이도록 압축 */
+  .ff102-options-card,
+  .ff96-options-card,
+  .ff-final-options-compact{
+    max-width:100% !important;
+    padding:12px !important;
+    border-radius:16px !important;
+    overflow:hidden !important;
+  }
+  .ff102-options-card h3,
+  .ff96-options-card h3,
+  .ff-final-options-compact h3{
+    font-size:15px !important;
+    margin:0 0 4px !important;
+  }
+  .ff102-options-card p,
+  .ff96-options-card p,
+  .ff-final-options-compact p{
+    font-size:11px !important;
+    line-height:1.35 !important;
+    margin:0 0 8px !important;
+    color:#9fb1c8 !important;
+  }
+  .ff102-cat{
+    margin:7px 0 !important;
+    padding:8px !important;
+    border:1px solid rgba(255,255,255,.10) !important;
+    border-radius:13px !important;
+    background:rgba(8,15,26,.48) !important;
+  }
+  .ff102-cat-title{
+    display:flex !important;
+    justify-content:space-between !important;
+    align-items:center !important;
+    gap:6px !important;
+    margin-bottom:6px !important;
+  }
+  .ff102-cat-title span{
+    font-size:12px !important;
+    font-weight:1000 !important;
+    color:#2ef2c9 !important;
+  }
+  .ff102-cat-title small{
+    font-size:9px !important;
+    color:#94a3b8 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+  .ff102-option-list{
+    display:grid !important;
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:7px !important;
+  }
+  .ff102-option-row{
+    display:grid !important;
+    grid-template-columns:42px 1fr !important;
+    gap:6px !important;
+    align-items:center !important;
+    min-width:0 !important;
+    padding:6px !important;
+    border-radius:11px !important;
+    border:1px solid rgba(255,255,255,.10) !important;
+    background:#0b1220 !important;
+    overflow:hidden !important;
+  }
+  .ff102-option-row.active{
+    border-color:#ff7a1a !important;
+    box-shadow:0 0 0 2px rgba(255,122,26,.18) !important;
+  }
+  .ff102-option-row img,
+  .ff107-option-img,
+  .ff-final-option-img{
+    display:block !important;
+    width:42px !important;
+    height:34px !important;
+    object-fit:contain !important;
+    background:#fff !important;
+    border-radius:8px !important;
+    padding:3px !important;
+    grid-row:1 / span 2 !important;
+  }
+  .ff107-option-main,
+  .ff-final-option-main{
+    min-width:0 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:4px !important;
+  }
+  .ff102-pick{
+    width:100% !important;
+    max-width:100% !important;
+    min-height:26px !important;
+    padding:5px 6px !important;
+    border-radius:8px !important;
+    font-size:10.5px !important;
+    line-height:1.15 !important;
+    white-space:normal !important;
+    word-break:keep-all !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2 !important;
+    -webkit-box-orient:vertical !important;
+  }
+  .ff107-controls,
+  .ff-final-option-controls{
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:4px !important;
+    min-width:0 !important;
+  }
+  .ff102-field label{display:none !important;}
+  .ff102-field select{
+    width:100% !important;
+    min-width:0 !important;
+    height:26px !important;
+    padding:2px 6px !important;
+    border-radius:7px !important;
+    font-size:10px !important;
+  }
+  .ff102-qty,
+  .ff102-field:has(.ff102-qty){
+    display:none !important;
+  }
+  .ff102-actions{
+    display:flex !important;
+    gap:8px !important;
+    margin-top:8px !important;
+  }
+  .ff102-actions button{
+    flex:1 !important;
+    min-height:34px !important;
+    padding:7px 10px !important;
+    border-radius:10px !important;
+    font-size:12px !important;
+  }
+  @media(max-width:760px){
+    .ff102-option-list{grid-template-columns:repeat(2,minmax(0,1fr)) !important;}
+  }
+</style>
+<script id="ff-final-material-options-hotfix-js">
+(function(){
+  'use strict';
+  function $(id){return document.getElementById(id);}
+  function qsa(sel,root){return Array.prototype.slice.call((root||document).querySelectorAll(sel));}
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function S(){window.state=window.state||{}; window.state.current=window.state.current||{}; return window.state;}
+  function cleanCode(v){return String(v||'').trim().replace(/^LEG_/i,'').replace(/^TOP_/i,'').replace(/^SCREEN_/i,'');}
+  function fallbackColor(code){
+    var m={WW:'#f7f5ef',WWK:'#eee5d6',W:'#fff',WH:'#fff',HW:'#c49a6c',OSG:'#b9b3a9',OGG:'#8c846f',DCR:'#4d4038',TS:'#9a8e7c',DSG:'#777b80',BKM:'#101010',BK:'#101010',BGM:'#b7a991'};
+    return m[String(code||'').toUpperCase()]||'#9aa3af';
+  }
+  function tex(code,part,cat){
+    code=cleanCode(code); if(!code) return '';
+    try{ if(typeof window.ffMaterialTextureUrl==='function'){var u=window.ffMaterialTextureUrl((part==='leg'?'LEG_':'')+code,part); if(u) return u;} }catch(e){}
+    try{ if(typeof window._ffLocalTextureForCode==='function'){var u2=window._ffLocalTextureForCode(part==='leg'?'LEG_'+code:code,cat||''); if(u2) return u2;} }catch(e){}
+    try{var m=window.TEXTURE_MAP||{}; return m[(part==='leg'?'LEG_':'')+code]||m[(part==='screen'?'SCREEN_':'')+code]||m[code]||'';}catch(e){}
+    return '';
+  }
+  function setRow(part, code, texture){
+    code=cleanCode(code); if(!code) return;
+    var map={top:['quick-top-code','quick-top-chip','quick-top-row'],leg:['quick-leg-code','quick-leg-chip','quick-leg-row'],screen:['quick-screen-code','quick-screen-chip','quick-screen-row']};
+    var a=map[part]; if(!a) return;
+    var codeEl=$(a[0]), chip=$(a[1]), row=$(a[2]);
+    if(codeEl) codeEl.textContent=code;
+    if(chip){
+      var url=texture||tex(code,part,(S()._currentCatName||S().currentCatName||''));
+      if(url){ chip.style.backgroundImage='url("'+url.replace(/"/g,'%22')+'")'; chip.style.backgroundColor='#222'; }
+      else { chip.style.backgroundImage='none'; chip.style.backgroundColor=fallbackColor(code); }
+      chip.style.backgroundSize='cover'; chip.style.backgroundPosition='center';
+    }
+    if(row){
+      row.classList.remove('active-top','active-leg','active-screen');
+      row.classList.add(part==='top'?'active-top':part==='leg'?'active-leg':'active-screen');
+      setTimeout(function(){row.classList.remove('active-top','active-leg','active-screen');},1200);
+    }
+    var badge=$('texture-name'); if(badge) badge.textContent='재질 선택값';
+    var panel=$('texture-preview'); if(panel) panel.style.display='block';
+  }
+  function syncFromState(){
+    var s=S(), c=s.current||{};
+    setRow('top', s.topColor||s.topCode||s.top||s._deskTopColor||c.topColor||'', s.topTex||s.topTexture||'');
+    setRow('leg', s.legColor||s.legCode||s.leg||s._deskLegColor||c.legColor||'', s.legTex||s.legTexture||'');
+    setRow('screen', s.screenColor||s.screenCode||s.screen||s.color||c.color||'', s.screenTex||s.screenTexture||'');
+    var badge=$('texture-name'); if(badge && /다리 선택|상판 선택|스크린 선택|준비중/.test(badge.textContent||'')) badge.textContent='재질 선택값';
+  }
+  var oldSelect=window.ffSelectMaterialButton;
+  window.ffSelectMaterialButton=function(inputId, code, part, btn){
+    var r=false;
+    try{ if(typeof oldSelect==='function') r=oldSelect.apply(this,arguments); }catch(e){console.warn('[ff final select previous]',e);}
+    var input=$(inputId); if(input) input.value=code;
+    part=String(part||'').toLowerCase();
+    if(part!=='leg' && part!=='screen') part='top';
+    var s=S();
+    if(part==='top'){s.topColor=code; s.topCode=code; s.top=code; s._deskTopColor=code; s.current.topColor=code;}
+    if(part==='leg'){s.legColor=code; s.legCode=code; s.leg=code; s._deskLegColor=code; s.current.legColor=code;}
+    if(part==='screen'){s.screenColor=code; s.screenCode=code; s.screen=code; s.current.color=code;}
+    qsa('.material-btn[data-input="'+String(inputId).replace(/"/g,'\\"')+'"]').forEach(function(b){b.classList.remove('active','selected');});
+    if(btn){btn.classList.add('active','selected');}
+    var texture='';
+    try{ var th=btn&&btn.querySelector&&btn.querySelector('.mat-thumb'); if(th){ var bg=th.style.backgroundImage||''; texture=bg.replace(/^url\(["']?/,'').replace(/["']?\)$/,''); } }catch(e){}
+    setRow(part, code, texture);
+    try{ if(window.FlowFinderFastPreview&&window.FlowFinderFastPreview.state){
+      var pv=window.FlowFinderFastPreview.state;
+      if(part==='top'){pv.top=cleanCode(code); pv.topTex=texture||tex(code,'top');}
+      if(part==='leg'){pv.leg=cleanCode(code); pv.legTex=texture||tex(code,'leg');}
+      if(part==='screen'){pv.screen=cleanCode(code); pv.screenTex=texture||tex(code,'screen');}
+      if(typeof window.FlowFinderFastPreview.render==='function') window.FlowFinderFastPreview.render(part);
+    }}catch(e){}
+    setTimeout(syncFromState,20);
+    return r||false;
+  };
+
+  /* 옵션 추가창: 수량 없이 제품명 + 색상 + 이미지로만 선택 */
+  var OPTIONS=(window.ff107AccessoryOptions||window.ff108AccessoryOptions||[
+    {cat:'멀티탭',note:'상판 주문품 요율 적용 가능',items:[
+      {name:'외장 3구 멀티탭',colors:['WW','BK'],img:'images/options/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭',colors:['WW','BK'],img:'images/options/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭',colors:['WW','BK'],img:'images/options/accessories/multitap_embedded_2outlet.png'}]},
+    {cat:'PC홀더',note:'제품별 색상 선택',items:[
+      {name:'행잉 PC홀더',colors:['WH','BK'],img:'images/options/accessories/pc_hanging.png'},
+      {name:'스트랩 PC홀더',colors:['BK'],img:'images/options/accessories/pc_strap.png'},
+      {name:'보급형 행잉 PC홀더',colors:['BK'],img:'images/options/accessories/pc_basic_hanging.png'}]},
+    {cat:'기타',note:'상판 주문품 요율 적용 가능',items:[
+      {name:'가방걸이',colors:['XX(투명)'],img:'images/options/accessories/bag_hook.png'},
+      {name:'탑마운트 모니터 암',colors:['BK'],img:'images/options/accessories/monitor_arm_topmount.png'}]}
+  ]);
+  window.ff107AccessoryOptions=OPTIONS; window.ff108AccessoryOptions=OPTIONS;
+  function bot(html){ if(typeof window.addMsg==='function') window.addMsg('bot',html); }
+  function user(html){ if(typeof window.addMsg==='function') window.addMsg('user',html); }
+  function scrollLatest(){setTimeout(function(){var m=$('messages'); if(m) m.scrollTop=m.scrollHeight;},40);}
+  function saveChosen(chosen){
+    var s=S(); s.addonOptions=chosen; s.extraOptions=chosen; s._ff102OptionsHandled=true; s._ff102OptionsVisible=false;
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+  }
+  function nextActions(){
+    var s=S(); s.step='next_actions';
+    try{ if(typeof window.updateFlowBar==='function') window.updateFlowBar(); }catch(e){}
+    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
+    scrollLatest();
+  }
+  window.ff102ToggleOption=function(rowId){
+    var row=$(rowId); if(!row) return;
+    row.classList.toggle('active');
+    var hidden=row.querySelector('input[type="hidden"][data-qty]');
+    if(hidden) hidden.value=row.classList.contains('active')?'1':'0';
+  };
+  window.ff102SyncRow=function(rowId){ var row=$(rowId); if(row) row.classList.toggle('active', !!(row.querySelector('input[type="hidden"][data-qty]')||{}).value); };
+  window.ff102StepQty=function(rowId,delta){ window.ff102ToggleOption(rowId); };
+  function showOptions(){
+    var s=S(); s.step='final_options'; s._ff102OptionsVisible=true;
+    try{ if(typeof window.updateFlowBar==='function') window.updateFlowBar(); }catch(e){}
+    var html='<div class="ff102-options-card ff-final-options-compact"><h3>옵션을 추가하시겠습니까?</h3><p>멀티탭, PC홀더, 기타 옵션을 선택하세요. 수량 입력 없이 선택된 항목은 각 1개로 반영됩니다.</p>';
+    OPTIONS.forEach(function(group,gi){
+      html+='<div class="ff102-cat"><div class="ff102-cat-title"><span>'+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
+      (group.items||[]).forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
+        html+='<div id="'+rowId+'" class="ff102-option-row" data-gi="'+gi+'" data-ii="'+ii+'">'
+          +'<img class="ff107-option-img ff-final-option-img" src="'+esc(item.img||'')+'" alt="'+esc(item.name)+'" onerror="this.style.visibility=\'hidden\'">'
+          +'<div class="ff107-option-main ff-final-option-main">'
+          +'<button type="button" class="ff102-pick" title="'+esc(item.name)+'" onclick="ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
+          +'<div class="ff107-controls ff-final-option-controls">'
+          +'<div class="ff102-field"><label>색상</label><select id="'+id+'_color">'+(item.colors||['BK']).map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>'
+          +'<input id="'+id+'_qty" type="hidden" data-qty="1" value="0">'
+          +'</div></div></div>';
+      });
+      html+='</div></div>';
+    });
+    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">이어하기</button><button onclick="ff102SkipOptions()">옵션 없이 이어하기</button></div></div>';
+    bot(html); scrollLatest();
+  }
+  window.ff102ShowOptions=showOptions;
+  window.ff96ShowOptions=showOptions;
+  window.ff102ApplyOptions=function(){
+    var chosen=[];
+    OPTIONS.forEach(function(group,gi){(group.items||[]).forEach(function(item,ii){
+      var id='ff102_'+gi+'_'+ii, row=$('ff102row_'+gi+'_'+ii);
+      var color=($(id+'_color')||{}).value||'';
+      var selected=!!(row&&row.classList.contains('active'));
+      if(selected) chosen.push({category:group.cat,name:item.name,color:color,qty:1,img:item.img||''});
+    });});
+    saveChosen(chosen);
+    user(chosen.length?chosen.map(function(x){return esc(x.name)+' / '+esc(x.color)+' / 1개';}).join('<br>'):'추가 옵션 없음');
+    nextActions();
+  };
+  window.ff96ApplyOptions=window.ff102ApplyOptions;
+  window.ff102SkipOptions=function(){saveChosen([]); user('추가 옵션 없음'); nextActions();};
+  window.ff97SkipFinalOptions=window.ff102SkipOptions;
+
+  function cleanupLabels(){
+    var badge=$('texture-name'); if(badge && /다리 선택|상판 선택|스크린 선택|준비중/.test(badge.textContent||'')) badge.textContent='재질 선택값';
+    qsa('.material-button-section-title,.bubble span,.bubble div').forEach(function(el){
+      if(!el || !el.textContent) return;
+      var t=el.textContent.trim();
+      if(/다리/.test(t) && /주문품/.test(t)) el.textContent='주문품색상';
+      if(t==='다리 선택') el.textContent='재질 선택값';
+    });
+    syncFromState();
+  }
+  document.addEventListener('DOMContentLoaded',function(){setTimeout(cleanupLabels,100); setTimeout(cleanupLabels,600);});
+  window.addEventListener('load',function(){setTimeout(cleanupLabels,300);});
+  document.addEventListener('click',function(){setTimeout(cleanupLabels,80);},true);
+  document.addEventListener('change',function(){setTimeout(cleanupLabels,80);},true);
+  try{new MutationObserver(function(){cleanupLabels();}).observe(document.documentElement,{childList:true,subtree:true,characterData:true});}catch(e){}
+})();
+</script>
+<!-- === /FF FINAL HOTFIX === -->
 </body>
 
 
