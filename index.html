@@ -14746,7 +14746,8 @@ window.showPanel = function(){
       if(t==='상판 색상 무늬목 / 라미네이트' || t==='상판 색상') el.innerHTML='상판색상 <span class="ff-kim-label-note">표준품색상 / 주문품색상 무늬목 / 주문품색상 라미네이트</span>';
       else if(t==='무늬목') el.textContent='주문품색상 무늬목';
       else if(t==='라미네이트') el.textContent='주문품색상 라미네이트';
-      else if(t==='주문품색상') el.textContent='주문품색상 무늬목';
+      else if(t==='주문품색상 무늬목' || t==='주문품색상 라미네이트') el.textContent='주문품색상';
+      else if(t==='주문품색상') el.textContent='주문품색상';
       else if(t==='표준 색상' || t==='표준품') el.textContent='표준품색상';
       else if(t==='다리 색상') el.innerHTML='다리색상 <span class="ff-kim-label-note">표준품색상 WW / DSG / BKM · 주문품색상 DCR / TS</span>';
     });
@@ -14781,7 +14782,8 @@ window.showPanel = function(){
     var title=document.createElement('div');
     title.className='ff-screen-size-title';
     title.style.cssText='font-weight:900;color:#2ef2c9;margin-bottom:8px;line-height:1.55;';
-    title.innerHTML='&lt;@@스크린 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
+    var screenName=((window.state&&state._currentCatName)||'스크린');
+    title.innerHTML='&lt;'+screenName+' 사이즈입력&gt;<br>원하시는 사이즈를 확인/조절해주세요.';
     b.insertBefore(title,b.firstChild);
   }
 
