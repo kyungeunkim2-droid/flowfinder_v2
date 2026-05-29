@@ -133,6 +133,7 @@ app.post('/api/generate-preview', async (req, res) => {
       casterType,
       topShape,
       size,
+      guideImage,
     } = req.body || {};
 
     const parts = [];
