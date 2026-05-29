@@ -21519,6 +21519,7 @@ el.innerHTML='<b>&lt;' + screenName + ' 사이즈입력&gt;</b><br>원하시는 
   min-height:168px !important;
 }
  <style>
+  
   /* ===== FINAL RIGHT PANEL LAYOUT ===== */
 
 body.ff-dashboard-preview #preview-panel,
@@ -21658,7 +21659,65 @@ body.ff-dashboard-preview #preview-panel,
   z-index:auto !important;
   margin:0 0 16px 0 !important;
 }
-  
+/* === FINAL FIX: 옵션 이미지 / 재질 선택값 겹침 방지 === */
+
+#desk-option-images,
+#desk-option-preview,
+.desk-option-image-wrap,
+#set-product-selector{
+  position:relative !important;
+  display:block !important;
+  width:100% !important;
+  height:auto !important;
+  min-height:auto !important;
+  overflow:visible !important;
+  clear:both !important;
+  margin-bottom:28px !important;
+  padding-bottom:24px !important;
+}
+
+#texture-preview,
+#material-selection-values,
+.material-selection-panel,
+#ff90-option-summary,
+#ff102-options-card{
+  position:relative !important;
+  display:block !important;
+  width:100% !important;
+  clear:both !important;
+  float:none !important;
+  margin-top:28px !important;
+  margin-bottom:22px !important;
+  z-index:1 !important;
+}
+
+#texture-preview{
+  transform:none !important;
+  inset:auto !important;
+  top:auto !important;
+  left:auto !important;
+}
+
+.ff-hero-swatches,
+.quick-materials{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+  width:100% !important;
+  clear:both !important;
+}
+
+.ff-hero-swatch,
+.material-chip-row{
+  min-height:68px !important;
+  flex:0 0 auto !important;
+}
+
+#quick-ai-preview-btn{
+  margin-top:18px !important;
+  position:relative !important;
+  z-index:2 !important;
+}  
 </style>
 <script id="ff-final-right-panel-order-override-script">
 (function(){
