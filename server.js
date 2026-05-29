@@ -231,12 +231,16 @@ app.post('/api/generate-screen-preview', async (req, res) => {
   try {
     const baseUrl = `${req.protocol}://${req.get('host')}/`;
 
-    const {
-      deskAiImage,
-      screenImage,
-      screenTexture
-    } = req.body || {};
-
+   const {
+  deskAiImage,
+  screenImage,
+  screenTexture,
+  guideImage,
+  frontScreenTexture,
+  sideScreenTexture,
+  frontScreenCode,
+  sideScreenCode,
+} = req.body || {};
     const parts = [];
 
     parts.push({
@@ -248,15 +252,20 @@ app.post('/api/generate-screen-preview', async (req, res) => {
         'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
         'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
         'Create one photorealistic office furniture catalog render.'
+        guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply front screen material only to FRONT and side screen material only to SIDE.' : '',
+frontScreenCode ? `FRONT screen material code: ${frontScreenCode}` : '',
+sideScreenCode ? `SIDE screen material code: ${sideScreenCode}` : '',
       ].join('\n')
     });
 
-    const imageInputs = [
-      ['generated desk image', deskAiImage],
-      ['screen product image', screenImage],
-      ['screen material texture reference', screenTexture],
-    ];
-
+   const imageInputs = [
+  ['generated desk image', deskAiImage],
+  ['screen product image', screenImage],
+  ['screen material texture reference', screenTexture],
+  ['front screen material texture reference', frontScreenTexture],
+  ['side screen material texture reference', sideScreenTexture],
+  ['front/side guide image', guideImage],
+];
     for (const [label, src] of imageInputs) {
       if (!src) continue;
 
