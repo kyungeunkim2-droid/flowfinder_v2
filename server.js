@@ -247,18 +247,16 @@ app.post('/api/generate-screen-preview', async (req, res) => {
     const parts = [];
 
     parts.push({
-      text: [
-        'Use the provided AI-generated desk image as the exact base image.',
-        'Add the provided screen product naturally to the desk.',
-        'Apply the provided screen material only to the screen panel.',
-        'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
-        'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
-        'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
-        'Create one photorealistic office furniture catalog render.'
-        guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply front screen material only to FRONT and side screen material only to SIDE.' : '',
-frontScreenCode ? `FRONT screen material code: ${frontScreenCode}` : '',
-sideScreenCode ? `SIDE screen material code: ${sideScreenCode}` : '',
-      ].join('\n')
+   text: [
+  'Use the provided AI-generated desk image as the exact base image.',
+  'Add the provided screen product naturally to the desk.',
+  'Apply the provided screen material only to the screen panel.',
+  'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
+  'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
+  'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
+  'Create one photorealistic office furniture catalog render.',
+  guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply front screen material only to FRONT and side screen material only to SIDE.' : ''
+].filter(Boolean).join('\n')
     });
 
    const imageInputs = [
