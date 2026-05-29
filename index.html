@@ -6278,6 +6278,7 @@ function setPreviewGlow(part) {
     if (btn) { btn.disabled = true; btn.textContent = '생성 중...'; }
     try {
       var payload = {
+
         deskImage: getBase(PREVIEW.deskKey),
         topTexture: PREVIEW.topTex || '',
         legTexture: PREVIEW.legTex || '',
@@ -6289,8 +6290,25 @@ function setPreviewGlow(part) {
         legType: (state.legType || ''),
         casterType: (state.casterType || ''),
         topShape: (state.topShape || ''),
-        size: { w: state.w || '', d: state.d || '', h: state.h || '' }
+        size: { w: state.w || '', d: state.d || '', h: state.h || '' },
+        screenKey: PREVIEW.screenKey || state.screenKey || '',
+selectedScreens: state.selectedScreens || [],
+guideImage: ''
       };
+    var screenText = String(
+  payload.screenKey || 
+  (payload.selectedScreens || []).join('_') || 
+  payload.screenInstruction || 
+  ''
+).toLowerCase();
+
+if (
+  screenText.indexOf('front') > -1 &&
+  screenText.indexOf('side') > -1
+) {
+  payload.guideImage = '/images/guides/frontside_guide.png';
+  payload.screenInstruction += '\nUse the guide image: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material to the matching panel only.';
+}
       var res = await fetch('/api/generate-preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -17297,6 +17315,36 @@ function localProductImage(key){
       if(!health || !health.ok) throw new Error('서버 /api/health 연결 실패');
       var controller = new AbortController();
       var timer = setTimeout(function(){ controller.abort(); }, 180000);
+      var guideImage = '';
+
+try {
+  var screenKey =
+    (window.state && (state.screenKey || state.selectedScreenKey || state.screen)) ||
+    (window.appState && (appState.screenKey || appState.selectedScreenKey || appState.screen)) ||
+    '';
+
+  var selectedScreens =
+    (window.state && state.selectedScreens) ||
+    (window.appState && appState.selectedScreens) ||
+    [];
+
+  var screenText = String(screenKey || selectedScreens.join('_') || '').toLowerCase();
+
+  if (
+    screenText.indexOf('front') > -1 &&
+    screenText.indexOf('side') > -1
+  ) {
+    guideImage = '/images/guides/frontside_guide.png';
+  }
+
+  if (guideImage) {
+    payload.guideImage = guideImage;
+    payload.images = payload.images || [];
+    payload.images.push(guideImage);
+
+    payload.prompt = (payload.prompt || '') + '\n\nUse the guide image to identify the panels. Apply the selected front screen material only to the FRONT panel, and the selected side screen material only to the SIDE panel. Keep the desk shape, camera angle, legs, screen layout, and dimensions unchanged.';
+  }
+} catch(e) {}
       var res=await fetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload),signal:controller.signal});
       clearTimeout(timer);
       var data=await res.json().catch(function(){return {};});
