@@ -287,6 +287,8 @@ app.post('/api/generate-screen-preview', async (req, res) => {
       if (part) parts.push(part);
     }
 
+ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+
  const result = await ai.models.generateContent({
   model: MODEL,
   contents: [{ role: 'user', parts }],
