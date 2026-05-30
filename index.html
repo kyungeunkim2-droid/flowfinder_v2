@@ -16324,153 +16324,6 @@ window.showPanel = function(){
 })();
 </script>
 
-<!-- === FF_RENDER_RESULT_TO_PANEL_FINAL: show Nano result in high-res panels using Blob URL === -->
-<script id="ff-render-result-to-panel-final">
-(function(){
-  if (window.__ffRenderResultToPanelFinal) return;
-  window.__ffRenderResultToPanelFinal = true;
-
-  function $(id){ return document.getElementById(id); }
-
-  function dataUrlToBlobUrl(dataUrl){
-    try{
-      if (!/^data:image\//i.test(String(dataUrl || ''))) return dataUrl;
-      var parts = dataUrl.split(',');
-      var header = parts[0] || '';
-      var b64 = parts.slice(1).join(',');
-      var mime = (header.match(/^data:([^;]+)/i) || [,'image/png'])[1];
-      var bin = atob(b64);
-      var len = bin.length;
-      var bytes = new Uint8Array(len);
-      for (var i=0; i<len; i++) bytes[i] = bin.charCodeAt(i);
-      var blob = new Blob([bytes], {type:mime});
-      if (window.__ffLastRenderBlobUrl) {
-        try { URL.revokeObjectURL(window.__ffLastRenderBlobUrl); } catch(e) {}
-      }
-      window.__ffLastRenderBlobUrl = URL.createObjectURL(blob);
-      return window.__ffLastRenderBlobUrl;
-    }catch(e){
-      console.error('[FF_RENDER_RESULT_TO_PANEL_FINAL] dataUrlToBlobUrl failed', e);
-      return dataUrl;
-    }
-  }
-
-  function getSrc(data){
-    if (!data) return '';
-    if (typeof data === 'string') return data;
-    return data.imageUrl || data.image || data.url || data.previewUrl || data.output || '';
-  }
-
-  function setImg(img, src){
-    if (!img || !src) return;
-    img.onload = function(){
-      console.log('[FF_RENDER_RESULT_TO_PANEL_FINAL] image displayed:', img.id || img.className);
-    };
-    img.onerror = function(e){
-      console.error('[FF_RENDER_RESULT_TO_PANEL_FINAL] image display failed:', img.id || img.className, e);
-    };
-    img.src = src;
-    img.style.display = 'block';
-    img.style.visibility = 'visible';
-    img.style.opacity = '1';
-    img.style.width = '100%';
-    img.style.height = '100%';
-    img.style.objectFit = 'contain';
-    img.style.background = '#fff';
-    img.classList && img.classList.add('show');
-    img.removeAttribute('hidden');
-  }
-
-  window.ffShowNanoRenderResult = function(rawSrc){
-    if (!rawSrc) return false;
-    var src = dataUrlToBlobUrl(rawSrc);
-    window.__ffLatestNanoRenderRaw = rawSrc;
-    window.__ffLatestNanoRenderSrc = src;
-
-    var cleanImg = $('ff-clean-preview-img');
-    var cleanCanvas = $('ff-clean-preview-canvas');
-    var cleanEmpty = $('ff-clean-empty-preview');
-    var cleanStatus = $('ff-clean-status');
-    setImg(cleanImg, src);
-    if (cleanCanvas) cleanCanvas.classList.remove('show');
-    if (cleanEmpty) {
-      cleanEmpty.classList.add('hide');
-      cleanEmpty.style.display = 'none';
-    }
-    if (cleanStatus) cleanStatus.textContent = '생성완료';
-
-    var livePanel = $('ff-ai-live-panel');
-    var liveImg = $('ff-ai-live-img');
-    var liveEmpty = $('ff-ai-live-empty');
-    var liveStatus = $('ff-ai-live-status');
-    if (livePanel) livePanel.classList.add('has-image');
-    setImg(liveImg, src);
-    if (liveEmpty) liveEmpty.style.display = 'none';
-    if (liveStatus) liveStatus.textContent = '생성완료';
-
-    var heroImg = $('ff-hero-img');
-    setImg(heroImg, src);
-
-    var note = $('quick-ai-preview-note');
-    if (note) {
-      note.className = 'ai-result';
-      note.style.display = 'block';
-      note.innerHTML =
-        '<div style="font-weight:900;color:#fff;margin-bottom:8px;">AI 고해상도 렌더링 결과</div>' +
-        '<img src="' + src + '" alt="AI 고해상도 렌더링 결과" style="width:100%;max-height:520px;object-fit:contain;border-radius:16px;border:1px solid rgba(46,242,201,.22);background:#fff;display:block;">';
-    }
-
-    try {
-      var target = $('ff-clean-preview-img') || $('ff-ai-live-panel') || note;
-      if (target && target.scrollIntoView) target.scrollIntoView({behavior:'smooth', block:'center'});
-    } catch(e) {}
-
-    return true;
-  };
-
-  function markLoading(){
-    var cleanStatus = $('ff-clean-status');
-    var liveStatus = $('ff-ai-live-status');
-    if (cleanStatus) cleanStatus.textContent = '생성중';
-    if (liveStatus) liveStatus.textContent = '생성중';
-  }
-
-  var oldFetch = window.fetch;
-  window.fetch = function(input, init){
-    var url = String(input || '');
-    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    if (isNano) markLoading();
-
-    return oldFetch.apply(this, arguments).then(function(res){
-      if (!isNano) return res;
-      try{
-        res.clone().json().then(function(data){
-          console.log('[FF_RENDER_RESULT_TO_PANEL_FINAL] Nano response received', data && Object.keys(data));
-          var rawSrc = getSrc(data);
-          if (rawSrc) {
-            window.ffShowNanoRenderResult(rawSrc);
-          } else {
-            console.warn('[FF_RENDER_RESULT_TO_PANEL_FINAL] no imageUrl in response', data);
-          }
-        }).catch(function(err){
-          console.error('[FF_RENDER_RESULT_TO_PANEL_FINAL] failed to read Nano response json', err);
-        });
-      }catch(e){
-        console.error('[FF_RENDER_RESULT_TO_PANEL_FINAL] response hook failed', e);
-      }
-      return res;
-    });
-  };
-
-  // 고해상도 버튼은 기존 작은 미리보기 버튼을 누르게 두되, 표시 결과는 위 fetch hook이 고해상도 패널로 강제 이동합니다.
-  window.addEventListener('click', function(e){
-    var btn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn');
-    if (!btn) return;
-    markLoading();
-  }, true);
-})();
-</script>
-
 </body>
 
 
@@ -22964,21 +22817,437 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 
 
 <!-- === FF_CURRENT_STEP_RENDER_FIX: current-step based desk/screen preview + payload === -->
-<style id="ff-current-step-render-fix-css">
-  .ff-render-flow-card{margin-top:10px;border:1px solid rgba(32,245,197,.25);border-radius:18px;overflow:hidden;background:#071722;color:#f8fffd;box-shadow:0 14px 34px rgba(0,0,0,.24);}
-  .ff-render-flow-card .ff-rf-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
-  .ff-render-flow-card .ff-rf-title{font-weight:950;color:#20f5c5;font-size:14px;}
-  .ff-render-flow-card .ff-rf-status{font-size:11px;color:#91b9b2;white-space:nowrap;}
-  .ff-render-flow-card .ff-rf-body{padding:12px;}
-  .ff-render-flow-card .ff-rf-body img{width:100%;max-height:520px;object-fit:contain;display:block;background:#fff;border-radius:14px;border:1px solid rgba(255,255,255,.12);}
-  .ff-render-flow-card .ff-rf-desc{margin-top:8px;color:#9fb3bd;font-size:11px;line-height:1.5;}
-  .ff-render-flow-card.ff-rf-error{border-color:rgba(252,165,165,.35);}
-  .ff-render-flow-card.ff-rf-error .ff-rf-title{color:#fca5a5;}
+<!-- === FF_FINAL_OPTION_COMPACT_IMAGE_RESTORE === -->
+<style id="ff-final-option-compact-image-restore-css">
+  .msg.bot:has(.ff-user-final-options-v2) .bubble{
+    max-width:min(96%, 560px) !important;
+    width:min(96%, 560px) !important;
+    padding:12px !important;
+    overflow:hidden !important;
+  }
+  .ff-user-final-options-v2{
+    width:100% !important;
+    max-width:560px !important;
+    margin:0 !important;
+    padding:12px !important;
+    border-radius:20px !important;
+    border:1px solid rgba(46,242,201,.25) !important;
+    background:linear-gradient(180deg,rgba(5,18,29,.98),rgba(3,14,24,.98)) !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  .ff-user-final-options-v2 h3{
+    margin:0 0 5px !important;
+    color:#2ef2c9 !important;
+    font-size:19px !important;
+    line-height:1.15 !important;
+    letter-spacing:-.3px !important;
+  }
+  .ff-user-final-options-v2 > p{
+    margin:0 0 8px !important;
+    color:#e5edf7 !important;
+    font-size:11px !important;
+    line-height:1.4 !important;
+  }
+  .ff-opt-cat-v2{
+    margin:8px 0 !important;
+    padding:9px !important;
+    border-radius:16px !important;
+    border:1px solid rgba(46,242,201,.18) !important;
+    background:rgba(7,23,34,.85) !important;
+  }
+  .ff-opt-cat-head-v2{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    margin-bottom:7px !important;
+  }
+  .ff-opt-cat-head-v2 b{
+    color:#2ef2c9 !important;
+    font-size:16px !important;
+    font-weight:1000 !important;
+    line-height:1.1 !important;
+  }
+  .ff-opt-cat-head-v2 small{
+    color:#b56cff !important;
+    font-size:9px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+  }
+  .ff-opt-grid-v2{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+  .ff-opt-row-v2{
+    min-width:0 !important;
+    min-height:64px !important;
+    display:grid !important;
+    grid-template-columns:46px minmax(0,1fr) 34px !important;
+    grid-template-rows:auto auto !important;
+    gap:5px 7px !important;
+    align-items:center !important;
+    padding:7px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(46,242,201,.26) !important;
+    background:#081b28 !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  .ff-opt-row-v2.active{
+    border-color:#2ef2c9 !important;
+    box-shadow:0 0 0 1px rgba(46,242,201,.18),0 0 16px rgba(46,242,201,.10) !important;
+    background:#082928 !important;
+  }
+  .ff-opt-img-v2{
+    grid-row:1 / span 2 !important;
+    width:46px !important;
+    height:46px !important;
+    object-fit:contain !important;
+    border-radius:10px !important;
+    border:1px solid rgba(255,255,255,.16) !important;
+    background:#f3f5f6 !important;
+    padding:3px !important;
+    display:block !important;
+  }
+  .ff-opt-name-v2{
+    min-width:0 !important;
+    color:#fff !important;
+    font-size:12px !important;
+    font-weight:1000 !important;
+    line-height:1.18 !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2 !important;
+    -webkit-box-orient:vertical !important;
+  }
+  .ff-opt-toggle-v2{
+    width:32px !important;
+    height:32px !important;
+    border-radius:11px !important;
+    border:1px solid rgba(46,242,201,.50) !important;
+    background:#06202a !important;
+    color:#2ef2c9 !important;
+    font-size:18px !important;
+    font-weight:1000 !important;
+    cursor:pointer !important;
+    line-height:1 !important;
+  }
+  .ff-opt-row-v2.active .ff-opt-toggle-v2{
+    background:#2ef2c9 !important;
+    color:#031313 !important;
+  }
+  .ff-opt-color-v2{
+    grid-column:2 / span 2 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    min-width:0 !important;
+  }
+  .ff-opt-color-v2 span{
+    color:#d8f7f1 !important;
+    font-size:10px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+  }
+  .ff-opt-color-v2 select{
+    flex:1 !important;
+    min-width:0 !important;
+    height:30px !important;
+    padding:0 8px !important;
+    border-radius:10px !important;
+    border:1px solid rgba(46,242,201,.35) !important;
+    background:#06131f !important;
+    color:#fff !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    outline:none !important;
+  }
+  .ff-opt-actions-v2{
+    display:flex !important;
+    gap:8px !important;
+    margin-top:9px !important;
+  }
+  .ff-opt-actions-v2 button{
+    flex:1 !important;
+    min-height:38px !important;
+    border-radius:13px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    font-size:13px !important;
+    font-weight:1000 !important;
+    cursor:pointer !important;
+  }
+  .ff-opt-actions-v2 .primary{
+    background:#2ef2c9 !important;
+    color:#031313 !important;
+    border-color:#2ef2c9 !important;
+  }
+  .ff-opt-actions-v2 .secondary{
+    background:#101a28 !important;
+    color:#e5edf7 !important;
+  }
+  @media(max-width:680px){
+    .ff-opt-grid-v2{grid-template-columns:1fr !important;}
+    .ff-user-final-options-v2{max-width:100% !important;}
+  }
 </style>
-<script id="ff-current-step-render-fix">
+<script id="ff-final-option-compact-image-restore-js">
 (function(){
-  if(window.__ffCurrentStepRenderFix) return;
-  window.__ffCurrentStepRenderFix = true;
+  if(window.__ffFinalOptionCompactImageRestore) return;
+  window.__ffFinalOptionCompactImageRestore = true;
+
+  function esc(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function bot(html){
+    if(typeof window.addMsg === 'function') window.addMsg('bot', html);
+  }
+  var OPTIONS = [
+    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'external_3outlet_powerstrip.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'sliding_3outlet_powerstrip.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'built_in_2outlet_powerstrip.png'}
+    ]},
+    {cat:'PC홀더', note:'', items:[
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'pc_holder_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'pc_holder_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'pc_holder_basic_hanging.png'}
+    ]},
+    {cat:'기타', note:'', items:[
+      {name:'모니터암', colors:['BK'], img:'topmount_monitor_arm.png'},
+      {name:'가방걸이', colors:['XX(투명)'], img:'bag_hook.png'}
+    ]}
+  ];
+
+  function imgSrc(file){
+    return './images/options/accessories/' + file;
+  }
+  window.ffOptionImgFallbackV2 = function(img){
+    var file = img.getAttribute('data-file') || '';
+    var step = Number(img.getAttribute('data-step') || '0');
+    var tries = [
+      './images/options/accessories/' + file,
+      './images/accessories/' + file,
+      './accessories/' + file,
+      'accessories/' + file
+    ];
+    step++;
+    if(step < tries.length){
+      img.setAttribute('data-step', String(step));
+      img.src = tries[step];
+    }else{
+      img.style.display = 'none';
+      var row = img.closest('.ff-opt-row-v2');
+      if(row) row.style.gridTemplateColumns = 'minmax(0,1fr) 34px';
+    }
+  };
+
+  function rowId(gi, ii){ return 'ff-opt-v2-' + gi + '-' + ii; }
+
+  function renderOptions(){
+    if(window.state){
+      state.step='final_options';
+      state._ff102OptionsVisible=true;
+    }
+    if(typeof window.updateFlowBar === 'function') window.updateFlowBar();
+
+    var html = '<div class="ff102-options-card ff-user-final-options-v2">'
+      + '<h3>옵션을 추가하시겠습니까?</h3>'
+      + '<p>필요한 옵션을 선택하고 색상만 지정해주세요. 수량 입력은 제거했습니다.</p>';
+
+    OPTIONS.forEach(function(group, gi){
+      html += '<div class="ff-opt-cat-v2">'
+        + '<div class="ff-opt-cat-head-v2"><b>' + esc(group.cat) + '</b>'
+        + (group.note ? '<small>' + esc(group.note) + '</small>' : '<small></small>')
+        + '</div><div class="ff-opt-grid-v2">';
+      group.items.forEach(function(item, ii){
+        var id = rowId(gi, ii);
+        var opts = (item.colors || ['BK']).map(function(c){
+          return '<option value="' + esc(c) + '">' + esc(c) + '</option>';
+        }).join('');
+        html += '<div class="ff-opt-row-v2" id="' + id + '" data-name="' + esc(item.name) + '" data-cat="' + esc(group.cat) + '">'
+          + '<img class="ff-opt-img-v2" data-file="' + esc(item.img) + '" data-step="0" src="' + esc(imgSrc(item.img)) + '" onerror="ffOptionImgFallbackV2(this)" alt="' + esc(item.name) + '">'
+          + '<div class="ff-opt-name-v2">' + esc(item.name) + '</div>'
+          + '<button type="button" class="ff-opt-toggle-v2" onclick="ffToggleOptionV2(\'' + id + '\')">+</button>'
+          + '<label class="ff-opt-color-v2"><span>색상</span><select onchange="ffOptionColorV2(\'' + id + '\', this.value)">' + opts + '</select></label>'
+          + '</div>';
+      });
+      html += '</div></div>';
+    });
+
+    html += '<div class="ff-opt-actions-v2">'
+      + '<button type="button" class="primary" onclick="ffSaveOptionsV2()">옵션 선택 완료</button>'
+      + '<button type="button" class="secondary" onclick="ffSkipOptionsV2()">선택 안 함</button>'
+      + '</div></div>';
+
+    bot(html);
+    if(typeof window.scrollBottom === 'function') window.scrollBottom();
+  }
+
+  window.ffToggleOptionV2 = function(id){
+    var row = document.getElementById(id);
+    if(!row) return;
+    row.classList.toggle('active');
+    var btn = row.querySelector('.ff-opt-toggle-v2');
+    if(btn) btn.textContent = row.classList.contains('active') ? '−' : '+';
+  };
+
+  window.ffOptionColorV2 = function(id, value){
+    var row = document.getElementById(id);
+    if(row) row.setAttribute('data-color', value || '');
+  };
+
+  function selectedOptions(){
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.ff-opt-row-v2.active'));
+    return rows.map(function(row){
+      var sel = row.querySelector('select');
+      return {
+        cat: row.getAttribute('data-cat') || '',
+        name: row.getAttribute('data-name') || '',
+        color: row.getAttribute('data-color') || (sel && sel.value) || '',
+        qty: 1
+      };
+    });
+  }
+
+  function saveChosen(chosen){
+    if(window.state){
+      state.extraOptionItems = chosen;
+      state.finalAddons = chosen.map(function(x){ return x.name; });
+      state.finalOptionQty = 1;
+      state._ff102OptionsHandled = true;
+      state._ff101OptionsHandled = true;
+      state._ff100OptionsDone = true;
+      state._ff96OptionsAsked = true;
+      state._ff97FinalOptionsAsked = true;
+      state._ffUserOptionsChosen = chosen;
+      state.step = 'next_actions';
+    }
+    if(typeof window.updateCurrent === 'function') window.updateCurrent();
+    if(typeof window.updatePreview === 'function') window.updatePreview();
+
+    if(chosen.length){
+      var summary = chosen.map(function(x){ return '· ' + esc(x.name) + ' / ' + esc(x.color); }).join('<br>');
+      bot('옵션 선택 완료:<br>' + summary);
+    }else{
+      bot('옵션은 선택하지 않는 것으로 처리했습니다.');
+    }
+
+    if(typeof window.updateFlowBar === 'function') window.updateFlowBar();
+    if(typeof window.askContinue === 'function'){
+      try{ window.askContinue(); return; }catch(e){}
+    }
+    if(typeof window.showFinalQuote === 'function'){
+      try{ window.showFinalQuote(); return; }catch(e){}
+    }
+  }
+
+  window.ffSaveOptionsV2 = function(){ saveChosen(selectedOptions()); };
+  window.ffSkipOptionsV2 = function(){ saveChosen([]); };
+
+  window.ff102ShowOptions = renderOptions;
+  window.ffShowFinalOptions70 = renderOptions;
+  window.ffShowFinalOptions96 = renderOptions;
+  window.ffShowFinalOptions97 = renderOptions;
+  window.ffShowFinalOptionsUser = renderOptions;
+})();
+</script>
+
+
+
+<!-- === FF_RIGHT_PANEL_RENDER_ORDER_FIX: product first, render result later, no left chat cards === -->
+<style id="ff-right-panel-render-order-fix-css">
+  #ff-clean-preview-img,
+  #ff-clean-preview-canvas{
+    display:block !important;
+    width:100% !important;
+    height:100% !important;
+    object-fit:contain !important;
+    max-height:420px !important;
+    background:#fff !important;
+  }
+  #ff-clean-preview-img[src=""],
+  #ff-clean-preview-img:not([src]){
+    display:none !important;
+  }
+  #ff-clean-empty-preview.hide{
+    display:none !important;
+  }
+  #ff-render-result-panel{
+    margin-top:14px !important;
+    border:1px solid rgba(46,242,201,.24) !important;
+    background:linear-gradient(180deg,rgba(4,19,30,.96),rgba(3,13,23,.96)) !important;
+    border-radius:20px !important;
+    padding:12px !important;
+    overflow:hidden !important;
+  }
+  #ff-render-result-panel .ff-render-result-head{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:10px !important;
+    margin-bottom:10px !important;
+  }
+  #ff-render-result-panel .ff-render-result-title{
+    color:#2ef2c9 !important;
+    font-size:14px !important;
+    font-weight:1000 !important;
+  }
+  #ff-render-result-panel .ff-render-result-status{
+    color:#91b9b2 !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+  }
+  #ff-render-result-panel .ff-render-result-box{
+    min-height:190px !important;
+    height:clamp(190px, 28vh, 340px) !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    border-radius:16px !important;
+    border:1px solid rgba(255,255,255,.12) !important;
+    background:linear-gradient(135deg,#eef4fb,#dfe8f3) !important;
+    overflow:hidden !important;
+    color:#334155 !important;
+    text-align:center !important;
+  }
+  #ff-render-result-panel img{
+    width:100% !important;
+    height:100% !important;
+    max-height:340px !important;
+    object-fit:contain !important;
+    background:#fff !important;
+    display:block !important;
+  }
+  #ff-render-result-panel .ff-render-loading{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:9px !important;
+    color:#334155 !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+  }
+  #ff-render-result-panel .ff-render-spinner{
+    width:28px !important;
+    height:28px !important;
+    border-radius:999px !important;
+    border:3px solid rgba(15,23,42,.16) !important;
+    border-top-color:#2ef2c9 !important;
+    animation:ffRenderSpin .8s linear infinite !important;
+  }
+  @keyframes ffRenderSpin{to{transform:rotate(360deg);}}
+</style>
+<script id="ff-right-panel-render-order-fix">
+(function(){
+  if(window.__ffRightPanelRenderOrderFix) return;
+  window.__ffRightPanelRenderOrderFix = true;
 
   var GUIDE_FRONTSIDE = './images/guides/frontside_guide';
 
@@ -22988,11 +23257,6 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       window.state || {},
       (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
     );
-  }
-  function esc(s){
-    return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-    });
   }
   function norm(p){
     if(!p) return '';
@@ -23072,7 +23336,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     return './images/previews/' + deskFolder() + '/' + baseName() + '_' + suffix + '.png';
   }
 
-  // 중요: 예전 /products/.../base/base.png 경로를 쓰는 함수가 남아 있어서 previews 경로로 강제 교체.
+  // 예전 /products/.../base/base.png 경로 방지
   window.productImage = function(key){
     key = String(key || '');
     if(key === 'front_side') key = 'frontside';
@@ -23080,7 +23344,6 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     if(key === 'screen_side') key = 'side';
     if(key === 'screen_straight') key = 'straight';
     if(key === 'screen_lshape') key = 'lshape';
-
     if(key === 'desk_standard' || key === 'desk_duct') return buildDeskOnlyPreview();
     if(/frontside|front|side|straight|lshape/i.test(key)){
       var sfx = key.match(/frontside|front|side|straight|lshape/i)[0].toLowerCase();
@@ -23092,26 +23355,19 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function localTexture(code, type){
     if(!code) return '';
     try{
-      if(typeof window._ffLocalTextureForCode === 'function'){
-        return norm(window._ffLocalTextureForCode(code, type || '') || '');
-      }
+      if(typeof window._ffLocalTextureForCode === 'function') return norm(window._ffLocalTextureForCode(code, type || '') || '');
     }catch(e){}
     try{
-      if(typeof window.screenTextureUrl === 'function'){
-        return norm(window.screenTextureUrl(code, type || '') || '');
-      }
+      if(typeof window.screenTextureUrl === 'function') return norm(window.screenTextureUrl(code, type || '') || '');
     }catch(e){}
     return '';
   }
-  function screenState(){
-    return window._screenPreviewState || {};
-  }
+  function screenState(){ return window._screenPreviewState || {}; }
   function screenCodesAndTextures(){
     var s = S();
     var st = screenState();
     var front = st.front || null;
     var side = st.side || null;
-    var latest = st.latest || null;
 
     var generalCode = text('quick-screen-code') || s.screenCode || s.screenColor || s.screen || window.__ffPreviewScreen || '';
     var generalTex = bgUrl('quick-screen-chip') || s.screenTex || s.screenTexture || localTexture(generalCode, currentName());
@@ -23119,8 +23375,6 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var frontCode = (front && front.color) || s.frontScreenCode || s.frontCode || (/전면|front/i.test(currentName()) ? generalCode : '');
     var sideCode = (side && side.color) || s.sideScreenCode || s.sideCode || (/사이드|side/i.test(currentName()) ? generalCode : '');
 
-    // 전면+사이드 조합인데 아직 둘 중 하나만 선택된 경우에도 현재 고른 재질을 해당 영역에 넣고,
-    // 없는 쪽은 generalTex로 fallback해서 undefined가 되지 않게 함.
     if(screenSuffixForCurrent() === 'frontside'){
       if(!frontCode && generalCode) frontCode = generalCode;
       if(!sideCode && generalCode) sideCode = generalCode;
@@ -23134,14 +23388,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       if(!sideTex) sideTex = norm(generalTex);
     }
 
-    return {
-      generalCode: generalCode,
-      generalTex: norm(generalTex),
-      frontCode: frontCode,
-      sideCode: sideCode,
-      frontTex: frontTex,
-      sideTex: sideTex
-    };
+    return {generalCode:generalCode,generalTex:norm(generalTex),frontCode:frontCode,sideCode:sideCode,frontTex:frontTex,sideTex:sideTex};
   }
   function materialPayloadBase(payload){
     var s = S();
@@ -23154,22 +23401,22 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function applyDeskPayload(payload){
     var img = buildDeskOnlyPreview();
     payload = materialPayloadBase(payload);
-    payload.targetType = 'desk';
-    payload.productType = 'desk';
-    payload.renderStep = 'desk_only_current_step';
-    payload.mode = 'desk-only-material-mapping-current-step';
-    payload.deskImage = img;
-    payload.fallbackDeskImage = img;
-    payload.composedPreview = '';
-    payload.screenSelected = false;
-    payload.screenImage = '';
-    payload.screenTexture = '';
-    payload.screenCode = '';
-    payload.guideImage = '';
-    payload.frontScreenTexture = '';
-    payload.sideScreenTexture = '';
-    payload.frontScreenCode = '';
-    payload.sideScreenCode = '';
+    payload.targetType='desk';
+    payload.productType='desk';
+    payload.renderStep='desk_only_right_panel';
+    payload.mode='desk-only-material-mapping-right-panel';
+    payload.deskImage=img;
+    payload.fallbackDeskImage=img;
+    payload.composedPreview='';
+    payload.screenSelected=false;
+    payload.screenImage='';
+    payload.screenTexture='';
+    payload.screenCode='';
+    payload.guideImage='';
+    payload.frontScreenTexture='';
+    payload.sideScreenTexture='';
+    payload.frontScreenCode='';
+    payload.sideScreenCode='';
     return payload;
   }
   function applyScreenPayload(payload){
@@ -23177,37 +23424,90 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var suffix = screenSuffixForCurrent();
     var m = screenCodesAndTextures();
     payload = materialPayloadBase(payload);
-    payload.targetType = 'screen';
-    payload.productType = 'screen';
-    payload.renderStep = suffix === 'frontside' ? 'frontside_screen_current_step' : 'screen_current_step';
-    payload.mode = suffix === 'frontside' ? 'frontside-guide-material-mapping-current-step' : 'screen-material-mapping-current-step';
-    payload.deskImage = img;
-    payload.screenImage = img;
-    payload.fallbackDeskImage = img;
-    payload.composedPreview = '';
-    payload.screenSelected = true;
-    payload.screenLabel = payload.screenLabel || currentName();
-
-    payload.screenTexture = payload.screenTexture || m.generalTex || m.frontTex || m.sideTex;
-    payload.screenCode = payload.screenCode || m.generalCode || m.frontCode || m.sideCode;
-
+    payload.targetType='screen';
+    payload.productType='screen';
+    payload.renderStep=suffix === 'frontside' ? 'frontside_screen_right_panel' : 'screen_right_panel';
+    payload.mode=suffix === 'frontside' ? 'frontside-guide-material-mapping-right-panel' : 'screen-material-mapping-right-panel';
+    payload.deskImage=img;
+    payload.screenImage=img;
+    payload.fallbackDeskImage=img;
+    payload.composedPreview='';
+    payload.screenSelected=true;
+    payload.screenLabel=payload.screenLabel || currentName();
+    payload.screenTexture=payload.screenTexture || m.generalTex || m.frontTex || m.sideTex;
+    payload.screenCode=payload.screenCode || m.generalCode || m.frontCode || m.sideCode;
     if(suffix === 'frontside'){
-      payload.guideImage = GUIDE_FRONTSIDE;
-      payload.frontScreenTexture = m.frontTex;
-      payload.sideScreenTexture = m.sideTex;
-      payload.frontScreenCode = m.frontCode;
-      payload.sideScreenCode = m.sideCode;
+      payload.guideImage=GUIDE_FRONTSIDE;
+      payload.frontScreenTexture=m.frontTex;
+      payload.sideScreenTexture=m.sideTex;
+      payload.frontScreenCode=m.frontCode;
+      payload.sideScreenCode=m.sideCode;
     }else{
-      payload.guideImage = '';
-      payload.frontScreenTexture = '';
-      payload.sideScreenTexture = '';
-      payload.frontScreenCode = '';
-      payload.sideScreenCode = '';
+      payload.guideImage='';
+      payload.frontScreenTexture='';
+      payload.sideScreenTexture='';
+      payload.frontScreenCode='';
+      payload.sideScreenCode='';
     }
-
     return payload;
   }
 
+  function ensureRightRenderPanel(){
+    var panel = $('ff-render-result-panel');
+    if(panel) return panel;
+
+    var html =
+      '<section id="ff-render-result-panel">' +
+        '<div class="ff-render-result-head">' +
+          '<div class="ff-render-result-title">AI 렌더링 결과</div>' +
+          '<div class="ff-render-result-status" id="ff-render-result-status">대기중</div>' +
+        '</div>' +
+        '<div class="ff-render-result-box" id="ff-render-result-box">' +
+          '<div class="ff-render-loading" id="ff-render-result-empty">렌더링 버튼을 누르면<br>결과 이미지가 여기에 표시됩니다.</div>' +
+        '</div>' +
+      '</section>';
+
+    var btn = $('ff-clean-render-btn');
+    if(btn && btn.parentNode){
+      btn.insertAdjacentHTML('afterend', html);
+    }else{
+      var preview = $('preview-panel');
+      if(preview) preview.insertAdjacentHTML('beforeend', html);
+    }
+    return $('ff-render-result-panel');
+  }
+  function setProductImage(src, kind){
+    var img = $('ff-clean-preview-img');
+    var canvas = $('ff-clean-preview-canvas');
+    var empty = $('ff-clean-empty-preview');
+    var status = $('ff-clean-status');
+    if(img && src){
+      img.src = src;
+      img.alt = kind === 'screen' ? '스크린 포함 원본 이미지' : '데스크 원본 이미지';
+      img.classList.add('show');
+      img.style.display='block';
+    }
+    if(canvas){
+      canvas.classList.remove('show');
+      canvas.style.display='none';
+    }
+    if(empty){
+      empty.classList.add('hide');
+      empty.style.display='none';
+    }
+    if(status) status.textContent = kind === 'screen' ? '스크린 원본' : '데스크 원본';
+  }
+  function showRenderLoading(kind){
+    ensureRightRenderPanel();
+    var title = document.querySelector('#ff-render-result-panel .ff-render-result-title');
+    var status = $('ff-render-result-status');
+    var box = $('ff-render-result-box');
+    if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과';
+    if(status) status.textContent='생성중';
+    if(box){
+      box.innerHTML = '<div class="ff-render-loading"><div class="ff-render-spinner"></div><div>' + (kind === 'screen' ? '스크린 렌더링 생성 중...' : '데스크 렌더링 생성 중...') + '</div></div>';
+    }
+  }
   function dataUrlToBlobUrl(dataUrl){
     try{
       if(!/^data:image\//i.test(String(dataUrl||''))) return dataUrl;
@@ -23221,73 +23521,67 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     if(typeof data === 'string') return data;
     return data.imageUrl || data.image || data.url || data.previewUrl || data.output || '';
   }
-  function addCard(kind){
-    var messages = $('messages');
-    if(!messages) return null;
-    var wrap = document.createElement('div');
-    wrap.className = 'msg bot ff-render-flow-msg';
-    var icon = document.createElement('div');
-    icon.className = 'bot-icon';
-    icon.textContent = 'AI';
-    var bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.innerHTML =
-      '<div class="ff-render-flow-card">' +
-      '<div class="ff-rf-head"><div class="ff-rf-title">' + (kind === 'screen' ? '스크린 렌더링 생성 중' : '데스크 렌더링 생성 중') + '</div><div class="ff-rf-status">생성중</div></div>' +
-      '<div class="ff-rf-body"><div class="ff-rf-desc">' + (kind === 'screen' ? '현재 스크린 단계 기준 원본 이미지에 재질을 맵핑하고 있습니다.' : '현재 데스크 단계 기준 원본 이미지에 상판/다리 재질만 맵핑하고 있습니다.') + '</div></div>' +
-      '</div>';
-    wrap.appendChild(icon);
-    wrap.appendChild(bubble);
-    messages.appendChild(wrap);
-    try{ messages.scrollTop = messages.scrollHeight; }catch(e){}
-    return wrap;
-  }
-  function updateCard(card, kind, src, err){
-    if(!card) return;
-    var box = card.querySelector('.ff-render-flow-card');
-    var title = card.querySelector('.ff-rf-title');
-    var status = card.querySelector('.ff-rf-status');
-    var body = card.querySelector('.ff-rf-body');
-    if(err){
-      if(box) box.classList.add('ff-rf-error');
-      if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 실패' : '데스크 렌더링 실패';
-      if(status) status.textContent = '오류';
-      if(body) body.innerHTML = '<div class="ff-rf-desc">' + esc(err) + '</div>';
-      return;
-    }
-    var img = dataUrlToBlobUrl(src);
+  function showRenderResult(kind, src, err){
+    ensureRightRenderPanel();
+    var title = document.querySelector('#ff-render-result-panel .ff-render-result-title');
+    var status = $('ff-render-result-status');
+    var box = $('ff-render-result-box');
     if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과';
-    if(status) status.textContent = '생성완료';
-    if(body) body.innerHTML = '<img src="' + esc(img) + '" alt="' + (kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과') + '"><div class="ff-rf-desc">' + (kind === 'screen' ? '스크린 단계 원본 기준으로 재질을 맵핑한 결과입니다.' : '데스크 단독 원본 기준으로 재질을 맵핑한 결과입니다.') + '</div>';
-    try{ var messages = $('messages'); if(messages) messages.scrollTop = messages.scrollHeight; }catch(e){}
+    if(status) status.textContent = err ? '오류' : '생성완료';
+    if(box){
+      if(err){
+        box.innerHTML = '<div class="ff-render-loading" style="color:#991b1b!important;">' + String(err).replace(/[<>&]/g,'') + '</div>';
+      }else{
+        var img = dataUrlToBlobUrl(src);
+        box.innerHTML = '<img src="' + img + '" alt="' + (kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과') + '">';
+      }
+    }
+  }
+  function syncProductByCurrentStep(){
+    var kind = currentKind();
+    var src = kind === 'screen' ? buildScreenPreview() : buildDeskOnlyPreview();
+    setProductImage(src, kind);
   }
 
-  // 고해상도 버튼을 누르는 순간의 "현재 단계"를 기록한다.
   document.addEventListener('click', function(e){
     var btn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn, #quick-ai-preview-btn');
     if(!btn) return;
     window.__ffNextRenderKind = currentKind();
-    console.log('[FF_CURRENT_STEP_RENDER_FIX] click kind:', window.__ffNextRenderKind, 'current:', currentName(), 'set:', setSelectionText());
+    syncProductByCurrentStep();
+    ensureRightRenderPanel();
+    console.log('[FF_RIGHT_PANEL_RENDER_ORDER_FIX] click kind:', window.__ffNextRenderKind, 'current:', currentName(), 'set:', setSelectionText());
   }, true);
+
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.closest && e.target.closest('.choice-btn, .material-btn, .confirm-btn, .back-btn, .preview-item, .item-chip, #send-btn')){
+      setTimeout(syncProductByCurrentStep, 120);
+      setTimeout(syncProductByCurrentStep, 500);
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    ensureRightRenderPanel();
+    setTimeout(syncProductByCurrentStep, 200);
+    setTimeout(syncProductByCurrentStep, 900);
+  });
 
   var previousFetch = window.fetch;
   window.fetch = function(input, init){
     var url = String(input || '');
     var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
     var kind = window.__ffNextRenderKind || currentKind();
-    var card = null;
 
     if(isNano && init && init.body){
       try{
         var payload = JSON.parse(init.body || '{}') || {};
         kind = window.__ffNextRenderKind || currentKind();
-
-        // 핵심: 처음 복수선택한 제품 목록이 아니라 현재 단계 기준으로만 결정.
         payload = kind === 'screen' ? applyScreenPayload(payload) : applyDeskPayload(payload);
-
         init = Object.assign({}, init, {body: JSON.stringify(payload)});
-        card = addCard(kind);
-        console.log('[FF_CURRENT_STEP_RENDER_FIX] payload:', {
+
+        setProductImage(payload.deskImage, kind);
+        showRenderLoading(kind);
+
+        console.log('[FF_RIGHT_PANEL_RENDER_ORDER_FIX] payload:', {
           kind: kind,
           current: currentName(),
           deskImage: payload.deskImage,
@@ -23305,7 +23599,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
           sideScreenCode: payload.sideScreenCode
         });
       }catch(e){
-        console.warn('[FF_CURRENT_STEP_RENDER_FIX] payload patch failed', e);
+        console.warn('[FF_RIGHT_PANEL_RENDER_ORDER_FIX] payload patch failed', e);
       }
     }
 
@@ -23314,16 +23608,16 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       try{
         res.clone().json().then(function(data){
           var src = getSrc(data);
-          if(src) updateCard(card, kind, src, '');
-          else updateCard(card, kind, '', (data && (data.error || data.detail)) || '이미지 결과를 받지 못했습니다.');
+          if(src) showRenderResult(kind, src, '');
+          else showRenderResult(kind, '', (data && (data.error || data.detail)) || '이미지 결과를 받지 못했습니다.');
         }).catch(function(err){
-          updateCard(card, kind, '', err && err.message ? err.message : '응답을 읽지 못했습니다.');
+          showRenderResult(kind, '', err && err.message ? err.message : '응답을 읽지 못했습니다.');
         });
       }catch(e){}
       window.__ffNextRenderKind = '';
       return res;
     }).catch(function(err){
-      if(isNano) updateCard(card, kind, '', err && err.message ? err.message : String(err));
+      if(isNano) showRenderResult(kind, '', err && err.message ? err.message : String(err));
       window.__ffNextRenderKind = '';
       throw err;
     });
