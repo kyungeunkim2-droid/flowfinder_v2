@@ -16323,6 +16323,163 @@ window.showPanel = function(){
   window.ff102SkipOptions=function(){ saveChosen([]); user('추가 옵션 없음'); nextActions(); };
 })();
 </script>
+
+<!-- === FF_RENDER_DISPLAY_FORCE_FIX: force NanoBanana result into visible preview panels === -->
+<script id="ff-render-display-force-fix">
+(function(){
+  if (window.__ffRenderDisplayForceFix) return;
+  window.__ffRenderDisplayForceFix = true;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function findImageUrl(data){
+    if (!data) return '';
+    if (typeof data === 'string') return data;
+    return data.imageUrl || data.image || data.url || data.previewUrl || data.output || '';
+  }
+  function showNanoImage(src){
+    if (!src) return;
+    window.__ffLatestNanoImage = src;
+
+    var livePanel = $('ff-ai-live-panel');
+    var liveImg = $('ff-ai-live-img');
+    var liveEmpty = $('ff-ai-live-empty');
+    var liveStatus = $('ff-ai-live-status');
+
+    if (livePanel) livePanel.classList.add('has-image');
+    if (liveEmpty) liveEmpty.style.display = 'none';
+    if (liveStatus) liveStatus.textContent = '생성완료';
+    if (liveImg) {
+      liveImg.removeAttribute('src');
+      liveImg.src = src;
+      liveImg.alt = 'AI 고해상도 렌더링 결과';
+      liveImg.style.display = 'block';
+      liveImg.style.visibility = 'visible';
+      liveImg.style.opacity = '1';
+      liveImg.style.objectFit = 'contain';
+      liveImg.style.background = '#fff';
+      liveImg.onerror = function(){
+        console.error('[FF_RENDER_DISPLAY_FORCE_FIX] ff-ai-live-img failed to render data url');
+      };
+    }
+
+    var cleanImg = $('ff-clean-preview-img');
+    var cleanEmpty = $('ff-clean-empty-preview');
+    var cleanStatus = $('ff-clean-status');
+    if (cleanEmpty) cleanEmpty.style.display = 'none';
+    if (cleanStatus) cleanStatus.textContent = '생성완료';
+    if (cleanImg) {
+      cleanImg.removeAttribute('src');
+      cleanImg.src = src;
+      cleanImg.alt = 'AI 고해상도 렌더링 결과';
+      cleanImg.style.display = 'block';
+      cleanImg.style.visibility = 'visible';
+      cleanImg.style.opacity = '1';
+      cleanImg.style.objectFit = 'contain';
+      cleanImg.style.background = '#fff';
+    }
+
+    var heroImg = $('ff-hero-img');
+    if (heroImg) {
+      heroImg.removeAttribute('src');
+      heroImg.src = src;
+      heroImg.alt = 'AI 고해상도 렌더링 결과';
+      heroImg.style.display = 'block';
+      heroImg.style.visibility = 'visible';
+      heroImg.style.opacity = '1';
+      heroImg.style.objectFit = 'contain';
+      heroImg.style.background = '#fff';
+    }
+
+    var note = $('quick-ai-preview-note');
+    if (note) {
+      note.className = 'ai-result';
+      note.style.display = 'block';
+      note.style.visibility = 'visible';
+      note.style.opacity = '1';
+      note.innerHTML =
+        '<div style="font-weight:900;color:#fff;margin-bottom:8px;">AI 고해상도 렌더링 결과</div>' +
+        '<img src="' + src + '" alt="AI 고해상도 렌더링 결과" style="width:100%;max-height:520px;object-fit:contain;border-radius:16px;border:1px solid rgba(46,242,201,.22);background:#fff;display:block;">' +
+        '<div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">서버에서 생성된 이미지를 표시했습니다.</div>';
+    }
+
+    try {
+      var target = livePanel || cleanImg || note;
+      if (target && target.scrollIntoView) target.scrollIntoView({behavior:'smooth', block:'center'});
+    } catch(e) {}
+  }
+
+  function showLoading(){
+    var livePanel = $('ff-ai-live-panel');
+    var liveStatus = $('ff-ai-live-status');
+    var cleanStatus = $('ff-clean-status');
+    if (livePanel) livePanel.classList.remove('has-image');
+    if (liveStatus) liveStatus.textContent = '생성중';
+    if (cleanStatus) cleanStatus.textContent = '생성중';
+
+    var note = $('quick-ai-preview-note');
+    if (note) {
+      note.className = 'ai-loading';
+      note.style.display = 'block';
+      note.innerHTML = '<b>AI 렌더링 생성 중...</b><br><span style="color:#aaa;">서버 응답을 기다리고 있습니다.</span>';
+    }
+  }
+
+  var oldFetch = window.fetch;
+  window.fetch = function(){
+    var args = arguments;
+    var url = String(args[0] || '');
+    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
+    if (isNano) showLoading();
+
+    return oldFetch.apply(this, args).then(function(res){
+      if (!isNano) return res;
+
+      try {
+        res.clone().json().then(function(data){
+          console.log('[FF_RENDER_DISPLAY_FORCE_FIX] nano response:', data);
+          var src = findImageUrl(data);
+          if (src) {
+            showNanoImage(src);
+          } else {
+            var note = $('quick-ai-preview-note');
+            if (note) {
+              note.className = 'ai-error';
+              note.style.display = 'block';
+              note.innerHTML = '<b style="color:#fca5a5;">이미지 표시 실패</b><br><span style="color:#ddd;">서버 응답은 왔지만 imageUrl 값이 없습니다.</span><pre style="white-space:pre-wrap;color:#8aa;font-size:10px;margin-top:8px;">' + esc(JSON.stringify(data).slice(0,800)) + '</pre>';
+            }
+          }
+        }).catch(function(err){
+          console.error('[FF_RENDER_DISPLAY_FORCE_FIX] response json parse failed', err);
+        });
+      } catch(e) {
+        console.error('[FF_RENDER_DISPLAY_FORCE_FIX] display hook failed', e);
+      }
+      return res;
+    });
+  };
+
+  window.ffForceShowNanoImage = showNanoImage;
+
+  document.addEventListener('DOMContentLoaded', function(){
+    var cleanBtn = $('ff-clean-render-btn');
+    if (cleanBtn && !cleanBtn.__ffForceBound) {
+      cleanBtn.__ffForceBound = true;
+      cleanBtn.addEventListener('click', function(e){
+        if (typeof window.prepareNanoBananaPreview === 'function') {
+          e.preventDefault();
+          window.prepareNanoBananaPreview();
+        }
+      }, true);
+    }
+  });
+})();
+</script>
+
 </body>
 
 
