@@ -22821,17 +22821,6 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 
 
 <!-- === FF_RENDER_FLOW_EXPLICIT_KIND_FIX: desk/screen render cards without hiding choices === -->
-<style id="ff-render-flow-explicit-kind-css">
-  .ff-render-flow-card{margin-top:10px;border:1px solid rgba(32,245,197,.25);border-radius:18px;overflow:hidden;background:#071722;color:#f8fffd;box-shadow:0 14px 34px rgba(0,0,0,.24);}
-  .ff-render-flow-card .ff-rf-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
-  .ff-render-flow-card .ff-rf-title{font-weight:950;color:#20f5c5;font-size:14px;}
-  .ff-render-flow-card .ff-rf-status{font-size:11px;color:#91b9b2;white-space:nowrap;}
-  .ff-render-flow-card .ff-rf-body{padding:12px;}
-  .ff-render-flow-card .ff-rf-body img{width:100%;max-height:520px;object-fit:contain;display:block;background:#fff;border-radius:14px;border:1px solid rgba(255,255,255,.12);}
-  .ff-render-flow-card .ff-rf-desc{margin-top:8px;color:#9fb3bd;font-size:11px;line-height:1.5;}
-  .ff-render-flow-card.ff-rf-error{border-color:rgba(252,165,165,.35);}
-  .ff-render-flow-card.ff-rf-error .ff-rf-title{color:#fca5a5;}
-</style>
 <script id="ff-render-flow-explicit-kind-fix">
 (function(){
   if(window.__ffRenderFlowExplicitKindFix) return;
@@ -22972,13 +22961,26 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 
 
 
-<!-- === FF_FRONTSIDE_GUIDE_PAYLOAD_FINAL_FIX === -->
-<script id="ff-frontside-guide-payload-final-fix">
-(function(){
-  if (window.__ffFrontSideGuidePayloadFinalFix) return;
-  window.__ffFrontSideGuidePayloadFinalFix = true;
 
-  var GUIDE_PATH = './images/guides/frontside_guide';
+
+<!-- === FF_CURRENT_STEP_RENDER_FIX: current-step based desk/screen preview + payload === -->
+<style id="ff-current-step-render-fix-css">
+  .ff-render-flow-card{margin-top:10px;border:1px solid rgba(32,245,197,.25);border-radius:18px;overflow:hidden;background:#071722;color:#f8fffd;box-shadow:0 14px 34px rgba(0,0,0,.24);}
+  .ff-render-flow-card .ff-rf-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .ff-render-flow-card .ff-rf-title{font-weight:950;color:#20f5c5;font-size:14px;}
+  .ff-render-flow-card .ff-rf-status{font-size:11px;color:#91b9b2;white-space:nowrap;}
+  .ff-render-flow-card .ff-rf-body{padding:12px;}
+  .ff-render-flow-card .ff-rf-body img{width:100%;max-height:520px;object-fit:contain;display:block;background:#fff;border-radius:14px;border:1px solid rgba(255,255,255,.12);}
+  .ff-render-flow-card .ff-rf-desc{margin-top:8px;color:#9fb3bd;font-size:11px;line-height:1.5;}
+  .ff-render-flow-card.ff-rf-error{border-color:rgba(252,165,165,.35);}
+  .ff-render-flow-card.ff-rf-error .ff-rf-title{color:#fca5a5;}
+</style>
+<script id="ff-current-step-render-fix">
+(function(){
+  if(window.__ffCurrentStepRenderFix) return;
+  window.__ffCurrentStepRenderFix = true;
+
+  var GUIDE_FRONTSIDE = './images/guides/frontside_guide';
 
   function $(id){ return document.getElementById(id); }
   function S(){
@@ -22986,6 +22988,19 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       window.state || {},
       (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
     );
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function norm(p){
+    if(!p) return '';
+    p = String(p).trim().replace(/^url\(["']?|["']?\)$/g,'').replace(/\\/g,'/');
+    p = p.replace('/products/', './products/');
+    p = p.replace(/^\.\.\//, './');
+    p = p.replace(/(^|_)front_side(?=\.png|\.jpg|\.jpeg|\.webp|$)/i, '$1frontside');
+    return p;
   }
   function text(id){
     var el = $(id);
@@ -22997,78 +23012,93 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     if(!el) return '';
     var bg = (el.style && el.style.backgroundImage) || getComputedStyle(el).backgroundImage || '';
     var m = bg.match(/url\(["']?(.+?)["']?\)/);
-    return m ? m[1] : '';
+    return m ? norm(m[1]) : '';
   }
-  function normPath(p){
-    if(!p) return '';
-    p = String(p).trim().replace(/^url\(["']?|["']?\)$/g,'');
-    if(!p) return '';
-    p = p.replace(/\\/g,'/');
-    p = p.replace(/(^|_)front_side(?=\.png|\.jpg|\.jpeg|\.webp|$)/i, '$1frontside');
-    return p;
+  function isScreenName(v){
+    return /스크린|screen|전면|사이드|일자형|L형|l형|front|side|straight|lshape/i.test(String(v||''));
   }
-  function hasFrontSide(){
+  function currentName(){
     var s = S();
-    var arr = window._setSelected || [];
-    var raw = [
-      arr.join(' '),
-      s.screenLabel,
-      s.screen,
-      s._currentCatName,
-      s.current && s.current.product,
-      s.product,
-      s.selectedScreenKey,
-      s.screenKey
-    ].filter(Boolean).join(' ');
-    return (/전면|front/i.test(raw) && /사이드|side/i.test(raw)) || /frontside|front_side/i.test(raw);
+    return String(s._currentCatName || (s.current && s.current.product) || s.product || '');
   }
-  function isScreenRenderByState(){
-    var s = S();
-    var raw = [
-      s._currentCatName,
-      s.current && s.current.product,
-      s.product,
-      s.step === 'choose_color' ? s.screenLabel : ''
-    ].filter(Boolean).join(' ');
-    return /스크린|screen|전면|사이드|일자형|L형|l형|front|side/i.test(raw);
+  function currentKind(){
+    return isScreenName(currentName()) ? 'screen' : 'desk';
   }
-  function buildFrontSidePreviewPath(existing){
-    existing = normPath(existing || '');
-    if(existing && /frontside/i.test(existing) && /images\/previews\//i.test(existing)) return existing;
-
-    try{
-      if(typeof window.ffBuildPreviewPath === 'function'){
-        var p = normPath(window.ffBuildPreviewPath());
-        if(p && /frontside/i.test(p)) return p;
-      }
-    }catch(e){}
-
+  function setSelectionText(){
+    return String((window._setSelected || []).join(' '));
+  }
+  function bothFrontSideSelected(){
+    var raw = setSelectionText();
+    return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
+  }
+  function screenSuffixForCurrent(){
+    var cur = currentName();
+    if(/L형|l형|lshape/i.test(cur)) return 'lshape';
+    if(/일자형|straight/i.test(cur)) return 'straight';
+    if(/사이드|side/i.test(cur)) return bothFrontSideSelected() ? 'frontside' : 'side';
+    if(/전면|front/i.test(cur)) return bothFrontSideSelected() ? 'frontside' : 'front';
+    if(/frontside|front_side/i.test(cur)) return 'frontside';
+    return bothFrontSideSelected() ? 'frontside' : '';
+  }
+  function legKey(v){
+    v = String(v||'');
+    if(/원형/.test(v)) return 'round';
+    if(/A자|A/.test(v)) return 'aframe';
+    return 'ladder';
+  }
+  function moveKey(v){
+    v = String(v||'');
+    return /캐스터/.test(v) ? 'caster' : 'glide';
+  }
+  function topKey(v){
+    v = String(v||'');
+    return /라운드/.test(v) ? 'round' : 'rect';
+  }
+  function deskFolder(){
     var s = S();
-    var folder = /덕트/.test(String((s.current&&s.current.product)||s.product||s.deskLabel||'')) ? 'desk_duct' : 'desk_standard';
+    var raw = String((s.current && s.current.product) || s.product || s.deskLabel || setSelectionText() || '');
+    return /덕트/.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function baseName(){
+    var s = S();
+    return [legKey(s.legType || s.legShape), moveKey(s.casterType || s.mobility), topKey(s.topShape)].join('_');
+  }
+  function buildDeskOnlyPreview(){
+    return './images/previews/' + deskFolder() + '/' + baseName() + '.png';
+  }
+  function buildScreenPreview(){
+    var suffix = screenSuffixForCurrent();
+    if(!suffix) return buildDeskOnlyPreview();
+    return './images/previews/' + deskFolder() + '/' + baseName() + '_' + suffix + '.png';
+  }
 
-    function legKey(v){
-      v=String(v||'');
-      if(/원형/.test(v)) return 'round';
-      if(/A자|A/.test(v)) return 'aframe';
-      return 'ladder';
+  // 중요: 예전 /products/.../base/base.png 경로를 쓰는 함수가 남아 있어서 previews 경로로 강제 교체.
+  window.productImage = function(key){
+    key = String(key || '');
+    if(key === 'front_side') key = 'frontside';
+    if(key === 'screen_front') key = 'front';
+    if(key === 'screen_side') key = 'side';
+    if(key === 'screen_straight') key = 'straight';
+    if(key === 'screen_lshape') key = 'lshape';
+
+    if(key === 'desk_standard' || key === 'desk_duct') return buildDeskOnlyPreview();
+    if(/frontside|front|side|straight|lshape/i.test(key)){
+      var sfx = key.match(/frontside|front|side|straight|lshape/i)[0].toLowerCase();
+      return './images/previews/' + deskFolder() + '/' + baseName() + '_' + sfx + '.png';
     }
-    function moveKey(v){ v=String(v||''); return /캐스터/.test(v) ? 'caster' : 'glide'; }
-    function topKey(v){ v=String(v||''); return /라운드/.test(v) ? 'round' : 'rect'; }
+    return buildDeskOnlyPreview();
+  };
 
-    return './images/previews/' + folder + '/' +
-      [legKey(s.legType||s.legShape), moveKey(s.casterType||s.mobility), topKey(s.topShape)].join('_') +
-      '_frontside.png';
-  }
   function localTexture(code, type){
     if(!code) return '';
     try{
       if(typeof window._ffLocalTextureForCode === 'function'){
-        return normPath(window._ffLocalTextureForCode(code, type || '전면 스크린') || '');
+        return norm(window._ffLocalTextureForCode(code, type || '') || '');
       }
     }catch(e){}
     try{
       if(typeof window.screenTextureUrl === 'function'){
-        return normPath(window.screenTextureUrl(code, type || '전면 스크린') || '');
+        return norm(window.screenTextureUrl(code, type || '') || '');
       }
     }catch(e){}
     return '';
@@ -23076,114 +23106,227 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function screenState(){
     return window._screenPreviewState || {};
   }
-  function entryTex(entry, fallbackType){
-    if(!entry) return '';
-    return normPath(entry.texUrl || localTexture(entry.color, entry.type || fallbackType));
-  }
-  function entryCode(entry){
-    return entry && entry.color ? String(entry.color).trim() : '';
-  }
-  function enrichFrontSidePayload(payload){
-    var st = screenState();
+  function screenCodesAndTextures(){
     var s = S();
+    var st = screenState();
     var front = st.front || null;
     var side = st.side || null;
     var latest = st.latest || null;
 
-    var generalScreenCode = text('quick-screen-code') || s.screenCode || s.screenColor || s.screen || window.__ffPreviewScreen || '';
-    var generalScreenTex = normPath(bgUrl('quick-screen-chip') || s.screenTex || s.screenTexture || localTexture(generalScreenCode, '전면 스크린'));
+    var generalCode = text('quick-screen-code') || s.screenCode || s.screenColor || s.screen || window.__ffPreviewScreen || '';
+    var generalTex = bgUrl('quick-screen-chip') || s.screenTex || s.screenTexture || localTexture(generalCode, currentName());
 
-    var frontCode = entryCode(front) || s.frontScreenCode || s.frontCode || generalScreenCode;
-    var sideCode = entryCode(side) || s.sideScreenCode || s.sideCode || generalScreenCode;
+    var frontCode = (front && front.color) || s.frontScreenCode || s.frontCode || (/전면|front/i.test(currentName()) ? generalCode : '');
+    var sideCode = (side && side.color) || s.sideScreenCode || s.sideCode || (/사이드|side/i.test(currentName()) ? generalCode : '');
 
-    var frontTex = entryTex(front, '전면 스크린') || s.frontScreenTexture || s.frontTexture || generalScreenTex;
-    var sideTex = entryTex(side, '사이드 스크린') || s.sideScreenTexture || s.sideTexture || generalScreenTex;
+    // 전면+사이드 조합인데 아직 둘 중 하나만 선택된 경우에도 현재 고른 재질을 해당 영역에 넣고,
+    // 없는 쪽은 generalTex로 fallback해서 undefined가 되지 않게 함.
+    if(screenSuffixForCurrent() === 'frontside'){
+      if(!frontCode && generalCode) frontCode = generalCode;
+      if(!sideCode && generalCode) sideCode = generalCode;
+    }
 
-    var preview = buildFrontSidePreviewPath(payload.deskImage || payload.screenImage);
+    var frontTex = norm((front && front.texUrl) || s.frontScreenTexture || s.frontTexture || localTexture(frontCode, '전면 스크린'));
+    var sideTex = norm((side && side.texUrl) || s.sideScreenTexture || s.sideTexture || localTexture(sideCode, '사이드 스크린'));
 
-    payload.targetType = 'screen';
-    payload.productType = 'screen';
-    payload.renderStep = 'frontside_screen_mapping';
-    payload.mode = 'frontside-screen-guide-material-mapping';
+    if(screenSuffixForCurrent() === 'frontside'){
+      if(!frontTex) frontTex = norm(generalTex);
+      if(!sideTex) sideTex = norm(generalTex);
+    }
 
-    // frontside 원본 이미지를 base와 screenImage 모두에 넣어서 Gemini가 새 제품을 만들지 않고 이 사진을 편집하게 함.
-    payload.deskImage = preview;
-    payload.screenImage = preview;
-    payload.fallbackDeskImage = preview;
-    payload.composedPreview = '';
-
-    payload.screenSelected = true;
-    payload.screenLabel = payload.screenLabel || s.screenLabel || '전면 스크린 + 사이드 스크린';
-    payload.guideImage = GUIDE_PATH;
-
-    payload.frontScreenTexture = frontTex;
-    payload.sideScreenTexture = sideTex;
-    payload.frontScreenCode = frontCode;
-    payload.sideScreenCode = sideCode;
-
-    // 기존 단일 screenTexture도 비워두지 않음. 단, 서버에서는 front/side가 우선됨.
-    payload.screenTexture = payload.screenTexture || frontTex || sideTex || generalScreenTex;
-    payload.screenCode = payload.screenCode || frontCode || sideCode || generalScreenCode;
-
-    payload.topTexture = payload.topTexture || normPath(bgUrl('quick-top-chip') || s.topTex || s.topTexture || s.topMaterialImg || '');
-    payload.legTexture = payload.legTexture || normPath(bgUrl('quick-leg-chip') || s.legTex || s.legTexture || s.legMaterialImg || '');
+    return {
+      generalCode: generalCode,
+      generalTex: norm(generalTex),
+      frontCode: frontCode,
+      sideCode: sideCode,
+      frontTex: frontTex,
+      sideTex: sideTex
+    };
+  }
+  function materialPayloadBase(payload){
+    var s = S();
+    payload.topTexture = payload.topTexture || bgUrl('quick-top-chip') || s.topTex || s.topTexture || s.topMaterialImg || '';
+    payload.legTexture = payload.legTexture || bgUrl('quick-leg-chip') || s.legTex || s.legTexture || s.legMaterialImg || '';
     payload.topCode = payload.topCode || text('quick-top-code') || s.top || s.topCode || s.topColor || '';
     payload.legCode = payload.legCode || text('quick-leg-code') || s.leg || s.legCode || s.legColor || '';
-
-    console.log('[FF_FRONTSIDE_GUIDE_PAYLOAD_FINAL_FIX]', {
-      deskImage: payload.deskImage,
-      screenImage: payload.screenImage,
-      guideImage: payload.guideImage,
-      frontScreenTexture: payload.frontScreenTexture,
-      sideScreenTexture: payload.sideScreenTexture,
-      frontScreenCode: payload.frontScreenCode,
-      sideScreenCode: payload.sideScreenCode
-    });
-
     return payload;
   }
-  function cleanDeskPayload(payload){
+  function applyDeskPayload(payload){
+    var img = buildDeskOnlyPreview();
+    payload = materialPayloadBase(payload);
     payload.targetType = 'desk';
     payload.productType = 'desk';
-    payload.renderStep = 'desk_only';
-    payload.mode = 'desk-only-material-mapping';
+    payload.renderStep = 'desk_only_current_step';
+    payload.mode = 'desk-only-material-mapping-current-step';
+    payload.deskImage = img;
+    payload.fallbackDeskImage = img;
+    payload.composedPreview = '';
+    payload.screenSelected = false;
+    payload.screenImage = '';
     payload.screenTexture = '';
     payload.screenCode = '';
-    payload.screenImage = '';
     payload.guideImage = '';
     payload.frontScreenTexture = '';
     payload.sideScreenTexture = '';
     payload.frontScreenCode = '';
     payload.sideScreenCode = '';
-    payload.screenSelected = false;
+    return payload;
+  }
+  function applyScreenPayload(payload){
+    var img = buildScreenPreview();
+    var suffix = screenSuffixForCurrent();
+    var m = screenCodesAndTextures();
+    payload = materialPayloadBase(payload);
+    payload.targetType = 'screen';
+    payload.productType = 'screen';
+    payload.renderStep = suffix === 'frontside' ? 'frontside_screen_current_step' : 'screen_current_step';
+    payload.mode = suffix === 'frontside' ? 'frontside-guide-material-mapping-current-step' : 'screen-material-mapping-current-step';
+    payload.deskImage = img;
+    payload.screenImage = img;
+    payload.fallbackDeskImage = img;
+    payload.composedPreview = '';
+    payload.screenSelected = true;
+    payload.screenLabel = payload.screenLabel || currentName();
+
+    payload.screenTexture = payload.screenTexture || m.generalTex || m.frontTex || m.sideTex;
+    payload.screenCode = payload.screenCode || m.generalCode || m.frontCode || m.sideCode;
+
+    if(suffix === 'frontside'){
+      payload.guideImage = GUIDE_FRONTSIDE;
+      payload.frontScreenTexture = m.frontTex;
+      payload.sideScreenTexture = m.sideTex;
+      payload.frontScreenCode = m.frontCode;
+      payload.sideScreenCode = m.sideCode;
+    }else{
+      payload.guideImage = '';
+      payload.frontScreenTexture = '';
+      payload.sideScreenTexture = '';
+      payload.frontScreenCode = '';
+      payload.sideScreenCode = '';
+    }
+
     return payload;
   }
 
-  var prevFetch = window.fetch;
+  function dataUrlToBlobUrl(dataUrl){
+    try{
+      if(!/^data:image\//i.test(String(dataUrl||''))) return dataUrl;
+      var p=dataUrl.split(','), mime=(p[0].match(/^data:([^;]+)/i)||[,'image/png'])[1], bin=atob(p.slice(1).join(',')), arr=new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      return URL.createObjectURL(new Blob([arr],{type:mime}));
+    }catch(e){ return dataUrl; }
+  }
+  function getSrc(data){
+    if(!data) return '';
+    if(typeof data === 'string') return data;
+    return data.imageUrl || data.image || data.url || data.previewUrl || data.output || '';
+  }
+  function addCard(kind){
+    var messages = $('messages');
+    if(!messages) return null;
+    var wrap = document.createElement('div');
+    wrap.className = 'msg bot ff-render-flow-msg';
+    var icon = document.createElement('div');
+    icon.className = 'bot-icon';
+    icon.textContent = 'AI';
+    var bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML =
+      '<div class="ff-render-flow-card">' +
+      '<div class="ff-rf-head"><div class="ff-rf-title">' + (kind === 'screen' ? '스크린 렌더링 생성 중' : '데스크 렌더링 생성 중') + '</div><div class="ff-rf-status">생성중</div></div>' +
+      '<div class="ff-rf-body"><div class="ff-rf-desc">' + (kind === 'screen' ? '현재 스크린 단계 기준 원본 이미지에 재질을 맵핑하고 있습니다.' : '현재 데스크 단계 기준 원본 이미지에 상판/다리 재질만 맵핑하고 있습니다.') + '</div></div>' +
+      '</div>';
+    wrap.appendChild(icon);
+    wrap.appendChild(bubble);
+    messages.appendChild(wrap);
+    try{ messages.scrollTop = messages.scrollHeight; }catch(e){}
+    return wrap;
+  }
+  function updateCard(card, kind, src, err){
+    if(!card) return;
+    var box = card.querySelector('.ff-render-flow-card');
+    var title = card.querySelector('.ff-rf-title');
+    var status = card.querySelector('.ff-rf-status');
+    var body = card.querySelector('.ff-rf-body');
+    if(err){
+      if(box) box.classList.add('ff-rf-error');
+      if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 실패' : '데스크 렌더링 실패';
+      if(status) status.textContent = '오류';
+      if(body) body.innerHTML = '<div class="ff-rf-desc">' + esc(err) + '</div>';
+      return;
+    }
+    var img = dataUrlToBlobUrl(src);
+    if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과';
+    if(status) status.textContent = '생성완료';
+    if(body) body.innerHTML = '<img src="' + esc(img) + '" alt="' + (kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과') + '"><div class="ff-rf-desc">' + (kind === 'screen' ? '스크린 단계 원본 기준으로 재질을 맵핑한 결과입니다.' : '데스크 단독 원본 기준으로 재질을 맵핑한 결과입니다.') + '</div>';
+    try{ var messages = $('messages'); if(messages) messages.scrollTop = messages.scrollHeight; }catch(e){}
+  }
+
+  // 고해상도 버튼을 누르는 순간의 "현재 단계"를 기록한다.
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn, #quick-ai-preview-btn');
+    if(!btn) return;
+    window.__ffNextRenderKind = currentKind();
+    console.log('[FF_CURRENT_STEP_RENDER_FIX] click kind:', window.__ffNextRenderKind, 'current:', currentName(), 'set:', setSelectionText());
+  }, true);
+
+  var previousFetch = window.fetch;
   window.fetch = function(input, init){
     var url = String(input || '');
     var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
+    var kind = window.__ffNextRenderKind || currentKind();
+    var card = null;
 
     if(isNano && init && init.body){
       try{
         var payload = JSON.parse(init.body || '{}') || {};
-        var explicitKind = window.__ffNextRenderKind || '';
-        var screenRender = explicitKind === 'screen' || /screen|스크린/i.test(String(payload.targetType || payload.productType || payload.mode || '')) || isScreenRenderByState();
+        kind = window.__ffNextRenderKind || currentKind();
 
-        if(screenRender && hasFrontSide()){
-          payload = enrichFrontSidePayload(payload);
-          window.__ffNextRenderKind = 'screen';
-        } else if(!screenRender || explicitKind === 'desk'){
-          payload = cleanDeskPayload(payload);
-          window.__ffNextRenderKind = 'desk';
-        }
+        // 핵심: 처음 복수선택한 제품 목록이 아니라 현재 단계 기준으로만 결정.
+        payload = kind === 'screen' ? applyScreenPayload(payload) : applyDeskPayload(payload);
 
-        init = Object.assign({}, init, { body: JSON.stringify(payload) });
+        init = Object.assign({}, init, {body: JSON.stringify(payload)});
+        card = addCard(kind);
+        console.log('[FF_CURRENT_STEP_RENDER_FIX] payload:', {
+          kind: kind,
+          current: currentName(),
+          deskImage: payload.deskImage,
+          screenImage: payload.screenImage,
+          guideImage: payload.guideImage,
+          topTexture: payload.topTexture,
+          legTexture: payload.legTexture,
+          screenTexture: payload.screenTexture,
+          frontScreenTexture: payload.frontScreenTexture,
+          sideScreenTexture: payload.sideScreenTexture,
+          topCode: payload.topCode,
+          legCode: payload.legCode,
+          screenCode: payload.screenCode,
+          frontScreenCode: payload.frontScreenCode,
+          sideScreenCode: payload.sideScreenCode
+        });
       }catch(e){
-        console.warn('[FF_FRONTSIDE_GUIDE_PAYLOAD_FINAL_FIX] payload patch failed', e);
+        console.warn('[FF_CURRENT_STEP_RENDER_FIX] payload patch failed', e);
       }
     }
-    return prevFetch.call(this, input, init);
+
+    return previousFetch.call(this, input, init).then(function(res){
+      if(!isNano) return res;
+      try{
+        res.clone().json().then(function(data){
+          var src = getSrc(data);
+          if(src) updateCard(card, kind, src, '');
+          else updateCard(card, kind, '', (data && (data.error || data.detail)) || '이미지 결과를 받지 못했습니다.');
+        }).catch(function(err){
+          updateCard(card, kind, '', err && err.message ? err.message : '응답을 읽지 못했습니다.');
+        });
+      }catch(e){}
+      window.__ffNextRenderKind = '';
+      return res;
+    }).catch(function(err){
+      if(isNano) updateCard(card, kind, '', err && err.message ? err.message : String(err));
+      window.__ffNextRenderKind = '';
+      throw err;
+    });
   };
 })();
 </script>
