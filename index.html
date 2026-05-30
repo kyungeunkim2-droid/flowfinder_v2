@@ -8604,8 +8604,8 @@ input[type="number"]::placeholder,#user-input::placeholder{color:#6d8f89!importa
     var b=e.target.closest && e.target.closest('.material-btn');
     if(b && window.ffRepairMaterialThumbnails) window.ffRepairMaterialThumbnails();
   }, true);
-  var mo=new MutationObserver(function(){ window.ffRepairMaterialThumbnails(); });
-  if(document.body) mo.observe(document.body,{childList:true,subtree:true});
+  var _ffRepairThumbTimer=null; var mo=new MutationObserver(function(){ clearTimeout(_ffRepairThumbTimer); _ffRepairThumbTimer=setTimeout(window.ffRepairMaterialThumbnails, 250); });
+  if(document.body) mo.observe(document.getElementById('preview-panel') || document.getElementById('messages') || document.body,{childList:true,subtree:false});
   setTimeout(window.ffRepairMaterialThumbnails, 400);
 })();
 </script>
@@ -8900,7 +8900,7 @@ button.material-btn{
   }
   window.ff54ClassifyMaterialGroups=classifyMaterialGroups;
   var mo=new MutationObserver(function(muts){ classifyMaterialGroups(document); });
-  document.addEventListener('DOMContentLoaded',function(){ classifyMaterialGroups(document); mo.observe(document.body,{childList:true,subtree:true}); });
+  document.addEventListener('DOMContentLoaded',function(){ classifyMaterialGroups(document); mo.observe(document.getElementById('preview-panel') || document.getElementById('messages') || document.body,{childList:true,subtree:false}); });
   setTimeout(function(){classifyMaterialGroups(document);},100);
 
   // 단품 제품 선택 화면도 데스크/스크린 카테고리로 보여주기
@@ -15515,23 +15515,38 @@ window.showPanel = function(){
 </script>
 
 
+
+
 <script id="ff-right-dashboard-clean-redesign-js">
 (function(){
+  let syncTimer = null;
+  let previewTimer = null;
+
   function textOf(sel){
-    var el = document.querySelector(sel);
+    const el = document.querySelector(sel);
     return el ? (el.textContent || '').trim() : '';
   }
 
   function setText(id, value){
-    var el = document.getElementById(id);
+    const el = document.getElementById(id);
     if(el) el.textContent = value && value !== 'undefined' ? value : '-';
   }
 
-  function setChip(id, code, part){
-    var el = document.getElementById(id);
-    if(!el) return;
+  function normalizeUrl(url){
+    if(!url) return '';
+    url = String(url);
+    if(/^https?:\/\//i.test(url)) return url;
+    if(url.indexOf('./') === 0) return url;
+    if(url.indexOf('/images/') === 0) return '.' + url;
+    if(url.indexOf('images/') === 0) return './' + url;
+    return url;
+  }
 
-    var url = '';
+  function setChip(id, code, part){
+    const el = document.getElementById(id);
+    if(!el || !code || code === '-') return;
+
+    let url = '';
     try{
       if(part === 'screen' && typeof window.ffMaterialTextureUrl === 'function'){
         url = window.ffMaterialTextureUrl(code, 'screen');
@@ -15540,16 +15555,13 @@ window.showPanel = function(){
       }
     }catch(e){}
 
-    if(url){
-      if(url.indexOf('images/') === 0) url = './' + url;
-      el.style.backgroundImage = 'url("' + url + '")';
-    }
+    url = normalizeUrl(url);
+    if(url) el.style.backgroundImage = 'url("' + url + '")';
   }
 
   function getStateValue(keys){
-    var s = window.state || {};
-    for(var i=0;i<keys.length;i++){
-      var k = keys[i];
+    const s = window.state || {};
+    for(const k of keys){
       if(s[k]) return s[k];
       if(s.current && s.current[k]) return s.current[k];
     }
@@ -15557,57 +15569,53 @@ window.showPanel = function(){
   }
 
   function syncCleanDashboard(){
-    var s = window.state || {};
-    var current = s.current || {};
+    syncTimer = null;
 
-    var product =
+    const s = window.state || {};
+    const current = s.current || {};
+    const fp = window.FlowFinderFastPreview && window.FlowFinderFastPreview.state;
+
+    const product =
       current.product ||
       s.product ||
-      textOf('#current-box .current-row:nth-child(1) span') ||
       textOf('.preview-item .item-name') ||
       '-';
 
-    var option =
+    const option =
       current.option ||
       current.options ||
       s.option ||
       s.options ||
-      textOf('#current-box .current-row:nth-child(2) span') ||
       '-';
 
-    var size =
+    const size =
       current.size ||
       s.size ||
       [current.width || s.width, current.depth || s.depth, current.height || s.height].filter(Boolean).join(' ') ||
-      textOf('#current-box .current-row:nth-child(3) span') ||
       '-';
 
-    var qty =
-      current.qty ||
-      s.qty ||
-      textOf('#qty') ||
-      '1';
+    const qty = current.qty || s.qty || '1';
 
-    var top =
+    const top =
       getStateValue(['topColor','_deskTopColor','top','topCode']) ||
-      (window.FlowFinderFastPreview && FlowFinderFastPreview.state && FlowFinderFastPreview.state.top) ||
+      (fp && fp.top) ||
       textOf('#quick-top-code') ||
       '-';
 
-    var leg =
+    const leg =
       getStateValue(['legColor','_deskLegColor','leg','legCode']) ||
-      (window.FlowFinderFastPreview && FlowFinderFastPreview.state && FlowFinderFastPreview.state.leg) ||
+      (fp && fp.leg) ||
       textOf('#quick-leg-code') ||
       '-';
 
-    var screen =
+    const screen =
       getStateValue(['screenColor','_screenColor','screen','screenCode']) ||
       window.__ffPreviewScreen ||
-      (window.FlowFinderFastPreview && FlowFinderFastPreview.state && FlowFinderFastPreview.state.screen) ||
+      (fp && fp.screen) ||
       textOf('#quick-screen-code') ||
       '-';
 
-    var total =
+    const total =
       textOf('#total-box .total-price') ||
       textOf('.total-price') ||
       textOf('.final-total-box b') ||
@@ -15627,89 +15635,129 @@ window.showPanel = function(){
     setChip('ff-clean-screen-chip', screen, 'screen');
   }
 
-  function showPreviewFromExisting(){
-    var img = document.getElementById('ff-clean-preview-img');
-    var canvas = document.getElementById('ff-clean-preview-canvas');
-    var empty = document.getElementById('ff-clean-empty-preview');
-    var status = document.getElementById('ff-clean-status');
+  function requestSync(delay){
+    if(syncTimer) clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncCleanDashboard, delay || 120);
+  }
 
-    var existingImg =
+  function showPreviewFromExisting(useCanvas){
+    previewTimer = null;
+
+    const img = document.getElementById('ff-clean-preview-img');
+    const canvas = document.getElementById('ff-clean-preview-canvas');
+    const empty = document.getElementById('ff-clean-empty-preview');
+    const status = document.getElementById('ff-clean-status');
+
+    const existingImg =
       document.querySelector('#product-preview-img') ||
       document.querySelector('#ff-hero-img') ||
       document.querySelector('#render-preview-img');
 
-    var existingCanvas =
-      document.querySelector('#ff-hero-canvas') ||
-      document.querySelector('#ff-render-canvas') ||
-      document.querySelector('#product-3d-canvas') ||
-      document.querySelector('#screen-composite-canvas');
-
     if(existingImg && existingImg.src){
       img.src = existingImg.src;
       img.classList.add('show');
-      canvas.classList.remove('show');
-      empty.classList.add('hide');
+      if(canvas) canvas.classList.remove('show');
+      if(empty) empty.classList.add('hide');
       if(status) status.textContent = '표시중';
       return true;
     }
 
-    if(existingCanvas){
-      try{
-        var url = existingCanvas.toDataURL('image/png');
-        img.src = url;
-        img.classList.add('show');
-        canvas.classList.remove('show');
-        empty.classList.add('hide');
-        if(status) status.textContent = '표시중';
-        return true;
-      }catch(e){}
+    // toDataURL is expensive, so only do it after the render button click.
+    if(useCanvas){
+      const existingCanvas =
+        document.querySelector('#ff-hero-canvas') ||
+        document.querySelector('#ff-render-canvas') ||
+        document.querySelector('#product-3d-canvas') ||
+        document.querySelector('#screen-composite-canvas');
+
+      if(existingCanvas){
+        try{
+          img.src = existingCanvas.toDataURL('image/png');
+          img.classList.add('show');
+          if(canvas) canvas.classList.remove('show');
+          if(empty) empty.classList.add('hide');
+          if(status) status.textContent = '표시중';
+          return true;
+        }catch(e){}
+      }
     }
 
     if(status) status.textContent = '대기중';
     return false;
   }
 
-  document.addEventListener('click', function(e){
-    var btn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn');
-    if(!btn) return;
-
-    btn.textContent = '렌더링 준비중...';
-
-    var oldBtn =
-      document.getElementById('quick-ai-preview-btn') ||
-      document.getElementById('ai-render-btn') ||
-      document.getElementById('product-preview-confirm') ||
-      document.getElementById('screen-ai-btn');
-
-    if(oldBtn && oldBtn !== btn){
-      try{ oldBtn.click(); }catch(e){}
-    }
-
-    setTimeout(function(){
-      showPreviewFromExisting();
-      btn.textContent = '✨ 고해상도 렌더링하기';
-    }, 900);
-  });
-
-  document.addEventListener('click', function(){
-    setTimeout(syncCleanDashboard, 80);
-    setTimeout(syncCleanDashboard, 350);
-  }, true);
-
-  if(window.MutationObserver){
-    var mo = new MutationObserver(function(){
-      syncCleanDashboard();
-      showPreviewFromExisting();
-    });
-    mo.observe(document.body, {childList:true, subtree:true, characterData:true});
+  function requestPreview(delay, useCanvas){
+    if(previewTimer) clearTimeout(previewTimer);
+    previewTimer = setTimeout(function(){ showPreviewFromExisting(!!useCanvas); }, delay || 300);
   }
 
-  window.ffSyncCleanDashboard = syncCleanDashboard;
+  document.addEventListener('click', function(e){
+    const renderBtn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn');
+
+    if(renderBtn){
+      renderBtn.textContent = '렌더링 준비중...';
+
+      const oldBtn =
+        document.getElementById('quick-ai-preview-btn') ||
+        document.getElementById('ai-render-btn') ||
+        document.getElementById('product-preview-confirm') ||
+        document.getElementById('screen-ai-btn');
+
+      if(oldBtn && oldBtn !== renderBtn){
+        try{ oldBtn.click(); }catch(e){}
+      }
+
+      requestSync(250);
+      requestPreview(900, true);
+      setTimeout(function(){
+        renderBtn.textContent = '✨ 고해상도 렌더링하기';
+      }, 950);
+      return;
+    }
+
+    if(e.target.closest('.choice-btn, .material-btn, .confirm-btn, .back-btn, .preview-item, .item-chip, #send-btn')){
+      requestSync(160);
+      requestPreview(500, false);
+    }
+  }, true);
+
+  document.addEventListener('change', function(e){
+    if(e.target && e.target.matches('input, select')){
+      requestSync(120);
+    }
+  }, true);
+
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.matches('input')){
+      requestSync(250);
+    }
+  }, true);
+
+  function observeLight(target){
+    if(!target || !window.MutationObserver) return;
+    const mo = new MutationObserver(function(){
+      requestSync(180);
+    });
+    mo.observe(target, {childList:true, characterData:true, subtree:true});
+  }
+
   document.addEventListener('DOMContentLoaded', function(){
-    syncCleanDashboard();
-    showPreviewFromExisting();
+    requestSync(80);
+    requestPreview(250, false);
+    observeLight(document.getElementById('total-box'));
+    observeLight(document.getElementById('current-box'));
+    observeLight(document.getElementById('preview-items'));
   });
-  setTimeout(syncCleanDashboard, 300);
+
+  setTimeout(function(){
+    requestSync(80);
+    requestPreview(250, false);
+  }, 300);
+
+  window.ffSyncCleanDashboard = function(){
+    requestSync(0);
+    requestPreview(100, false);
+  };
 })();
 </script>
 
@@ -16556,8 +16604,8 @@ button.material-btn {
     });
   }
   document.addEventListener('click', hideLegacyBundleMenus, true);
-  var mo = new MutationObserver(hideLegacyBundleMenus);
-  if(document.body) mo.observe(document.body, { childList:true, subtree:true });
+  var _ffHideLegacyTimer=null; var mo = new MutationObserver(function(){ clearTimeout(_ffHideLegacyTimer); _ffHideLegacyTimer=setTimeout(hideLegacyBundleMenus, 250); });
+  if(document.body) mo.observe(document.getElementById('preview-panel') || document.getElementById('messages') || document.body, { childList:true, subtree:false });
   setTimeout(hideLegacyBundleMenus, 100);
 })();
 </script>
@@ -16689,8 +16737,8 @@ button.material-btn {
     });
   }
   document.addEventListener('click', cleanupOldQuoteText, true);
-  var mo = new MutationObserver(cleanupOldQuoteText);
-  if(document.body) mo.observe(document.body,{childList:true,subtree:true});
+  var _ffCleanupQuoteTimer=null; var mo = new MutationObserver(function(){ clearTimeout(_ffCleanupQuoteTimer); _ffCleanupQuoteTimer=setTimeout(cleanupOldQuoteText, 250); });
+  if(document.body) mo.observe(document.getElementById('preview-panel') || document.getElementById('messages') || document.body,{childList:true,subtree:false});
   setTimeout(cleanupOldQuoteText, 100);
 })();
 </script>
