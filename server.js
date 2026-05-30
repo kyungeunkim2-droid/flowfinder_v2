@@ -111,6 +111,7 @@ function extractText(response) {
 
 app.post('/api/generate-preview', async (req, res) => {
   console.log('[NanoBanana] /api/generate-preview called');
+  console.log('[SERVER_TEXTURE_NOT_BACKGROUND_FIX] active');
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
@@ -182,30 +183,25 @@ console.log('[RENDER BODY]', {
 
     parts.push({
       text: [
-        'Use the base furniture product image as the exact reference.',
-        'THIS IS AN IMAGE EDITING TASK, NOT AN IMAGE GENERATION TASK.',
-        'Use the supplied base product image as a locked canvas.',
-        'Do not create a new furniture design.',
-        'Do not generate a new desk.',
-        'Do not generate a new screen.',
-        'Do not change the shape, dimensions, proportions, position, crop, camera angle, perspective, shadows, or background.',
-        'Preserve the exact product geometry from the source image.',
-        'Only replace the material appearance on existing visible surfaces.',
-        'Do not add or remove any furniture components.',
-        'The output must look identical to the source image except for material/color changes.',
-        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
-        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
-        'Apply the provided leg material naturally only to the vertical desk legs.',
+        'Use the base furniture product image as the PRIMARY TARGET IMAGE.',
+        'The texture images are material swatches only, not backgrounds, not scenes, and not replacement product images.',
+        'Never use any texture image as the background.',
+        'Never fill the whole image with a texture.',
+        'Keep the original clean catalog background from the base image.',
+        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, crop, background, and lighting from the base image.',
+        'Preserve the original furniture layout and visible product parts.',
+        'Apply the provided top material texture only as a surface finish on the existing desktop/tabletop surface.',
+        'Apply the provided leg material only as a color/material finish on the existing vertical desk legs/frame.',
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
-        effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
-        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not modify the screen shape.' : '',
-        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not move the screen.' : '',
-        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not resize the screen.' : '',
-        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not create additional screen panels.' : '',
-        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Only change the color/material of the existing screen surface.' : '',
-        effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
-        effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.' : '',
+        effectiveScreenTexture ? 'Apply the provided screen material texture only as fabric/surface finish on the existing screen panel area.' : '',
+        effectiveScreenTexture ? 'The screen texture reference must not become the image background.' : '',
+        effectiveScreenTexture ? 'Do not enlarge the screen texture beyond the screen panel surface.' : '',
+        effectiveScreenTexture ? 'Do not create a new desk or new screen from the texture image.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Keep the desk, desktop, legs, cable duct, brackets, casters, crop, and background unchanged except for requested material finishes.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Only change the color/material of the existing visible screen surface.' : '',
+        effectiveFrontScreenTexture ? 'Apply the provided front screen material only as fabric/surface finish to the FRONT screen panel identified by the guide image. Do not use this texture as background.' : '',
+        effectiveSideScreenTexture ? 'Apply the provided side screen material only as fabric/surface finish to the SIDE screen panel identified by the guide image. Do not use this texture as background.' : '',
         effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
         effectiveFrontScreenCode ? `Front screen material code: ${effectiveFrontScreenCode}.` : '',
         effectiveSideScreenCode ? `Side screen material code: ${effectiveSideScreenCode}.` : '',
@@ -230,7 +226,7 @@ console.log('[RENDER BODY]', {
     });
 
     const imageInputs = [
-      ['base furniture product image', deskImage],
+      ['PRIMARY TARGET base furniture product image to edit', deskImage],
       ['desktop material texture reference', topTexture],
       ['legs and frame material color reference', legTexture],
       ['screen material texture reference', effectiveScreenTexture],
@@ -319,20 +315,15 @@ app.post('/api/generate-screen-preview', async (req, res) => {
 
     parts.push({
    text: [
-  'Use the provided AI-generated desk image as the exact base image.',
-  'THIS IS AN IMAGE EDITING TASK, NOT AN IMAGE GENERATION TASK.',
-  'Use the supplied base product image as a locked canvas.',
-  'Do not create a new furniture design.',
-  'Do not generate a new desk.',
-  'Do not generate a new screen.',
-  'Preserve the exact product geometry, crop, perspective, lighting, and background.',
-  'Only replace the material/color on the existing visible screen surface.',
-  'Add the provided screen product naturally to the desk.',
-  'Apply the provided screen material only to the screen panel.',
-  'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
-  'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
+  'Use the provided desk image as the PRIMARY TARGET IMAGE.',
+  'The texture images are material swatches only, not backgrounds and not replacement product images.',
+  'Never use any texture image as the background.',
+  'Keep the original clean catalog background from the base image.',
+  'Apply the provided screen material only as surface/fabric finish to the existing screen panel.',
+  'Do not modify the desktop, desk legs, cable duct, brackets, casters, or existing desk materials.',
+  'Keep the same camera angle, perspective, lighting, proportions, crop, and product shape.',
   'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
-  'Create one photorealistic office furniture catalog render.',
+  'Create one photorealistic office furniture catalog material-edit result.',
   guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply front screen material only to FRONT and side screen material only to SIDE.' : ''
 ].filter(Boolean).join('\n')
     });
