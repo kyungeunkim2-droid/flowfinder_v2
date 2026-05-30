@@ -111,7 +111,7 @@ function extractText(response) {
 
 app.post('/api/generate-preview', async (req, res) => {
   console.log('[NanoBanana] /api/generate-preview called');
-  console.log('[SERVER_NO_VISIBLE_GUIDE_FIX] active');
+  console.log('[SERVER_GUIDE_BACK_MAPPING_ONLY] active');
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
@@ -144,7 +144,6 @@ app.post('/api/generate-preview', async (req, res) => {
       sideScreenTexture,
       frontScreenCode,
       sideScreenCode,
-      frontSideInstruction,
     } = req.body || {};
 console.log('[RENDER BODY]', {
   deskImage,
@@ -164,8 +163,7 @@ console.log('[RENDER BODY]', {
 
   targetType,
   productType,
-  mode,
-  frontSideInstruction
+  mode
 });
     // FF_TARGET_MODE_SAFE_PATCH
     const targetMode = String(targetType || productType || mode || '').toLowerCase();
@@ -175,7 +173,7 @@ console.log('[RENDER BODY]', {
     const effectiveScreenTexture = isDeskRender ? '' : screenTexture;
     const effectiveScreenCode = isDeskRender ? '' : screenCode;
     const effectiveScreenImage = isDeskRender ? '' : screenImage;
-    const effectiveGuideImage = (isDeskRender || frontSideInstruction) ? '' : guideImage;
+    const effectiveGuideImage = isDeskRender ? '' : guideImage;
     const effectiveFrontScreenTexture = isDeskRender ? '' : frontScreenTexture;
     const effectiveSideScreenTexture = isDeskRender ? '' : sideScreenTexture;
     const effectiveFrontScreenCode = isDeskRender ? '' : frontScreenCode;
@@ -185,13 +183,23 @@ console.log('[RENDER BODY]', {
 
     parts.push({
       text: [
-        'Use the base furniture product image as the exact reference.',
-        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
-        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
-        'Apply the provided leg material naturally only to the vertical desk legs.',
+        'THIS IS A MATERIAL MAPPING / IMAGE EDITING TASK.',
+        'Do NOT generate a new furniture product.',
+        'Do NOT redesign the desk.',
+        'Do NOT redesign the screen.',
+        'Do NOT create a new scene or a new office environment.',
+        'Use the base furniture product image as the final product photograph to edit.',
+        'Keep the original image composition exactly the same.',
+        'Preserve product shape, dimensions, proportions, screen position, desk position, camera angle, crop, shadows, lighting, and background.',
+        'Only replace the visible material/color on the specified existing surfaces.',
+        'Texture images are material references only, not backgrounds and not replacement product images.',
+        'Never use texture images as the background.',
+        'Never fill the whole image with a texture.',
+        'Apply the provided top material texture naturally only to the existing desktop/tabletop surface.',
+        'Apply the provided leg material naturally only to the existing vertical desk legs.',
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
-        effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
+        effectiveScreenTexture ? 'Apply the provided screen material texture only to the existing screen panel surface. Do not change the screen shape, size, position, desk, legs, camera angle, crop, or background.' : '',
         effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
         effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.' : '',
         effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
@@ -213,9 +221,9 @@ console.log('[RENDER BODY]', {
         topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
         size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
         'Create one photorealistic office furniture catalog render.',
-        frontSideInstruction ? frontSideInstruction : '',
-        frontSideInstruction ? 'Do not render any guide text, labels, red marks, arrows, drawings, annotations, or overlays in the final image.' : '',
-        effectiveGuideImage ? 'Use the guide image internally only to identify screen panels. Do not render the guide, guide text, labels, arrows, drawings, annotations, or overlays in the final image.' : '',
+        effectiveGuideImage ? 'Use the guide image only as an area map. White painted area = FRONT screen panel. Red painted area = SIDE screen panel.' : '',
+        effectiveGuideImage ? 'Do not render the guide image itself. Do not show white/red guide colors, labels, arrows, annotations, or overlay marks in the final image.' : '',
+        effectiveGuideImage ? 'Use the guide only to decide where each screen material should be applied, then output the clean product image with materials mapped.' : '',
       ].filter(Boolean).join('\n'),
     });
 
@@ -226,7 +234,6 @@ console.log('[RENDER BODY]', {
       ['screen material texture reference', effectiveScreenTexture],
       ['front screen material texture reference', effectiveFrontScreenTexture],
       ['side screen material texture reference', effectiveSideScreenTexture],
-      ['screen product reference', effectiveScreenImage],
       ['front/side guide image', effectiveGuideImage],
     ];
 
