@@ -23574,9 +23574,8 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 
 
 
-<!-- === FF_FRONT_SIDE_NO_GUIDE_AND_MATERIAL_ROWS === -->
-<style id="ff-front-side-no-guide-and-material-rows-css">
-  /* 전면+사이드 복수 선택 시 재질 선택값을 2줄로 표시 */
+<!-- === FF_FRONT_SIDE_MATERIAL_ROWS_ONLY === -->
+<style id="ff-front-side-material-rows-only-css">
   .ff-screen-split-row{
     display:grid !important;
     grid-template-columns:88px 1fr !important;
@@ -23600,10 +23599,10 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     white-space:nowrap !important;
   }
 </style>
-<script id="ff-front-side-no-guide-and-material-rows-js">
+<script id="ff-front-side-material-rows-only-js">
 (function(){
-  if(window.__ffFrontSideNoGuideMaterialRows) return;
-  window.__ffFrontSideNoGuideMaterialRows = true;
+  if(window.__ffFrontSideMaterialRowsOnly) return;
+  window.__ffFrontSideMaterialRowsOnly = true;
 
   function $(id){ return document.getElementById(id); }
   function S(){
@@ -23612,9 +23611,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
     );
   }
-  function selectedText(){
-    return String((window._setSelected || []).join(' '));
-  }
+  function selectedText(){ return String((window._setSelected || []).join(' ')); }
   function bothFrontSideSelected(){
     var raw = selectedText();
     return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
@@ -23624,56 +23621,34 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var v = el ? String(el.textContent || '').trim() : '';
     return v === '-' ? '' : v;
   }
-  function screenState(){
-    return window._screenPreviewState || {};
-  }
   function materialCodes(){
     var s = S();
-    var st = screenState();
-    var front = st.front || null;
-    var side = st.side || null;
-
+    var st = window._screenPreviewState || {};
     var general = text('quick-screen-code') || s.screenCode || s.screenColor || s.screen || window.__ffPreviewScreen || '';
-    var frontCode = (front && front.color) || s.frontScreenCode || s.frontCode || '';
-    var sideCode = (side && side.color) || s.sideScreenCode || s.sideCode || '';
-
-    // 전면+사이드인데 하나만 저장된 경우, 현재 값이라도 보여주되 2줄 구조는 유지
+    var frontCode = (st.front && st.front.color) || s.frontScreenCode || s.frontCode || '';
+    var sideCode = (st.side && st.side.color) || s.sideScreenCode || s.sideCode || '';
+    var cur = String(s._currentCatName || '');
     if(bothFrontSideSelected()){
-      if(!frontCode && /전면|front/i.test(String(s._currentCatName || ''))) frontCode = general;
-      if(!sideCode && /사이드|side/i.test(String(s._currentCatName || ''))) sideCode = general;
-      if(!frontCode && general && !sideCode) frontCode = general;
-      if(!sideCode && general && !frontCode) sideCode = general;
+      if(!frontCode && /전면|front/i.test(cur)) frontCode = general;
+      if(!sideCode && /사이드|side/i.test(cur)) sideCode = general;
     }
-
-    return {
-      general: general || '-',
-      front: frontCode || '-',
-      side: sideCode || '-'
-    };
+    return {front: frontCode || '-', side: sideCode || '-'};
   }
-
-  function ensureSplitMaterialRows(){
+  function ensureRows(){
     if(!bothFrontSideSelected()) return;
 
-    // 기존 오른쪽 재질 선택값 카드 안에 screen 한 줄만 있는 구조를 전면/사이드 2줄로 대체
     var materialCard =
       document.querySelector('.ff-clean-material-card') ||
       document.querySelector('[id*="material"]') ||
       null;
 
     var screenCodeEl = $('ff-clean-screen-code') || $('quick-screen-code');
-
     if(!materialCard && screenCodeEl){
       materialCard = screenCodeEl.closest('.ff-clean-card') || screenCodeEl.closest('.ff-clean-material-card') || screenCodeEl.parentElement;
     }
     if(!materialCard) return;
 
     var codes = materialCodes();
-    var oldScreenRows = Array.prototype.slice.call(materialCard.querySelectorAll('.ff-clean-row, .material-chip-row, .ff-screen-split-row')).filter(function(row){
-      return /스크린|screen/i.test(row.textContent || '');
-    });
-
-    // 이미 만든 split row가 있으면 값만 갱신
     var existingFront = materialCard.querySelector('[data-ff-screen-split="front"] b');
     var existingSide = materialCard.querySelector('[data-ff-screen-split="side"] b');
     if(existingFront && existingSide){
@@ -23682,55 +23657,30 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       return;
     }
 
+    var oldScreenRows = Array.prototype.slice.call(materialCard.querySelectorAll('.ff-clean-row, .material-chip-row')).filter(function(row){
+      return /스크린|screen/i.test(row.textContent || '');
+    });
     oldScreenRows.forEach(function(row){ row.style.display = 'none'; });
 
-    var anchor = oldScreenRows[0] || materialCard.querySelector('h3') || materialCard.firstElementChild;
     var wrap = document.createElement('div');
     wrap.setAttribute('data-ff-screen-split-wrap','1');
     wrap.innerHTML =
       '<div class="ff-screen-split-row" data-ff-screen-split="front"><span>전면스크린</span><b>' + codes.front + '</b></div>' +
       '<div class="ff-screen-split-row" data-ff-screen-split="side"><span>사이드스크린</span><b>' + codes.side + '</b></div>';
 
-    if(anchor && anchor.parentNode){
-      anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
-    }else{
-      materialCard.appendChild(wrap);
-    }
-  }
-
-  // 기존 payload patch들이 guideImage를 넣더라도 최종 전송 직전에 제거.
-  function stripGuideFromPayload(init){
-    try{
-      if(!init || !init.body) return init;
-      var payload = JSON.parse(init.body || '{}');
-      var mode = String(payload.mode || payload.renderStep || payload.screenLabel || '').toLowerCase();
-      var isFrontSide = /frontside|front_side|전면.*사이드|사이드.*전면/.test(mode) || bothFrontSideSelected();
-
-      if(isFrontSide){
-        payload.guideImage = '';
-        // 서버가 guide 없이도 구분하도록 명시적인 힌트만 남김
-        payload.frontSideInstruction =
-          'The base image contains two existing screen panels. The front panel is the large rear panel behind the desk. The side panel is the angled side panel. Use frontScreenTexture only on the front panel and sideScreenTexture only on the side panel. Do not render labels, guide text, arrows, drawings, annotations, or overlays.';
-        init = Object.assign({}, init, { body: JSON.stringify(payload) });
-        console.log('[FF_FRONT_SIDE_NO_GUIDE] guideImage stripped, material split preserved', {
-          frontScreenTexture: payload.frontScreenTexture,
-          sideScreenTexture: payload.sideScreenTexture,
-          guideImage: payload.guideImage
-        });
-      }
-    }catch(e){}
-    return init;
+    var anchor = oldScreenRows[0] || materialCard.querySelector('h3') || materialCard.firstElementChild;
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+    else materialCard.appendChild(wrap);
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(ensureSplitMaterialRows, 300);
-    setTimeout(ensureSplitMaterialRows, 1000);
+    setTimeout(ensureRows, 300);
+    setTimeout(ensureRows, 1000);
   });
-
   document.addEventListener('click', function(e){
     if(e.target && e.target.closest && e.target.closest('.choice-btn,.material-btn,.confirm-btn,#send-btn,#ff-clean-render-btn,#quick-ai-preview-btn')){
-      setTimeout(ensureSplitMaterialRows, 120);
-      setTimeout(ensureSplitMaterialRows, 700);
+      setTimeout(ensureRows, 120);
+      setTimeout(ensureRows, 700);
     }
   }, true);
 
@@ -23738,9 +23688,17 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   window.fetch = function(input, init){
     var url = String(input || '');
     var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    if(isNano){
-      init = stripGuideFromPayload(init);
-      setTimeout(ensureSplitMaterialRows, 150);
+    if(isNano && init && init.body){
+      try{
+        var payload = JSON.parse(init.body || '{}');
+        var isFrontSide = /frontside|front_side/i.test(String(payload.mode || payload.renderStep || payload.deskImage || payload.screenImage || '')) || bothFrontSideSelected();
+        if(isFrontSide){
+          payload.guideImage = './images/guides/frontside_guide.png';
+          init = Object.assign({}, init, {body: JSON.stringify(payload)});
+          console.log('[FF_FRONT_SIDE_MATERIAL_ROWS_ONLY] guide sent:', payload.guideImage);
+        }
+      }catch(e){}
+      setTimeout(ensureRows, 150);
     }
     return prevFetch.call(this, input, init);
   };
