@@ -23261,7 +23261,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function norm(p){
     if(!p) return '';
     p = String(p).trim().replace(/^url\(["']?|["']?\)$/g,'').replace(/\\/g,'/');
-    p = p.replace('/products/', './products/');
+    p = ffRewriteProductUrlToPreview(p);
     p = p.replace(/^\.\.\//, './');
     p = p.replace(/(^|_)front_side(?=\.png|\.jpg|\.jpeg|\.webp|$)/i, '$1frontside');
     return p;
@@ -23622,6 +23622,186 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       throw err;
     });
   };
+})();
+</script>
+
+
+
+<!-- === FF_PRODUCTS_PATH_HARD_BLOCK_FINAL === -->
+<script id="ff-products-path-hard-block-final">
+(function(){
+  if(window.__ffProductsPathHardBlockFinal) return;
+  window.__ffProductsPathHardBlockFinal = true;
+
+  function S(){
+    return Object.assign({},
+      window.state || {},
+      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
+    );
+  }
+  function setText(){
+    return String((window._setSelected || []).join(' '));
+  }
+  function legKey(v){
+    v=String(v||'');
+    if(/원형/.test(v)) return 'round';
+    if(/A자|A/.test(v)) return 'aframe';
+    return 'ladder';
+  }
+  function moveKey(v){
+    v=String(v||'');
+    return /캐스터/.test(v) ? 'caster' : 'glide';
+  }
+  function topKey(v){
+    v=String(v||'');
+    return /라운드/.test(v) ? 'round' : 'rect';
+  }
+  function deskFolder(){
+    var s=S();
+    var raw=String((s.current&&s.current.product)||s.product||s.deskLabel||setText()||'');
+    return /덕트/.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function baseName(){
+    var s=S();
+    return [legKey(s.legType||s.legShape), moveKey(s.casterType||s.mobility), topKey(s.topShape)].join('_');
+  }
+  function currentName(){
+    var s=S();
+    return String(s._currentCatName || (s.current&&s.current.product) || s.product || '');
+  }
+  function bothFrontSideSelected(){
+    var raw=setText();
+    return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
+  }
+  function suffixFromAnything(raw){
+    raw=String(raw||'');
+    if(/frontside|front_side/i.test(raw)) return 'frontside';
+    if(/lshape|L형|l형/i.test(raw)) return 'lshape';
+    if(/straight|일자형/i.test(raw)) return 'straight';
+    if(/side|사이드/i.test(raw)) return bothFrontSideSelected() ? 'frontside' : 'side';
+    if(/front|전면/i.test(raw)) return bothFrontSideSelected() ? 'frontside' : 'front';
+    return '';
+  }
+  function previewPathForSuffix(suffix){
+    var path='./images/previews/' + deskFolder() + '/' + baseName();
+    if(suffix) path += '_' + suffix;
+    return path + '.png';
+  }
+
+  window.ffRewriteProductUrlToPreview = function(url){
+    if(!url) return '';
+    var s=String(url);
+    if(!/\/products\//i.test(s)) return s;
+    var suffix=suffixFromAnything(s);
+    var out=previewPathForSuffix(suffix);
+    console.warn('[FF_PRODUCTS_PATH_HARD_BLOCK_FINAL] rewrite', s, '=>', out);
+    return out;
+  };
+
+  var previousProductImage = window.productImage;
+  window.productImage = function(key){
+    key=String(key||'');
+    var suffix=suffixFromAnything(key || currentName());
+    if(/desk_standard|desk_duct/i.test(key)) suffix='';
+    return previewPathForSuffix(suffix);
+  };
+
+  // setAttribute('src', '/products/...') 차단
+  var oldSetAttribute = Element.prototype.setAttribute;
+  Element.prototype.setAttribute = function(name, value){
+    if(String(name).toLowerCase()==='src' && typeof value === 'string' && /\/products\//i.test(value)){
+      value = window.ffRewriteProductUrlToPreview(value);
+    }
+    return oldSetAttribute.call(this, name, value);
+  };
+
+  // img.src = '/products/...' 차단
+  try{
+    var imgProto = HTMLImageElement.prototype;
+    var desc = Object.getOwnPropertyDescriptor(imgProto, 'src');
+    if(desc && desc.set && desc.get && !imgProto.__ffProductSrcBlocked){
+      Object.defineProperty(imgProto, 'src', {
+        configurable:true,
+        enumerable:desc.enumerable,
+        get:function(){ return desc.get.call(this); },
+        set:function(v){
+          if(typeof v === 'string' && /\/products\//i.test(v)){
+            v = window.ffRewriteProductUrlToPreview(v);
+          }
+          return desc.set.call(this, v);
+        }
+      });
+      imgProto.__ffProductSrcBlocked = true;
+    }
+  }catch(e){}
+
+  function fixExisting(){
+    var imgs = document.querySelectorAll('img');
+    imgs.forEach(function(img){
+      var src = img.getAttribute('src') || '';
+      if(/\/products\//i.test(src)){
+        img.setAttribute('src', window.ffRewriteProductUrlToPreview(src));
+      }
+    });
+  }
+
+  var mo = new MutationObserver(function(records){
+    records.forEach(function(r){
+      if(r.type === 'attributes' && r.attributeName === 'src' && r.target && r.target.tagName === 'IMG'){
+        var src = r.target.getAttribute('src') || '';
+        if(/\/products\//i.test(src)){
+          r.target.setAttribute('src', window.ffRewriteProductUrlToPreview(src));
+        }
+      }
+      if(r.addedNodes && r.addedNodes.length){
+        r.addedNodes.forEach(function(n){
+          if(!n || n.nodeType !== 1) return;
+          if(n.tagName === 'IMG'){
+            var src = n.getAttribute('src') || '';
+            if(/\/products\//i.test(src)) n.setAttribute('src', window.ffRewriteProductUrlToPreview(src));
+          }
+          if(n.querySelectorAll){
+            n.querySelectorAll('img').forEach(function(img){
+              var src = img.getAttribute('src') || '';
+              if(/\/products\//i.test(src)) img.setAttribute('src', window.ffRewriteProductUrlToPreview(src));
+            });
+          }
+        });
+      }
+    });
+  });
+
+  function start(){
+    fixExisting();
+    mo.observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:['src']});
+  }
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+
+  // 현재 단계에 맞춰 오른쪽 제품 원본도 다시 보정
+  window.ffForceRightProductPreviewFix = function(){
+    var img = document.getElementById('ff-clean-preview-img');
+    if(!img) return;
+    var suffix = suffixFromAnything(currentName());
+    if(!/스크린|screen|전면|사이드|일자형|L형|l형|front|side|straight|lshape/i.test(currentName())) suffix = '';
+    var path = previewPathForSuffix(suffix);
+    img.src = path;
+    img.style.objectFit = 'contain';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.display = 'block';
+    img.classList.add('show');
+    var empty = document.getElementById('ff-clean-empty-preview');
+    if(empty){ empty.classList.add('hide'); empty.style.display='none'; }
+    console.log('[FF_PRODUCTS_PATH_HARD_BLOCK_FINAL] right product preview fixed:', path);
+  };
+
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.closest && e.target.closest('.choice-btn,.material-btn,.confirm-btn,#ff-clean-render-btn,#quick-ai-preview-btn')){
+      setTimeout(window.ffForceRightProductPreviewFix, 80);
+      setTimeout(window.ffForceRightProductPreviewFix, 450);
+    }
+  }, true);
 })();
 </script>
 
