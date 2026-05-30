@@ -20783,15 +20783,28 @@ var OPTION_IMG = {
     if(p.indexOf('L')>-1 || p.indexOf('엘')>-1) return 'lshape';
     return 'front';
   }
-  function productImage(key){
+function productImage(key){
   key = String(key || '');
 
-  if (key === 'front') key = 'screen_front';
-  if (key === 'side') key = 'screen_side';
-  if (key === 'straight') key = 'screen_straight';
-  if (key === 'lshape') key = 'screen_lshape';
+  if (key === 'front') key = 'front';
+  if (key === 'side') key = 'side';
+  if (key === 'straight') key = 'straight';
+  if (key === 'lshape') key = 'lshape';
+  if (key === 'frontside' || key === 'front_side') key = 'frontside';
 
-  return key ? '/products/' + key + '/base/base.png' : '';
+  if (key === 'desk_standard') {
+    return './images/previews/desk_standard/round_caster_round.png';
+  }
+
+  if (key === 'desk_duct') {
+    return './images/previews/desk_duct/round_caster_round.png';
+  }
+
+  if (['front','side','straight','lshape','frontside'].includes(key)) {
+    return './images/previews/desk_standard/round_caster_round_' + key + '.png';
+  }
+
+  return key ? './images/previews/desk_standard/round_caster_round.png' : '';
 }
   function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key]||key;}
   function materialState(){
