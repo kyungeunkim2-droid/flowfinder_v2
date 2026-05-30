@@ -136,7 +136,28 @@ app.post('/api/generate-preview', async (req, res) => {
       topShape,
       size,
       guideImage,
+      targetType,
+      productType,
+      mode,
+      frontScreenTexture,
+      sideScreenTexture,
+      frontScreenCode,
+      sideScreenCode,
     } = req.body || {};
+
+    // FF_TARGET_MODE_SAFE_PATCH
+    const targetMode = String(targetType || productType || mode || '').toLowerCase();
+    const isScreenRender = /screen|스크린/.test(targetMode);
+    const isDeskRender = /desk|데스크/.test(targetMode) && !isScreenRender;
+
+    const effectiveScreenTexture = isDeskRender ? '' : screenTexture;
+    const effectiveScreenCode = isDeskRender ? '' : screenCode;
+    const effectiveScreenImage = isDeskRender ? '' : screenImage;
+    const effectiveGuideImage = isDeskRender ? '' : guideImage;
+    const effectiveFrontScreenTexture = isDeskRender ? '' : frontScreenTexture;
+    const effectiveSideScreenTexture = isDeskRender ? '' : sideScreenTexture;
+    const effectiveFrontScreenCode = isDeskRender ? '' : frontScreenCode;
+    const effectiveSideScreenCode = isDeskRender ? '' : sideScreenCode;
 
     const parts = [];
 
@@ -146,10 +167,16 @@ app.post('/api/generate-preview', async (req, res) => {
         'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
         'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
         'Apply the provided leg material naturally only to the vertical desk legs.',
-        screenTexture ? 'Apply the provided screen material texture naturally only to the screen panel area.' : '',
-        screenCode ? `Screen material code: ${screenCode}.` : '',
-        'If a screen panel exists in the base image, preserve it and recolor only the screen surface.',
-        'Do not leave the screen panel black if a screen texture reference is provided.',
+        isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
+        isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
+        effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
+        effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
+        effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.' : '',
+        effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
+        effectiveFrontScreenCode ? `Front screen material code: ${effectiveFrontScreenCode}.` : '',
+        effectiveSideScreenCode ? `Side screen material code: ${effectiveSideScreenCode}.` : '',
+        effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture ? 'If a screen panel exists in the base image, preserve it and recolor only the screen surface.' : '',
+        effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture ? 'Do not leave the screen panel black if a screen texture reference is provided.' : '',
 
 'Keep the cable duct / cable tray area under the desktop matte white.',
 
@@ -164,7 +191,7 @@ app.post('/api/generate-preview', async (req, res) => {
         topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
         size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
         'Create one photorealistic office furniture catalog render.',
-        guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching labeled panel.' : '',
+        effectiveGuideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching labeled panel.' : '',
       ].filter(Boolean).join('\n'),
     });
 
@@ -172,9 +199,11 @@ app.post('/api/generate-preview', async (req, res) => {
       ['base furniture product image', deskImage],
       ['desktop material texture reference', topTexture],
       ['legs and frame material color reference', legTexture],
-      ['screen material texture reference', screenTexture],
-      ['screen product reference', screenImage],
-      ['front/side guide image', guideImage],
+      ['screen material texture reference', effectiveScreenTexture],
+      ['front screen material texture reference', effectiveFrontScreenTexture],
+      ['side screen material texture reference', effectiveSideScreenTexture],
+      ['screen product reference', effectiveScreenImage],
+      ['front/side guide image', effectiveGuideImage],
     ];
 
     for (const [label, src] of imageInputs) {
