@@ -214,6 +214,8 @@ const response = await ai.models.generateContent({
 console.timeEnd('[NanoBanana] generateContent');
 console.log('[NanoBanana] response received');
       const inline = extractInlineImage(response);
+      console.log('[NanoBanana] inline image found:', !!inline?.data, inline?.mimeType);
+console.log('[NanoBanana] response keys:', Object.keys(response || {}));
       if (inline?.data) {
         return res.json({ imageUrl: `data:${inline.mimeType};base64,${inline.data}` });
       }
