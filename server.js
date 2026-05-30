@@ -144,7 +144,26 @@ app.post('/api/generate-preview', async (req, res) => {
       frontScreenCode,
       sideScreenCode,
     } = req.body || {};
+console.log('[RENDER BODY]', {
+  deskImage,
+  screenImage,
+  guideImage,
 
+  topTexture,
+  legTexture,
+  screenTexture,
+
+  frontScreenTexture,
+  sideScreenTexture,
+
+  topCode,
+  legCode,
+  screenCode,
+
+  targetType,
+  productType,
+  mode
+});
     // FF_TARGET_MODE_SAFE_PATCH
     const targetMode = String(targetType || productType || mode || '').toLowerCase();
     const isScreenRender = /screen|스크린/.test(targetMode);
