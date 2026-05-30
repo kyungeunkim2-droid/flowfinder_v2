@@ -280,10 +280,11 @@ app.post('/api/generate-screen-preview', async (req, res) => {
       if (part) parts.push(part);
     }
 
-    const result = await ai.models.generateContent({
-      model: 'gemini-2.5-flash-image-preview',
-      contents: [{ role: 'user', parts }]
-    });
+ const result = await ai.models.generateContent({
+  model: MODEL,
+  contents: [{ role: 'user', parts }],
+  config: { responseModalities: ['TEXT', 'IMAGE'] },
+});
 
     const partsOut =
       result?.candidates?.[0]?.content?.parts ||
