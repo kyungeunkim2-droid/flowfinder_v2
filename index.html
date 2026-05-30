@@ -22657,3 +22657,140 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   setTimeout(fixNanoButton,0); setTimeout(fixNanoButton,800); setTimeout(fixNanoButton,2000);
 })();
 </script>
+
+
+<!-- === FF FINAL SAFE HOTFIX: Nano image response display bridge === -->
+<style id="ff-final-safe-nano-display-css">
+  #quick-ai-preview-note.ai-result,
+  #quick-ai-preview-note.ff-safe-ai-result{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    height:auto !important;
+    min-height:0 !important;
+    margin-top:10px !important;
+    padding:12px !important;
+    border:1px solid rgba(74,222,128,.35) !important;
+    border-radius:16px !important;
+    background:#08131f !important;
+    color:#fff !important;
+    overflow:visible !important;
+  }
+  #quick-ai-preview-note.ai-result img,
+  #quick-ai-preview-note.ff-safe-ai-result img{
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    max-height:560px !important;
+    object-fit:contain !important;
+    border-radius:14px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    background:#fff !important;
+  }
+</style>
+<script id="ff-final-safe-nano-display-bridge">
+(function(){
+  if (window.__ffFinalSafeNanoDisplayBridge) return;
+  window.__ffFinalSafeNanoDisplayBridge = true;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function ensureNanoArea(){
+    var panel = $('texture-preview') || $('preview-panel') || document.body;
+    var btn = $('quick-ai-preview-btn');
+    if (!btn) {
+      btn = document.createElement('button');
+      btn.id = 'quick-ai-preview-btn';
+      btn.type = 'button';
+      btn.textContent = '✨ 원본 사진에 재질 적용';
+    }
+    btn.type = 'button';
+    btn.style.display = 'block';
+    btn.disabled = false;
+    if (panel && btn.parentNode !== panel) panel.appendChild(btn);
+
+    var note = $('quick-ai-preview-note');
+    if (!note) {
+      note = document.createElement('div');
+      note.id = 'quick-ai-preview-note';
+    }
+    if (panel && note.parentNode !== panel) panel.appendChild(note);
+    return {btn:btn, note:note, panel:panel};
+  }
+  function showNanoImage(src, label){
+    if (!src) return;
+    var ui = ensureNanoArea();
+    var note = ui.note;
+    note.className = 'ai-result ff-safe-ai-result';
+    note.style.cssText += ';display:block!important;visibility:visible!important;opacity:1!important;height:auto!important;';
+    note.innerHTML =
+      '<div style="font-weight:900;color:#fff;margin-bottom:8px;">'+esc(label || 'AI 실사 미리보기')+'</div>' +
+      '<img src="'+src+'" alt="Nano Banana 렌더링 결과">' +
+      '<div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">Nano Banana API에서 받은 실제 이미지 결과입니다.</div>';
+
+    var heroImg = $('ff-hero-img');
+    if (heroImg) {
+      heroImg.src = src;
+      heroImg.style.display = 'block';
+      heroImg.classList.remove('ff-composited-hidden');
+    }
+    var heroCanvas = $('ff-hero-canvas');
+    if (heroCanvas) heroCanvas.style.display = 'none';
+
+    try { note.scrollIntoView({behavior:'smooth', block:'center'}); } catch(e) {}
+  }
+  window.ffSafeShowNanoImage = showNanoImage;
+
+  var oldFetch = window.fetch;
+  if (oldFetch && !oldFetch.__ffSafeNanoPatched) {
+    var patchedFetch = function(input, init){
+      var url = (typeof input === 'string') ? input : (input && input.url) || '';
+      var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
+      return oldFetch.call(this, input, init).then(function(res){
+        if (isNano) {
+          try {
+            res.clone().json().then(function(data){
+              var src = (typeof data === 'string') ? data : (data && (data.imageUrl || data.image || data.url || data.result));
+              if (src) {
+                var label = url.indexOf('/api/generate-screen-preview') > -1 ? '재질 적용 미리보기 · 스크린' : '재질 적용 미리보기 · 데스크';
+                showNanoImage(src, label);
+                setTimeout(function(){ showNanoImage(src, label); }, 250);
+                setTimeout(function(){ showNanoImage(src, label); }, 1200);
+              } else if (data && (data.error || data.detail)) {
+                var ui = ensureNanoArea();
+                ui.note.className = 'ai-error';
+                ui.note.style.display = 'block';
+                ui.note.innerHTML = '<b style="color:#fca5a5;">재질 적용 실패</b><br><span style="color:#ddd;">'+esc(data.error || data.detail)+'</span>';
+              }
+            }).catch(function(){});
+          } catch(e) {}
+        }
+        return res;
+      });
+    };
+    patchedFetch.__ffSafeNanoPatched = true;
+    window.fetch = patchedFetch;
+  }
+
+  function bind(){
+    var ui = ensureNanoArea();
+    if (ui.btn && typeof window.prepareNanoBananaPreview === 'function') {
+      ui.btn.onclick = function(e){
+        if (e) e.preventDefault();
+        window.prepareNanoBananaPreview();
+        return false;
+      };
+    }
+  }
+  bind();
+  document.addEventListener('DOMContentLoaded', bind);
+  window.addEventListener('load', bind);
+  document.addEventListener('click', function(){ setTimeout(bind, 80); }, true);
+  setInterval(bind, 1500);
+})();
+</script>
+<!-- === /FF FINAL SAFE HOTFIX === -->
