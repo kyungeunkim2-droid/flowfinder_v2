@@ -2091,246 +2091,57 @@ body.ff-dashboard-preview #preview-panel,
 </style>
 
 
-<style id="ff-right-dashboard-clean-redesign">
-/* === Clean right dashboard redesign: only layout, no business logic changes === */
+
+
+<style id="ff-right-panel-safe-layout-recovery">
+/* SAFE recovery: do not hide chat/option/size/material controls */
 #preview-panel{
   display:flex !important;
   flex-direction:column !important;
-  gap:14px !important;
+  gap:12px !important;
   overflow-y:auto !important;
 }
 
-/* Hide old duplicated right-panel modules visually, but keep them in DOM for existing logic */
-#preview-panel > h2,
+/* Hide only truly duplicated visual preview blocks when they are direct children of the right panel.
+   Keep #preview-items, #current-box, #total-box, material/option controls visible. */
 #preview-panel > #recommend-panel,
-#preview-panel > #current-box,
-#preview-panel > #preview-items,
-#preview-panel > #wip-group,
-#preview-panel > #total-box,
-#preview-panel > #product-preview-box,
-#preview-panel > #screen-composite-preview,
-#preview-panel > #texture-preview,
-#preview-panel > #ff-dashboard-hero,
-#preview-panel > .quick-preview-panel,
-#preview-panel > .quote-group,
-#preview-panel > .preview-add-btn{
+#preview-panel > #screen-composite-preview{
   display:none !important;
 }
 
-#ff-clean-right-dashboard{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-  width:100%;
+/* Keep core right panel sections visible */
+#preview-panel > h2,
+#preview-panel > #current-box,
+#preview-panel > #preview-items,
+#preview-panel > #texture-preview,
+#preview-panel > #product-preview-box,
+#preview-panel > #total-box{
+  display:block !important;
 }
 
-.ff-clean-card{
-  border:1px solid rgba(45, 245, 210, .22);
-  background:linear-gradient(180deg, rgba(11,26,43,.96), rgba(6,18,32,.96));
-  border-radius:24px;
-  padding:18px;
-  color:#f8fafc;
-  box-shadow:0 18px 44px rgba(0,0,0,.22);
+/* Make visible cards cleaner without changing logic */
+#product-preview-box,
+#texture-preview,
+#current-box,
+#total-box{
+  border-radius:20px !important;
+  margin-bottom:10px !important;
 }
 
-.ff-clean-card-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:14px;
-}
-.ff-clean-card-head strong{
-  display:block;
-  font-size:20px;
-  font-weight:1000;
-  letter-spacing:-.5px;
-  color:#fff;
-}
-.ff-clean-card-head span{
-  display:block;
-  margin-top:5px;
-  font-size:12px;
-  color:#9fb1c8;
-}
-.ff-clean-card-head em{
-  font-style:normal;
-  flex-shrink:0;
-  border:1px solid rgba(45,245,210,.25);
-  color:#2df5d2;
-  background:rgba(45,245,210,.08);
-  border-radius:999px;
-  padding:5px 10px;
-  font-size:11px;
-  font-weight:900;
+#preview-items{
+  min-height:80px;
 }
 
-.ff-clean-preview-box{
-  position:relative;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:280px;
-  height:clamp(280px, 36vh, 420px);
-  border-radius:22px;
-  overflow:hidden;
-  background:linear-gradient(135deg,#eef4fb,#dfe8f3);
-  border:1px solid rgba(255,255,255,.14);
-}
-#ff-clean-preview-img,
-#ff-clean-preview-canvas{
-  display:none;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-  max-height:420px;
-}
-#ff-clean-preview-img.show,
-#ff-clean-preview-canvas.show{
-  display:block;
-}
-#ff-clean-empty-preview{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  gap:6px;
-  color:#334155;
-}
-#ff-clean-empty-preview b{
-  font-size:18px;
-  font-weight:1000;
-}
-#ff-clean-empty-preview span{
-  font-size:12px;
-  color:#64748b;
-}
-#ff-clean-empty-preview.hide{
-  display:none;
+/* readable text */
+#preview-panel,
+#preview-panel *{
+  text-shadow:none;
 }
 
-#ff-clean-render-btn{
-  width:100%;
-  min-height:52px;
-  margin-top:14px;
-  border:0;
-  border-radius:18px;
-  cursor:pointer;
-  color:#07111f;
-  font-size:15px;
-  font-weight:1000;
-  background:linear-gradient(135deg,#2df5d2,#7c3aed);
-  box-shadow:0 16px 34px rgba(45,245,210,.18), 0 12px 28px rgba(124,58,237,.22);
-}
-#ff-clean-render-btn:hover{
-  filter:brightness(1.08);
-  transform:translateY(-1px);
-}
-
-.ff-clean-info-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:14px;
-}
-.ff-clean-summary-card h3,
-.ff-clean-material-card h3{
-  margin:0 0 12px;
-  color:#2df5d2;
-  font-size:14px;
-  font-weight:1000;
-}
-.ff-clean-row{
-  display:grid;
-  grid-template-columns:64px 1fr;
-  gap:10px;
-  align-items:center;
-  padding:10px 0;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-.ff-clean-row:last-child{
-  border-bottom:0;
-}
-.ff-clean-row span{
-  color:#8fa1bb;
-  font-size:12px;
-  font-weight:900;
-}
-.ff-clean-row b{
-  color:#fff;
-  font-size:13px;
-  font-weight:1000;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:nowrap;
-}
-
-.ff-clean-material-row{
-  display:grid;
-  grid-template-columns:42px 48px 1fr;
-  gap:10px;
-  align-items:center;
-  min-height:54px;
-  padding:8px 0;
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-.ff-clean-material-row:last-child{
-  border-bottom:0;
-}
-.ff-clean-material-row em{
-  display:block;
-  width:42px;
-  height:34px;
-  border-radius:11px;
-  border:1px solid rgba(255,255,255,.18);
-  background:#252525 center/cover no-repeat;
-}
-.ff-clean-material-row span{
-  color:#8fa1bb;
-  font-size:12px;
-  font-weight:900;
-}
-.ff-clean-material-row b{
-  color:#fff;
-  font-size:14px;
-  font-weight:1000;
-}
-
-.ff-clean-total-card{
-  display:grid;
-  grid-template-columns:1fr auto;
-  align-items:end;
-  gap:4px 16px;
-  background:linear-gradient(135deg, rgba(12,31,43,.98), rgba(11,25,45,.98));
-}
-.ff-clean-total-card span{
-  color:#cbd5e1;
-  font-size:14px;
-  font-weight:900;
-}
-.ff-clean-total-card strong{
-  color:#2df5d2;
-  font-size:34px;
-  line-height:1;
-  letter-spacing:-1.2px;
-  font-weight:1000;
-  text-align:right;
-}
-.ff-clean-total-card small{
-  grid-column:2;
-  color:#9fb1c8;
-  font-size:11px;
-  font-weight:900;
-  text-align:right;
-}
-
-@media(max-width:1200px){
-  .ff-clean-info-grid{
-    grid-template-columns:1fr;
-  }
-  .ff-clean-preview-box{
-    min-height:240px;
-  }
+#preview-panel input,
+#preview-panel select,
+#preview-panel textarea{
+  color:#fff !important;
 }
 </style>
 
@@ -2368,13 +2179,7 @@ body.ff-dashboard-preview #preview-panel,
 
 <div id="preview-panel">
 
-<div id="ff-clean-right-dashboard">
-  <section class="ff-clean-card ff-clean-preview-card">
-    <div class="ff-clean-card-head">
-      <div>
-        <strong>고해상도 미리보기</strong>
-        <span>버튼을 눌러 최종 렌더링을 확인하세요</span>
-      </div>
+
       <em id="ff-clean-status">대기중</em>
     </div>
 
@@ -15517,247 +15322,24 @@ window.showPanel = function(){
 
 
 
-<script id="ff-right-dashboard-clean-redesign-js">
+
+
+<script id="ff-render-button-safe-bridge">
 (function(){
-  let syncTimer = null;
-  let previewTimer = null;
-
-  function textOf(sel){
-    const el = document.querySelector(sel);
-    return el ? (el.textContent || '').trim() : '';
-  }
-
-  function setText(id, value){
-    const el = document.getElementById(id);
-    if(el) el.textContent = value && value !== 'undefined' ? value : '-';
-  }
-
-  function normalizeUrl(url){
-    if(!url) return '';
-    url = String(url);
-    if(/^https?:\/\//i.test(url)) return url;
-    if(url.indexOf('./') === 0) return url;
-    if(url.indexOf('/images/') === 0) return '.' + url;
-    if(url.indexOf('images/') === 0) return './' + url;
-    return url;
-  }
-
-  function setChip(id, code, part){
-    const el = document.getElementById(id);
-    if(!el || !code || code === '-') return;
-
-    let url = '';
-    try{
-      if(part === 'screen' && typeof window.ffMaterialTextureUrl === 'function'){
-        url = window.ffMaterialTextureUrl(code, 'screen');
-      }else if(typeof window._ffLocalTextureForCode === 'function'){
-        url = window._ffLocalTextureForCode(part === 'leg' ? 'LEG_' + code : code, part === 'leg' ? '다리' : '상판');
-      }
-    }catch(e){}
-
-    url = normalizeUrl(url);
-    if(url) el.style.backgroundImage = 'url("' + url + '")';
-  }
-
-  function getStateValue(keys){
-    const s = window.state || {};
-    for(const k of keys){
-      if(s[k]) return s[k];
-      if(s.current && s.current[k]) return s.current[k];
-    }
-    return '';
-  }
-
-  function syncCleanDashboard(){
-    syncTimer = null;
-
-    const s = window.state || {};
-    const current = s.current || {};
-    const fp = window.FlowFinderFastPreview && window.FlowFinderFastPreview.state;
-
-    const product =
-      current.product ||
-      s.product ||
-      textOf('.preview-item .item-name') ||
-      '-';
-
-    const option =
-      current.option ||
-      current.options ||
-      s.option ||
-      s.options ||
-      '-';
-
-    const size =
-      current.size ||
-      s.size ||
-      [current.width || s.width, current.depth || s.depth, current.height || s.height].filter(Boolean).join(' ') ||
-      '-';
-
-    const qty = current.qty || s.qty || '1';
-
-    const top =
-      getStateValue(['topColor','_deskTopColor','top','topCode']) ||
-      (fp && fp.top) ||
-      textOf('#quick-top-code') ||
-      '-';
-
-    const leg =
-      getStateValue(['legColor','_deskLegColor','leg','legCode']) ||
-      (fp && fp.leg) ||
-      textOf('#quick-leg-code') ||
-      '-';
-
-    const screen =
-      getStateValue(['screenColor','_screenColor','screen','screenCode']) ||
-      window.__ffPreviewScreen ||
-      (fp && fp.screen) ||
-      textOf('#quick-screen-code') ||
-      '-';
-
-    const total =
-      textOf('#total-box .total-price') ||
-      textOf('.total-price') ||
-      textOf('.final-total-box b') ||
-      '0원';
-
-    setText('ff-clean-product', product);
-    setText('ff-clean-option', option);
-    setText('ff-clean-size', size);
-    setText('ff-clean-qty', qty);
-    setText('ff-clean-top', top);
-    setText('ff-clean-leg', leg);
-    setText('ff-clean-screen', screen);
-    setText('ff-clean-total', total);
-
-    setChip('ff-clean-top-chip', top, 'top');
-    setChip('ff-clean-leg-chip', leg, 'leg');
-    setChip('ff-clean-screen-chip', screen, 'screen');
-  }
-
-  function requestSync(delay){
-    if(syncTimer) clearTimeout(syncTimer);
-    syncTimer = setTimeout(syncCleanDashboard, delay || 120);
-  }
-
-  function showPreviewFromExisting(useCanvas){
-    previewTimer = null;
-
-    const img = document.getElementById('ff-clean-preview-img');
-    const canvas = document.getElementById('ff-clean-preview-canvas');
-    const empty = document.getElementById('ff-clean-empty-preview');
-    const status = document.getElementById('ff-clean-status');
-
-    const existingImg =
-      document.querySelector('#product-preview-img') ||
-      document.querySelector('#ff-hero-img') ||
-      document.querySelector('#render-preview-img');
-
-    if(existingImg && existingImg.src){
-      img.src = existingImg.src;
-      img.classList.add('show');
-      if(canvas) canvas.classList.remove('show');
-      if(empty) empty.classList.add('hide');
-      if(status) status.textContent = '표시중';
-      return true;
-    }
-
-    // toDataURL is expensive, so only do it after the render button click.
-    if(useCanvas){
-      const existingCanvas =
-        document.querySelector('#ff-hero-canvas') ||
-        document.querySelector('#ff-render-canvas') ||
-        document.querySelector('#product-3d-canvas') ||
-        document.querySelector('#screen-composite-canvas');
-
-      if(existingCanvas){
-        try{
-          img.src = existingCanvas.toDataURL('image/png');
-          img.classList.add('show');
-          if(canvas) canvas.classList.remove('show');
-          if(empty) empty.classList.add('hide');
-          if(status) status.textContent = '표시중';
-          return true;
-        }catch(e){}
-      }
-    }
-
-    if(status) status.textContent = '대기중';
-    return false;
-  }
-
-  function requestPreview(delay, useCanvas){
-    if(previewTimer) clearTimeout(previewTimer);
-    previewTimer = setTimeout(function(){ showPreviewFromExisting(!!useCanvas); }, delay || 300);
-  }
-
   document.addEventListener('click', function(e){
-    const renderBtn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn');
+    var btn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn, #hero-render-btn');
+    if(!btn) return;
 
-    if(renderBtn){
-      renderBtn.textContent = '렌더링 준비중...';
+    var oldBtn =
+      document.getElementById('quick-ai-preview-btn') ||
+      document.getElementById('ai-render-btn') ||
+      document.getElementById('product-preview-confirm') ||
+      document.getElementById('screen-ai-btn');
 
-      const oldBtn =
-        document.getElementById('quick-ai-preview-btn') ||
-        document.getElementById('ai-render-btn') ||
-        document.getElementById('product-preview-confirm') ||
-        document.getElementById('screen-ai-btn');
-
-      if(oldBtn && oldBtn !== renderBtn){
-        try{ oldBtn.click(); }catch(e){}
-      }
-
-      requestSync(250);
-      requestPreview(900, true);
-      setTimeout(function(){
-        renderBtn.textContent = '✨ 고해상도 렌더링하기';
-      }, 950);
-      return;
-    }
-
-    if(e.target.closest('.choice-btn, .material-btn, .confirm-btn, .back-btn, .preview-item, .item-chip, #send-btn')){
-      requestSync(160);
-      requestPreview(500, false);
+    if(oldBtn && oldBtn !== btn){
+      try{ oldBtn.click(); }catch(err){}
     }
   }, true);
-
-  document.addEventListener('change', function(e){
-    if(e.target && e.target.matches('input, select')){
-      requestSync(120);
-    }
-  }, true);
-
-  document.addEventListener('input', function(e){
-    if(e.target && e.target.matches('input')){
-      requestSync(250);
-    }
-  }, true);
-
-  function observeLight(target){
-    if(!target || !window.MutationObserver) return;
-    const mo = new MutationObserver(function(){
-      requestSync(180);
-    });
-    mo.observe(target, {childList:true, characterData:true, subtree:true});
-  }
-
-  document.addEventListener('DOMContentLoaded', function(){
-    requestSync(80);
-    requestPreview(250, false);
-    observeLight(document.getElementById('total-box'));
-    observeLight(document.getElementById('current-box'));
-    observeLight(document.getElementById('preview-items'));
-  });
-
-  setTimeout(function(){
-    requestSync(80);
-    requestPreview(250, false);
-  }, 300);
-
-  window.ffSyncCleanDashboard = function(){
-    requestSync(0);
-    requestPreview(100, false);
-  };
 })();
 </script>
 
