@@ -2093,19 +2093,88 @@ body.ff-dashboard-preview #preview-panel,
 
 
 
-<style id="ff-right-panel-minimal-overlap-fix">
-/* Minimal right panel cleanup based on RIGHT_PANEL_CLEAN_FAST_FINAL2.
-   Do NOT hide functional inputs/options/render controls. */
+<style id="ff-flow-visibility-recovery-final">
+/* Final recovery: keep all quotation flow controls visible. */
+#chat-panel,
+#messages,
+#input-area{
+  display:flex !important;
+}
+#chat-panel{
+  flex-direction:column !important;
+}
+#messages{
+  flex-direction:column !important;
+  overflow-y:auto !important;
+}
+#input-area{
+  align-items:center !important;
+}
 
+/* Never hide chatbot bubbles, option buttons, size inputs, material inputs, option add, or final quote actions */
+#messages .msg,
+#messages .bubble,
+#messages .btn-group,
+#messages .choice-btn,
+#messages .confirm-btn,
+#messages .back-btn,
+#messages input,
+#messages select,
+#messages textarea,
+#messages button,
+#messages .material-button-group,
+#messages .material-button-section,
+#messages .material-btn,
+#messages .ff-num-control,
+#messages .ff-finish-menu,
+#messages .ff-menu-btns,
+#messages .quote-result,
+#messages .final-quote-wrap,
+#messages .final-actions,
+#messages .final-action-btn{
+  display:revert !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
+}
+
+/* Layout for common controls after display:revert */
+#messages .btn-group,
+#messages .material-button-group,
+#messages .ff-menu-btns,
+#messages .final-actions{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:8px !important;
+}
+#messages .ff-num-control{
+  display:flex !important;
+  align-items:center !important;
+  gap:4px !important;
+}
+#messages input,
+#messages select,
+#messages textarea{
+  color:#fff !important;
+  background:#111827 !important;
+  border:1px solid rgba(255,255,255,.18) !important;
+}
+
+/* Right panel should not overlap or cover the chat flow */
 #preview-panel{
   display:flex !important;
   flex-direction:column !important;
   gap:12px !important;
   overflow-y:auto !important;
   overflow-x:hidden !important;
+  z-index:1 !important;
+}
+#chat-panel{
+  position:relative !important;
+  z-index:2 !important;
 }
 
-/* prevent visual cards from stacking on top of each other */
+/* Right panel direct children should stack normally */
 #preview-panel > *{
   position:relative !important;
   float:none !important;
@@ -2113,13 +2182,7 @@ body.ff-dashboard-preview #preview-panel,
   flex-shrink:0 !important;
 }
 
-/* Only hide duplicated visual-only panels, not input/option panels */
-#preview-panel > #ff-dashboard-hero,
-#preview-panel > #screen-composite-preview{
-  display:none !important;
-}
-
-/* Keep these visible because they are used by the flow */
+/* Keep required right-panel quotation controls visible */
 #preview-panel > h2,
 #preview-panel > #current-box,
 #preview-panel > #preview-items,
@@ -2128,11 +2191,20 @@ body.ff-dashboard-preview #preview-panel,
 #preview-panel > #total-box,
 #preview-panel > .preview-add-btn,
 #preview-panel > .quote-group,
-#preview-panel > #wip-group{
+#preview-panel > #wip-group,
+#preview-panel #add-item-btn{
   display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
 }
 
-/* Resize visual cards so they don't dominate or overlap */
+/* Only hide duplicated visual-only preview panel that causes overlap */
+#preview-panel > #screen-composite-preview{
+  display:none !important;
+}
+
+/* Do NOT let preview images/cards dominate the right panel */
 #product-preview-box,
 #texture-preview,
 #current-box,
@@ -2143,7 +2215,6 @@ body.ff-dashboard-preview #preview-panel,
   border-radius:18px !important;
   box-sizing:border-box !important;
 }
-
 #product-preview-box img,
 #product-preview-img,
 #texture-preview canvas,
@@ -2152,33 +2223,22 @@ body.ff-dashboard-preview #preview-panel,
   max-height:220px !important;
   object-fit:contain !important;
 }
-
-/* Preview items remain scrollable but not collapsed */
 #preview-items{
-  min-height:72px !important;
-  max-height:260px !important;
+  min-height:80px !important;
+  max-height:280px !important;
   overflow-y:auto !important;
 }
 
-/* Make text readable */
-#preview-panel,
-#preview-panel *{
-  text-shadow:none !important;
+/* Final quote modal/buttons must appear above everything */
+.final-quote-modal,
+.final-quote-wrap,
+.quote-result{
+  visibility:visible !important;
+  opacity:1 !important;
+  pointer-events:auto !important;
 }
-
-#preview-panel input,
-#preview-panel select,
-#preview-panel textarea{
-  color:#fff !important;
-}
-
-/* If a legacy dashboard button remains, don't let it cover content */
-#hero-render-btn,
-#ff-clean-render-btn{
-  position:static !important;
-  transform:none !important;
-  width:100% !important;
-  margin-top:10px !important;
+.final-quote-modal{
+  z-index:99999 !important;
 }
 </style>
 
@@ -15359,6 +15419,63 @@ window.showPanel = function(){
 
 
 
+
+
+<script id="ff-flow-visibility-recovery-final-js">
+(function(){
+  function shouldRecover(el){
+    if(!el || !el.matches) return false;
+
+    if(el.closest('#messages')){
+      if(el.matches('.msg,.bubble,.btn-group,.choice-btn,.confirm-btn,.back-btn,input,select,textarea,button,.material-button-group,.material-button-section,.material-btn,.ff-num-control,.ff-finish-menu,.ff-menu-btns,.quote-result,.final-quote-wrap,.final-actions,.final-action-btn')){
+        return true;
+      }
+    }
+
+    if(el.closest('#preview-panel')){
+      if(el.matches('#current-box,#preview-items,#texture-preview,#product-preview-box,#total-box,.preview-add-btn,.quote-group,#wip-group,#add-item-btn')){
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function recoverVisibility(root){
+    root = root || document;
+    var nodes = root.querySelectorAll ? root.querySelectorAll('#messages .msg,#messages .bubble,#messages .btn-group,#messages .choice-btn,#messages .confirm-btn,#messages .back-btn,#messages input,#messages select,#messages textarea,#messages button,#messages .material-button-group,#messages .material-button-section,#messages .material-btn,#messages .ff-num-control,#messages .ff-finish-menu,#messages .ff-menu-btns,#messages .quote-result,#messages .final-quote-wrap,#messages .final-actions,#messages .final-action-btn,#preview-panel #current-box,#preview-panel #preview-items,#preview-panel #texture-preview,#preview-panel #product-preview-box,#preview-panel #total-box,#preview-panel .preview-add-btn,#preview-panel .quote-group,#preview-panel #wip-group,#preview-panel #add-item-btn') : [];
+    nodes.forEach(function(el){
+      if(shouldRecover(el)){
+        el.style.visibility = 'visible';
+        el.style.opacity = '1';
+        el.style.pointerEvents = 'auto';
+        if(el.style.display === 'none') el.style.display = '';
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    recoverVisibility(document);
+  });
+
+  document.addEventListener('click', function(){
+    setTimeout(function(){ recoverVisibility(document); }, 50);
+    setTimeout(function(){ recoverVisibility(document); }, 250);
+  }, true);
+
+  if(window.MutationObserver){
+    var timer = null;
+    var target = document.getElementById('messages') || document.body;
+    var mo = new MutationObserver(function(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ recoverVisibility(document); }, 80);
+    });
+    mo.observe(target, {childList:true, subtree:true});
+  }
+
+  window.ffRecoverFlowVisibility = function(){ recoverVisibility(document); };
+})();
+</script>
 
 </body>
 
