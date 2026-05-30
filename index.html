@@ -23331,3 +23331,345 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+
+<!-- === FF_FINAL_OPTION_COMPACT_IMAGE_RESTORE === -->
+<style id="ff-final-option-compact-image-restore-css">
+  .msg.bot:has(.ff-user-final-options-v2) .bubble{
+    max-width:min(96%, 560px) !important;
+    width:min(96%, 560px) !important;
+    padding:12px !important;
+    overflow:hidden !important;
+  }
+  .ff-user-final-options-v2{
+    width:100% !important;
+    max-width:560px !important;
+    margin:0 !important;
+    padding:12px !important;
+    border-radius:20px !important;
+    border:1px solid rgba(46,242,201,.25) !important;
+    background:linear-gradient(180deg,rgba(5,18,29,.98),rgba(3,14,24,.98)) !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  .ff-user-final-options-v2 h3{
+    margin:0 0 5px !important;
+    color:#2ef2c9 !important;
+    font-size:19px !important;
+    line-height:1.15 !important;
+    letter-spacing:-.3px !important;
+  }
+  .ff-user-final-options-v2 > p{
+    margin:0 0 8px !important;
+    color:#e5edf7 !important;
+    font-size:11px !important;
+    line-height:1.4 !important;
+  }
+  .ff-opt-cat-v2{
+    margin:8px 0 !important;
+    padding:9px !important;
+    border-radius:16px !important;
+    border:1px solid rgba(46,242,201,.18) !important;
+    background:rgba(7,23,34,.85) !important;
+  }
+  .ff-opt-cat-head-v2{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    margin-bottom:7px !important;
+  }
+  .ff-opt-cat-head-v2 b{
+    color:#2ef2c9 !important;
+    font-size:16px !important;
+    font-weight:1000 !important;
+    line-height:1.1 !important;
+  }
+  .ff-opt-cat-head-v2 small{
+    color:#b56cff !important;
+    font-size:9px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+  }
+  .ff-opt-grid-v2{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:8px !important;
+  }
+  .ff-opt-row-v2{
+    min-width:0 !important;
+    min-height:64px !important;
+    display:grid !important;
+    grid-template-columns:46px minmax(0,1fr) 34px !important;
+    grid-template-rows:auto auto !important;
+    gap:5px 7px !important;
+    align-items:center !important;
+    padding:7px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(46,242,201,.26) !important;
+    background:#081b28 !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  .ff-opt-row-v2.active{
+    border-color:#2ef2c9 !important;
+    box-shadow:0 0 0 1px rgba(46,242,201,.18),0 0 16px rgba(46,242,201,.10) !important;
+    background:#082928 !important;
+  }
+  .ff-opt-img-v2{
+    grid-row:1 / span 2 !important;
+    width:46px !important;
+    height:46px !important;
+    object-fit:contain !important;
+    border-radius:10px !important;
+    border:1px solid rgba(255,255,255,.16) !important;
+    background:#f3f5f6 !important;
+    padding:3px !important;
+    display:block !important;
+  }
+  .ff-opt-name-v2{
+    min-width:0 !important;
+    color:#fff !important;
+    font-size:12px !important;
+    font-weight:1000 !important;
+    line-height:1.18 !important;
+    white-space:normal !important;
+    overflow:hidden !important;
+    display:-webkit-box !important;
+    -webkit-line-clamp:2 !important;
+    -webkit-box-orient:vertical !important;
+  }
+  .ff-opt-toggle-v2{
+    width:32px !important;
+    height:32px !important;
+    border-radius:11px !important;
+    border:1px solid rgba(46,242,201,.50) !important;
+    background:#06202a !important;
+    color:#2ef2c9 !important;
+    font-size:18px !important;
+    font-weight:1000 !important;
+    cursor:pointer !important;
+    line-height:1 !important;
+  }
+  .ff-opt-row-v2.active .ff-opt-toggle-v2{
+    background:#2ef2c9 !important;
+    color:#031313 !important;
+  }
+  .ff-opt-color-v2{
+    grid-column:2 / span 2 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:6px !important;
+    min-width:0 !important;
+  }
+  .ff-opt-color-v2 span{
+    color:#d8f7f1 !important;
+    font-size:10px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+  }
+  .ff-opt-color-v2 select{
+    flex:1 !important;
+    min-width:0 !important;
+    height:30px !important;
+    padding:0 8px !important;
+    border-radius:10px !important;
+    border:1px solid rgba(46,242,201,.35) !important;
+    background:#06131f !important;
+    color:#fff !important;
+    font-size:11px !important;
+    font-weight:900 !important;
+    outline:none !important;
+  }
+  .ff-opt-actions-v2{
+    display:flex !important;
+    gap:8px !important;
+    margin-top:9px !important;
+  }
+  .ff-opt-actions-v2 button{
+    flex:1 !important;
+    min-height:38px !important;
+    border-radius:13px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    font-size:13px !important;
+    font-weight:1000 !important;
+    cursor:pointer !important;
+  }
+  .ff-opt-actions-v2 .primary{
+    background:#2ef2c9 !important;
+    color:#031313 !important;
+    border-color:#2ef2c9 !important;
+  }
+  .ff-opt-actions-v2 .secondary{
+    background:#101a28 !important;
+    color:#e5edf7 !important;
+  }
+  @media(max-width:680px){
+    .ff-opt-grid-v2{grid-template-columns:1fr !important;}
+    .ff-user-final-options-v2{max-width:100% !important;}
+  }
+</style>
+<script id="ff-final-option-compact-image-restore-js">
+(function(){
+  if(window.__ffFinalOptionCompactImageRestore) return;
+  window.__ffFinalOptionCompactImageRestore = true;
+
+  function esc(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function bot(html){
+    if(typeof window.addMsg === 'function') window.addMsg('bot', html);
+  }
+  var OPTIONS = [
+    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'external_3outlet_powerstrip.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'sliding_3outlet_powerstrip.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'built_in_2outlet_powerstrip.png'}
+    ]},
+    {cat:'PC홀더', note:'', items:[
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'pc_holder_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'pc_holder_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'pc_holder_basic_hanging.png'}
+    ]},
+    {cat:'기타', note:'', items:[
+      {name:'모니터암', colors:['BK'], img:'topmount_monitor_arm.png'},
+      {name:'가방걸이', colors:['XX(투명)'], img:'bag_hook.png'}
+    ]}
+  ];
+
+  function imgSrc(file){
+    return './images/options/accessories/' + file;
+  }
+  window.ffOptionImgFallbackV2 = function(img){
+    var file = img.getAttribute('data-file') || '';
+    var step = Number(img.getAttribute('data-step') || '0');
+    var tries = [
+      './images/options/accessories/' + file,
+      './images/accessories/' + file,
+      './accessories/' + file,
+      'accessories/' + file
+    ];
+    step++;
+    if(step < tries.length){
+      img.setAttribute('data-step', String(step));
+      img.src = tries[step];
+    }else{
+      img.style.display = 'none';
+      var row = img.closest('.ff-opt-row-v2');
+      if(row) row.style.gridTemplateColumns = 'minmax(0,1fr) 34px';
+    }
+  };
+
+  function rowId(gi, ii){ return 'ff-opt-v2-' + gi + '-' + ii; }
+
+  function renderOptions(){
+    if(window.state){
+      state.step='final_options';
+      state._ff102OptionsVisible=true;
+    }
+    if(typeof window.updateFlowBar === 'function') window.updateFlowBar();
+
+    var html = '<div class="ff102-options-card ff-user-final-options-v2">'
+      + '<h3>옵션을 추가하시겠습니까?</h3>'
+      + '<p>필요한 옵션을 선택하고 색상만 지정해주세요. 수량 입력은 제거했습니다.</p>';
+
+    OPTIONS.forEach(function(group, gi){
+      html += '<div class="ff-opt-cat-v2">'
+        + '<div class="ff-opt-cat-head-v2"><b>' + esc(group.cat) + '</b>'
+        + (group.note ? '<small>' + esc(group.note) + '</small>' : '<small></small>')
+        + '</div><div class="ff-opt-grid-v2">';
+      group.items.forEach(function(item, ii){
+        var id = rowId(gi, ii);
+        var opts = (item.colors || ['BK']).map(function(c){
+          return '<option value="' + esc(c) + '">' + esc(c) + '</option>';
+        }).join('');
+        html += '<div class="ff-opt-row-v2" id="' + id + '" data-name="' + esc(item.name) + '" data-cat="' + esc(group.cat) + '">'
+          + '<img class="ff-opt-img-v2" data-file="' + esc(item.img) + '" data-step="0" src="' + esc(imgSrc(item.img)) + '" onerror="ffOptionImgFallbackV2(this)" alt="' + esc(item.name) + '">'
+          + '<div class="ff-opt-name-v2">' + esc(item.name) + '</div>'
+          + '<button type="button" class="ff-opt-toggle-v2" onclick="ffToggleOptionV2(\'' + id + '\')">+</button>'
+          + '<label class="ff-opt-color-v2"><span>색상</span><select onchange="ffOptionColorV2(\'' + id + '\', this.value)">' + opts + '</select></label>'
+          + '</div>';
+      });
+      html += '</div></div>';
+    });
+
+    html += '<div class="ff-opt-actions-v2">'
+      + '<button type="button" class="primary" onclick="ffSaveOptionsV2()">옵션 선택 완료</button>'
+      + '<button type="button" class="secondary" onclick="ffSkipOptionsV2()">선택 안 함</button>'
+      + '</div></div>';
+
+    bot(html);
+    if(typeof window.scrollBottom === 'function') window.scrollBottom();
+  }
+
+  window.ffToggleOptionV2 = function(id){
+    var row = document.getElementById(id);
+    if(!row) return;
+    row.classList.toggle('active');
+    var btn = row.querySelector('.ff-opt-toggle-v2');
+    if(btn) btn.textContent = row.classList.contains('active') ? '−' : '+';
+  };
+
+  window.ffOptionColorV2 = function(id, value){
+    var row = document.getElementById(id);
+    if(row) row.setAttribute('data-color', value || '');
+  };
+
+  function selectedOptions(){
+    var rows = Array.prototype.slice.call(document.querySelectorAll('.ff-opt-row-v2.active'));
+    return rows.map(function(row){
+      var sel = row.querySelector('select');
+      return {
+        cat: row.getAttribute('data-cat') || '',
+        name: row.getAttribute('data-name') || '',
+        color: row.getAttribute('data-color') || (sel && sel.value) || '',
+        qty: 1
+      };
+    });
+  }
+
+  function saveChosen(chosen){
+    if(window.state){
+      state.extraOptionItems = chosen;
+      state.finalAddons = chosen.map(function(x){ return x.name; });
+      state.finalOptionQty = 1;
+      state._ff102OptionsHandled = true;
+      state._ff101OptionsHandled = true;
+      state._ff100OptionsDone = true;
+      state._ff96OptionsAsked = true;
+      state._ff97FinalOptionsAsked = true;
+      state._ffUserOptionsChosen = chosen;
+      state.step = 'next_actions';
+    }
+    if(typeof window.updateCurrent === 'function') window.updateCurrent();
+    if(typeof window.updatePreview === 'function') window.updatePreview();
+
+    if(chosen.length){
+      var summary = chosen.map(function(x){ return '· ' + esc(x.name) + ' / ' + esc(x.color); }).join('<br>');
+      bot('옵션 선택 완료:<br>' + summary);
+    }else{
+      bot('옵션은 선택하지 않는 것으로 처리했습니다.');
+    }
+
+    if(typeof window.updateFlowBar === 'function') window.updateFlowBar();
+    if(typeof window.askContinue === 'function'){
+      try{ window.askContinue(); return; }catch(e){}
+    }
+    if(typeof window.showFinalQuote === 'function'){
+      try{ window.showFinalQuote(); return; }catch(e){}
+    }
+  }
+
+  window.ffSaveOptionsV2 = function(){ saveChosen(selectedOptions()); };
+  window.ffSkipOptionsV2 = function(){ saveChosen([]); };
+
+  window.ff102ShowOptions = renderOptions;
+  window.ffShowFinalOptions70 = renderOptions;
+  window.ffShowFinalOptions96 = renderOptions;
+  window.ffShowFinalOptions97 = renderOptions;
+  window.ffShowFinalOptionsUser = renderOptions;
+})();
+</script>
+
