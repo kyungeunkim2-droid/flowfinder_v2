@@ -2334,6 +2334,102 @@ body.ff-dashboard-preview #preview-panel,
 }
 </style>
 
+
+<style id="ff-final-flow-and-render-fix-css">
+#messages .msg,
+#messages .bubble,
+#messages .btn-group,
+#messages .choice-btn,
+#messages .confirm-btn,
+#messages .back-btn,
+#messages input,
+#messages select,
+#messages textarea,
+#messages button,
+#messages .material-button-group,
+#messages .material-button-section,
+#messages .material-btn,
+#messages .ff-num-control,
+#messages .ff-finish-menu,
+#messages .ff-menu-btns,
+#messages .quote-result,
+#messages .final-quote-wrap{
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+
+#messages .btn-group,
+#messages .material-button-group,
+#messages .ff-menu-btns{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  gap:8px!important;
+}
+
+#messages .ff-num-control{
+  display:flex!important;
+  align-items:center!important;
+}
+
+#messages input:not(.material-hidden-input),
+#messages select,
+#messages textarea{
+  color:#fff!important;
+  background:#111827!important;
+  border:1px solid rgba(255,255,255,.18)!important;
+}
+
+/* 오른쪽 패널 겹침만 최소 정리 */
+#preview-panel{
+  display:flex!important;
+  flex-direction:column!important;
+  gap:12px!important;
+  overflow-y:auto!important;
+  overflow-x:hidden!important;
+}
+#preview-panel>*{
+  position:relative!important;
+  float:none!important;
+  clear:both!important;
+  flex-shrink:0!important;
+}
+#preview-panel>#screen-composite-preview{
+  display:none!important;
+}
+#preview-panel>#current-box,
+#preview-panel>#preview-items,
+#preview-panel>#texture-preview,
+#preview-panel>#product-preview-box,
+#preview-panel>#total-box,
+#preview-panel>.preview-add-btn,
+#preview-panel>.quote-group,
+#preview-panel>#wip-group{
+  visibility:visible!important;
+  opacity:1!important;
+  pointer-events:auto!important;
+}
+#product-preview-box,#texture-preview,#current-box,#total-box{
+  width:100%!important;
+  max-width:100%!important;
+  margin:0 0 12px 0!important;
+  box-sizing:border-box!important;
+}
+#product-preview-box img,
+#product-preview-img,
+#texture-preview canvas,
+#product-3d-canvas,
+#ff-render-canvas{
+  max-height:240px!important;
+  object-fit:contain!important;
+}
+#preview-items{
+  min-height:90px!important;
+  max-height:300px!important;
+  overflow-y:auto!important;
+}
+</style>
+
 </head>
 
 <script id="ff-hotfix-block-broken-assets">
@@ -15762,140 +15858,277 @@ window.showPanel = function(){
 </script>
 
 
-
-<!-- === FF-HOTFIX: restore screen flow size -> color -> options -> final quote === -->
-<script id="ff-hotfix-screen-color-options-final">
+<script id="ff-final-screen-size-and-render-fix-js">
 (function(){
-  function $(id){ return document.getElementById(id); }
-  function esc(s){ return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];}); }
-  function bot(html){ if(typeof window.addMsg==='function') window.addMsg('bot', html); }
-  function user(txt){ if(typeof window.addMsg==='function') window.addMsg('user', txt); }
-  function isScreen(cat){
-    var info=(window.USER_CATEGORIES && window.USER_CATEGORIES[cat]) || {};
-    return !!info.isScreen || /스크린/.test(String(cat||''));
+  function visible(el){
+    if(!el) return;
+    el.style.visibility = 'visible';
+    el.style.opacity = '1';
+    el.style.pointerEvents = 'auto';
+    if(el.style.display === 'none') el.style.display = '';
   }
-  function getPack(cat){
-    var info=(window.USER_CATEGORIES && window.USER_CATEGORIES[cat]) || {};
-    var mode=(typeof window.ffDataTypeForMode==='function') ? window.ffDataTypeForMode(info) : (info.type||'unit');
-    var keys=(typeof window.ffUnitKeysForMode==='function') ? window.ffUnitKeysForMode(cat, info.keys) : (info.keys||[]);
-    var key=keys && keys.length ? keys[0] : (info.key || cat);
-    var data=mode==='set' ? window.SET_DATA : window.UNIT_DATA;
-    return {mode:mode, key:key, items:(data && data[key]) || []};
+
+  function recoverEssentialControls(root){
+    root = root || document;
+    var selector = [
+      '#messages .btn-group',
+      '#messages .choice-btn',
+      '#messages .confirm-btn',
+      '#messages .back-btn',
+      '#messages input',
+      '#messages select',
+      '#messages textarea',
+      '#messages button',
+      '#messages .material-button-group',
+      '#messages .material-button-section',
+      '#messages .material-btn',
+      '#messages .ff-num-control',
+      '#messages .ff-finish-menu',
+      '#messages .ff-menu-btns',
+      '#messages .quote-result',
+      '#messages .final-quote-wrap',
+      '#preview-panel #current-box',
+      '#preview-panel #preview-items',
+      '#preview-panel #texture-preview',
+      '#preview-panel #product-preview-box',
+      '#preview-panel #total-box',
+      '#preview-panel .preview-add-btn',
+      '#preview-panel .quote-group'
+    ].join(',');
+    root.querySelectorAll(selector).forEach(visible);
   }
-  function defaults(cat){
-    return (cat==='일자형 스크린'||cat==='L형 스크린') ? {h:590, above:350} : {h:715, above:405};
+
+  function contextText(el){
+    var box = el && el.closest && el.closest('.bubble, .msg, form, #messages');
+    return box ? (box.textContent || '') : '';
   }
-  function updateCurrentSafe(){ if(typeof window.updateCurrent==='function') window.updateCurrent(); if(typeof window.updateFlowBar==='function') window.updateFlowBar(); }
 
-  window.ffHotfixAskScreenColor=function(cat){
-    window.state=window.state||{};
-    cat = cat || state._currentCatName;
-    if(!cat) return;
-    state._currentCatName=cat;
-    var pack=state._flowColorPack || getPack(cat);
-    state._flowColorPack=pack;
-    state._currentDataType=pack.mode;
-    state._currentProductKey=pack.key;
-    state._currentItems=pack.items;
-    if(typeof window.askColorTypeFirst==='function'){
-      window.askColorTypeFirst(cat, pack.mode, pack.items, pack.key);
-    }else if(typeof window.askStdColorDrop==='function'){
-      window.askStdColorDrop(cat, pack.mode, pack.items, pack.key);
-    }else{
-      bot('<span class="error-msg">색상 선택 화면을 불러오지 못했습니다. 새로고침 후 다시 시도해주세요.</span>');
+  function looksLikeScreenSizeConfirm(el){
+    var txt = (el && (el.textContent || el.value) || '').trim();
+    var ctx = contextText(el);
+    return /확인|다음|적용|완료|입력/.test(txt) && /스크린/.test(ctx) && /사이즈|가로|세로|높이|폭|W|H/.test(ctx);
+  }
+
+  function findLastScreenSizeValues(){
+    var scope = document.getElementById('messages') || document;
+    var inputs = Array.from(scope.querySelectorAll('input'));
+    var vals = inputs.map(function(i){ return String(i.value || '').trim(); }).filter(Boolean);
+    return vals;
+  }
+
+  function forceScreenMaterialStep(){
+    recoverEssentialControls(document);
+
+    // If material buttons already exist but were hidden, just reveal them.
+    var materialGroup = document.querySelector('#messages .material-button-group, #messages .material-button-section');
+    if(materialGroup){
+      visible(materialGroup);
+      materialGroup.querySelectorAll('button,.material-btn').forEach(visible);
+      return true;
     }
-  };
 
-  window.ffHotfixAskScreenTopGap=function(cat,newH){
-    window.state=window.state||{};
-    var d=defaults(cat), h=parseInt(newH,10)||d.h;
-    state._screenNewH=h; state.h=h; state.step='input_screen_top'; state._currentCatName=cat;
-    state.current=state.current||{}; state.current.size='H'+h; updateCurrentSafe();
-    var fid=Date.now(); state._topFormId=fid;
-    var above=Math.min(d.above, Math.max(1,h-1));
-    var diff=h-d.h;
-    var diffTxt=diff>0?'기준보다 +'+diff+'mm':diff<0?'기준보다 '+diff+'mm':'기준값';
-    var html='📐 <b>'+esc(cat)+'</b> 사이즈 정리<br>'
-      +'전체 H: <b>'+h+'mm</b> <span style="color:#9fb1c8;font-size:12px;">('+diffTxt+')</span><br><br>'
-      +'책상 <b>상판 위</b> 높이(mm)를 입력해주세요.'
-      +'<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'
-      +'<div class="ff-size-control">'
-      +'<button type="button" onclick="ffHotfixStepScreenTop('+fid+',-50)">−</button>'
-      +'<input id="ff-hotfix-screen-top-'+fid+'" type="number" value="'+above+'" min="1" max="'+(h-1)+'" onkeydown="if(event.key===\'Enter\')ffHotfixSubmitScreenTop('+fid+')">'
-      +'<button type="button" onclick="ffHotfixStepScreenTop('+fid+',50)">+</button>'
-      +'</div><span style="font-size:11px;color:#9fb1c8;">mm</span></div>'
-      +'<span class="hint" style="display:block;margin-top:8px;">전면/사이드 기준: 전체 715 · 상판위 405<br>일자형/L형 기준: 전체 590 · 상판위 350</span>'
-      +'<button class="confirm-btn" style="margin-top:10px;" onclick="ffHotfixSubmitScreenTop('+fid+')">상판 위 값 확인 ✓</button>';
-    bot(html);
-    var input=$('user-input'); if(input){ input.disabled=true; input.placeholder='위 칸에 입력해주세요'; }
-    setTimeout(function(){ var el=$('ff-hotfix-screen-top-'+fid); if(el) el.focus(); },60);
-  };
-  window.ffHotfixStepScreenTop=function(fid,delta){
-    var el=$('ff-hotfix-screen-top-'+fid) || $('screen-top-'+fid) || $('screen-top-final-'+fid); if(!el) return;
-    var min=parseInt(el.min,10)||1, max=parseInt(el.max,10)||9999, val=parseInt(el.value,10)||min;
-    el.value=Math.max(min, Math.min(max, val+delta));
-  };
-  window.ffHotfixSubmitScreenTop=function(fid){
-    var el=$('ff-hotfix-screen-top-'+fid) || $('screen-top-'+fid) || $('screen-top-final-'+fid); if(!el || el.disabled) return;
-    var val=parseInt(el.value,10), h=(window.state && (state._screenNewH||state.h)) || 715;
-    if(!val || val<1 || val>=h){ el.style.borderColor='#f87171'; el.focus(); return; }
-    el.disabled=true;
-    var oldBtn=document.querySelector('[onclick*="'+fid+'"]'); if(oldBtn) oldBtn.disabled=true;
-    window.state=window.state||{}; state.current=state.current||{};
-    state._screenTopGap=val; state.screenTopGap=val; state.current.screenTopGap=val;
-    state.current.size='H'+h+' / 상판위 '+val+'mm';
-    updateCurrentSafe();
-    user('상판 위 '+val+'mm');
-    bot('📐 스크린 사이즈 정리:<br>· 전체 H: <b>'+h+'mm</b><br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+(h-val)+'mm</b><br><br>이제 스크린 색상을 선택해주세요.');
-    var input=$('user-input'); if(input){ input.disabled=false; input.placeholder='입력하세요...'; }
-    window.ffHotfixAskScreenColor(state._currentCatName);
-  };
+    // Try existing project functions first.
+    var fnNames = [
+      'askScreenMaterial',
+      'askScreenColor',
+      'showScreenMaterialSelection',
+      'showScreenColorSelection',
+      'askColor',
+      'askMaterial'
+    ];
 
-  /* 기존 버튼명이 어떤 버전으로 남아있어도 색상 단계로 이어지게 연결 */
-  window.ff98SubmitTopGap=window.ffHotfixSubmitScreenTop;
-  window.ffFinalSubmitTopGap=window.ffHotfixSubmitScreenTop;
-  window.submitTopGapForm=window.ffHotfixSubmitScreenTop;
-
-  var prevAfter=window.afterSizeInput;
-  window.afterSizeInput=function(parsed){
-    var cat=window.state && state._currentCatName;
-    if(isScreen(cat)){
-      parsed=parsed||{};
-      state.w=parsed.w||state.w||null; state.d=parsed.d||state.d||null; state.h=parsed.h||state.h||defaults(cat).h;
-      window.ffHotfixAskScreenTopGap(cat, state.h);
-      return;
+    for(var i=0;i<fnNames.length;i++){
+      var fn = window[fnNames[i]];
+      if(typeof fn === 'function'){
+        try{
+          fn();
+          setTimeout(function(){ recoverEssentialControls(document); }, 80);
+          return true;
+        }catch(e){}
+      }
     }
-    return (typeof prevAfter==='function') ? prevAfter.apply(this, arguments) : undefined;
-  };
 
-  var prevAfterColor=window.afterColorSelected;
-  window.afterColorSelected=function(catName,dataType,items,productKey){
-    if(isScreen(catName) && (state.h || (state.current && state.current.size))){
-      state.step='finish_decision'; state._currentCatName=catName;
-      updateCurrentSafe();
-      if(typeof window.showFinishDecision==='function') return window.showFinishDecision(catName);
-      if(typeof window.calcAndFinish==='function') return window.calcAndFinish(catName);
-      return;
+    // Fallback: create a small recovery prompt only if no material UI appears.
+    var messages = document.getElementById('messages');
+    if(!messages) return false;
+
+    if(document.getElementById('ff-screen-material-fallback')) return false;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'msg bot';
+    wrap.id = 'ff-screen-material-fallback';
+    wrap.innerHTML =
+      '<div class="bubble">' +
+      '<b>&lt;@@스크린 재질입력&gt;</b><br>스크린 재질을 선택해주세요.' +
+      '<div class="btn-group material-button-group">' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="1P1">1P1</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="1P2">1P2</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="1P4">1P4</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="1P7">1P7</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="3F1">3F1</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="3F2">3F2</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="061">061</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="064">064</button>' +
+      '<button class="choice-btn material-btn" data-part="screen" data-code="067">067</button>' +
+      '</div>' +
+      '<button class="confirm-btn" id="ff-screen-material-fallback-next">스크린 재질 선택 완료</button>' +
+      '</div>';
+
+    messages.appendChild(wrap);
+    messages.scrollTop = messages.scrollHeight;
+    return true;
+  }
+
+  // When screen size is confirmed and the app stalls, reveal/call the next material step.
+  document.addEventListener('click', function(e){
+    var target = e.target;
+    if(!target) return;
+
+    if(looksLikeScreenSizeConfirm(target)){
+      setTimeout(forceScreenMaterialStep, 180);
+      setTimeout(forceScreenMaterialStep, 650);
     }
-    return (typeof prevAfterColor==='function') ? prevAfterColor.apply(this, arguments) : undefined;
-  };
 
-  var prevFinish=window.showFinishDecision;
-  window.showFinishDecision=function(catName){
-    window.state=window.state||{}; state.step='finish_decision'; state._currentCatName=catName || state._currentCatName;
-    updateCurrentSafe();
-    var safe=String(state._currentCatName||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'");
-    var html='<div class="ff-finish-menu"><b>다음 진행을 선택해주세요.</b>'
-      +'<p>색상까지 선택되었습니다. 옵션을 추가하거나 바로 최종견적을 확인할 수 있습니다.</p>'
-      +'<div class="ff-menu-btns">'
-      +'<button class="primary" onclick="window.ff102ShowOptions ? ff102ShowOptions() : (calcAndFinish && calcAndFinish(\''+safe+'\'))">옵션추가</button>'
-      +'<button onclick="state._ff102OptionsHandled=true; calcAndFinish && calcAndFinish(\''+safe+'\')">최종견적</button>'
-      +'<button onclick="goBack && goBack()">이전단계</button>'
-      +'</div></div>';
-    bot(html);
-  };
+    if(target && target.id === 'ff-screen-material-fallback-next'){
+      var chosen = document.querySelector('#ff-screen-material-fallback .material-btn.active, #ff-screen-material-fallback .material-btn.selected');
+      var code = chosen ? chosen.getAttribute('data-code') : '';
+      if(code){
+        window.__ffPreviewScreen = code;
+        if(window.state){
+          window.state.screenColor = code;
+          window.state._screenColor = code;
+          if(window.state.current){
+            window.state.current.screenColor = code;
+            window.state.current.color = code;
+          }
+        }
+      }
+
+      // continue to option/final flow using known project functions if available
+      var nextFns = ['askOptions','askOption','showOptionStep','showOptionSelection','finishCurrentItem','showFinishMenu'];
+      for(var i=0;i<nextFns.length;i++){
+        if(typeof window[nextFns[i]] === 'function'){
+          try{ window[nextFns[i]](); recoverEssentialControls(document); return; }catch(err){}
+        }
+      }
+      recoverEssentialControls(document);
+    }
+
+    var matBtn = target.closest && target.closest('.material-btn[data-part="screen"], .choice-btn[data-part="screen"]');
+    if(matBtn){
+      document.querySelectorAll('.material-btn[data-part="screen"], .choice-btn[data-part="screen"]').forEach(function(b){
+        b.classList.remove('active','selected');
+      });
+      matBtn.classList.add('active','selected');
+      var code = matBtn.getAttribute('data-code') || (matBtn.textContent || '').trim();
+      window.__ffPreviewScreen = code;
+      if(window.state){
+        window.state.screenColor = code;
+        window.state._screenColor = code;
+        if(window.state.current){
+          window.state.current.screenColor = code;
+          window.state.current.color = code;
+        }
+      }
+    }
+  }, true);
+
+  function getImageUrlFromResponse(data){
+    if(!data) return '';
+    if(typeof data === 'string') return data;
+    return data.imageUrl || data.image_url || data.url || data.outputUrl || data.output_url ||
+      data.previewUrl || data.preview_url || data.renderedImage || data.rendered_image ||
+      data.image || data.base64 || data.dataUrl || data.data_url || '';
+  }
+
+  function normalizeImageUrl(url){
+    if(!url) return '';
+    url = String(url);
+    if(url.indexOf('data:image') === 0) return url;
+    if(url.length > 500 && /^[A-Za-z0-9+/=]+$/.test(url.slice(0,80))) return 'data:image/png;base64,' + url;
+    return url;
+  }
+
+  function showRenderedImage(url){
+    url = normalizeImageUrl(url);
+    if(!url) return;
+
+    var ids = ['product-preview-img','ff-hero-img','render-preview-img','screen-preview-img'];
+    ids.forEach(function(id){
+      var img = document.getElementById(id);
+      if(img){
+        img.src = url;
+        img.style.display = 'block';
+        img.classList.remove('ff-composited-hidden');
+        visible(img);
+      }
+    });
+
+    var box = document.getElementById('product-preview-box') || document.getElementById('ff-dashboard-hero') || document.getElementById('texture-preview');
+    visible(box);
+
+    window.__ffLastRenderedImage = url;
+  }
+
+  // Hook fetch so API render responses are placed into visible preview image.
+  if(!window.__ffRenderFetchHooked){
+    window.__ffRenderFetchHooked = true;
+    var oldFetch = window.fetch;
+    if(typeof oldFetch === 'function'){
+      window.fetch = function(){
+        var args = arguments;
+        return oldFetch.apply(this, args).then(function(resp){
+          try{
+            var url = String(args[0] || '');
+            if(/generate|render|preview|image/i.test(url)){
+              resp.clone().json().then(function(data){
+                var imageUrl = getImageUrlFromResponse(data);
+                if(imageUrl) showRenderedImage(imageUrl);
+              }).catch(function(){});
+            }
+          }catch(e){}
+          return resp;
+        });
+      };
+    }
+  }
+
+  // Render button bridge: after clicking existing render button, resync image.
+  document.addEventListener('click', function(e){
+    var t = e.target;
+    if(!t) return;
+    var txt = (t.textContent || t.value || '').trim();
+    if(/렌더|미리보기|재질 적용/.test(txt)){
+      setTimeout(function(){
+        if(window.__ffLastRenderedImage) showRenderedImage(window.__ffLastRenderedImage);
+        recoverEssentialControls(document);
+      }, 1000);
+      setTimeout(function(){
+        if(window.__ffLastRenderedImage) showRenderedImage(window.__ffLastRenderedImage);
+        recoverEssentialControls(document);
+      }, 2500);
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    recoverEssentialControls(document);
+  });
+
+  if(window.MutationObserver){
+    var timer = null;
+    var target = document.getElementById('messages') || document.body;
+    var mo = new MutationObserver(function(){
+      clearTimeout(timer);
+      timer = setTimeout(function(){ recoverEssentialControls(document); }, 120);
+    });
+    mo.observe(target, {childList:true, subtree:true});
+  }
+
+  window.ffForceScreenMaterialStep = forceScreenMaterialStep;
+  window.ffShowRenderedImage = showRenderedImage;
 })();
 </script>
+
 </body>
 
 
