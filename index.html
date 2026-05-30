@@ -2335,98 +2335,204 @@ body.ff-dashboard-preview #preview-panel,
 </style>
 
 
-<style id="ff-final-flow-and-render-fix-css">
-#messages .msg,
-#messages .bubble,
-#messages .btn-group,
-#messages .choice-btn,
-#messages .confirm-btn,
-#messages .back-btn,
-#messages input,
-#messages select,
-#messages textarea,
-#messages button,
-#messages .material-button-group,
-#messages .material-button-section,
-#messages .material-btn,
-#messages .ff-num-control,
-#messages .ff-finish-menu,
-#messages .ff-menu-btns,
-#messages .quote-result,
-#messages .final-quote-wrap{
-  visibility:visible!important;
-  opacity:1!important;
-  pointer-events:auto!important;
-}
 
-#messages .btn-group,
-#messages .material-button-group,
-#messages .ff-menu-btns{
-  display:flex!important;
-  flex-wrap:wrap!important;
-  gap:8px!important;
+<!-- === FF109: option add window compact overflow fix === -->
+<style id="ff109-option-compact-overflow-fix">
+/* 옵션 추가 화면이 채팅 말풍선 안에서 튀어나가지 않도록 강제 보정 */
+.msg.bot:has(.ff102-options-card) .bubble,
+.msg.bot:has(.ff100-options-card) .bubble,
+.msg.bot:has(.ff96-options-card) .bubble{
+  max-width:min(96%, 620px) !important;
+  width:min(96%, 620px) !important;
+  overflow:hidden !important;
+  padding:14px !important;
 }
+.ff102-options-card{
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+  padding:14px !important;
+  border-radius:20px !important;
+  overflow:hidden !important;
+}
+.ff102-options-card h3{font-size:20px !important;margin-bottom:8px !important;}
+.ff102-options-card p{font-size:12px !important;line-height:1.5 !important;margin-bottom:12px !important;}
+.ff102-cat{margin-top:14px !important;}
+.ff102-cat-title{gap:8px !important;margin-bottom:8px !important;}
+.ff102-cat-title span{font-size:17px !important;white-space:nowrap !important;}
+.ff102-cat-title small{font-size:10px !important;max-width:52% !important;}
+.ff102-option-list{gap:8px !important;}
+.ff102-option-row{
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-height:0 !important;
+  display:grid !important;
+  grid-template-columns:58px minmax(0,1fr) !important;
+  gap:9px !important;
+  align-items:start !important;
+  padding:9px !important;
+  border-radius:16px !important;
+  overflow:hidden !important;
+}
+.ff107-option-img{
+  width:58px !important;
+  height:58px !important;
+  border-radius:12px !important;
+  padding:3px !important;
+}
+.ff107-option-main{
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:7px !important;
+  overflow:hidden !important;
+}
+.ff102-pick{
+  box-sizing:border-box !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  min-height:36px !important;
+  padding:8px 10px !important;
+  font-size:13px !important;
+  line-height:1.25 !important;
+  white-space:normal !important;
+  word-break:keep-all !important;
+  overflow-wrap:anywhere !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+}
+.ff107-controls{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) minmax(0,1fr) !important;
+  gap:6px !important;
+  overflow:hidden !important;
+}
+.ff102-field{min-width:0 !important;max-width:100% !important;}
+.ff102-field label{font-size:10px !important;margin-bottom:3px !important;}
+.ff102-field select{height:32px !important;font-size:12px !important;padding:0 7px !important;}
+.ff102-qty{height:32px !important;grid-template-columns:26px minmax(28px,1fr) 26px !important;}
+.ff102-qty button{font-size:14px !important;}
+.ff102-qty input{font-size:12px !important;min-width:0 !important;padding:0 !important;}
+.ff102-actions{margin-top:12px !important;gap:7px !important;}
+.ff102-actions button{min-height:36px !important;padding:8px 12px !important;font-size:12px !important;}
+@media(max-width:720px){
+  .msg.bot:has(.ff102-options-card) .bubble,
+  .msg.bot:has(.ff100-options-card) .bubble,
+  .msg.bot:has(.ff96-options-card) .bubble{
+    max-width:96% !important;
+    width:96% !important;
+  }
+  .ff102-options-card{padding:12px !important;}
+  .ff102-option-row{grid-template-columns:54px minmax(0,1fr) !important;gap:8px !important;padding:8px !important;}
+  .ff107-option-img{width:54px !important;height:54px !important;}
+  .ff107-controls{grid-template-columns:1fr 1fr !important;}
+  .ff102-pick{font-size:12px !important;min-height:34px !important;}
+}
+@media(max-width:430px){
+  .ff107-controls{grid-template-columns:1fr !important;}
+  .ff102-cat-title{align-items:flex-start !important;flex-direction:column !important;}
+  .ff102-cat-title small{max-width:100% !important;text-align:left !important;}
+}
+</style>
 
-#messages .ff-num-control{
+
+
+<style id="ff-kk-option-ultra-compact-v3">
+/* 옵션추가 창 초압축: 한 화면에 들어오도록 이미지 숨김 + 2열 카드 */
+.msg.bot:has(.ff102-options-card) .bubble{
+  max-width:min(100%,720px)!important;
+  width:min(100%,720px)!important;
+  padding:12px!important;
+}
+.ff102-options-card{
+  max-width:100%!important;
+  padding:10px!important;
+  border-radius:14px!important;
+}
+.ff102-options-card h3{
+  font-size:17px!important;
+  margin:0 0 4px!important;
+}
+.ff102-options-card p{
+  font-size:11px!important;
+  line-height:1.35!important;
+  margin:0 0 6px!important;
+}
+.ff102-cat{margin-top:8px!important;}
+.ff102-cat-title{
+  margin:0 0 5px!important;
   display:flex!important;
   align-items:center!important;
+  justify-content:space-between!important;
 }
-
-#messages input:not(.material-hidden-input),
-#messages select,
-#messages textarea{
-  color:#fff!important;
-  background:#111827!important;
-  border:1px solid rgba(255,255,255,.18)!important;
+.ff102-cat-title span{font-size:13px!important;}
+.ff102-cat-title small{font-size:9px!important;max-width:48%!important;text-align:right!important;}
+.ff102-option-list{
+  display:grid!important;
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:6px!important;
 }
-
-/* 오른쪽 패널 겹침만 최소 정리 */
-#preview-panel{
-  display:flex!important;
-  flex-direction:column!important;
-  gap:12px!important;
-  overflow-y:auto!important;
-  overflow-x:hidden!important;
+.ff102-option-row,
+.ff102-option-row.ff107-no-img{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  min-height:0!important;
+  padding:6px!important;
+  gap:4px!important;
+  border-radius:11px!important;
+  overflow:hidden!important;
 }
-#preview-panel>*{
-  position:relative!important;
-  float:none!important;
-  clear:both!important;
-  flex-shrink:0!important;
+.ff107-option-img{display:none!important;}
+.ff107-option-main{
+  display:grid!important;
+  grid-template-columns:1fr!important;
+  gap:5px!important;
+  min-width:0!important;
 }
-#preview-panel>#screen-composite-preview{
-  display:none!important;
-}
-#preview-panel>#current-box,
-#preview-panel>#preview-items,
-#preview-panel>#texture-preview,
-#preview-panel>#product-preview-box,
-#preview-panel>#total-box,
-#preview-panel>.preview-add-btn,
-#preview-panel>.quote-group,
-#preview-panel>#wip-group{
-  visibility:visible!important;
-  opacity:1!important;
-  pointer-events:auto!important;
-}
-#product-preview-box,#texture-preview,#current-box,#total-box{
+.ff102-pick{
   width:100%!important;
-  max-width:100%!important;
-  margin:0 0 12px 0!important;
-  box-sizing:border-box!important;
+  min-height:28px!important;
+  height:auto!important;
+  padding:5px 7px!important;
+  font-size:11px!important;
+  line-height:1.15!important;
+  text-align:left!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
 }
-#product-preview-box img,
-#product-preview-img,
-#texture-preview canvas,
-#product-3d-canvas,
-#ff-render-canvas{
-  max-height:240px!important;
-  object-fit:contain!important;
+.ff107-controls{
+  display:grid!important;
+  grid-template-columns:minmax(72px,1fr) minmax(80px,1fr)!important;
+  gap:5px!important;
+  align-items:end!important;
 }
-#preview-items{
-  min-height:90px!important;
-  max-height:300px!important;
-  overflow-y:auto!important;
+.ff102-field label{font-size:8px!important;margin:0 0 1px!important;line-height:1!important;}
+.ff102-field select{height:26px!important;font-size:10px!important;padding:0 5px!important;border-radius:8px!important;}
+.ff102-qty{height:26px!important;grid-template-columns:22px 1fr 22px!important;border-radius:8px!important;}
+.ff102-qty button{font-size:12px!important;line-height:1!important;}
+.ff102-qty input{font-size:10px!important;min-width:0!important;padding:0!important;}
+.ff102-actions{
+  position:sticky!important;
+  bottom:0!important;
+  z-index:5!important;
+  margin-top:8px!important;
+  padding-top:7px!important;
+  background:linear-gradient(180deg,rgba(7,18,30,0),rgba(7,18,30,.96) 35%)!important;
+}
+.ff102-actions button{min-height:30px!important;padding:6px 10px!important;font-size:11px!important;}
+@media(max-width:520px){
+  .msg.bot:has(.ff102-options-card) .bubble{max-width:100%!important;width:100%!important;padding:10px!important;}
+  .ff102-option-list{grid-template-columns:1fr!important;}
+  .ff102-option-row{padding:6px!important;}
+  .ff107-controls{grid-template-columns:1fr 1fr!important;}
 }
 </style>
 
@@ -15858,277 +15964,371 @@ window.showPanel = function(){
 </script>
 
 
-<script id="ff-final-screen-size-and-render-fix-js">
+
+<!-- === FF EMERGENCY FIX: robust screen color panel after top-gap === -->
+<script id="ff-emergency-screen-color-panel-fix">
 (function(){
-  function visible(el){
-    if(!el) return;
-    el.style.visibility = 'visible';
-    el.style.opacity = '1';
-    el.style.pointerEvents = 'auto';
-    if(el.style.display === 'none') el.style.display = '';
+  'use strict';
+  function $(id){return document.getElementById(id);}
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function S(){window.state=window.state||{}; return window.state;}
+  function cat(){var s=S(); return s._currentCatName || (s.current&&s.current.product) || s.product || '전면 스크린';}
+  function isScreen(c){return /스크린|screen|전면|사이드|일자형|L형|l형/i.test(String(c||'')) || !!((window.USER_CATEGORIES||{})[c]||{}).isScreen;}
+  function unique(a){var o=[];(a||[]).forEach(function(x){x=String(x||'').trim(); if(x && o.indexOf(x)<0)o.push(x);}); return o;}
+  function fallbackColors(c){
+    var standard=[];
+    if(window.STD_COLORS && window.STD_COLORS[c]) standard=window.STD_COLORS[c].slice();
+    var items=S()._currentItems||[];
+    items.forEach(function(i){ if(i && i.color) standard.push(i.color); });
+    if(!standard.length) standard=['3F1','3F2','061','064','067'];
+    var custom=[];
+    if(/일자형|L형|l형/i.test(String(c))) custom=(window.CUSTOM_PET_COLORS_SCREEN||[]).slice();
+    else custom=(window.CUSTOM_FABRIC_COLORS_SCREEN||[]).slice();
+    return {standard:unique(standard), custom:unique(custom)};
   }
-
-  function recoverEssentialControls(root){
-    root = root || document;
-    var selector = [
-      '#messages .btn-group',
-      '#messages .choice-btn',
-      '#messages .confirm-btn',
-      '#messages .back-btn',
-      '#messages input',
-      '#messages select',
-      '#messages textarea',
-      '#messages button',
-      '#messages .material-button-group',
-      '#messages .material-button-section',
-      '#messages .material-btn',
-      '#messages .ff-num-control',
-      '#messages .ff-finish-menu',
-      '#messages .ff-menu-btns',
-      '#messages .quote-result',
-      '#messages .final-quote-wrap',
-      '#preview-panel #current-box',
-      '#preview-panel #preview-items',
-      '#preview-panel #texture-preview',
-      '#preview-panel #product-preview-box',
-      '#preview-panel #total-box',
-      '#preview-panel .preview-add-btn',
-      '#preview-panel .quote-group'
-    ].join(',');
-    root.querySelectorAll(selector).forEach(visible);
+  function textureUrl(code,c){
+    try{ if(typeof window._ffLocalTextureForCode==='function') return window._ffLocalTextureForCode(code,c)||''; }catch(e){}
+    try{ if(typeof window.screenTextureUrl==='function') return window.screenTextureUrl(code,c)||''; }catch(e){}
+    var base='./images/textures/screen/front/';
+    return base + (['3F1','3F2','061','064','067'].indexOf(String(code))>-1?'standard':'custom') + '/' + code + '.jpg';
   }
-
-  function contextText(el){
-    var box = el && el.closest && el.closest('.bubble, .msg, form, #messages');
-    return box ? (box.textContent || '') : '';
+  function buttonHtml(code,c){
+    var url=textureUrl(code,c);
+    return '<button type="button" class="material-btn" data-code="'+esc(code)+'" onclick="ffEmergencyPickScreenColor(\''+esc(code)+'\')">'
+      + '<span class="mat-thumb" style="background-image:url(\''+esc(url)+'\')"></span><span class="mat-code">'+esc(code)+'</span></button>';
   }
-
-  function looksLikeScreenSizeConfirm(el){
-    var txt = (el && (el.textContent || el.value) || '').trim();
-    var ctx = contextText(el);
-    return /확인|다음|적용|완료|입력/.test(txt) && /스크린/.test(ctx) && /사이즈|가로|세로|높이|폭|W|H/.test(ctx);
-  }
-
-  function findLastScreenSizeValues(){
-    var scope = document.getElementById('messages') || document;
-    var inputs = Array.from(scope.querySelectorAll('input'));
-    var vals = inputs.map(function(i){ return String(i.value || '').trim(); }).filter(Boolean);
-    return vals;
-  }
-
-  function forceScreenMaterialStep(){
-    recoverEssentialControls(document);
-
-    // If material buttons already exist but were hidden, just reveal them.
-    var materialGroup = document.querySelector('#messages .material-button-group, #messages .material-button-section');
-    if(materialGroup){
-      visible(materialGroup);
-      materialGroup.querySelectorAll('button,.material-btn').forEach(visible);
-      return true;
+  window.ffEmergencyShowScreenColors=function(force){
+    var c=cat();
+    if(!isScreen(c)) return false;
+    var last=document.querySelector('#messages .msg:last-child .bubble');
+    if(!force && last && last.querySelector('.ff-emergency-screen-colors')) return true;
+    var colors=fallbackColors(c);
+    var html='<div class="ff-emergency-screen-colors"><b>'+esc(c)+'</b> 색상을 선택해주세요:'
+      + '<div class="material-button-section"><div class="material-button-section-title">표준품 색상</div><div class="material-button-group">'+colors.standard.map(function(x){return buttonHtml(x,c);}).join('')+'</div></div>';
+    if(colors.custom.length){
+      html += '<div class="material-button-section"><div class="material-button-section-title">주문품 색상</div><div class="material-button-group">'+colors.custom.map(function(x){return buttonHtml(x,c);}).join('')+'</div></div>';
     }
-
-    // Try existing project functions first.
-    var fnNames = [
-      'askScreenMaterial',
-      'askScreenColor',
-      'showScreenMaterialSelection',
-      'showScreenColorSelection',
-      'askColor',
-      'askMaterial'
-    ];
-
-    for(var i=0;i<fnNames.length;i++){
-      var fn = window[fnNames[i]];
-      if(typeof fn === 'function'){
-        try{
-          fn();
-          setTimeout(function(){ recoverEssentialControls(document); }, 80);
-          return true;
-        }catch(e){}
+    html += '<div class="material-picker-hint">색상 버튼을 누르면 바로 다음 단계로 진행됩니다.</div></div>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    return true;
+  };
+  window.ffEmergencyPickScreenColor=function(code){
+    var s=S(), c=cat();
+    s.color=code; s.screenColor=code; s.screenCode=code; s._screenColor=code; s.step='choose_option';
+    s.current=s.current||{}; s.current.product=s.current.product||c; s.current.color=code; s.current.screenColor=code;
+    try{ if(typeof window.updateScreenComposite==='function') window.updateScreenComposite(c,code,textureUrl(code,c)); }catch(e){}
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    if(typeof window.addMsg==='function') window.addMsg('user','스크린 색상 '+code);
+    try{ if(typeof window.calcAndFinish==='function') return window.calcAndFinish(c); }catch(e){}
+    try{ if(typeof window.afterColorSelected==='function') return window.afterColorSelected(c,S()._currentDataType||'unit',S()._currentItems||[],S()._currentProductKey||''); }catch(e){}
+    if(typeof window.addMsg==='function') window.addMsg('bot','색상이 선택되었습니다. 옵션 추가 단계로 진행해주세요.');
+  };
+  function safeShow(){
+    var c=cat(); if(!isScreen(c)) return;
+    try{
+      if(typeof window.askColorTypeFirst==='function'){
+        var s=S(); var before=document.querySelectorAll('#messages .msg').length;
+        window.askColorTypeFirst(c, s._currentDataType||'unit', s._currentItems||[], s._currentProductKey||'');
+        setTimeout(function(){
+          var after=document.querySelectorAll('#messages .msg').length;
+          var last=document.querySelector('#messages .msg:last-child .bubble');
+          if(after===before || !last || (!last.querySelector('.material-btn') && !last.querySelector('.choice-btn') && !last.querySelector('select'))){ window.ffEmergencyShowScreenColors(true); }
+        },80);
+        return true;
       }
-    }
-
-    // Fallback: create a small recovery prompt only if no material UI appears.
-    var messages = document.getElementById('messages');
-    if(!messages) return false;
-
-    if(document.getElementById('ff-screen-material-fallback')) return false;
-
-    var wrap = document.createElement('div');
-    wrap.className = 'msg bot';
-    wrap.id = 'ff-screen-material-fallback';
-    wrap.innerHTML =
-      '<div class="bubble">' +
-      '<b>&lt;@@스크린 재질입력&gt;</b><br>스크린 재질을 선택해주세요.' +
-      '<div class="btn-group material-button-group">' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="1P1">1P1</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="1P2">1P2</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="1P4">1P4</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="1P7">1P7</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="3F1">3F1</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="3F2">3F2</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="061">061</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="064">064</button>' +
-      '<button class="choice-btn material-btn" data-part="screen" data-code="067">067</button>' +
-      '</div>' +
-      '<button class="confirm-btn" id="ff-screen-material-fallback-next">스크린 재질 선택 완료</button>' +
-      '</div>';
-
-    messages.appendChild(wrap);
-    messages.scrollTop = messages.scrollHeight;
+    }catch(e){ console.warn('[ff] askColorTypeFirst failed, using fallback',e); }
+    window.ffEmergencyShowScreenColors(true);
     return true;
   }
-
-  // When screen size is confirmed and the app stalls, reveal/call the next material step.
-  document.addEventListener('click', function(e){
-    var target = e.target;
-    if(!target) return;
-
-    if(looksLikeScreenSizeConfirm(target)){
-      setTimeout(forceScreenMaterialStep, 180);
-      setTimeout(forceScreenMaterialStep, 650);
-    }
-
-    if(target && target.id === 'ff-screen-material-fallback-next'){
-      var chosen = document.querySelector('#ff-screen-material-fallback .material-btn.active, #ff-screen-material-fallback .material-btn.selected');
-      var code = chosen ? chosen.getAttribute('data-code') : '';
-      if(code){
-        window.__ffPreviewScreen = code;
-        if(window.state){
-          window.state.screenColor = code;
-          window.state._screenColor = code;
-          if(window.state.current){
-            window.state.current.screenColor = code;
-            window.state.current.color = code;
-          }
-        }
-      }
-
-      // continue to option/final flow using known project functions if available
-      var nextFns = ['askOptions','askOption','showOptionStep','showOptionSelection','finishCurrentItem','showFinishMenu'];
-      for(var i=0;i<nextFns.length;i++){
-        if(typeof window[nextFns[i]] === 'function'){
-          try{ window[nextFns[i]](); recoverEssentialControls(document); return; }catch(err){}
-        }
-      }
-      recoverEssentialControls(document);
-    }
-
-    var matBtn = target.closest && target.closest('.material-btn[data-part="screen"], .choice-btn[data-part="screen"]');
-    if(matBtn){
-      document.querySelectorAll('.material-btn[data-part="screen"], .choice-btn[data-part="screen"]').forEach(function(b){
-        b.classList.remove('active','selected');
-      });
-      matBtn.classList.add('active','selected');
-      var code = matBtn.getAttribute('data-code') || (matBtn.textContent || '').trim();
-      window.__ffPreviewScreen = code;
-      if(window.state){
-        window.state.screenColor = code;
-        window.state._screenColor = code;
-        if(window.state.current){
-          window.state.current.screenColor = code;
-          window.state.current.color = code;
-        }
-      }
-    }
-  }, true);
-
-  function getImageUrlFromResponse(data){
-    if(!data) return '';
-    if(typeof data === 'string') return data;
-    return data.imageUrl || data.image_url || data.url || data.outputUrl || data.output_url ||
-      data.previewUrl || data.preview_url || data.renderedImage || data.rendered_image ||
-      data.image || data.base64 || data.dataUrl || data.data_url || '';
-  }
-
-  function normalizeImageUrl(url){
-    if(!url) return '';
-    url = String(url);
-    if(url.indexOf('data:image') === 0) return url;
-    if(url.length > 500 && /^[A-Za-z0-9+/=]+$/.test(url.slice(0,80))) return 'data:image/png;base64,' + url;
-    return url;
-  }
-
-  function showRenderedImage(url){
-    url = normalizeImageUrl(url);
-    if(!url) return;
-
-    var ids = ['product-preview-img','ff-hero-img','render-preview-img','screen-preview-img'];
-    ids.forEach(function(id){
-      var img = document.getElementById(id);
-      if(img){
-        img.src = url;
-        img.style.display = 'block';
-        img.classList.remove('ff-composited-hidden');
-        visible(img);
-      }
-    });
-
-    var box = document.getElementById('product-preview-box') || document.getElementById('ff-dashboard-hero') || document.getElementById('texture-preview');
-    visible(box);
-
-    window.__ffLastRenderedImage = url;
-  }
-
-  // Hook fetch so API render responses are placed into visible preview image.
-  if(!window.__ffRenderFetchHooked){
-    window.__ffRenderFetchHooked = true;
-    var oldFetch = window.fetch;
-    if(typeof oldFetch === 'function'){
-      window.fetch = function(){
-        var args = arguments;
-        return oldFetch.apply(this, args).then(function(resp){
-          try{
-            var url = String(args[0] || '');
-            if(/generate|render|preview|image/i.test(url)){
-              resp.clone().json().then(function(data){
-                var imageUrl = getImageUrlFromResponse(data);
-                if(imageUrl) showRenderedImage(imageUrl);
-              }).catch(function(){});
-            }
-          }catch(e){}
-          return resp;
-        });
-      };
-    }
-  }
-
-  // Render button bridge: after clicking existing render button, resync image.
-  document.addEventListener('click', function(e){
-    var t = e.target;
-    if(!t) return;
-    var txt = (t.textContent || t.value || '').trim();
-    if(/렌더|미리보기|재질 적용/.test(txt)){
+  ['ffScreenTopGapSubmitFinal','ffFinalSubmitTopGap','ff98SubmitTopGap','submitTopGapForm'].forEach(function(name){
+    var old=window[name];
+    window[name]=function(){
+      var r; try{ if(typeof old==='function') r=old.apply(this,arguments); }catch(e){ console.warn('[ff] '+name+' failed',e); }
       setTimeout(function(){
-        if(window.__ffLastRenderedImage) showRenderedImage(window.__ffLastRenderedImage);
-        recoverEssentialControls(document);
-      }, 1000);
-      setTimeout(function(){
-        if(window.__ffLastRenderedImage) showRenderedImage(window.__ffLastRenderedImage);
-        recoverEssentialControls(document);
-      }, 2500);
-    }
-  }, true);
-
-  document.addEventListener('DOMContentLoaded', function(){
-    recoverEssentialControls(document);
+        var lastText=(document.querySelector('#messages .msg:last-child .bubble')||{}).textContent||'';
+        if(/스크린 색상|색상을 선택/.test(lastText)) safeShow();
+      },120);
+      return r;
+    };
   });
-
-  if(window.MutationObserver){
-    var timer = null;
-    var target = document.getElementById('messages') || document.body;
-    var mo = new MutationObserver(function(){
-      clearTimeout(timer);
-      timer = setTimeout(function(){ recoverEssentialControls(document); }, 120);
-    });
-    mo.observe(target, {childList:true, subtree:true});
-  }
-
-  window.ffForceScreenMaterialStep = forceScreenMaterialStep;
-  window.ffShowRenderedImage = showRenderedImage;
+  var mo=new MutationObserver(function(){
+    var last=document.querySelector('#messages .msg:last-child .bubble');
+    if(!last) return;
+    var t=last.textContent||'';
+    if(/이제\s*스크린\s*색상|스크린 색상을 선택/.test(t) && !last.querySelector('.material-btn') && !document.querySelector('.ff-emergency-screen-colors')){
+      setTimeout(function(){ if(!document.querySelector('.ff-emergency-screen-colors')) window.ffEmergencyShowScreenColors(true); },180);
+    }
+  });
+  document.addEventListener('DOMContentLoaded',function(){var m=$('messages'); if(m) mo.observe(m,{childList:true,subtree:true});});
 })();
 </script>
+<!-- === /FF EMERGENCY FIX === -->
 
+
+
+<!-- === FF112: compact accessory option cards / no checkbox / no qty === -->
+<style id="ff112-option-card-no-checkbox-css">
+.ff102-options-card{
+  width:min(760px,100%) !important;
+  max-width:760px !important;
+  padding:18px 18px 16px !important;
+  border-radius:22px !important;
+  background:linear-gradient(180deg,#06141f,#031019) !important;
+  border:1px solid rgba(45,212,191,.35) !important;
+  box-shadow:0 18px 44px rgba(0,0,0,.34) !important;
+  color:#fff !important;
+}
+.ff102-options-card h3{
+  margin:0 0 8px !important;
+  color:#2ef2c9 !important;
+  font-size:24px !important;
+  letter-spacing:-.5px !important;
+  line-height:1.2 !important;
+}
+.ff102-options-card>p{
+  margin:0 0 14px !important;
+  color:#d7e1ee !important;
+  font-size:13px !important;
+  line-height:1.55 !important;
+}
+.ff102-cat{
+  margin:10px 0 12px !important;
+  padding:12px 14px 14px !important;
+  border-radius:18px !important;
+  border:1px solid rgba(148,163,184,.18) !important;
+  background:rgba(8,20,32,.68) !important;
+}
+.ff102-cat-title{
+  display:flex !important;
+  align-items:center !important;
+  justify-content:space-between !important;
+  gap:10px !important;
+  margin-bottom:8px !important;
+}
+.ff102-cat-title span{
+  color:#2ef2c9 !important;
+  font-size:18px !important;
+  font-weight:1000 !important;
+  letter-spacing:-.3px !important;
+}
+.ff102-cat-title small{
+  color:#a78bfa !important;
+  font-size:11px !important;
+  font-weight:900 !important;
+  white-space:nowrap !important;
+}
+.ff102-option-list{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:8px !important;
+}
+.ff102-option-row{
+  display:grid !important;
+  grid-template-columns:78px minmax(0,1fr) auto !important;
+  align-items:center !important;
+  gap:12px !important;
+  min-height:64px !important;
+  padding:8px 10px !important;
+  border-radius:15px !important;
+  border:1px solid rgba(148,163,184,.18) !important;
+  background:linear-gradient(135deg,rgba(15,34,52,.96),rgba(8,23,36,.96)) !important;
+  cursor:pointer !important;
+  transition:border-color .15s, box-shadow .15s, background .15s, transform .15s !important;
+}
+.ff102-option-row:hover{
+  border-color:rgba(45,242,201,.55) !important;
+  box-shadow:0 0 0 2px rgba(45,242,201,.10),0 12px 22px rgba(0,0,0,.20) !important;
+}
+.ff102-option-row.active,
+.ff102-option-row.ff112-selected{
+  border-color:#2ef2c9 !important;
+  background:linear-gradient(135deg,rgba(12,52,49,.96),rgba(8,29,42,.96)) !important;
+  box-shadow:0 0 0 2px rgba(45,242,201,.22),0 0 20px rgba(45,242,201,.22) !important;
+}
+.ff102-option-row.active::after,
+.ff102-option-row.ff112-selected::after{
+  content:'선택됨';
+  position:absolute;
+  right:14px;
+  top:-9px;
+  padding:2px 7px;
+  border-radius:999px;
+  background:#2ef2c9;
+  color:#00251f;
+  font-size:10px;
+  font-weight:1000;
+}
+.ff102-option-row{ position:relative !important; }
+.ff107-option-img,
+.ff112-option-img{
+  width:72px !important;
+  height:48px !important;
+  object-fit:contain !important;
+  display:block !important;
+  border-radius:10px !important;
+  background:rgba(255,255,255,.06) !important;
+  padding:3px !important;
+}
+.ff107-no-img .ff107-option-img,
+.ff107-no-img .ff112-option-img{display:none !important;}
+.ff102-pick,
+.ff112-option-name{
+  min-width:0 !important;
+  width:100% !important;
+  padding:0 !important;
+  border:0 !important;
+  background:transparent !important;
+  color:#fff !important;
+  box-shadow:none !important;
+  text-align:left !important;
+  font-size:15px !important;
+  font-weight:1000 !important;
+  line-height:1.25 !important;
+  white-space:normal !important;
+  cursor:pointer !important;
+}
+.ff102-pick:hover{transform:none !important;color:#fff !important;}
+.ff112-color-wrap{
+  display:flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  justify-content:flex-end !important;
+  white-space:nowrap !important;
+}
+.ff112-color-wrap label,
+.ff102-field label{
+  margin:0 !important;
+  color:#e5edf7 !important;
+  font-size:12px !important;
+  font-weight:900 !important;
+}
+.ff112-color-wrap select,
+.ff102-field select{
+  min-width:86px !important;
+  max-width:104px !important;
+  height:42px !important;
+  padding:0 30px 0 12px !important;
+  border-radius:12px !important;
+  border:1px solid rgba(45,212,191,.46) !important;
+  background:#06111b !important;
+  color:#fff !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
+  outline:none !important;
+}
+.ff102-field{margin:0 !important;}
+.ff102-qty{display:none !important;}
+.ff102-actions{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:10px !important;
+  margin-top:14px !important;
+}
+.ff102-actions button{
+  min-height:44px !important;
+  border-radius:14px !important;
+  font-size:14px !important;
+  font-weight:1000 !important;
+}
+@media(max-width:680px){
+  .ff102-options-card{padding:14px !important;}
+  .ff102-options-card h3{font-size:21px !important;}
+  .ff102-cat{padding:10px !important;}
+  .ff102-option-row{grid-template-columns:56px minmax(0,1fr) auto !important;gap:8px !important;min-height:58px !important;padding:7px !important;}
+  .ff107-option-img,.ff112-option-img{width:54px !important;height:42px !important;}
+  .ff102-pick,.ff112-option-name{font-size:13px !important;}
+  .ff112-color-wrap label{display:none !important;}
+  .ff112-color-wrap select{min-width:76px !important;height:38px !important;font-size:13px !important;}
+}
+</style>
+<script id="ff112-option-card-no-checkbox-js">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
+  function user(html){ if(typeof addMsg==='function') addMsg('user', html); }
+  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },80); }
+  var OPTIONS=[
+    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+    ]},
+    {cat:'PC홀더', note:'', items:[
+      {name:'PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'}
+    ]},
+    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'모니터암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'},
+      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'}
+    ]}
+  ];
+  window.ff112AccessoryOptions=OPTIONS;
+  window.ff107AccessoryOptions=OPTIONS;
+  window.ff108AccessoryOptions=OPTIONS;
+  function saveChosen(chosen){
+    if(window.state){
+      state.extraOptionItems=chosen;
+      state._ff102OptionsHandled=true;
+      state._ff101OptionsHandled=true;
+      state._ff100OptionsDone=true;
+      state._ff96OptionsAsked=true;
+      state._ff97FinalOptionsAsked=true;
+    }
+  }
+  function nextActions(){
+    if(window.state){ state.step='next_actions'; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
+    scrollLatest();
+  }
+  window.ff102ToggleOption=function(rowId, forceOn){
+    var row=document.getElementById(rowId); if(!row) return;
+    var on = (typeof forceOn==='boolean') ? forceOn : !row.classList.contains('ff112-selected');
+    row.classList.toggle('ff112-selected', on);
+    row.classList.toggle('active', on);
+    row.setAttribute('data-selected', on ? '1' : '0');
+  };
+  window.ff102SyncRow=function(rowId){
+    var row=document.getElementById(rowId); if(!row) return;
+    var on=row.getAttribute('data-selected')==='1' || row.classList.contains('ff112-selected') || row.classList.contains('active');
+    row.classList.toggle('ff112-selected',on); row.classList.toggle('active',on);
+  };
+  window.ff102StepQty=function(rowId,delta){ window.ff102ToggleOption(rowId, (delta||0)>=0); };
+  window.ff102ShowOptions=function(){
+    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    var html='<div class="ff102-options-card ff112-options-card"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션 카드를 클릭하고 색상만 지정해주세요.<br>선택하지 않은 옵션은 견적에 포함되지 않습니다.</p>';
+    OPTIONS.forEach(function(group,gi){
+      html+='<div class="ff102-cat ff112-cat"><div class="ff102-cat-title"><span>'+(gi+1)+'. '+esc(group.cat)+'</span><small>'+esc(group.note||'')+'</small></div><div class="ff102-option-list">';
+      group.items.forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
+        html+='<div id="'+rowId+'" class="ff102-option-row ff112-option-row" data-gi="'+gi+'" data-ii="'+ii+'" data-selected="0" onclick="ff102ToggleOption(\''+rowId+'\')">'
+          +'<img class="ff107-option-img ff112-option-img" src="'+esc(item.img)+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff102-option-row\').classList.add(\'ff107-no-img\');this.remove();">'
+          +'<button type="button" class="ff102-pick ff112-option-name" title="'+esc(item.name)+'" onclick="event.stopPropagation();ff102ToggleOption(\''+rowId+'\')">'+esc(item.name)+'</button>'
+          +'<div class="ff112-color-wrap" onclick="event.stopPropagation();ff102ToggleOption(\''+rowId+'\', true)"><label>색상</label><select id="'+id+'_color" onchange="ff102ToggleOption(\''+rowId+'\', true)">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select></div>'
+          +'<input id="'+id+'_qty" type="hidden" value="0">'
+          +'</div>';
+      });
+      html+='</div></div>';
+    });
+    html+='<div class="ff102-actions"><button class="primary" onclick="ff102ApplyOptions()">선택 완료</button><button onclick="ff102SkipOptions()">건너뛰기</button></div></div>';
+    bot(html); scrollLatest();
+  };
+  window.ff102ApplyOptions=function(){
+    var chosen=[];
+    OPTIONS.forEach(function(group,gi){group.items.forEach(function(item,ii){
+      var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
+      var row=document.getElementById(rowId);
+      var selected=!!(row && (row.getAttribute('data-selected')==='1' || row.classList.contains('ff112-selected') || row.classList.contains('active')));
+      var color=(document.getElementById(id+'_color')||{}).value||'';
+      if(selected) chosen.push({category:group.cat,name:item.name,color:color,qty:1});
+    });});
+    saveChosen(chosen);
+    user(chosen.length?chosen.map(function(x){return esc(x.name)+' / '+esc(x.color)+' / 1개';}).join('<br>'):'추가 옵션 없음');
+    nextActions();
+  };
+  window.ff102SkipOptions=function(){ saveChosen([]); user('추가 옵션 없음'); nextActions(); };
+})();
+</script>
 </body>
 
 
@@ -21803,3 +22003,380 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 <!-- === /FINAL RIGHT PANEL ORDER OVERRIDE === -->
+
+<!-- === FF FINAL HOTFIX: restore screen flow + render button 2026-05-30 === -->
+<script id="ff-final-screen-flow-render-hotfix">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function S(){ window.state = window.state || {}; return window.state; }
+  function isScreenCat(cat){
+    cat = String(cat || '');
+    var info = (window.USER_CATEGORIES && window.USER_CATEGORIES[cat]) || {};
+    return !!info.isScreen || /스크린|screen|전면|사이드|일자형|L형|l형/i.test(cat);
+  }
+  function screenDefaults(cat){
+    cat = String(cat || '');
+    if(/일자형|L형|l형/i.test(cat)) return {total:590, above:350};
+    return {total:715, above:405};
+  }
+  function getPack(cat){
+    var info = (window.USER_CATEGORIES && window.USER_CATEGORIES[cat]) || {};
+    var mode = (typeof window.ffDataTypeForMode === 'function') ? window.ffDataTypeForMode(info) : (info.type || 'unit');
+    var keys = (typeof window.ffUnitKeysForMode === 'function') ? window.ffUnitKeysForMode(cat, info.keys || []) : (info.keys || []);
+    var key = keys[0] || '';
+    var data = (mode === 'set') ? window.SET_DATA : window.UNIT_DATA;
+    return {mode:mode, key:key, items:(data && data[key]) || []};
+  }
+  function currentCat(){
+    var s = S();
+    return s._currentCatName || (s.current && s.current.product) || s.product || '';
+  }
+  function goScreenColor(cat){
+    var s = S();
+    cat = cat || currentCat();
+    if(!isScreenCat(cat)) return false;
+    var pack = s._flowColorPack || getPack(cat);
+    s._currentCatName = cat;
+    s._currentDataType = pack.mode;
+    s._currentItems = pack.items;
+    s._currentProductKey = pack.key;
+    s.step = 'choose_color';
+    var input = $('user-input');
+    if(input){ input.disabled = false; input.placeholder = '입력하세요...'; }
+    if(typeof window.askColorTypeFirst === 'function'){
+      window.askColorTypeFirst(cat, pack.mode, pack.items, pack.key);
+      return true;
+    }
+    if(typeof window.askStdColorDrop === 'function'){
+      window.askStdColorDrop(cat, pack.mode, pack.items, pack.key);
+      return true;
+    }
+    if(typeof window.addMsg === 'function') window.addMsg('bot','스크린 색상 선택 함수를 찾지 못했습니다.');
+    return false;
+  }
+  function askTopGapFinal(cat, newH){
+    var s = S();
+    cat = cat || currentCat();
+    var def = screenDefaults(cat);
+    newH = parseInt(newH,10) || def.total;
+    s._currentCatName = cat;
+    s.h = newH;
+    s._screenNewH = newH;
+    s.step = 'input_screen_top';
+    s.current = s.current || {product:cat};
+    s.current.product = s.current.product || cat;
+    s.current.size = 'H' + newH;
+    if(typeof window.updateCurrent === 'function') window.updateCurrent();
+    var fid = 'fffix' + Date.now();
+    var above = Math.min(def.above, Math.max(1, newH - 1));
+    var below = newH - above;
+    var html = '📐 <b>&lt;@@스크린 사이즈입력&gt;</b><br>'
+      + '전체 H: <b>'+newH+'mm</b><br>'
+      + '책상 <b>상판 위</b> 높이(mm)를 입력해주세요.'
+      + '<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'
+      + '<div style="display:flex;flex-direction:column;gap:5px;min-width:140px;">'
+      + '<span style="font-size:12px;color:#26f5c9;font-weight:950;">상판 위 높이</span>'
+      + '<div class="ff-size-control" style="display:flex;gap:4px;align-items:center;">'
+      + '<button type="button" onclick="ffScreenTopGapStepFinal(\''+fid+'\',-50)">−</button>'
+      + '<input id="screen-top-'+fid+'" type="number" value="'+above+'" min="1" max="'+(newH-1)+'" onkeydown="if(event.key===\'Enter\')ffScreenTopGapSubmitFinal(\''+fid+'\')" style="width:88px;background:#0b1220;border:1px solid #2ef2c9;color:#fff;border-radius:8px;padding:8px;text-align:center;font-weight:900;">'
+      + '<button type="button" onclick="ffScreenTopGapStepFinal(\''+fid+'\',50)">+</button>'
+      + '</div><span style="font-size:10px;color:#9fb3bd;">기준 상판위 '+def.above+'mm / 자동 계산 상판아래 '+below+'mm</span></div></div>'
+      + '<button class="confirm-btn" style="margin-top:10px;" onclick="ffScreenTopGapSubmitFinal(\''+fid+'\')">상판 위 값 확인 ✓</button>';
+    if(typeof window.addMsg === 'function') window.addMsg('bot', html);
+    var input = $('user-input'); if(input){ input.disabled = true; input.placeholder = '위 칸에 입력해주세요'; }
+    setTimeout(function(){ var el = $('screen-top-'+fid); if(el) el.focus(); }, 50);
+    if(typeof window.updateFlowBar === 'function') window.updateFlowBar();
+  }
+  window.ffScreenTopGapStepFinal = function(fid, delta){
+    var el = $('screen-top-'+fid); if(!el) return;
+    var min = parseInt(el.min,10) || 1, max = parseInt(el.max,10) || 9999, val = parseInt(el.value,10) || min;
+    el.value = Math.max(min, Math.min(max, val + delta));
+  };
+  window.ffScreenTopGapSubmitFinal = function(fid){
+    var el = $('screen-top-'+fid); if(!el || el.disabled) return;
+    var s = S(), cat = currentCat(), newH = parseInt(s._screenNewH || s.h || screenDefaults(cat).total,10);
+    var val = parseInt(el.value,10);
+    if(!val || val < 1 || val >= newH){ el.style.borderColor = '#f87171'; el.focus(); return; }
+    el.disabled = true;
+    var btn = document.querySelector('[onclick="ffScreenTopGapSubmitFinal(\''+fid+'\')"]'); if(btn) btn.disabled = true;
+    s._screenTopGap = val; s.screenTopGap = val;
+    s.current = s.current || {product:cat};
+    s.current.screenTopGap = val;
+    s.current.size = 'H' + newH + ' / 상판위 ' + val + 'mm';
+    if(typeof window.updateCurrent === 'function') window.updateCurrent();
+    if(typeof window.addMsg === 'function'){
+      window.addMsg('user','상판 위 '+val+'mm');
+      window.addMsg('bot','📐 스크린 사이즈 정리:<br>· 전체 H: <b>'+newH+'mm</b><br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+(newH-val)+'mm</b><br><br>이제 <b>스크린 색상</b>을 선택해주세요.');
+    }
+    goScreenColor(cat);
+  };
+
+  // 기존 파일에는 submitTopGapForm / ff98SubmitTopGap / ffFinalSubmitTopGap 이 서로 다르게 존재함.
+  // 어느 버튼이 생성돼도 모두 색상선택으로 이어지게 마지막에 강제 오버라이드한다.
+  window.submitTopGapForm = function(fid){
+    var el = $('screen-top-'+fid); if(!el || el.disabled) return;
+    var s = S(), cat = currentCat(), newH = parseInt(s._screenNewH || s.h || screenDefaults(cat).total,10);
+    var val = parseInt(el.value,10);
+    if(!val || val < 1 || val >= newH){ el.style.borderColor='#f87171'; el.focus(); return; }
+    el.disabled = true; var b=document.querySelector('[onclick="submitTopGapForm('+fid+')"]'); if(b) b.disabled=true;
+    s._screenTopGap = val; s.screenTopGap = val; s.current = s.current || {product:cat}; s.current.size = 'H'+newH+' / 상판위 '+val+'mm';
+    if(typeof window.updateCurrent==='function') window.updateCurrent();
+    if(typeof window.addMsg==='function') window.addMsg('user','상판 위 '+val+'mm');
+    goScreenColor(cat);
+  };
+  window.ff98SubmitTopGap = function(fid){
+    var el = $('screen-top-'+fid); if(!el || el.disabled) return;
+    var s = S(), cat = currentCat(), newH = parseInt(s._screenNewH || s.h || screenDefaults(cat).total,10), val = parseInt(el.value,10);
+    if(!val || val < 1 || val >= newH){ el.style.borderColor='#f87171'; el.focus(); return; }
+    el.disabled = true; s._screenTopGap = val; s.screenTopGap = val; s.current = s.current || {product:cat}; s.current.size = 'H'+newH+' / 상판위 '+val+'mm';
+    if(typeof window.updateCurrent==='function') window.updateCurrent();
+    if(typeof window.addMsg==='function') window.addMsg('user','상판 위 '+val+'mm');
+    goScreenColor(cat);
+  };
+  window.ffFinalSubmitTopGap = function(fid){
+    var el = $('screen-top-final-'+fid) || $('screen-top-'+fid); if(!el || el.disabled) return;
+    var s = S(), cat = currentCat(), newH = parseInt(s._screenNewH || s.h || screenDefaults(cat).total,10), val = parseInt(el.value,10);
+    if(!val || val < 1 || val >= newH){ el.style.borderColor='#f87171'; el.focus(); return; }
+    el.disabled = true; s._screenTopGap = val; s.screenTopGap = val; s.current = s.current || {product:cat}; s.current.size = 'H'+newH+' / 상판위 '+val+'mm';
+    if(typeof window.updateCurrent==='function') window.updateCurrent();
+    if(typeof window.addMsg==='function') window.addMsg('user','상판 위 '+val+'mm');
+    goScreenColor(cat);
+  };
+
+  var prevAfterSize = window.afterSizeInput;
+  window.afterSizeInput = function(parsed){
+    var s = S(), cat = currentCat();
+    if(isScreenCat(cat)){
+      parsed = parsed || {};
+      var def = screenDefaults(cat);
+      s.w = parsed.w || s.w || null;
+      s.d = parsed.d || s.d || null;
+      s.h = parseInt(parsed.h || s.h || def.total,10);
+      s.current = s.current || {product:cat};
+      s.current.product = s.current.product || cat;
+      s.current.size = 'H' + s.h;
+      if(typeof window.updateCurrent === 'function') window.updateCurrent();
+      // 범위검증 함수가 있으면 먼저 돌리고, 실패 시 기존 사이즈 입력으로 복귀
+      if(typeof window.checkSizeRule === 'function'){
+        var chk = window.checkSizeRule(cat, s.w, s.d, s.h);
+        if(chk && chk.ok === false){
+          if(typeof window.addMsg === 'function') window.addMsg('bot','<div class="warning-box">⛔ 해당 사이즈는 주문이 불가합니다.<br>('+(chk.errors||[]).join(' / ')+')</div>');
+          if(typeof window.askSizeInput === 'function') window.askSizeInput(cat);
+          return;
+        }
+      }
+      askTopGapFinal(cat, s.h);
+      return;
+    }
+    return (typeof prevAfterSize === 'function') ? prevAfterSize.apply(this, arguments) : undefined;
+  };
+
+  var prevAfterColor = window.afterColorSelected;
+  window.afterColorSelected = afterColorSelected = function(catName, dataType, items, productKey){
+    var s = S();
+    if(isScreenCat(catName) && s.h){
+      s._currentCatName = catName;
+      s._currentDataType = dataType || s._currentDataType || 'unit';
+      s._currentItems = items || s._currentItems || getPack(catName).items;
+      s._currentProductKey = productKey || s._currentProductKey || getPack(catName).key;
+      if(typeof window.calcAndFinish === 'function') return window.calcAndFinish(catName);
+    }
+    return (typeof prevAfterColor === 'function') ? prevAfterColor.apply(this, arguments) : undefined;
+  };
+
+  function ensureRenderButton(){
+    var tex = $('texture-preview') || $('preview-panel');
+    if(!tex) return;
+    var btn = $('quick-ai-preview-btn');
+    if(!btn){
+      btn = document.createElement('button');
+      btn.id = 'quick-ai-preview-btn';
+      btn.type = 'button';
+      btn.textContent = '✨ 원본 사진에 재질 적용';
+    }
+    btn.style.display = 'block';
+    btn.disabled = false;
+    btn.onclick = function(){ if(typeof window.prepareNanoBananaPreview === 'function') window.prepareNanoBananaPreview(); };
+    if(btn.parentNode !== tex) tex.appendChild(btn);
+    var note = $('quick-ai-preview-note');
+    if(!note){ note = document.createElement('div'); note.id = 'quick-ai-preview-note'; }
+    if(note.parentNode !== tex) tex.appendChild(note);
+  }
+  document.addEventListener('DOMContentLoaded', ensureRenderButton);
+  window.addEventListener('load', ensureRenderButton);
+  document.addEventListener('click', function(){ setTimeout(ensureRenderButton, 60); }, true);
+  document.addEventListener('change', function(){ setTimeout(ensureRenderButton, 60); }, true);
+  setInterval(ensureRenderButton, 1000);
+})();
+</script>
+<!-- === /FF FINAL HOTFIX === -->
+
+
+<!-- === FF FINAL USER FIX: 2-column compact options + screen name label + single material select === -->
+<style id="ff-final-user-fix-2col-name-single-material">
+/* 옵션추가: 말풍선 안에서 진짜 2열 초압축 */
+.msg.bot:has(.ff102-options-card) .bubble,
+.msg.bot:has(.ff100-options-card) .bubble,
+.msg.bot:has(.ff96-options-card) .bubble{
+  width:min(98%, 720px) !important;
+  max-width:min(98%, 720px) !important;
+  padding:10px !important;
+  overflow:hidden !important;
+}
+.ff102-options-card{
+  width:100% !important;
+  max-width:100% !important;
+  padding:12px !important;
+  border-radius:18px !important;
+  overflow:hidden !important;
+}
+.ff102-options-card h3{font-size:19px !important;margin:0 0 6px !important;line-height:1.2 !important;}
+.ff102-options-card p{font-size:12px !important;line-height:1.35 !important;margin:0 0 9px !important;}
+.ff102-cat{margin-top:10px !important;}
+.ff102-cat-title{margin-bottom:6px !important;gap:6px !important;}
+.ff102-cat-title span{font-size:16px !important;line-height:1.2 !important;}
+.ff102-cat-title small{font-size:10px !important;line-height:1.2 !important;max-width:48% !important;}
+.ff102-option-list{
+  display:grid !important;
+  grid-template-columns:repeat(2, minmax(0, 1fr)) !important;
+  gap:7px !important;
+  align-items:stretch !important;
+}
+.ff102-option-row,
+.ff102-option-row.ff107-no-img{
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-height:0 !important;
+  padding:8px !important;
+  gap:6px !important;
+  border-radius:14px !important;
+  align-items:stretch !important;
+  overflow:hidden !important;
+}
+.ff107-option-img{display:none !important;}
+.ff107-option-main{
+  min-width:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  display:grid !important;
+  grid-template-columns:1fr !important;
+  gap:6px !important;
+  overflow:hidden !important;
+}
+.ff102-pick{
+  width:100% !important;
+  max-width:100% !important;
+  min-width:0 !important;
+  min-height:34px !important;
+  padding:7px 9px !important;
+  border-radius:12px !important;
+  font-size:12px !important;
+  line-height:1.25 !important;
+  white-space:normal !important;
+  word-break:keep-all !important;
+  overflow-wrap:anywhere !important;
+  overflow:hidden !important;
+  text-align:left !important;
+}
+.ff107-controls{
+  display:grid !important;
+  grid-template-columns:1fr 84px !important;
+  gap:5px !important;
+  width:100% !important;
+  min-width:0 !important;
+}
+.ff102-field{min-width:0 !important;width:100% !important;}
+.ff102-field label{font-size:9px !important;margin-bottom:2px !important;line-height:1 !important;}
+.ff102-field select{height:30px !important;font-size:12px !important;padding:0 6px !important;border-radius:10px !important;}
+.ff102-qty{height:30px !important;grid-template-columns:22px 1fr 22px !important;border-radius:10px !important;}
+.ff102-qty button{width:22px !important;height:26px !important;font-size:12px !important;}
+.ff102-qty input{height:26px !important;font-size:12px !important;padding:0 !important;}
+.ff102-options-card .confirm-btn,
+.ff102-options-card .back-btn{min-height:34px !important;padding:8px 12px !important;font-size:12px !important;margin-top:8px !important;}
+@media(max-width:430px){
+  .msg.bot:has(.ff102-options-card) .bubble{width:100% !important;max-width:100% !important;padding:8px !important;}
+  .ff102-options-card{padding:10px !important;}
+  .ff102-option-list{grid-template-columns:repeat(2, minmax(0, 1fr)) !important;gap:6px !important;}
+  .ff102-option-row{padding:7px !important;}
+  .ff102-pick{font-size:11px !important;padding:7px !important;}
+  .ff107-controls{grid-template-columns:1fr 72px !important;gap:4px !important;}
+  .ff102-field select{height:28px !important;font-size:11px !important;}
+}
+</style>
+<script id="ff-final-user-fix-screen-name-and-single-material">
+(function(){
+  'use strict';
+  function S(){ window.state=window.state||{}; return window.state; }
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function getScreenName(){
+    var s=S();
+    var name=s._currentCatName || (s.current&&s.current.product) || s.product || s.category || '스크린';
+    name=String(name||'스크린').trim();
+    return name || '스크린';
+  }
+  function fixScreenNameText(root){
+    root=root||document;
+    var name=getScreenName();
+    var nodes=root.querySelectorAll ? root.querySelectorAll('.bubble, .msg, .ff-flow-note, div, b') : [];
+    Array.prototype.forEach.call(nodes,function(el){
+      if(!el || !el.innerHTML) return;
+      var h=el.innerHTML;
+      if(h.indexOf('@@스크린')===-1 && h.indexOf('&lt;@@스크린')===-1) return;
+      h=h.replace(/@@스크린/g, esc(name));
+      h=h.replace(/&lt;@@스크린/g, '&lt;'+esc(name));
+      el.innerHTML=h;
+    });
+  }
+  function clearSameMaterialPart(part, keep){
+    if(!part || (part!=='top' && part!=='leg' && part!=='screen')) return;
+    document.querySelectorAll('.material-btn[data-part="'+part+'"]').forEach(function(btn){
+      if(btn!==keep) btn.classList.remove('active','selected','multi-selected','ff-selected-option');
+    });
+    if(part==='top'){
+      var s=S();
+      // 주문품 상판 무늬목/라미네이트 탭이 둘 다 남는 문제 방지: 같은 input으로 묶이지 않아도 상판은 전체 1개만 표시
+      document.querySelectorAll('.ff127-top-group .material-btn').forEach(function(btn){ if(btn!==keep) btn.classList.remove('active','selected','multi-selected','ff-selected-option'); });
+    }
+  }
+  var oldSelect=window.ffSelectMaterialButton;
+  window.ffSelectMaterialButton=function(inputId,code,part,btn){
+    var ret;
+    if(typeof oldSelect==='function') ret=oldSelect.apply(this,arguments);
+    else {
+      var input=document.getElementById(inputId); if(input){input.value=code; input.dispatchEvent(new Event('change',{bubbles:true}));}
+      if(btn){btn.classList.add('active','selected');}
+    }
+    clearSameMaterialPart(part, btn||null);
+    if(btn) btn.classList.add('active','selected');
+    var s=S();
+    if(part==='top'){s._deskTopColor=code; if(s.current) s.current.topColor=code;}
+    if(part==='leg'){s._deskLegColor=code; if(s.current) s.current.legColor=code;}
+    if(part==='screen'){s.color=code; if(s.current) s.current.color=code;}
+    return ret===undefined ? false : ret;
+  };
+  document.addEventListener('click',function(e){
+    var btn=e.target && e.target.closest && e.target.closest('.material-btn');
+    if(!btn) return;
+    setTimeout(function(){
+      var part=btn.getAttribute('data-part') || '';
+      clearSameMaterialPart(part, btn);
+      btn.classList.add('active','selected');
+      fixScreenNameText(document);
+    },0);
+  },true);
+  function apply(){fixScreenNameText(document);}
+  document.addEventListener('DOMContentLoaded',apply);
+  window.addEventListener('load',apply);
+  document.addEventListener('click',function(){setTimeout(apply,30);},true);
+  document.addEventListener('change',function(){setTimeout(apply,30);},true);
+  var msgs=document.getElementById('messages');
+  if(msgs){ new MutationObserver(function(muts){muts.forEach(function(m){Array.prototype.forEach.call(m.addedNodes,function(n){if(n.nodeType===1) fixScreenNameText(n);});});}).observe(msgs,{childList:true,subtree:true}); }
+  setInterval(apply,500);
+})();
+</script>
+<!-- === /FF FINAL USER FIX === -->
