@@ -23705,3 +23705,268 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+
+<!-- === FF_FRONTSIDE_PERSIST_SPLIT_MATERIALS === -->
+<style id="ff-frontside-persist-split-materials-css">
+  .ff-screen-split-row{
+    display:grid !important;
+    grid-template-columns:88px 1fr !important;
+    gap:10px !important;
+    align-items:center !important;
+    padding:10px 0 !important;
+    border-bottom:1px solid rgba(255,255,255,.08) !important;
+  }
+  .ff-screen-split-row span{
+    color:#9fb1c8 !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+  }
+  .ff-screen-split-row b{
+    color:#fff !important;
+    font-size:13px !important;
+    font-weight:1000 !important;
+    text-align:right !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:nowrap !important;
+  }
+</style>
+<script id="ff-frontside-persist-split-materials-js">
+(function(){
+  if(window.__ffFrontsidePersistSplitMaterials) return;
+  window.__ffFrontsidePersistSplitMaterials = true;
+
+  function $(id){ return document.getElementById(id); }
+  function S(){
+    return Object.assign({},
+      window.state || {},
+      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
+    );
+  }
+  function selectedText(){
+    return String((window._setSelected || []).join(' '));
+  }
+  function currentCat(){
+    var s = S();
+    return String(s._currentCatName || (s.current && s.current.product) || s.product || '');
+  }
+  function bothFrontSideSelected(){
+    var raw = selectedText();
+    return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
+  }
+  function currentScreenPart(){
+    var cat = currentCat();
+    if(/전면|front/i.test(cat)) return 'front';
+    if(/사이드|side/i.test(cat)) return 'side';
+    return '';
+  }
+  function normalizeTexture(url){
+    if(!url) return '';
+    url = String(url).trim().replace(/\\/g,'/');
+    if(url.indexOf('./') === 0 || url.indexOf('/') === 0 || url.indexOf('http') === 0 || url.indexOf('data:') === 0) return url;
+    return './' + url.replace(/^\/+/, '');
+  }
+  function textureFor(code, screenPart){
+    if(!code || code === '-') return '';
+    var cat = screenPart === 'front' ? '전면 스크린' : screenPart === 'side' ? '사이드 스크린' : currentCat();
+    try{
+      if(typeof window.ffTextureUrlForChoice === 'function'){
+        var p = window.ffTextureUrlForChoice(code, 'screen', cat);
+        if(p) return normalizeTexture(p);
+      }
+    }catch(e){}
+    try{
+      if(typeof window._ffLocalTextureForCode === 'function'){
+        var p2 = window._ffLocalTextureForCode(code, cat);
+        if(p2) return normalizeTexture(p2);
+      }
+    }catch(e){}
+    try{
+      if(typeof window.screenTextureUrl === 'function'){
+        var p3 = window.screenTextureUrl(code, cat);
+        if(p3) return normalizeTexture(p3);
+      }
+    }catch(e){}
+    return '';
+  }
+  function initStore(){
+    window._screenPreviewState = window._screenPreviewState || {};
+    return window._screenPreviewState;
+  }
+  function storeScreenMaterial(code, explicitPart){
+    if(!code || code === '-') return;
+    var part = explicitPart || currentScreenPart();
+    if(!part) return;
+
+    var st = initStore();
+    var tex = textureFor(code, part);
+    st[part] = {
+      color: code,
+      code: code,
+      texUrl: tex,
+      texture: tex,
+      catName: currentCat(),
+      updatedAt: Date.now()
+    };
+
+    if(window.state){
+      if(part === 'front'){
+        state.frontScreenCode = code;
+        state.frontScreenTexture = tex;
+      }else if(part === 'side'){
+        state.sideScreenCode = code;
+        state.sideScreenTexture = tex;
+      }
+      // 일반 스크린 값은 마지막 선택값으로 유지하되 front/side 저장값은 별도 보존
+      state.screenCode = code;
+      state.screenColor = code;
+      state.screenTexture = tex;
+      state.screenTex = tex;
+    }
+
+    console.log('[FF_FRONTSIDE_PERSIST_SPLIT_MATERIALS] stored', part, code, tex);
+    setTimeout(updateSplitRows, 50);
+    setTimeout(updateSplitRows, 300);
+  }
+
+  // 재질 버튼 클릭 즉시 전면/사이드 값을 따로 저장
+  var oldSelect = window.ffSelectMaterialButton;
+  if(typeof oldSelect === 'function'){
+    window.ffSelectMaterialButton = function(inputId, code, part, btn){
+      var result = oldSelect.apply(this, arguments);
+      try{
+        if(part === 'screen' && bothFrontSideSelected()){
+          storeScreenMaterial(code, currentScreenPart());
+        }
+      }catch(e){ console.warn('[FF_FRONTSIDE_PERSIST_SPLIT_MATERIALS] select store failed', e); }
+      return result;
+    };
+  }
+
+  // 색상 확인 버튼을 눌렀을 때도 hidden input 값을 저장
+  var oldConfirm = window.confirmStdColorDrop;
+  if(typeof oldConfirm === 'function'){
+    window.confirmStdColorDrop = function(catName, dataType, productKey, selId){
+      try{
+        if(/스크린|screen|전면|사이드|front|side/i.test(String(catName || '')) && bothFrontSideSelected()){
+          var input = $(selId);
+          var code = input ? String(input.value || '').trim() : '';
+          var part = /전면|front/i.test(String(catName)) ? 'front' : /사이드|side/i.test(String(catName)) ? 'side' : currentScreenPart();
+          storeScreenMaterial(code, part);
+        }
+      }catch(e){ console.warn('[FF_FRONTSIDE_PERSIST_SPLIT_MATERIALS] confirm pre-store failed', e); }
+      var result = oldConfirm.apply(this, arguments);
+      setTimeout(updateSplitRows, 80);
+      setTimeout(updateSplitRows, 500);
+      return result;
+    };
+  }
+
+  function codes(){
+    var s = S();
+    var st = initStore();
+    return {
+      front: (st.front && (st.front.color || st.front.code)) || s.frontScreenCode || '-',
+      side: (st.side && (st.side.color || st.side.code)) || s.sideScreenCode || '-'
+    };
+  }
+
+  function updateSplitRows(){
+    if(!bothFrontSideSelected()) return;
+
+    var materialCard =
+      document.querySelector('.ff-clean-material-card') ||
+      (document.getElementById('quick-screen-code') && document.getElementById('quick-screen-code').closest('.ff-clean-card')) ||
+      document.querySelector('[id*="material"]');
+    if(!materialCard) return;
+
+    var c = codes();
+    var existingFront = materialCard.querySelector('[data-ff-screen-split="front"] b');
+    var existingSide = materialCard.querySelector('[data-ff-screen-split="side"] b');
+    if(existingFront && existingSide){
+      existingFront.textContent = c.front || '-';
+      existingSide.textContent = c.side || '-';
+      return;
+    }
+
+    var oldScreenRows = Array.prototype.slice.call(materialCard.querySelectorAll('.ff-clean-row, .material-chip-row')).filter(function(row){
+      return /스크린|screen/i.test(row.textContent || '');
+    });
+    oldScreenRows.forEach(function(row){ row.style.display = 'none'; });
+
+    var wrap = document.createElement('div');
+    wrap.setAttribute('data-ff-screen-split-wrap','1');
+    wrap.innerHTML =
+      '<div class="ff-screen-split-row" data-ff-screen-split="front"><span>전면스크린</span><b>' + (c.front || '-') + '</b></div>' +
+      '<div class="ff-screen-split-row" data-ff-screen-split="side"><span>사이드스크린</span><b>' + (c.side || '-') + '</b></div>';
+
+    var anchor = oldScreenRows[0] || materialCard.querySelector('h3') || materialCard.firstElementChild;
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(wrap, anchor.nextSibling);
+    else materialCard.appendChild(wrap);
+  }
+
+  function ensurePayloadSplit(init){
+    try{
+      if(!init || !init.body) return init;
+      var payload = JSON.parse(init.body || '{}') || {};
+      var isFrontside =
+        /frontside|front_side/i.test(String(payload.mode || payload.renderStep || payload.deskImage || payload.screenImage || '')) ||
+        bothFrontSideSelected();
+
+      if(!isFrontside) return init;
+
+      var st = initStore();
+      var frontCode = (st.front && (st.front.color || st.front.code)) || (window.state && state.frontScreenCode) || '';
+      var sideCode = (st.side && (st.side.color || st.side.code)) || (window.state && state.sideScreenCode) || '';
+      var frontTex = normalizeTexture((st.front && (st.front.texUrl || st.front.texture)) || (window.state && state.frontScreenTexture) || textureFor(frontCode, 'front'));
+      var sideTex = normalizeTexture((st.side && (st.side.texUrl || st.side.texture)) || (window.state && state.sideScreenTexture) || textureFor(sideCode, 'side'));
+
+      // 기존 screenTexture가 마지막 선택값이라 한쪽으로만 들어가는 문제를 방지
+      payload.guideImage = './images/guides/frontside_guide.png';
+      payload.frontScreenCode = frontCode || payload.frontScreenCode || '';
+      payload.sideScreenCode = sideCode || payload.sideScreenCode || '';
+      payload.frontScreenTexture = frontTex || payload.frontScreenTexture || '';
+      payload.sideScreenTexture = sideTex || payload.sideScreenTexture || '';
+
+      // 둘 중 하나만 있으면 일반 screenTexture가 양쪽에 들어가는 걸 막기 위해 screenTexture는 비워둔다.
+      // 서버는 front/side texture를 우선 사용함.
+      if(payload.frontScreenTexture || payload.sideScreenTexture){
+        payload.screenTexture = '';
+        payload.screenCode = '';
+      }
+
+      console.log('[FF_FRONTSIDE_PERSIST_SPLIT_MATERIALS] payload split', {
+        frontScreenCode: payload.frontScreenCode,
+        sideScreenCode: payload.sideScreenCode,
+        frontScreenTexture: payload.frontScreenTexture,
+        sideScreenTexture: payload.sideScreenTexture,
+        guideImage: payload.guideImage
+      });
+
+      init = Object.assign({}, init, {body: JSON.stringify(payload)});
+    }catch(e){ console.warn('[FF_FRONTSIDE_PERSIST_SPLIT_MATERIALS] payload split failed', e); }
+    return init;
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(updateSplitRows, 300);
+    setTimeout(updateSplitRows, 1000);
+  });
+  document.addEventListener('click', function(e){
+    if(e.target && e.target.closest && e.target.closest('.choice-btn,.material-btn,.confirm-btn,#send-btn,#ff-clean-render-btn,#quick-ai-preview-btn')){
+      setTimeout(updateSplitRows, 120);
+      setTimeout(updateSplitRows, 700);
+    }
+  }, true);
+
+  var prevFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = String(input || '');
+    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
+    if(isNano) init = ensurePayloadSplit(init);
+    return prevFetch.call(this, input, init);
+  };
+})();
+</script>
+
