@@ -111,6 +111,7 @@ function extractText(response) {
 
 app.post('/api/generate-preview', async (req, res) => {
   console.log('[NanoBanana] /api/generate-preview called');
+  console.log('[SERVER_NO_VISIBLE_GUIDE_FIX] active');
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
@@ -143,6 +144,7 @@ app.post('/api/generate-preview', async (req, res) => {
       sideScreenTexture,
       frontScreenCode,
       sideScreenCode,
+      frontSideInstruction,
     } = req.body || {};
 console.log('[RENDER BODY]', {
   deskImage,
@@ -162,7 +164,8 @@ console.log('[RENDER BODY]', {
 
   targetType,
   productType,
-  mode
+  mode,
+  frontSideInstruction
 });
     // FF_TARGET_MODE_SAFE_PATCH
     const targetMode = String(targetType || productType || mode || '').toLowerCase();
@@ -172,7 +175,7 @@ console.log('[RENDER BODY]', {
     const effectiveScreenTexture = isDeskRender ? '' : screenTexture;
     const effectiveScreenCode = isDeskRender ? '' : screenCode;
     const effectiveScreenImage = isDeskRender ? '' : screenImage;
-    const effectiveGuideImage = isDeskRender ? '' : guideImage;
+    const effectiveGuideImage = (isDeskRender || frontSideInstruction) ? '' : guideImage;
     const effectiveFrontScreenTexture = isDeskRender ? '' : frontScreenTexture;
     const effectiveSideScreenTexture = isDeskRender ? '' : sideScreenTexture;
     const effectiveFrontScreenCode = isDeskRender ? '' : frontScreenCode;
@@ -210,7 +213,9 @@ console.log('[RENDER BODY]', {
         topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
         size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
         'Create one photorealistic office furniture catalog render.',
-        effectiveGuideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching labeled panel.' : '',
+        frontSideInstruction ? frontSideInstruction : '',
+        frontSideInstruction ? 'Do not render any guide text, labels, red marks, arrows, drawings, annotations, or overlays in the final image.' : '',
+        effectiveGuideImage ? 'Use the guide image internally only to identify screen panels. Do not render the guide, guide text, labels, arrows, drawings, annotations, or overlays in the final image.' : '',
       ].filter(Boolean).join('\n'),
     });
 
