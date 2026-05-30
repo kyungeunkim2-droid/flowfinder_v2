@@ -23078,7 +23078,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   if(window.__ffCleanPreviewsRenderFinal) return;
   window.__ffCleanPreviewsRenderFinal = true;
 
-var GUIDE_FRONTSIDE = './images/guides/frontside_guide.png';
+  var GUIDE_FRONTSIDE = './images/guides/frontside_guide.png';
 
   function $(id){ return document.getElementById(id); }
   function S(){
@@ -23288,7 +23288,7 @@ var GUIDE_FRONTSIDE = './images/guides/frontside_guide.png';
     payload.screenTexture = payload.screenTexture || mat.generalTex || mat.frontTex || mat.sideTex;
     payload.screenCode = payload.screenCode || mat.generalCode || mat.frontCode || mat.sideCode;
     if(suffix === 'frontside'){
-      payload.guideImage = GUIDE_FRONTSIDE;
+      payload.guideImage = './images/guides/frontside_guide.png';
       payload.frontScreenTexture = mat.frontTex;
       payload.sideScreenTexture = mat.sideTex;
       payload.frontScreenCode = mat.frontCode;
@@ -23452,6 +23452,123 @@ var GUIDE_FRONTSIDE = './images/guides/frontside_guide.png';
       throw err;
     });
   };
+})();
+</script>
+
+
+
+<!-- === FF_REMOVE_DUPLICATE_PREVIEW_KEEP_RENDER_RESULT === -->
+<style id="ff-remove-duplicate-preview-keep-render-result-css">
+  /* 오른쪽 중복 원본/고해상도 미리보기 제거: 제품 원본 이미지는 왼쪽 제품선택 6개 카드가 담당 */
+  #ff-dashboard-hero{
+    display:none !important;
+  }
+  .ff-clean-preview-card .ff-clean-card-head,
+  .ff-clean-preview-card .ff-clean-preview-box{
+    display:none !important;
+  }
+  .ff-clean-preview-card{
+    padding:0 !important;
+    margin:0 0 14px !important;
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+  }
+  #ff-clean-render-btn{
+    margin-top:0 !important;
+  }
+
+  /* 렌더 결과는 버튼 누른 뒤에만 오른쪽 아래에 표시 */
+  #ff-cpf-render-panel{
+    display:none !important;
+  }
+  #ff-cpf-render-panel.ff-cpf-visible{
+    display:block !important;
+  }
+</style>
+<script id="ff-remove-duplicate-preview-keep-render-result-js">
+(function(){
+  if(window.__ffRemoveDuplicatePreviewKeepRenderResult) return;
+  window.__ffRemoveDuplicatePreviewKeepRenderResult = true;
+
+  function $(id){ return document.getElementById(id); }
+
+  function hideDuplicatePreview(){
+    var hero = $('ff-dashboard-hero');
+    if(hero) hero.style.display = 'none';
+
+    var head = document.querySelector('.ff-clean-preview-card .ff-clean-card-head');
+    if(head) head.style.display = 'none';
+
+    var box = document.querySelector('.ff-clean-preview-card .ff-clean-preview-box');
+    if(box) box.style.display = 'none';
+
+    var panel = $('ff-cpf-render-panel');
+    if(panel && !panel.classList.contains('ff-cpf-has-run')){
+      panel.classList.remove('ff-cpf-visible');
+      panel.style.display = 'none';
+    }
+  }
+
+  function showRenderPanel(){
+    var panel = $('ff-cpf-render-panel');
+    if(panel){
+      panel.classList.add('ff-cpf-visible','ff-cpf-has-run');
+      panel.style.display = 'block';
+    }
+  }
+
+  function fixGuidePathInOutgoingBody(init){
+    try{
+      if(!init || !init.body) return init;
+      var payload = JSON.parse(init.body || '{}');
+      if(payload && payload.guideImage && /frontside_guide$/i.test(String(payload.guideImage))){
+        payload.guideImage = './images/guides/frontside_guide.png';
+        init = Object.assign({}, init, {body: JSON.stringify(payload)});
+      }
+    }catch(e){}
+    return init;
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(hideDuplicatePreview, 100);
+    setTimeout(hideDuplicatePreview, 800);
+  });
+
+  document.addEventListener('click', function(e){
+    var renderBtn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn, #quick-ai-preview-btn');
+    if(renderBtn) {
+      setTimeout(showRenderPanel, 10);
+      setTimeout(showRenderPanel, 300);
+    } else {
+      setTimeout(hideDuplicatePreview, 120);
+    }
+  }, true);
+
+  var prevFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = String(input || '');
+    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
+    if(isNano){
+      init = fixGuidePathInOutgoingBody(init);
+      showRenderPanel();
+    }
+    return prevFetch.call(this, input, init).then(function(res){
+      if(isNano) showRenderPanel();
+      return res;
+    }).catch(function(err){
+      if(isNano) showRenderPanel();
+      throw err;
+    });
+  };
+
+  // 기존 패치가 렌더 결과 패널을 나중에 생성해도 곧바로 숨김/표시 규칙 적용
+  var mo = new MutationObserver(function(){
+    hideDuplicatePreview();
+  });
+  if(document.documentElement){
+    mo.observe(document.documentElement, {childList:true, subtree:true});
+  }
 })();
 </script>
 
