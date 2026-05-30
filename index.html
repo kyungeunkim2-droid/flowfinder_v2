@@ -22807,247 +22807,150 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 </script>
 
 
-<!-- === FF_RENDER_FLOW_SPLIT_CARDS: sequential desk/screen render cards in chat === -->
-<style id="ff-render-flow-split-cards-css">
-  .ff-render-flow-card{
-    margin-top:10px;
-    border:1px solid rgba(32,245,197,.25);
-    border-radius:18px;
-    overflow:hidden;
-    background:#071722;
-    color:#f8fffd;
-    box-shadow:0 14px 34px rgba(0,0,0,.24);
-  }
-  .ff-render-flow-card .ff-rf-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:12px 14px;
-    border-bottom:1px solid rgba(255,255,255,.08);
-  }
-  .ff-render-flow-card .ff-rf-title{
-    font-weight:950;
-    color:#20f5c5;
-    font-size:14px;
-  }
-  .ff-render-flow-card .ff-rf-status{
-    font-size:11px;
-    color:#91b9b2;
-    white-space:nowrap;
-  }
-  .ff-render-flow-card .ff-rf-body{
-    padding:12px;
-  }
-  .ff-render-flow-card .ff-rf-body img{
-    width:100%;
-    max-height:520px;
-    object-fit:contain;
-    display:block;
-    background:#fff;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.12);
-  }
-  .ff-render-flow-card .ff-rf-desc{
-    margin-top:8px;
-    color:#9fb3bd;
-    font-size:11px;
-    line-height:1.5;
-  }
-  .ff-render-flow-card.ff-rf-error{
-    border-color:rgba(252,165,165,.35);
-  }
-  .ff-render-flow-card.ff-rf-error .ff-rf-title{
-    color:#fca5a5;
-  }
+<!-- === FF_RENDER_FLOW_EXPLICIT_KIND_FIX: desk/screen render cards without hiding choices === -->
+<style id="ff-render-flow-explicit-kind-css">
+  .ff-render-flow-card{margin-top:10px;border:1px solid rgba(32,245,197,.25);border-radius:18px;overflow:hidden;background:#071722;color:#f8fffd;box-shadow:0 14px 34px rgba(0,0,0,.24);}
+  .ff-render-flow-card .ff-rf-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .ff-render-flow-card .ff-rf-title{font-weight:950;color:#20f5c5;font-size:14px;}
+  .ff-render-flow-card .ff-rf-status{font-size:11px;color:#91b9b2;white-space:nowrap;}
+  .ff-render-flow-card .ff-rf-body{padding:12px;}
+  .ff-render-flow-card .ff-rf-body img{width:100%;max-height:520px;object-fit:contain;display:block;background:#fff;border-radius:14px;border:1px solid rgba(255,255,255,.12);}
+  .ff-render-flow-card .ff-rf-desc{margin-top:8px;color:#9fb3bd;font-size:11px;line-height:1.5;}
+  .ff-render-flow-card.ff-rf-error{border-color:rgba(252,165,165,.35);}
+  .ff-render-flow-card.ff-rf-error .ff-rf-title{color:#fca5a5;}
 </style>
-<script id="ff-render-flow-split-cards">
+<script id="ff-render-flow-explicit-kind-fix">
 (function(){
-  if(window.__ffRenderFlowSplitCards) return;
-  window.__ffRenderFlowSplitCards = true;
+  if(window.__ffRenderFlowExplicitKindFix) return;
+  window.__ffRenderFlowExplicitKindFix = true;
 
   function $(id){ return document.getElementById(id); }
-  function text(id){
-    var el = $(id);
-    var v = el ? String(el.textContent || '').trim() : '';
-    return v === '-' ? '' : v;
-  }
-  function bgUrl(id){
-    var el = $(id);
-    if(!el) return '';
-    var bg = (el.style && el.style.backgroundImage) || getComputedStyle(el).backgroundImage || '';
-    var m = bg.match(/url\(["']?(.+?)["']?\)/);
-    return m ? m[1] : '';
-  }
-  function state(){
-    return Object.assign({},
-      window.state || {},
-      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
-    );
-  }
-  function getSrc(data){
-    if(!data) return '';
-    if(typeof data === 'string') return data;
-    return data.imageUrl || data.image || data.url || data.previewUrl || data.output || '';
-  }
-  function esc(s){
-    return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){
-      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-    });
+  function S(){ return Object.assign({}, window.state||{}, (window.FlowFinderFastPreview&&window.FlowFinderFastPreview.state)||{}); }
+  function txt(id){ var el=$(id); var v=el?String(el.textContent||'').trim():''; return v==='-'?'':v; }
+  function bg(id){ var el=$(id); if(!el) return ''; var b=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=b.match(/url\(["']?(.+?)["']?\)/); return m?m[1]:''; }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function isScreenName(v){ return /스크린|screen|전면|사이드|일자형|L형|l형|front|side/i.test(String(v||'')); }
+  function currentKind(){
+    var s=S();
+    var current = [
+      s._currentCatName,
+      s.current && s.current.product,
+      s.product,
+      s.screenLabel && s.step === 'choose_color' ? s.screenLabel : ''
+    ].filter(Boolean).join(' ');
+    return isScreenName(current) ? 'screen' : 'desk';
   }
   function dataUrlToBlobUrl(dataUrl){
     try{
       if(!/^data:image\//i.test(String(dataUrl||''))) return dataUrl;
-      var parts = dataUrl.split(',');
-      var mime = (parts[0].match(/^data:([^;]+)/i) || [,'image/png'])[1];
-      var bin = atob(parts.slice(1).join(','));
-      var bytes = new Uint8Array(bin.length);
-      for(var i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-      return URL.createObjectURL(new Blob([bytes], {type:mime}));
-    }catch(e){
-      return dataUrl;
-    }
+      var p=dataUrl.split(','), mime=(p[0].match(/^data:([^;]+)/i)||[,'image/png'])[1], bin=atob(p.slice(1).join(',')), arr=new Uint8Array(bin.length);
+      for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+      return URL.createObjectURL(new Blob([arr],{type:mime}));
+    }catch(e){ return dataUrl; }
   }
-  function inferKind(url, payload){
-    var raw = [
-      url || '',
-      payload && payload.targetType,
-      payload && payload.productType,
-      payload && payload.mode
-    ].join(' ').toLowerCase();
-    if(raw.indexOf('generate-screen-preview') > -1) return 'screen';
-    if(/screen|스크린/.test(raw)) return 'screen';
-    return 'desk';
-  }
-  function normalizePayloadForKind(url, body){
-    var payload = {};
-    try{ payload = JSON.parse(body || '{}') || {}; }catch(e){ return {body:body, kind:'desk'}; }
-    var kind = inferKind(url, payload);
-    var s = state();
-
-    payload.targetType = kind;
-    payload.productType = kind;
-    payload.renderStep = kind === 'screen' ? 'screen_with_desk' : 'desk_only';
-
-    if(kind === 'desk'){
-      payload.mode = 'desk-only-material-mapping-sequential';
-      payload.screenTexture = '';
-      payload.screenCode = '';
-      payload.screenImage = '';
-      payload.SCREEN_MASK = '';
-      payload.guideImage = '';
-      payload.frontScreenTexture = '';
-      payload.sideScreenTexture = '';
-      payload.frontScreenCode = '';
-      payload.sideScreenCode = '';
-      payload.screenSelected = false;
-    }else{
-      payload.mode = 'desk-screen-material-mapping-sequential';
-      payload.topTexture = payload.topTexture || bgUrl('quick-top-chip') || s.topTex || s.topTexture || s.topMaterialImg || '';
-      payload.legTexture = payload.legTexture || bgUrl('quick-leg-chip') || s.legTex || s.legTexture || s.legMaterialImg || '';
-      payload.screenTexture = payload.screenTexture || bgUrl('quick-screen-chip') || s.screenTex || s.screenTexture || '';
-      payload.topCode = payload.topCode || text('quick-top-code') || s.top || s.topCode || s.topColor || '';
-      payload.legCode = payload.legCode || text('quick-leg-code') || s.leg || s.legCode || s.legColor || '';
-      payload.screenCode = payload.screenCode || text('quick-screen-code') || s.screen || s.screenCode || s.screenColor || '';
-      payload.screenSelected = true;
-
-      // If project has FRONTSIDE guide files, these harmless candidate paths help the server load one when present.
-      var screenLabel = String(payload.screenLabel || s.screenLabel || s.screen || '').toLowerCase();
-      if(!payload.guideImage && /front|side|전면|사이드|frontside|front_side/.test(screenLabel)){
-        payload.guideImage = 'images/frontside/front_side.png';
-      }
-    }
-    return {body:JSON.stringify(payload), kind:kind, payload:payload};
-  }
+  function getSrc(data){ if(!data) return ''; if(typeof data==='string') return data; return data.imageUrl||data.image||data.url||data.previewUrl||data.output||''; }
   function addCard(kind){
-    var messages = $('messages');
-    if(!messages) return null;
-
-    var wrap = document.createElement('div');
-    wrap.className = 'msg bot ff-render-flow-msg';
-    var icon = document.createElement('div');
-    icon.className = 'bot-icon';
-    icon.textContent = 'AI';
-    var bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    var title = kind === 'screen' ? '스크린 렌더링 생성 중' : '데스크 렌더링 생성 중';
-    var desc = kind === 'screen'
-      ? '데스크+스크린 원본 사진에 상판/다리/스크린 재질을 순서대로 맵핑하고 있습니다.'
-      : '데스크 원본 사진에 상판/다리 재질만 맵핑하고 있습니다.';
-    bubble.innerHTML =
-      '<div class="ff-render-flow-card">' +
-        '<div class="ff-rf-head"><div class="ff-rf-title">'+esc(title)+'</div><div class="ff-rf-status">생성중</div></div>' +
-        '<div class="ff-rf-body"><div class="ff-rf-desc">'+esc(desc)+'</div></div>' +
-      '</div>';
-    wrap.appendChild(icon);
-    wrap.appendChild(bubble);
-    messages.appendChild(wrap);
-    try{ messages.scrollTop = messages.scrollHeight; }catch(e){}
+    var messages=$('messages'); if(!messages) return null;
+    var wrap=document.createElement('div'); wrap.className='msg bot ff-render-flow-msg';
+    var icon=document.createElement('div'); icon.className='bot-icon'; icon.textContent='AI';
+    var bubble=document.createElement('div'); bubble.className='bubble';
+    bubble.innerHTML='<div class="ff-render-flow-card"><div class="ff-rf-head"><div class="ff-rf-title">'+(kind==='screen'?'스크린 렌더링 생성 중':'데스크 렌더링 생성 중')+'</div><div class="ff-rf-status">생성중</div></div><div class="ff-rf-body"><div class="ff-rf-desc">'+(kind==='screen'?'데스크+스크린 원본 사진에 상판/다리/스크린 재질을 맵핑하고 있습니다.':'데스크 원본 사진에 상판/다리 재질만 맵핑하고 있습니다.')+'</div></div></div>';
+    wrap.appendChild(icon); wrap.appendChild(bubble); messages.appendChild(wrap);
+    try{ messages.scrollTop=messages.scrollHeight; }catch(e){}
     return wrap;
   }
-  function updateCard(card, kind, src, err){
+  function updateCard(card,kind,src,err){
     if(!card) return;
-    var cardBox = card.querySelector('.ff-render-flow-card');
-    var title = card.querySelector('.ff-rf-title');
-    var status = card.querySelector('.ff-rf-status');
-    var body = card.querySelector('.ff-rf-body');
+    var box=card.querySelector('.ff-render-flow-card'), title=card.querySelector('.ff-rf-title'), status=card.querySelector('.ff-rf-status'), body=card.querySelector('.ff-rf-body');
     if(err){
-      if(cardBox) cardBox.classList.add('ff-rf-error');
-      if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 실패' : '데스크 렌더링 실패';
-      if(status) status.textContent = '오류';
-      if(body) body.innerHTML = '<div class="ff-rf-desc">'+esc(err)+'</div>';
+      if(box) box.classList.add('ff-rf-error');
+      if(title) title.textContent=kind==='screen'?'스크린 렌더링 실패':'데스크 렌더링 실패';
+      if(status) status.textContent='오류';
+      if(body) body.innerHTML='<div class="ff-rf-desc">'+esc(err)+'</div>';
       return;
     }
-    var blobSrc = dataUrlToBlobUrl(src);
-    if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과';
-    if(status) status.textContent = '생성완료';
-    if(body){
-      body.innerHTML =
-        '<img src="'+esc(blobSrc)+'" alt="'+esc(kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과')+'">' +
-        '<div class="ff-rf-desc">'+
-          (kind === 'screen'
-            ? '데스크+스크린 원본 기준으로 상판/다리/스크린 재질을 맵핑한 결과입니다.'
-            : '데스크 원본 기준으로 상판/다리 재질만 맵핑한 결과입니다.') +
-        '</div>';
+    var src2=dataUrlToBlobUrl(src);
+    if(title) title.textContent=kind==='screen'?'스크린 렌더링 결과':'데스크 렌더링 결과';
+    if(status) status.textContent='생성완료';
+    if(body) body.innerHTML='<img src="'+esc(src2)+'" alt="'+(kind==='screen'?'스크린 렌더링 결과':'데스크 렌더링 결과')+'"><div class="ff-rf-desc">'+(kind==='screen'?'데스크+스크린 원본 기준으로 상판/다리/스크린 재질을 맵핑한 결과입니다.':'데스크 원본 기준으로 상판/다리 재질만 맵핑한 결과입니다.')+'</div>';
+    try{ var messages=$('messages'); if(messages) messages.scrollTop=messages.scrollHeight; }catch(e){}
+  }
+  function sanitizeBody(kind, body){
+    var payload={};
+    try{ payload=JSON.parse(body||'{}')||{}; }catch(e){ return body; }
+    var s=S();
+    payload.targetType=kind;
+    payload.productType=kind;
+    payload.renderStep=kind==='screen'?'screen_with_desk':'desk_only';
+
+    if(kind==='desk'){
+      payload.mode='desk-only-material-mapping-explicit';
+      payload.screenTexture='';
+      payload.screenCode='';
+      payload.screenImage='';
+      payload.SCREEN_MASK='';
+      payload.guideImage='';
+      payload.frontScreenTexture='';
+      payload.sideScreenTexture='';
+      payload.frontScreenCode='';
+      payload.sideScreenCode='';
+      payload.screenSelected=false;
+    }else{
+      payload.mode='desk-screen-material-mapping-explicit';
+      payload.topTexture=payload.topTexture||bg('quick-top-chip')||s.topTex||s.topTexture||s.topMaterialImg||'';
+      payload.legTexture=payload.legTexture||bg('quick-leg-chip')||s.legTex||s.legTexture||s.legMaterialImg||'';
+      payload.screenTexture=payload.screenTexture||bg('quick-screen-chip')||s.screenTex||s.screenTexture||'';
+      payload.topCode=payload.topCode||txt('quick-top-code')||s.top||s.topCode||s.topColor||'';
+      payload.legCode=payload.legCode||txt('quick-leg-code')||s.leg||s.legCode||s.legColor||'';
+      payload.screenCode=payload.screenCode||txt('quick-screen-code')||s.screen||s.screenCode||s.screenColor||'';
+      payload.screenSelected=true;
+      if(!payload.guideImage && /front|side|전면|사이드|frontside|front_side/i.test(String(payload.screenLabel||s.screenLabel||s.screen||''))){
+        payload.guideImage='images/frontside/front_side.png';
+      }
     }
-    try{
-      var messages = $('messages');
-      if(messages) messages.scrollTop = messages.scrollHeight;
-    }catch(e){}
+    return JSON.stringify(payload);
   }
 
-  var previousFetch = window.fetch;
-  window.fetch = function(input, init){
-    var url = String(input || '');
-    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    var kind = 'desk';
-    var card = null;
-
-    if(isNano && init && init.body){
-      var fixed = normalizePayloadForKind(url, init.body);
-      kind = fixed.kind;
-      init = Object.assign({}, init, {body: fixed.body});
-      card = addCard(kind);
-      console.log('[FF_RENDER_FLOW_SPLIT_CARDS] payload fixed:', kind, fixed.payload);
+  // The high-resolution button now records the actual current step before legacy code clicks hidden buttons.
+  document.addEventListener('click',function(e){
+    var clean=e.target&&e.target.closest&&e.target.closest('#ff-clean-render-btn');
+    if(clean){
+      window.__ffNextRenderKind=currentKind();
+      console.log('[FF_RENDER_FLOW_EXPLICIT_KIND_FIX] requested kind:', window.__ffNextRenderKind, S()._currentCatName, S().step);
     }
+  }, true);
 
-    return previousFetch.call(this, input, init).then(function(res){
+  var oldFetch=window.fetch;
+  window.fetch=function(input,init){
+    var url=String(input||'');
+    var isNano=url.indexOf('/api/generate-preview')>-1 || url.indexOf('/api/generate-screen-preview')>-1;
+    var kind=window.__ffNextRenderKind || '';
+    var card=null;
+    if(isNano){
+      if(!kind){
+        // Only use explicit payload markers. Do not infer screen just because a screen is selected.
+        try{
+          var p=JSON.parse((init&&init.body)||'{}')||{};
+          kind=/screen|스크린/i.test(String(p.targetType||p.productType||p.mode||''))?'screen':'desk';
+        }catch(e){ kind='desk'; }
+      }
+      if(init&&init.body) init=Object.assign({},init,{body:sanitizeBody(kind,init.body)});
+      card=addCard(kind);
+    }
+    return oldFetch.call(this,input,init).then(function(res){
       if(!isNano) return res;
       try{
         res.clone().json().then(function(data){
-          var src = getSrc(data);
-          if(src){
-            updateCard(card, kind, src, '');
-          }else{
-            updateCard(card, kind, '', (data && (data.error || data.detail)) || '이미지 결과를 받지 못했습니다.');
-          }
-        }).catch(function(err){
-          updateCard(card, kind, '', err && err.message ? err.message : '응답을 읽지 못했습니다.');
-        });
+          var src=getSrc(data);
+          if(src) updateCard(card,kind,src,'');
+          else updateCard(card,kind,'',(data&&(data.error||data.detail))||'이미지 결과를 받지 못했습니다.');
+        }).catch(function(err){ updateCard(card,kind,'',err&&err.message?err.message:'응답을 읽지 못했습니다.'); });
       }catch(e){}
+      window.__ffNextRenderKind='';
       return res;
     }).catch(function(err){
-      if(isNano) updateCard(card, kind, '', err && err.message ? err.message : String(err));
+      if(isNano) updateCard(card,kind,'',err&&err.message?err.message:String(err));
+      window.__ffNextRenderKind='';
       throw err;
     });
   };
