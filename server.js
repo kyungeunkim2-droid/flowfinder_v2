@@ -183,12 +183,27 @@ console.log('[RENDER BODY]', {
     parts.push({
       text: [
         'Use the base furniture product image as the exact reference.',
+        'THIS IS AN IMAGE EDITING TASK, NOT AN IMAGE GENERATION TASK.',
+        'Use the supplied base product image as a locked canvas.',
+        'Do not create a new furniture design.',
+        'Do not generate a new desk.',
+        'Do not generate a new screen.',
+        'Do not change the shape, dimensions, proportions, position, crop, camera angle, perspective, shadows, or background.',
+        'Preserve the exact product geometry from the source image.',
+        'Only replace the material appearance on existing visible surfaces.',
+        'Do not add or remove any furniture components.',
+        'The output must look identical to the source image except for material/color changes.',
         'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
         'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
         'Apply the provided leg material naturally only to the vertical desk legs.',
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
         effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not modify the screen shape.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not move the screen.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not resize the screen.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not create additional screen panels.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Only change the color/material of the existing screen surface.' : '',
         effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
         effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.' : '',
         effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
@@ -221,7 +236,6 @@ console.log('[RENDER BODY]', {
       ['screen material texture reference', effectiveScreenTexture],
       ['front screen material texture reference', effectiveFrontScreenTexture],
       ['side screen material texture reference', effectiveSideScreenTexture],
-      ['screen product reference', effectiveScreenImage],
       ['front/side guide image', effectiveGuideImage],
     ];
 
@@ -306,6 +320,13 @@ app.post('/api/generate-screen-preview', async (req, res) => {
     parts.push({
    text: [
   'Use the provided AI-generated desk image as the exact base image.',
+  'THIS IS AN IMAGE EDITING TASK, NOT AN IMAGE GENERATION TASK.',
+  'Use the supplied base product image as a locked canvas.',
+  'Do not create a new furniture design.',
+  'Do not generate a new desk.',
+  'Do not generate a new screen.',
+  'Preserve the exact product geometry, crop, perspective, lighting, and background.',
+  'Only replace the material/color on the existing visible screen surface.',
   'Add the provided screen product naturally to the desk.',
   'Apply the provided screen material only to the screen panel.',
   'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
@@ -318,7 +339,6 @@ app.post('/api/generate-screen-preview', async (req, res) => {
 
    const imageInputs = [
   ['generated desk image', deskAiImage],
-  ['screen product image', screenImage],
   ['screen material texture reference', screenTexture],
   ['front screen material texture reference', frontScreenTexture],
   ['side screen material texture reference', sideScreenTexture],
