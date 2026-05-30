@@ -22957,3 +22957,221 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+
+<!-- === FF_FRONTSIDE_GUIDE_PAYLOAD_FINAL_FIX === -->
+<script id="ff-frontside-guide-payload-final-fix">
+(function(){
+  if (window.__ffFrontSideGuidePayloadFinalFix) return;
+  window.__ffFrontSideGuidePayloadFinalFix = true;
+
+  var GUIDE_PATH = './images/guides/frontside_guide';
+
+  function $(id){ return document.getElementById(id); }
+  function S(){
+    return Object.assign({},
+      window.state || {},
+      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}
+    );
+  }
+  function text(id){
+    var el = $(id);
+    var v = el ? String(el.textContent || '').trim() : '';
+    return v === '-' ? '' : v;
+  }
+  function bgUrl(id){
+    var el = $(id);
+    if(!el) return '';
+    var bg = (el.style && el.style.backgroundImage) || getComputedStyle(el).backgroundImage || '';
+    var m = bg.match(/url\(["']?(.+?)["']?\)/);
+    return m ? m[1] : '';
+  }
+  function normPath(p){
+    if(!p) return '';
+    p = String(p).trim().replace(/^url\(["']?|["']?\)$/g,'');
+    if(!p) return '';
+    p = p.replace(/\\/g,'/');
+    p = p.replace(/(^|_)front_side(?=\.png|\.jpg|\.jpeg|\.webp|$)/i, '$1frontside');
+    return p;
+  }
+  function hasFrontSide(){
+    var s = S();
+    var arr = window._setSelected || [];
+    var raw = [
+      arr.join(' '),
+      s.screenLabel,
+      s.screen,
+      s._currentCatName,
+      s.current && s.current.product,
+      s.product,
+      s.selectedScreenKey,
+      s.screenKey
+    ].filter(Boolean).join(' ');
+    return (/전면|front/i.test(raw) && /사이드|side/i.test(raw)) || /frontside|front_side/i.test(raw);
+  }
+  function isScreenRenderByState(){
+    var s = S();
+    var raw = [
+      s._currentCatName,
+      s.current && s.current.product,
+      s.product,
+      s.step === 'choose_color' ? s.screenLabel : ''
+    ].filter(Boolean).join(' ');
+    return /스크린|screen|전면|사이드|일자형|L형|l형|front|side/i.test(raw);
+  }
+  function buildFrontSidePreviewPath(existing){
+    existing = normPath(existing || '');
+    if(existing && /frontside/i.test(existing) && /images\/previews\//i.test(existing)) return existing;
+
+    try{
+      if(typeof window.ffBuildPreviewPath === 'function'){
+        var p = normPath(window.ffBuildPreviewPath());
+        if(p && /frontside/i.test(p)) return p;
+      }
+    }catch(e){}
+
+    var s = S();
+    var folder = /덕트/.test(String((s.current&&s.current.product)||s.product||s.deskLabel||'')) ? 'desk_duct' : 'desk_standard';
+
+    function legKey(v){
+      v=String(v||'');
+      if(/원형/.test(v)) return 'round';
+      if(/A자|A/.test(v)) return 'aframe';
+      return 'ladder';
+    }
+    function moveKey(v){ v=String(v||''); return /캐스터/.test(v) ? 'caster' : 'glide'; }
+    function topKey(v){ v=String(v||''); return /라운드/.test(v) ? 'round' : 'rect'; }
+
+    return './images/previews/' + folder + '/' +
+      [legKey(s.legType||s.legShape), moveKey(s.casterType||s.mobility), topKey(s.topShape)].join('_') +
+      '_frontside.png';
+  }
+  function localTexture(code, type){
+    if(!code) return '';
+    try{
+      if(typeof window._ffLocalTextureForCode === 'function'){
+        return normPath(window._ffLocalTextureForCode(code, type || '전면 스크린') || '');
+      }
+    }catch(e){}
+    try{
+      if(typeof window.screenTextureUrl === 'function'){
+        return normPath(window.screenTextureUrl(code, type || '전면 스크린') || '');
+      }
+    }catch(e){}
+    return '';
+  }
+  function screenState(){
+    return window._screenPreviewState || {};
+  }
+  function entryTex(entry, fallbackType){
+    if(!entry) return '';
+    return normPath(entry.texUrl || localTexture(entry.color, entry.type || fallbackType));
+  }
+  function entryCode(entry){
+    return entry && entry.color ? String(entry.color).trim() : '';
+  }
+  function enrichFrontSidePayload(payload){
+    var st = screenState();
+    var s = S();
+    var front = st.front || null;
+    var side = st.side || null;
+    var latest = st.latest || null;
+
+    var generalScreenCode = text('quick-screen-code') || s.screenCode || s.screenColor || s.screen || window.__ffPreviewScreen || '';
+    var generalScreenTex = normPath(bgUrl('quick-screen-chip') || s.screenTex || s.screenTexture || localTexture(generalScreenCode, '전면 스크린'));
+
+    var frontCode = entryCode(front) || s.frontScreenCode || s.frontCode || generalScreenCode;
+    var sideCode = entryCode(side) || s.sideScreenCode || s.sideCode || generalScreenCode;
+
+    var frontTex = entryTex(front, '전면 스크린') || s.frontScreenTexture || s.frontTexture || generalScreenTex;
+    var sideTex = entryTex(side, '사이드 스크린') || s.sideScreenTexture || s.sideTexture || generalScreenTex;
+
+    var preview = buildFrontSidePreviewPath(payload.deskImage || payload.screenImage);
+
+    payload.targetType = 'screen';
+    payload.productType = 'screen';
+    payload.renderStep = 'frontside_screen_mapping';
+    payload.mode = 'frontside-screen-guide-material-mapping';
+
+    // frontside 원본 이미지를 base와 screenImage 모두에 넣어서 Gemini가 새 제품을 만들지 않고 이 사진을 편집하게 함.
+    payload.deskImage = preview;
+    payload.screenImage = preview;
+    payload.fallbackDeskImage = preview;
+    payload.composedPreview = '';
+
+    payload.screenSelected = true;
+    payload.screenLabel = payload.screenLabel || s.screenLabel || '전면 스크린 + 사이드 스크린';
+    payload.guideImage = GUIDE_PATH;
+
+    payload.frontScreenTexture = frontTex;
+    payload.sideScreenTexture = sideTex;
+    payload.frontScreenCode = frontCode;
+    payload.sideScreenCode = sideCode;
+
+    // 기존 단일 screenTexture도 비워두지 않음. 단, 서버에서는 front/side가 우선됨.
+    payload.screenTexture = payload.screenTexture || frontTex || sideTex || generalScreenTex;
+    payload.screenCode = payload.screenCode || frontCode || sideCode || generalScreenCode;
+
+    payload.topTexture = payload.topTexture || normPath(bgUrl('quick-top-chip') || s.topTex || s.topTexture || s.topMaterialImg || '');
+    payload.legTexture = payload.legTexture || normPath(bgUrl('quick-leg-chip') || s.legTex || s.legTexture || s.legMaterialImg || '');
+    payload.topCode = payload.topCode || text('quick-top-code') || s.top || s.topCode || s.topColor || '';
+    payload.legCode = payload.legCode || text('quick-leg-code') || s.leg || s.legCode || s.legColor || '';
+
+    console.log('[FF_FRONTSIDE_GUIDE_PAYLOAD_FINAL_FIX]', {
+      deskImage: payload.deskImage,
+      screenImage: payload.screenImage,
+      guideImage: payload.guideImage,
+      frontScreenTexture: payload.frontScreenTexture,
+      sideScreenTexture: payload.sideScreenTexture,
+      frontScreenCode: payload.frontScreenCode,
+      sideScreenCode: payload.sideScreenCode
+    });
+
+    return payload;
+  }
+  function cleanDeskPayload(payload){
+    payload.targetType = 'desk';
+    payload.productType = 'desk';
+    payload.renderStep = 'desk_only';
+    payload.mode = 'desk-only-material-mapping';
+    payload.screenTexture = '';
+    payload.screenCode = '';
+    payload.screenImage = '';
+    payload.guideImage = '';
+    payload.frontScreenTexture = '';
+    payload.sideScreenTexture = '';
+    payload.frontScreenCode = '';
+    payload.sideScreenCode = '';
+    payload.screenSelected = false;
+    return payload;
+  }
+
+  var prevFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = String(input || '');
+    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
+
+    if(isNano && init && init.body){
+      try{
+        var payload = JSON.parse(init.body || '{}') || {};
+        var explicitKind = window.__ffNextRenderKind || '';
+        var screenRender = explicitKind === 'screen' || /screen|스크린/i.test(String(payload.targetType || payload.productType || payload.mode || '')) || isScreenRenderByState();
+
+        if(screenRender && hasFrontSide()){
+          payload = enrichFrontSidePayload(payload);
+          window.__ffNextRenderKind = 'screen';
+        } else if(!screenRender || explicitKind === 'desk'){
+          payload = cleanDeskPayload(payload);
+          window.__ffNextRenderKind = 'desk';
+        }
+
+        init = Object.assign({}, init, { body: JSON.stringify(payload) });
+      }catch(e){
+        console.warn('[FF_FRONTSIDE_GUIDE_PAYLOAD_FINAL_FIX] payload patch failed', e);
+      }
+    }
+    return prevFetch.call(this, input, init);
+  };
+})();
+</script>
+
