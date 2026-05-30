@@ -2750,13 +2750,7 @@ body.ff-dashboard-preview #preview-panel,
       <div class="material-chip-row" id="quick-leg-row"><span>다리</span><i id="quick-leg-code">-</i><em id="quick-leg-chip"></em></div>
       <div class="material-chip-row" id="quick-screen-row"><span>스크린</span><i id="quick-screen-code">-</i><em id="quick-screen-chip"></em></div>
     </div>
-    <button id="quick-ai-preview-btn" <button onclick="prepareNanoBananaPreview('desk')">
-  ✨ 데스크 재질 적용
-</button>
-
-<button onclick="prepareNanoBananaPreview('screen')">
-  ✨ 스크린 재질 적용
-</button>>✨ 원본 사진에 재질 적용</button>
+    <button id="quick-ai-preview-btn" type="button" onclick="prepareNanoBananaPreview()">✨ 원본 사진에 재질 적용</button>
     <div id="quick-ai-preview-note" style="display:none;"></div>
     <canvas id="product-3d-canvas" height="1" style="display:none;"></canvas>
     <div id="texture-strip" style="display:none;"></div>
@@ -22380,3 +22374,286 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 <!-- === /FF FINAL USER FIX === -->
+
+
+<!-- === FF FINAL USER FIX: compact option cards + nano button repair === -->
+<style id="ff-final-user-option-card-override">
+  .ff102-options-card.ff-user-final-options{
+    width:100% !important;
+    max-width:620px !important;
+    margin:0 !important;
+    padding:14px 16px !important;
+    border-radius:22px !important;
+    border:1px solid rgba(46,242,201,.25) !important;
+    background:linear-gradient(180deg,rgba(5,18,29,.98),rgba(3,14,24,.98)) !important;
+    box-sizing:border-box !important;
+    overflow:hidden !important;
+  }
+  .ff102-options-card.ff-user-final-options h3{
+    margin:0 0 6px !important;
+    color:#2ef2c9 !important;
+    font-size:22px !important;
+    line-height:1.15 !important;
+    letter-spacing:-.4px !important;
+  }
+  .ff102-options-card.ff-user-final-options > p{
+    margin:0 0 10px !important;
+    color:#e5edf7 !important;
+    font-size:12px !important;
+    line-height:1.45 !important;
+  }
+  .ff-user-option-cat{
+    margin:8px 0 10px !important;
+    padding:10px !important;
+    border-radius:17px !important;
+    border:1px solid rgba(148,163,184,.18) !important;
+    background:rgba(7,19,31,.72) !important;
+  }
+  .ff-user-option-head{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+    gap:8px !important;
+    margin:0 0 7px !important;
+  }
+  .ff-user-option-head b{
+    color:#2ef2c9 !important;
+    font-size:18px !important;
+    font-weight:1000 !important;
+    letter-spacing:-.25px !important;
+  }
+  .ff-user-option-head small{
+    color:#b99cff !important;
+    font-size:10px !important;
+    font-weight:900 !important;
+    white-space:nowrap !important;
+  }
+  .ff-user-option-list{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:7px !important;
+  }
+  .ff-user-option-row{
+    display:grid !important;
+    grid-template-columns:70px minmax(0,1fr) 44px 88px !important;
+    align-items:center !important;
+    gap:10px !important;
+    min-height:58px !important;
+    padding:6px 8px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(148,163,184,.18) !important;
+    background:linear-gradient(135deg,rgba(14,33,51,.96),rgba(8,23,36,.96)) !important;
+    cursor:pointer !important;
+    transition:border-color .15s, box-shadow .15s, background .15s !important;
+  }
+  .ff-user-option-row:hover{
+    border-color:rgba(46,242,201,.55) !important;
+    box-shadow:0 0 0 2px rgba(46,242,201,.10) !important;
+  }
+  .ff-user-option-row.ff-user-selected{
+    border-color:#2ef2c9 !important;
+    background:linear-gradient(135deg,rgba(8,55,48,.95),rgba(8,26,40,.95)) !important;
+    box-shadow:0 0 0 2px rgba(46,242,201,.20),0 0 18px rgba(46,242,201,.16) !important;
+  }
+  .ff-user-option-img{
+    width:66px !important;
+    height:44px !important;
+    object-fit:contain !important;
+    display:block !important;
+    border-radius:9px !important;
+    background:rgba(255,255,255,.06) !important;
+    padding:2px !important;
+  }
+  .ff-user-no-img .ff-user-option-img{display:none !important;}
+  .ff-user-no-img{grid-template-columns:minmax(0,1fr) 44px 88px !important;}
+  .ff-user-option-name{
+    color:#fff !important;
+    font-size:14px !important;
+    line-height:1.25 !important;
+    font-weight:1000 !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+    white-space:normal !important;
+  }
+  .ff-user-color-label{
+    color:#e5edf7 !important;
+    font-size:12px !important;
+    font-weight:900 !important;
+    text-align:right !important;
+  }
+  .ff-user-color-select{
+    width:88px !important;
+    height:38px !important;
+    border-radius:12px !important;
+    border:1px solid rgba(46,242,201,.44) !important;
+    background:#06111b !important;
+    color:#fff !important;
+    font-size:13px !important;
+    font-weight:1000 !important;
+    padding:0 26px 0 10px !important;
+    outline:none !important;
+  }
+  .ff-user-option-info{
+    margin:10px 0 0 !important;
+    padding:10px 12px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(46,242,201,.20) !important;
+    background:rgba(9,29,43,.74) !important;
+    color:#cde7e4 !important;
+    font-size:12px !important;
+    line-height:1.55 !important;
+  }
+  .ff-user-option-actions{
+    display:grid !important;
+    grid-template-columns:1fr 1fr !important;
+    gap:10px !important;
+    margin-top:12px !important;
+  }
+  .ff-user-option-actions button{
+    min-height:42px !important;
+    border-radius:14px !important;
+    border:1px solid rgba(255,255,255,.14) !important;
+    font-size:14px !important;
+    font-weight:1000 !important;
+    cursor:pointer !important;
+  }
+  .ff-user-option-actions .primary{
+    background:#2ef2c9 !important;
+    border-color:#2ef2c9 !important;
+    color:#03120f !important;
+  }
+  .ff-user-option-actions .secondary{
+    background:rgba(255,255,255,.05) !important;
+    color:#fff !important;
+  }
+  #quick-ai-preview-btn{
+    display:block !important;
+    width:100% !important;
+    min-height:44px !important;
+    margin:10px 0 0 !important;
+    border-radius:14px !important;
+    border:0 !important;
+    background:#2ef2c9 !important;
+    color:#03120f !important;
+    font-size:14px !important;
+    font-weight:1000 !important;
+    cursor:pointer !important;
+  }
+  @media(max-width:680px){
+    .ff102-options-card.ff-user-final-options{padding:12px !important;max-width:100% !important;}
+    .ff-user-option-head b{font-size:16px !important;}
+    .ff-user-option-head small{font-size:9px !important;}
+    .ff-user-option-row{grid-template-columns:52px minmax(0,1fr) 34px 70px !important;gap:7px !important;min-height:52px !important;padding:6px !important;}
+    .ff-user-option-img{width:50px !important;height:36px !important;}
+    .ff-user-option-name{font-size:12px !important;}
+    .ff-user-color-label{font-size:10px !important;}
+    .ff-user-color-select{width:70px !important;height:34px !important;font-size:12px !important;padding-left:8px !important;}
+    .ff-user-no-img{grid-template-columns:minmax(0,1fr) 34px 70px !important;}
+  }
+</style>
+<script id="ff-final-user-option-card-override-js">
+(function(){
+  function esc(s){return String(s==null?'':s).replace(/[&<>\"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[c];});}
+  function bot(html){ if(typeof addMsg==='function') addMsg('bot', html); }
+  function user(html){ if(typeof addMsg==='function') addMsg('user', html); }
+  function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m){ m.scrollTop=m.scrollHeight; var last=m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); } },80); }
+  var OPTIONS=[
+    {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+    ]},
+    {cat:'PC홀더', note:'', items:[
+      {name:'PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'}
+    ]},
+    {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
+      {name:'모니터암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'},
+      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'}
+    ]}
+  ];
+  window.ff102AccessoryOptions=OPTIONS;
+  window.ff107AccessoryOptions=OPTIONS;
+  window.ff108AccessoryOptions=OPTIONS;
+  window.ff112AccessoryOptions=OPTIONS;
+  function saveChosen(chosen){
+    if(window.state){
+      state.extraOptionItems=chosen;
+      state.finalAddons=chosen.map(function(x){return x.name;});
+      state.finalOptionQty=1;
+      state._ff102OptionsHandled=true;
+      state._ff101OptionsHandled=true;
+      state._ff100OptionsDone=true;
+      state._ff96OptionsAsked=true;
+      state._ff97FinalOptionsAsked=true;
+      state.step='next_actions';
+    }
+  }
+  function nextActions(){
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    bot('<div class="ff-finish-menu"><b>다음 작업을 선택해주세요</b><p>현재까지 선택한 제품 견적이 준비되었습니다.</p><div class="ff-menu-btns"><button class="primary" onclick="showFinalQuote && showFinalQuote()">최종 견적서 보기</button><button onclick="printFinalQuote && printFinalQuote()">PDF 저장</button><button onclick="ff47AddProduct && ff47AddProduct()">제품 추가</button><button onclick="resetAll && resetAll()">처음으로</button></div></div>');
+    scrollLatest();
+  }
+  window.ff102ToggleOption=function(rowId, forceOn){
+    var row=document.getElementById(rowId); if(!row) return;
+    var on=(typeof forceOn==='boolean')?forceOn:!row.classList.contains('ff-user-selected');
+    row.classList.toggle('ff-user-selected',on);
+    row.classList.toggle('active',on);
+    row.classList.toggle('ff112-selected',on);
+    row.setAttribute('data-selected',on?'1':'0');
+  };
+  window.ff102StepQty=function(rowId,delta){ window.ff102ToggleOption(rowId, (delta||0)>=0); };
+  window.ff102SyncRow=function(rowId){ var row=document.getElementById(rowId); if(row) row.setAttribute('data-selected', row.classList.contains('ff-user-selected')?'1':'0'); };
+  window.ff102ShowOptions=function(){
+    if(window.state){ state.step='final_options'; state._ff102OptionsVisible=true; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+    var html='<div class="ff102-options-card ff-user-final-options"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션 카드를 클릭하고 색상만 지정해주세요.<br>선택하지 않은 옵션은 견적에 포함되지 않습니다.</p>';
+    OPTIONS.forEach(function(group,gi){
+      html+='<div class="ff-user-option-cat"><div class="ff-user-option-head"><b>'+(gi+1)+'. '+esc(group.cat)+'</b><small>'+esc(group.note||'')+'</small></div><div class="ff-user-option-list">';
+      group.items.forEach(function(item,ii){
+        var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
+        html+='<div id="'+rowId+'" class="ff-user-option-row" data-gi="'+gi+'" data-ii="'+ii+'" data-selected="0" onclick="ff102ToggleOption(\''+rowId+'\')">'
+          +'<img class="ff-user-option-img" src="'+esc(item.img)+'" alt="'+esc(item.name)+'" onerror="this.closest(\'.ff-user-option-row\').classList.add(\'ff-user-no-img\');this.remove();">'
+          +'<div class="ff-user-option-name" title="'+esc(item.name)+'">'+esc(item.name)+'</div>'
+          +'<div class="ff-user-color-label">색상</div>'
+          +'<select class="ff-user-color-select" id="'+id+'_color" onclick="event.stopPropagation();ff102ToggleOption(\''+rowId+'\', true)" onchange="ff102ToggleOption(\''+rowId+'\', true)">'+item.colors.map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('')+'</select>'
+          +'<input id="'+id+'_qty" type="hidden" value="1">'
+          +'</div>';
+      });
+      html+='</div></div>';
+    });
+    html+='<div class="ff-user-option-info">옵션은 카드 클릭 시 선택됩니다. 선택된 카드는 민트색 테두리로 표시됩니다.</div><div class="ff-user-option-actions"><button class="secondary" onclick="ff102SkipOptions()">건너뛰기</button><button class="primary" onclick="ff102ApplyOptions()">선택 완료</button></div></div>';
+    bot(html); scrollLatest();
+  };
+  window.ff102ApplyOptions=function(){
+    var chosen=[];
+    OPTIONS.forEach(function(group,gi){ group.items.forEach(function(item,ii){
+      var id='ff102_'+gi+'_'+ii, rowId='ff102row_'+gi+'_'+ii;
+      var row=document.getElementById(rowId);
+      var selected=!!(row && (row.getAttribute('data-selected')==='1' || row.classList.contains('ff-user-selected') || row.classList.contains('active')));
+      var color=(document.getElementById(id+'_color')||{}).value||'';
+      if(selected) chosen.push({category:group.cat,name:item.name,color:color,qty:1});
+    }); });
+    saveChosen(chosen);
+    user(chosen.length ? chosen.map(function(x){return esc(x.category)+' · '+esc(x.name)+' / '+esc(x.color);}).join('<br>') : '추가 옵션 없음');
+    nextActions();
+  };
+  window.ff102SkipOptions=function(){ saveChosen([]); user('추가 옵션 없음'); nextActions(); };
+  function fixNanoButton(){
+    var texture=document.getElementById('texture-preview');
+    var old=document.getElementById('quick-ai-preview-btn');
+    if(!old && texture){
+      old=document.createElement('button'); old.id='quick-ai-preview-btn'; old.type='button'; old.textContent='✨ 원본 사진에 재질 적용'; texture.appendChild(old);
+    }
+    if(old){
+      old.type='button';
+      old.textContent='✨ 원본 사진에 재질 적용';
+      old.onclick=function(e){ if(e) e.preventDefault(); if(typeof window.prepareNanoBananaPreview==='function') window.prepareNanoBananaPreview(); return false; };
+      if(texture && old.parentElement!==texture) texture.appendChild(old);
+    }
+    var note=document.getElementById('quick-ai-preview-note');
+    if(texture && note && note.parentElement!==texture) texture.appendChild(note);
+  }
+  setTimeout(fixNanoButton,0); setTimeout(fixNanoButton,800); setTimeout(fixNanoButton,2000);
+})();
+</script>
