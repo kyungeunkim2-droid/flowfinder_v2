@@ -2093,55 +2093,92 @@ body.ff-dashboard-preview #preview-panel,
 
 
 
-<style id="ff-right-panel-safe-layout-recovery">
-/* SAFE recovery: do not hide chat/option/size/material controls */
+<style id="ff-right-panel-minimal-overlap-fix">
+/* Minimal right panel cleanup based on RIGHT_PANEL_CLEAN_FAST_FINAL2.
+   Do NOT hide functional inputs/options/render controls. */
+
 #preview-panel{
   display:flex !important;
   flex-direction:column !important;
   gap:12px !important;
   overflow-y:auto !important;
+  overflow-x:hidden !important;
 }
 
-/* Hide only truly duplicated visual preview blocks when they are direct children of the right panel.
-   Keep #preview-items, #current-box, #total-box, material/option controls visible. */
-#preview-panel > #recommend-panel,
+/* prevent visual cards from stacking on top of each other */
+#preview-panel > *{
+  position:relative !important;
+  float:none !important;
+  clear:both !important;
+  flex-shrink:0 !important;
+}
+
+/* Only hide duplicated visual-only panels, not input/option panels */
+#preview-panel > #ff-dashboard-hero,
 #preview-panel > #screen-composite-preview{
   display:none !important;
 }
 
-/* Keep core right panel sections visible */
+/* Keep these visible because they are used by the flow */
 #preview-panel > h2,
 #preview-panel > #current-box,
 #preview-panel > #preview-items,
 #preview-panel > #texture-preview,
 #preview-panel > #product-preview-box,
-#preview-panel > #total-box{
+#preview-panel > #total-box,
+#preview-panel > .preview-add-btn,
+#preview-panel > .quote-group,
+#preview-panel > #wip-group{
   display:block !important;
 }
 
-/* Make visible cards cleaner without changing logic */
+/* Resize visual cards so they don't dominate or overlap */
 #product-preview-box,
 #texture-preview,
 #current-box,
 #total-box{
-  border-radius:20px !important;
-  margin-bottom:10px !important;
+  width:100% !important;
+  max-width:100% !important;
+  margin:0 0 12px 0 !important;
+  border-radius:18px !important;
+  box-sizing:border-box !important;
 }
 
+#product-preview-box img,
+#product-preview-img,
+#texture-preview canvas,
+#product-3d-canvas,
+#ff-render-canvas{
+  max-height:220px !important;
+  object-fit:contain !important;
+}
+
+/* Preview items remain scrollable but not collapsed */
 #preview-items{
-  min-height:80px;
+  min-height:72px !important;
+  max-height:260px !important;
+  overflow-y:auto !important;
 }
 
-/* readable text */
+/* Make text readable */
 #preview-panel,
 #preview-panel *{
-  text-shadow:none;
+  text-shadow:none !important;
 }
 
 #preview-panel input,
 #preview-panel select,
 #preview-panel textarea{
   color:#fff !important;
+}
+
+/* If a legacy dashboard button remains, don't let it cover content */
+#hero-render-btn,
+#ff-clean-render-btn{
+  position:static !important;
+  transform:none !important;
+  width:100% !important;
+  margin-top:10px !important;
 }
 </style>
 
@@ -15322,26 +15359,6 @@ window.showPanel = function(){
 
 
 
-
-
-<script id="ff-render-button-safe-bridge">
-(function(){
-  document.addEventListener('click', function(e){
-    var btn = e.target && e.target.closest && e.target.closest('#ff-clean-render-btn, #hero-render-btn');
-    if(!btn) return;
-
-    var oldBtn =
-      document.getElementById('quick-ai-preview-btn') ||
-      document.getElementById('ai-render-btn') ||
-      document.getElementById('product-preview-confirm') ||
-      document.getElementById('screen-ai-btn');
-
-    if(oldBtn && oldBtn !== btn){
-      try{ oldBtn.click(); }catch(err){}
-    }
-  }, true);
-})();
-</script>
 
 </body>
 
