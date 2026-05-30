@@ -202,12 +202,17 @@ app.post('/api/generate-preview', async (req, res) => {
       lastModel = model;
       console.log(`[NanoBanana] trying model: ${model}`);
 
-      const response = await ai.models.generateContent({
-        model,
-        contents: [{ role: 'user', parts }],
-        config: { responseModalities: ['TEXT', 'IMAGE'] },
-      });
+    console.log('[NanoBanana] parts count:', parts.length);
+console.time('[NanoBanana] generateContent');
 
+const response = await ai.models.generateContent({
+  model,
+  contents: [{ role: 'user', parts }],
+  config: { responseModalities: ['TEXT', 'IMAGE'] },
+});
+
+console.timeEnd('[NanoBanana] generateContent');
+console.log('[NanoBanana] response received');
       const inline = extractInlineImage(response);
       if (inline?.data) {
         return res.json({ imageUrl: `data:${inline.mimeType};base64,${inline.data}` });
