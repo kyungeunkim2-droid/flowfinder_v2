@@ -175,8 +175,8 @@ app.post('/api/generate-preview', async (req, res) => {
         effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
         effectiveFrontScreenCode ? `Front screen material code: ${effectiveFrontScreenCode}.` : '',
         effectiveSideScreenCode ? `Side screen material code: ${effectiveSideScreenCode}.` : '',
-        effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture ? 'If a screen panel exists in the base image, preserve it and recolor only the screen surface.' : '',
-        effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture ? 'Do not leave the screen panel black if a screen texture reference is provided.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'If a screen panel exists in the base image, preserve it and recolor only the screen surface.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not leave the screen panel black if a screen texture reference is provided.' : '',
 
 'Keep the cable duct / cable tray area under the desktop matte white.',
 
