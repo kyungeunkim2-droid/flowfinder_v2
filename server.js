@@ -237,9 +237,7 @@ app.post('/api/generate-preview', async (req, res) => {
               topShape ? `Selected tabletop shape to preserve exactly: ${topShape}.` : '',
               size && (size.w || size.d || size.h) ? `Approximate size reference only: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm. Do not change visible proportions from the base photo.` : '',
               'Return the same original product photo with only tabletop and leg/frame materials changed.'
-            ]
- ).filter(Boolean).join("\\n");
-    });
+          ].filter(Boolean).join("\\n");
 
     const imageInputs = [
       ['base furniture product image', baseFurnitureImage],
