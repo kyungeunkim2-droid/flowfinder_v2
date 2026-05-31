@@ -65,6 +65,45 @@ function dataUrlToImagePart(src) {
   };
 }
 
+
+function ffBaseFileNameFromImage(src) {
+  const raw = String(src || '').split('?')[0].split('#')[0].replace(/\\/g, '/');
+  const file = raw.split('/').pop() || '';
+  return file || '';
+}
+
+function ffUnique(values) {
+  const out = [];
+  for (const v of values || []) {
+    const s = String(v || '').trim();
+    if (s && !out.includes(s)) out.push(s);
+  }
+  return out;
+}
+
+function ffFrontsideGuideCandidates(guideImage, baseImage) {
+  const file = ffBaseFileNameFromImage(baseImage);
+  const normalizedFile = file
+    .replace(/front_side/gi, 'frontside')
+    .replace(/front-side/gi, 'frontside')
+    .replace(/front—side/gi, 'frontside');
+
+  const names = ffUnique([
+    normalizedFile,
+    normalizedFile.replace(/_/g, '-'),
+    normalizedFile.replace(/_/g, '—'),
+    normalizedFile.replace(/-/g, '_'),
+    normalizedFile.replace(/—/g, '_'),
+    'frontside_guide.png'
+  ]);
+
+  const fromFile = names.map((name) => `./images/guides/${name}`);
+  return ffUnique([
+    guideImage,
+    ...fromFile
+  ]);
+}
+
 async function loadImagePart(src, label, baseUrl) {
   const dataPart = dataUrlToImagePart(src);
   if (dataPart) return dataPart;
@@ -111,7 +150,7 @@ function extractText(response) {
 
 app.post('/api/generate-preview', async (req, res) => {
   console.log('[NanoBanana] /api/generate-preview called');
-  console.log('[SERVER_GUIDE_BACK_MAPPING_ONLY] active');
+  console.log('[SERVER_AUTO_GUIDE_BY_BASENAME] active');
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
@@ -174,6 +213,8 @@ console.log('[RENDER BODY]', {
     const effectiveScreenCode = isDeskRender ? '' : screenCode;
     const effectiveScreenImage = isDeskRender ? '' : screenImage;
     const effectiveGuideImage = isDeskRender ? '' : guideImage;
+    const effectiveGuideCandidates = isDeskRender ? [] : ffFrontsideGuideCandidates(effectiveGuideImage, effectiveScreenImage || deskImage);
+    console.log('[GUIDE CANDIDATES]', effectiveGuideCandidates);
     const effectiveFrontScreenTexture = isDeskRender ? '' : frontScreenTexture;
     const effectiveSideScreenTexture = isDeskRender ? '' : sideScreenTexture;
     const effectiveFrontScreenCode = isDeskRender ? '' : frontScreenCode;
@@ -183,23 +224,13 @@ console.log('[RENDER BODY]', {
 
     parts.push({
       text: [
-        'THIS IS A MATERIAL MAPPING / IMAGE EDITING TASK.',
-        'Do NOT generate a new furniture product.',
-        'Do NOT redesign the desk.',
-        'Do NOT redesign the screen.',
-        'Do NOT create a new scene or a new office environment.',
-        'Use the base furniture product image as the final product photograph to edit.',
-        'Keep the original image composition exactly the same.',
-        'Preserve product shape, dimensions, proportions, screen position, desk position, camera angle, crop, shadows, lighting, and background.',
-        'Only replace the visible material/color on the specified existing surfaces.',
-        'Texture images are material references only, not backgrounds and not replacement product images.',
-        'Never use texture images as the background.',
-        'Never fill the whole image with a texture.',
-        'Apply the provided top material texture naturally only to the existing desktop/tabletop surface.',
-        'Apply the provided leg material naturally only to the existing vertical desk legs.',
+        'Use the base furniture product image as the exact reference.',
+        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
+        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
+        'Apply the provided leg material naturally only to the vertical desk legs.',
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
-        effectiveScreenTexture ? 'Apply the provided screen material texture only to the existing screen panel surface. Do not change the screen shape, size, position, desk, legs, camera angle, crop, or background.' : '',
+        effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
         effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
         effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.' : '',
         effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
@@ -221,9 +252,8 @@ console.log('[RENDER BODY]', {
         topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
         size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
         'Create one photorealistic office furniture catalog render.',
-        effectiveGuideImage ? 'Use the guide image only as an area map. White painted area = FRONT screen panel. Red painted area = SIDE screen panel.' : '',
-        effectiveGuideImage ? 'Do not render the guide image itself. Do not show white/red guide colors, labels, arrows, annotations, or overlay marks in the final image.' : '',
-        effectiveGuideImage ? 'Use the guide only to decide where each screen material should be applied, then output the clean product image with materials mapped.' : '',
+        (effectiveGuideCandidates && effectiveGuideCandidates.length) ? 'Use the provided guide image only as an area map for the exact same base product image. White area = FRONT screen panel only. Red area = SIDE screen panel only. Apply frontScreenTexture only to the white area and sideScreenTexture only to the red area. Do not render guide colors, labels, arrows, annotations, or overlay marks in the final output.' : '',
+        (effectiveGuideCandidates && effectiveGuideCandidates.length) ? 'This is a material mapping edit. Keep the original product photo geometry, camera angle, crop, shadows, lighting, desk shape, and screen positions unchanged. Do not create a new desk, new screen, or new scene.' : '',
       ].filter(Boolean).join('\n'),
     });
 
@@ -234,7 +264,7 @@ console.log('[RENDER BODY]', {
       ['screen material texture reference', effectiveScreenTexture],
       ['front screen material texture reference', effectiveFrontScreenTexture],
       ['side screen material texture reference', effectiveSideScreenTexture],
-      ['front/side guide image', effectiveGuideImage],
+      ...((effectiveGuideCandidates || []).map((src, idx) => [`front/side guide image candidate ${idx + 1}`, src])),
     ];
 
     for (const [label, src] of imageInputs) {
