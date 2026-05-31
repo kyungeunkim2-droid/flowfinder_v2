@@ -5139,6 +5139,7 @@ function ffTextureUrlForChoice(code, part, catName) {
   return path.indexOf('textures/') === 0 ? path : (GITHUB_RAW + path);
 }
 function ffMaterialBtnHtml(code, inputId, part, catName) {
+  if(!code) return '';
   var url = ffTextureUrlForChoice(code, part, catName || '');
   if (url && typeof window.ffPreloadMaterialTexture === 'function') window.ffPreloadMaterialTexture(url);
   var bg = url ? "background-image:url('" + url + "')" : ('background:' + colorFallback((part === 'leg' ? 'LEG_' : '') + code));
@@ -13241,11 +13242,21 @@ ${map.move[move] || move}
     var data=mode==='set' ? window.SET_DATA : window.UNIT_DATA;
     return {mode:mode,key:key,items:(data&&data[key])||[]};
   }
-  function btnGroup(arr,inputId,part,catName){
-    arr=(arr||[]).filter(Boolean);
-    var h='<div class="material-button-group">';
-    arr.forEach(function(c){ if(typeof window.ffMaterialBtnHtml==='function') h+=window.ffMaterialBtnHtml(c,inputId,part,catName); });
-    return h+'</div>';
+ function btnGroup(arr,inputId,part,catName){
+arr=(arr||[]).filter(function(c){
+  return c !== undefined &&
+         c !== null &&
+         String(c).trim() !== '';
+});
+
+  var h='<div class="material-button-group">';
+  arr.forEach(function(c){
+    if(typeof window.ffMaterialBtnHtml==='function') {
+      h+=window.ffMaterialBtnHtml(c,inputId,part,catName);
+    }
+  });
+  return h+'</div>';
+}
   }
   function colorSection(title, arr, inputId, part, catName, note){
     if(!arr || !arr.length) return '';
@@ -13480,6 +13491,7 @@ ${map.move[move] || move}
     var p = 'images/options/combo/' + folder + '/' + legKey() + '_' + moveKey() + '.png';
     return asRel(p);
   }
+
   function optionImagePath(kind, value){
     kind = norm(kind); value = norm(value);
     if(kind === 'leg'){
@@ -16243,16 +16255,16 @@ window.showPanel = function(){
   function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },80); }
   var OPTIONS=[
     {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'./images/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'./images/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'./images/accessories/multitap_embedded_2outlet.png'}
     ]},
     {cat:'PC홀더', note:'', items:[
-      {name:'PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'}
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'./images/accessories/pc_hanging.png'},  {name:'스트랩 PC홀더', colors:['BK'], img:'./images/accessories/pc_strap.png'}, {name:'보급형 행잉 PC홀더', colors:['BK'], img:'./images/accessories/pc_basic_hanging.png'}
     ]},
     {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'모니터암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'},
-      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'}
+      {name:'모니터암', colors:['BK'], img:'./images/accessories/monitor_arm_topmount.png'},
+      {name:'가방걸이', colors:['XX(투명)'], img:'./images/accessories/bag_hook.png'}
     ]}
   ];
   window.ff112AccessoryOptions=OPTIONS;
@@ -20577,18 +20589,18 @@ var OPTION_IMG = {
   function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m) m.scrollTop=m.scrollHeight; var last=m&&m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); },60); }
   var OPTIONS=[
     {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'.images/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'.images/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'.images/accessories/multitap_recessed_2outlet.png'}
     ]},
     {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'accessories/pc_holder_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'accessories/pc_holder_basic_hanging.png'}
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'.images/accessories/pc_holder_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'.images/accessories/pc_holder_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'.images/accessories/pc_holder_basic_hanging.png'}
     ]},
     {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'},
-      {name:'탑마운트 모니터 암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'}
+      {name:'가방걸이', colors:['XX(투명)'], img:'.images/accessories/bag_hook.png'},
+      {name:'탑마운트 모니터 암', colors:['BK'], img:'.images/accessories/topmount_monitor_arm_topmount.png'}
     ]}
   ];
   window.ff107AccessoryOptions=OPTIONS;
@@ -23287,16 +23299,17 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function scrollLatest(){ setTimeout(function(){ var m=document.getElementById('messages'); if(m){ m.scrollTop=m.scrollHeight; var last=m.lastElementChild; if(last&&last.scrollIntoView) last.scrollIntoView({block:'nearest',behavior:'smooth'}); } },80); }
   var OPTIONS=[
     {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_external_3.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_sliding_3.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'accessories/powerstrip_recessed_2.png'}
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'.images/accessories/multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'.images/accessories/multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'.images/accessories/multitap_recessed_2outlet.png'}
     ]},
     {cat:'PC홀더', note:'', items:[
-      {name:'PC홀더', colors:['WH','BK'], img:'accessories/pc_holder_hanging.png'}
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'./images/accessories/pc_hanging.png'},  {name:'스트랩 PC홀더', colors:['BK'], img:'./images/accessories/pc_strap.png'}, {name:'보급형 행잉 PC홀더', colors:['BK'], img:'./images/accessories/pc_basic_hanging.png'}
+
     ]},
     {cat:'기타', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'모니터암', colors:['BK'], img:'accessories/topmount_monitor_arm.png'},
-      {name:'가방걸이', colors:['XX(투명)'], img:'accessories/bag_hook.png'}
+      {name:'모니터암', colors:['BK'], img:'.images/accessories/monitor_arm_topmount.png'},
+      {name:'가방걸이', colors:['XX(투명)'], img:'.images/accessories/bag_hook.png'}
     ]}
   ];
   window.ff102AccessoryOptions=OPTIONS;
@@ -23578,17 +23591,17 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   }
   var OPTIONS = [
     {cat:'멀티탭', note:'상판 주문품 요율 적용 가능', items:[
-      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'external_3outlet_powerstrip.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'sliding_3outlet_powerstrip.png'},
-      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'built_in_2outlet_powerstrip.png'}
+      {name:'외장 3구 멀티탭', colors:['WW','BK'], img:'multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭', colors:['WW','BK'], img:'multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭', colors:['WW','BK'], img:'multitap_embedded_2outlet.png'}
     ]},
     {cat:'PC홀더', note:'', items:[
-      {name:'행잉 PC홀더', colors:['WH','BK'], img:'pc_holder_hanging.png'},
-      {name:'스트랩 PC홀더', colors:['BK'], img:'pc_holder_strap.png'},
-      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'pc_holder_basic_hanging.png'}
+      {name:'행잉 PC홀더', colors:['WH','BK'], img:'pc_hanging.png'},
+      {name:'스트랩 PC홀더', colors:['BK'], img:'pc_strap.png'},
+      {name:'보급형 행잉 PC홀더', colors:['BK'], img:'pc_basic_hanging.png'}
     ]},
     {cat:'기타', note:'', items:[
-      {name:'모니터암', colors:['BK'], img:'topmount_monitor_arm.png'},
+      {name:'모니터암', colors:['BK'], img:'monitor_arm_topmount.png'},
       {name:'가방걸이', colors:['XX(투명)'], img:'bag_hook.png'}
     ]}
   ];
