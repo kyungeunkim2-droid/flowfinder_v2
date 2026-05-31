@@ -244,7 +244,7 @@ console.log('[RENDER BODY]', {
 
 'Keep the cable duct / cable tray area exactly as in the source image.',
 
-'Do not recolor the duct/tray section.'
+'Do not recolor the duct/tray section.',
         'Do not redraw the product.',
         'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
         topCode ? `Top material code: ${topCode}.` : '',
