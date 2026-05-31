@@ -2749,7 +2749,6 @@ body.ff-dashboard-preview #preview-panel,
       <div class="material-chip-row" id="quick-top-row"><span>상판</span><i id="quick-top-code">-</i><em id="quick-top-chip"></em></div>
       <div class="material-chip-row" id="quick-leg-row"><span>다리</span><i id="quick-leg-code">-</i><em id="quick-leg-chip"></em></div>
       <div class="material-chip-row" id="quick-screen-row"><span>스크린</span><i id="quick-screen-code">-</i><em id="quick-screen-chip"></em></div>
-      <div class="material-chip-row" id="quick-side-screen-row"><span>사이드</span><i id="quick-side-screen-code">-</i><em id="quick-side-screen-chip"></em></div>
     </div>
     <button id="quick-ai-preview-btn" type="button" onclick="prepareNanoBananaPreview()">✨ 원본 사진에 재질 적용</button>
     <div id="quick-ai-preview-note" style="display:none;"></div>
@@ -6664,7 +6663,7 @@ function setPreviewGlow(part) {
     if (src && img.src.indexOf(src) === -1) img.src = src;
     if (!src) img.removeAttribute('src');
   }
-  function setChip(rowId, codeId, chipId, code, tex, cls){
+  function (rowId, codeId, chipId, code, tex, cls){
     var row=$(rowId), codeEl=$(codeId), chip=$(chipId);
     if (codeEl) codeEl.textContent = code || '-';
     if (chip) {
@@ -6731,28 +6730,27 @@ function setPreviewGlow(part) {
       PREVIEW.legTex = textureFor(upper, cat);
     } else if ((USER_CATEGORIES[cat] || {}).isScreen || cat.indexOf('스크린') !== -1) {
       part = 'screen';
-      var key = productKeyFromCatName(cat) || PREVIEW.screenKey;
-      var tex = textureFor(code, cat);
-      var isFrontside = PREVIEW.screenKey === 'frontside' || key === 'frontside' || window.__ffForceFrontside === true;
+  PREVIEW.screenKey = key || PREVIEW.screenKey;
 
-      // 전면+사이드 복수선택은 마지막 선택값으로 덮어쓰지 않고 각각 저장
-      if(isFrontside){
-        if(/사이드/.test(cat)){
-          PREVIEW.sideScreen = code;
-          PREVIEW.sideScreenTex = tex;
-        }else if(/전면/.test(cat)){
-          PREVIEW.frontScreen = code;
-          PREVIEW.frontScreenTex = tex;
-        }else{
-          PREVIEW.screen = code;
-          PREVIEW.screenTex = tex;
-        }
-        PREVIEW.screenKey = 'frontside';
-      }else{
-        PREVIEW.screen = code;
-        PREVIEW.screenTex = tex;
-        PREVIEW.screenKey = key;
-      }
+var tex = normalizeTex(texUrl) || textureFor(colorCode, type);
+var isFrontside = PREVIEW.screenKey === 'frontside' || key === 'frontside';
+
+if(isFrontside){
+  if(/사이드/.test(type)){
+    PREVIEW.sideScreen = colorCode || PREVIEW.sideScreen;
+    PREVIEW.sideScreenTex = tex;
+  } else if(/전면/.test(type)){
+    PREVIEW.frontScreen = colorCode || PREVIEW.frontScreen;
+    PREVIEW.frontScreenTex = tex;
+  } else {
+    PREVIEW.screen = colorCode || PREVIEW.screen;
+    PREVIEW.screenTex = tex;
+  }
+  PREVIEW.screenKey = 'frontside';
+} else {
+  PREVIEW.screen = colorCode || PREVIEW.screen;
+  PREVIEW.screenTex = tex;
+}
     } else {
       part = 'top';
       PREVIEW.top = code;
@@ -6765,27 +6763,9 @@ function setPreviewGlow(part) {
   };
   window.updateScreenComposite = function(type, colorCode, texUrl){
     var key = productKeyFromCatName(type);
-    var tex = normalizeTex(texUrl) || textureFor(colorCode, type);
-    var isFrontside = PREVIEW.screenKey === 'frontside' || key === 'frontside' || window.__ffForceFrontside === true;
-
-    if(isFrontside){
-      if(/사이드/.test(type)){
-        PREVIEW.sideScreen = colorCode || PREVIEW.sideScreen;
-        PREVIEW.sideScreenTex = tex;
-      }else if(/전면/.test(type)){
-        PREVIEW.frontScreen = colorCode || PREVIEW.frontScreen;
-        PREVIEW.frontScreenTex = tex;
-      }else{
-        PREVIEW.screen = colorCode || PREVIEW.screen;
-        PREVIEW.screenTex = tex;
-      }
-      PREVIEW.screenKey = 'frontside';
-    }else{
-      PREVIEW.screenKey = key || PREVIEW.screenKey;
-      PREVIEW.screen = colorCode || PREVIEW.screen;
-      PREVIEW.screenTex = tex;
-    }
-
+    PREVIEW.screenKey = key || PREVIEW.screenKey;
+    PREVIEW.screen = colorCode || PREVIEW.screen;
+    PREVIEW.screenTex = normalizeTex(texUrl) || textureFor(colorCode, type);
     window.__ffPreviewScreen = colorCode;
     window.__ffActiveGlowPart = 'screen';
     var oldBox = $('screen-composite-preview'); if (oldBox) oldBox.style.display='none';
@@ -6829,7 +6809,6 @@ var payload = {
   sideScreenTexture: isFrontside ? (PREVIEW.sideScreenTex || '') : '',
 
   screenGuide: isFrontside ? './images/guides/frontside_guide.png' : '',
-  guideImage: isFrontside ? './images/guides/frontside_guide.png' : '',
 screenImage: isFrontside ? getBase('frontside') : (getBase(PREVIEW.screenKey) || ''),
 screenLabel: isFrontside ? 'frontside' : (PREVIEW.screenKey || ''),
 screenType: isFrontside ? 'frontside' : (PREVIEW.screenKey || ''),
@@ -15852,7 +15831,7 @@ window.showPanel = function(){
     return url;
   }
 
-  function applyChipTexture(id, code, part){
+  function (id, code, part){
     const el = document.getElementById(id);
     if(!el || !code || code === '-') return;
 
@@ -16854,6 +16833,25 @@ if(isFrontside && (!frontTex || !sideTex)){
   };
 }
 
+    // frontside는 전면/사이드 각각 선택값이 있으면 그것을 우선 사용한다.
+    // 없으면 단일 screenTex로 대체하지 않고 렌더를 막는다.
+      frontScreenTexture: frontTex,
+      sideScreenTexture: sideTex
+  var isFrontside =
+  /전면\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || '')) &&
+  /사이드\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || ''));
+
+if(!isFrontside && typeof screenSuffix === 'function'){
+  try{
+    isFrontside = screenSuffix() === 'frontside';
+  }catch(e){}
+}
+
+if(isFrontside && (!frontTex || !sideTex)){
+  throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택해야 합니다.');
+}
+    };
+  }
 
   function ensureRenderPanel(kind){
     var panel = $('ff-cpf-render-panel');
@@ -17049,15 +17047,9 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
       btn.textContent = '선택 완료';
       return;
     }
-    if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t) && !btn.classList.contains('ff-lshape-confirm')){
-      // 제품 카드 클릭 시에는 방향 선택창을 바로 띄우지 않는다.
-      // 제품선택의 선택완료 버튼을 눌렀을 때만 방향 선택창을 띄운다.
-      window.__ffNeedAskLshapeAfterSetConfirm = true;
-      return;
-    }
-    if((btn.id === 'set-confirm-btn' || btn.id === 'ff71-confirm-btn') && window.__ffNeedAskLshapeAfterSetConfirm){
+    if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t)){
       window.__ffAskedLshapeDirection = false;
-      setTimeout(askLshapeDirection, 120);
+      setTimeout(askLshapeDirection, 80);
     }
   }, true);
 
@@ -17328,358 +17320,6 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
 }
 </style>
 
-
-
-<!-- === FF FINAL SAFE LAYOUT + FRONTSIDE + LSHAPE PATCH === -->
-<style id="ff-final-safe-layout-frontside-lshape">
-#flow-bar .flow-step{
-  font-size:9px !important;
-  padding:0 10px 0 16px !important;
-  min-width:0 !important;
-  letter-spacing:-.7px !important;
-  white-space:nowrap !important;
-}
-#preview-panel{
-  display:flex !important;
-  flex-direction:column !important;
-  gap:14px !important;
-  overflow-y:auto !important;
-  overflow-x:hidden !important;
-}
-#set-product-selector{
-  order:10 !important;
-  display:grid !important;
-  width:100% !important;
-  margin:0 0 14px 0 !important;
-  position:relative !important;
-  clear:both !important;
-}
-#ff-static-option-preview,
-#ff90-option-summary,
-#ff71-selection-gallery,
-#desk-option-preview,
-#desk-option-images{
-  order:20 !important;
-  display:block !important;
-  width:100% !important;
-  position:relative !important;
-  clear:both !important;
-  margin:0 0 14px 0 !important;
-  z-index:2 !important;
-}
-#ff-clean-right-dashboard{
-  order:30 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:14px !important;
-  width:100% !important;
-  position:relative !important;
-  clear:both !important;
-}
-#ff-clean-right-dashboard > .ff-clean-info-grid{
-  order:10 !important;
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:14px !important;
-}
-#ff-clean-right-dashboard > .ff-clean-preview-card{ order:20 !important; }
-#ff-clean-right-dashboard > .ff-clean-total-card{ order:999 !important; }
-#quick-ai-preview-btn,
-#ff-clean-render-btn{ order:25 !important; }
-#total-box{ order:999 !important; }
-#texture-preview .quick-materials{
-  display:grid !important;
-  grid-template-columns:1fr 1fr !important;
-  gap:10px !important;
-}
-#quick-screen-row{ grid-column:1 / 2 !important; }
-#quick-side-screen-row{ display:grid !important; grid-column:2 / 3 !important; }
-@media(max-width:760px){
-  #ff-clean-right-dashboard > .ff-clean-info-grid,
-  #texture-preview .quick-materials{ grid-template-columns:1fr !important; }
-  #quick-screen-row,#quick-side-screen-row{ grid-column:1 !important; }
-}
-</style>
-<script id="ff-final-safe-layout-frontside-lshape-js">
-(function(){
-  if(window.__ffFinalSafeLayoutFrontsideLshape) return;
-  window.__ffFinalSafeLayoutFrontsideLshape = true;
-
-  function $(id){ return document.getElementById(id); }
-  function txt(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
-  function hasFrontSideSelected(){
-    var t = Array.prototype.map.call(document.querySelectorAll('.selected,.multi-selected,[aria-pressed="true"]'), txt).join(' ');
-    t += ' ' + txt(document.body);
-    return /전면\s*스크린/.test(t) && /사이드\s*스크린/.test(t);
-  }
-  function ensureSideRow(){
-    var row = $('quick-screen-row');
-    if(row && !$('quick-side-screen-row')){
-      var n = row.cloneNode(true);
-      n.id='quick-side-screen-row';
-      var sp=n.querySelector('span'); if(sp) sp.textContent='사이드';
-      var i=n.querySelector('i'); if(i){ i.id='quick-side-screen-code'; i.textContent='-'; }
-      var em=n.querySelector('em'); if(em){ em.id='quick-side-screen-chip'; em.style.backgroundImage=''; }
-      row.parentNode.insertBefore(n,row.nextSibling);
-    }
-  }
-  function removeEarlyLshapePrompt(){
-    if(window.__ffAllowLshapePrompt) return;
-    Array.prototype.slice.call(document.querySelectorAll('.msg.bot .bubble')).forEach(function(b){
-      if(/L형 방향을 선택해주세요/.test(txt(b))){
-        var msg=b.closest('.msg'); if(msg) msg.remove();
-      }
-    });
-  }
-  function showLshapePrompt(){
-    if(window.__ffAskedLshapeDirectionFinal) return;
-    window.__ffAskedLshapeDirectionFinal = true;
-    window.__ffAllowLshapePrompt = true;
-    var messages=$('messages'); if(!messages) return;
-    var row=document.createElement('div');
-    row.className='msg bot';
-    row.innerHTML='<div class="bot-icon">AI</div><div class="bubble">L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div><div style="margin-top:12px"><button class="choice-btn ff-lshape-confirm" disabled>선택 완료</button></div><span class="hint">좌측/우측을 선택한 뒤 <b>선택 완료</b>를 눌러주세요.</span></div>';
-    messages.appendChild(row);
-    messages.scrollTop=messages.scrollHeight;
-  }
-  function lshapeSelected(){
-    var t=Array.prototype.map.call(document.querySelectorAll('.selected,.multi-selected,[aria-pressed="true"]'),txt).join(' ');
-    return /L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t);
-  }
-
-  document.addEventListener('click',function(e){
-    var btn=e.target && e.target.closest && e.target.closest('button,.choice-btn,[data-set-name]');
-    if(!btn) return;
-    var t=txt(btn);
-
-    if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t) && !btn.classList.contains('ff-lshape-confirm')){
-      window.__ffNeedAskLshapeAfterSetConfirm = true;
-      window.__ffAllowLshapePrompt = false;
-      setTimeout(removeEarlyLshapePrompt,120);
-    }
-    if((btn.id==='set-confirm-btn' || btn.id==='ff71-confirm-btn' || /선택\s*완료/.test(t)) && !btn.classList.contains('ff-lshape-confirm')){
-      if(window.__ffNeedAskLshapeAfterSetConfirm || lshapeSelected()){
-        setTimeout(showLshapePrompt,180);
-      }
-    }
-
-    if(btn.classList.contains('ff-lshape-dir')){
-      var dir=btn.getAttribute('data-dir')==='right'?'right':'left';
-      window.__ffPendingLshapeDirection=dir;
-      var bubble=btn.closest('.bubble') || document;
-      Array.prototype.slice.call(bubble.querySelectorAll('.ff-lshape-dir')).forEach(function(x){x.classList.remove('selected');});
-      btn.classList.add('selected');
-      var confirm=bubble.querySelector('.ff-lshape-confirm');
-      if(confirm) confirm.disabled=false;
-    }
-    if(btn.classList.contains('ff-lshape-confirm')){
-      window.__ffLshapeDirection = window.__ffPendingLshapeDirection || window.__ffLshapeDirection || 'left';
-      btn.classList.add('selected');
-      btn.textContent='선택 완료';
-      btn.disabled=true;
-    }
-  },true);
-
-  // 기존 조기 L형 방향 질문 제거
-  document.addEventListener('DOMContentLoaded',function(){
-    ensureSideRow();
-    setTimeout(removeEarlyLshapePrompt,100);
-    var mo=new MutationObserver(function(){ ensureSideRow(); removeEarlyLshapePrompt(); });
-    mo.observe(document.documentElement,{childList:true,subtree:true});
-  });
-  setTimeout(ensureSideRow,0);
-
-  // fetch payload 보정: frontside일 때 guide와 전면/사이드 재질을 분리해서 서버로 보낸다.
-  var oldFetch=window.fetch;
-  window.fetch=function(input,init){
-    try{
-      var url=String(typeof input==='string'?input:(input&&input.url)||'');
-      if(url.indexOf('/api/generate-preview')>=0 && init && init.body){
-        var p=JSON.parse(init.body);
-        var frontside = p.screenLabel==='frontside' || p.screenType==='frontside' || p.screenKey==='frontside' || hasFrontSideSelected();
-        if(frontside){
-          p.targetType='screen';
-          p.productType='screen';
-          p.screenLabel='frontside';
-          p.screenType='frontside';
-          p.screenKey='frontside';
-          p.screenTexture='';
-          p.screenCode='';
-          p.screenGuide='./images/guides/frontside_guide.png';
-          p.guideImage='./images/guides/frontside_guide.png';
-          p.screenImage=p.screenImage || p.baseImage || p.sourceImage || p.deskImage;
-          p.baseImage=p.baseImage || p.screenImage;
-          p.sourceImage=p.sourceImage || p.screenImage;
-          p.instruction=(p.instruction||'')+' Use screenGuide/guideImage to separate the frontside screen areas. White guide area is FRONT screen. Red guide area is SIDE screen. Apply frontScreenTexture only to the front/white area and sideScreenTexture only to the side/red area. Never apply one texture to both screens. Do not redraw.';
-        }
-        init=Object.assign({},init,{body:JSON.stringify(p)});
-      }
-    }catch(e){}
-    return oldFetch.apply(this,arguments.length? [input,init] : arguments);
-  };
-
-  console.log('✅ FF FINAL SAFE LAYOUT + FRONTSIDE + LSHAPE PATCH LOADED');
-})();
-</script>
-
-
-<!-- === FF_FINAL_LSHAPE_CONFIRM_FLOW_PATCH === -->
-<script id="ff-final-lshape-confirm-flow-patch">
-(function(){
-  if(window.__ffFinalLshapeConfirmFlowPatch) return;
-  window.__ffFinalLshapeConfirmFlowPatch = true;
-
-  function txt(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
-  function hasLshapeText(v){ return /L\s*형|L형|lshape/i.test(String(v||'')); }
-  function selectedText(){
-    var arr=[];
-    try{ if(window.state){ Object.keys(window.state).forEach(function(k){ var v=window.state[k]; if(typeof v==='string') arr.push(v); }); } }catch(e){}
-    try{ if(Array.isArray(window._setSelected)) arr=arr.concat(window._setSelected); }catch(e){}
-    try{ Array.prototype.slice.call(document.querySelectorAll('.selected,.multi-selected,.selected-set-card,[aria-pressed="true"]')).forEach(function(el){ arr.push(txt(el)); }); }catch(e){}
-    return arr.join(' ');
-  }
-  function lshapeSelected(){ return hasLshapeText(selectedText()); }
-  function removeExistingLshapePrompt(){
-    Array.prototype.slice.call(document.querySelectorAll('.msg.bot .bubble')).forEach(function(b){
-      if(/L형\s*방향을\s*선택해주세요/.test(txt(b))){
-        var m=b.closest('.msg'); if(m) m.remove();
-      }
-    });
-  }
-  function addBot(html){
-    if(typeof window.addMsg==='function'){
-      try{ window.addMsg('bot', html); return; }catch(e){}
-    }
-    var messages=document.getElementById('messages'); if(!messages) return;
-    var row=document.createElement('div'); row.className='msg bot';
-    row.innerHTML='<div class="bot-icon">AI</div><div class="bubble">'+html+'</div>';
-    messages.appendChild(row); messages.scrollTop=messages.scrollHeight;
-  }
-  function showLshapePrompt(){
-    removeExistingLshapePrompt();
-    window.__ffAllowLshapePrompt = true;
-    window.__ffAskedLshapeDirection = true;
-    addBot('L형 방향을 선택해주세요.<div class="btn-group ff-lshape-direction-box"><button type="button" class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button type="button" class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div><div style="margin-top:12px"><button type="button" class="choice-btn ff-lshape-confirm" disabled>선택 완료</button></div><span class="hint">좌측/우측을 선택한 뒤 <b>선택 완료</b>를 눌러주세요.</span>');
-  }
-  function currentLshapeCat(){
-    var s=window.state || {};
-    var cands=[s._currentCatName, s.currentCatName, s.screenLabel, s.screenType, s.screenKey, s.current && s.current.product, s.current && s.current.name];
-    for(var i=0;i<cands.length;i++){ if(hasLshapeText(cands[i])) return 'L형 스크린'; }
-    return 'L형 스크린';
-  }
-  function goAfterLshapeDirection(){
-    var cat=currentLshapeCat();
-    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
-    try{ if(typeof window.updateFlowBar==='function') window.updateFlowBar(); }catch(e){}
-    if(typeof window.askSizeInput==='function'){
-      window.askSizeInput(cat);
-      return;
-    }
-    if(typeof askSizeInput==='function'){
-      askSizeInput(cat);
-      return;
-    }
-  }
-  function applyDirection(dir){
-    dir = dir === 'right' ? 'right' : 'left';
-    window.__ffLshapeDirection = dir;
-    window.__ffPendingLshapeDirection = dir;
-    window.state = window.state || {};
-    window.state.screenKey = dir === 'right' ? 'lshape_R' : 'lshape';
-    window.state.selectedScreenKey = window.state.screenKey;
-    window.state.currentScreenKey = window.state.screenKey;
-    window.state.screenType = window.state.screenKey;
-    window.state.screenLabel = dir === 'right' ? 'L형 스크린(우측)' : 'L형 스크린';
-    window.state._currentCatName = 'L형 스크린';
-    window.state.currentCatName = 'L형 스크린';
-    if(typeof window.ffApplyLshapeDirectionToPreviewKey === 'function'){
-      try{ window.ffApplyLshapeDirectionToPreviewKey(dir); }catch(e){}
-    }
-  }
-  function isProductConfirm(btn){
-    if(!btn) return false;
-    if(btn.classList && (btn.classList.contains('ff-lshape-confirm') || btn.classList.contains('ff-lshape-dir'))) return false;
-    var id=btn.id || '';
-    var t=txt(btn);
-    if(/set-confirm-btn|ff71-confirm-btn|product-preview-confirm/.test(id)) return true;
-    if(btn.classList && btn.classList.contains('product-confirm-btn')) return true;
-    if(/옵션\s*선택\s*완료|선택\s*완료|선택완료/.test(t)){
-      var bubble=btn.closest && btn.closest('.bubble');
-      var inLshapePrompt=bubble && /L형\s*방향을\s*선택해주세요/.test(txt(bubble));
-      if(!inLshapePrompt) return true;
-    }
-    return false;
-  }
-  function relabelProductConfirm(){
-    if(!lshapeSelected()) return;
-    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,.confirm-btn')).forEach(function(btn){
-      if(btn.classList && (btn.classList.contains('ff-lshape-confirm') || btn.classList.contains('ff-lshape-dir'))) return;
-      if(/옵션\s*선택\s*완료/.test(txt(btn))){ btn.textContent='선택완료'; }
-    });
-  }
-  function hideRightLshapeProductButton(){
-    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,[data-set-name]')).forEach(function(el){
-      if(/L형\s*스크린\s*R|L형\s*스크린\s*\(우측\)|L형스크린\s*R|L형스크린\s*\(우측\)/i.test(txt(el))){
-        el.style.display='none';
-        el.setAttribute('aria-hidden','true');
-      }
-    });
-  }
-
-  document.addEventListener('click', function(e){
-    var btn=e.target && e.target.closest && e.target.closest('button,.choice-btn,.confirm-btn,[data-set-name]');
-    if(!btn) return;
-    var t=txt(btn);
-
-    if(/L형\s*스크린/.test(t) && !/우측|오른쪽|\(우측\)|R\b/i.test(t)){
-      window.__ffNeedAskLshapeAfterSetConfirm = true;
-      window.__ffAllowLshapePrompt = false;
-      removeExistingLshapePrompt();
-      setTimeout(relabelProductConfirm, 30);
-    }
-
-    if(btn.classList && btn.classList.contains('ff-lshape-dir')){
-      if(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
-      var dir=btn.getAttribute('data-dir')==='right' ? 'right' : 'left';
-      window.__ffPendingLshapeDirection=dir;
-      var box=btn.closest('.bubble') || document;
-      Array.prototype.slice.call(box.querySelectorAll('.ff-lshape-dir')).forEach(function(x){ x.classList.remove('selected'); });
-      btn.classList.add('selected');
-      var confirm=box.querySelector('.ff-lshape-confirm');
-      if(confirm) confirm.disabled=false;
-      return false;
-    }
-
-    if(btn.classList && btn.classList.contains('ff-lshape-confirm')){
-      if(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
-      applyDirection(window.__ffPendingLshapeDirection || window.__ffLshapeDirection || 'left');
-      btn.classList.add('selected');
-      btn.disabled=true;
-      btn.textContent='선택 완료';
-      window.__ffNeedAskLshapeAfterSetConfirm=false;
-      setTimeout(function(){ goAfterLshapeDirection(); }, 80);
-      return false;
-    }
-
-    if(isProductConfirm(btn) && lshapeSelected()){
-      if(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
-      window.__ffNeedAskLshapeAfterSetConfirm=false;
-      setTimeout(showLshapePrompt, 80);
-      return false;
-    }
-  }, true);
-
-  document.addEventListener('click', function(){ setTimeout(function(){ relabelProductConfirm(); hideRightLshapeProductButton(); }, 60); }, true);
-  document.addEventListener('DOMContentLoaded', function(){
-    hideRightLshapeProductButton();
-    relabelProductConfirm();
-    var mo=new MutationObserver(function(){ hideRightLshapeProductButton(); relabelProductConfirm(); });
-    mo.observe(document.documentElement, {childList:true, subtree:true, characterData:true});
-  });
-
-  console.log('✅ FF FINAL LSHAPE CONFIRM FLOW PATCH LOADED');
-})();
-</script>
 </body>
 
 
