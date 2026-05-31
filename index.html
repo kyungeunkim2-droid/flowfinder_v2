@@ -12840,15 +12840,19 @@ ${map.move[move] || move}
     var uid=Date.now(), topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
     function btnGroup(arr,inputId,part){var h='<div class="material-button-group">';(arr||[]).forEach(function(c){h+=window.ffMaterialBtnHtml?ffMaterialBtnHtml(c,inputId,part,catName):'<button type="button" class="material-btn" onclick="document.getElementById(\''+inputId+'\').value=\''+c+'\'">'+c+'</button>';});return h+'</div>';}
     var topHtml='';
-    if(isCustom){
-      topHtml+='<div class="ff127-tabs"><button type="button" class="ff127-tab active" onclick="ff127TopTab(\''+uid+'\',\'veneer\')">무늬목</button><button type="button" class="ff127-tab" onclick="ff127TopTab(\''+uid+'\',\'laminate\')">라미네이트</button></div>';
-      topHtml+='<div id="ff127-top-veneer-'+uid+'" class="ff127-top-group active">'+btnGroup(window.CUSTOM_VENEER_COLORS_DESK||[],topId,'top')+'</div>';
-      topHtml+='<div id="ff127-top-laminate-'+uid+'" class="ff127-top-group">'+btnGroup(window.CUSTOM_LAMINATE_COLORS_DESK||[],topId,'top')+'</div>';
-    } else { topHtml=btnGroup(topColors,topId,'top'); }
+if(isCustom){
+
+  topHtml+='<div class="material-button-section-title">주문품색상 무늬목</div>';
+  topHtml+=btnGroup(window.CUSTOM_VENEER_COLORS_DESK||[],topId,'top');
+
+  topHtml+='<div class="material-button-section-title">주문품색상 라미네이트</div>';
+  topHtml+=btnGroup(window.CUSTOM_LAMINATE_COLORS_DESK||[],topId,'top');
+
+}else { topHtml=btnGroup(topColors,topId,'top'); }
     var html='📌 <b>색상 조합</b>을 선택해주세요'
       +'<input class="material-hidden-input" id="'+topId+'" data-peer="'+legId+'" value="">'
       +'<input class="material-hidden-input" id="'+legId+'" data-peer="'+topId+'" value="">'
-      +'<div class="color-pair-grid"><div><label>상판 색상'+(isCustom?' <span style="color:#a78bfa;font-size:11px;">무늬목 또는 라미네이트 중 1개</span>':'')+'</label>'+topHtml+'</div>'
+      +'<div class="color-pair-grid"><div><label>표준품 색상'+(isCustom?' <span style="color:#a78bfa;font-size:11px;">무늬목 또는 라미네이트 중 1개</span>':'')+'</label>'+topHtml+'</div>'
       +'<div><label>다리 색상</label>'+btnGroup(legColors,legId,'leg')+'</div></div>'
       +'<div id="desk-color-combo-'+uid+'" class="color-combo-preview">상판은 무늬목/라미네이트 중 한 그룹만 선택됩니다.</div>'
       +'<button class="confirm-btn" style="margin-top:10px;" onclick="confirmDeskColorPairDrop(\''+catName+'\',\''+dataType+'\',\''+productKey+'\',\''+topId+'\',\''+legId+'\')">색상 조합 확인 ✓</button>';
@@ -13242,22 +13246,20 @@ ${map.move[move] || move}
     var data=mode==='set' ? window.SET_DATA : window.UNIT_DATA;
     return {mode:mode,key:key,items:(data&&data[key])||[]};
   }
- function btnGroup(arr,inputId,part,catName){
-arr=(arr||[]).filter(function(c){
-  return c !== undefined &&
-         c !== null &&
-         String(c).trim() !== '';
-});
+function btnGroup(arr,inputId,part,catName){
+  arr=(arr||[]).filter(function(c){
+    return c !== undefined && c !== null && String(c).trim() !== '';
+  });
 
   var h='<div class="material-button-group">';
   arr.forEach(function(c){
-    if(typeof window.ffMaterialBtnHtml==='function') {
-      h+=window.ffMaterialBtnHtml(c,inputId,part,catName);
+    if(typeof window.ffMaterialBtnHtml === 'function'){
+      h += window.ffMaterialBtnHtml(c,inputId,part,catName);
     }
   });
-  return h+'</div>';
+  h += '</div>';
+  return h;
 }
-  }
   function colorSection(title, arr, inputId, part, catName, note){
     if(!arr || !arr.length) return '';
     return '<div class="ff-color-category-card"><div class="ff-color-category-title"><span>'+esc(title)+'</span>'+(note?'<small>'+esc(note)+'</small>':'')+'</div>'+btnGroup(arr,inputId,part,catName)+'</div>';
