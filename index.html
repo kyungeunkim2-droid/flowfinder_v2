@@ -17320,6 +17320,122 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
 }
 </style>
 
+
+
+<!-- === FF FINAL SAFE RIGHT ORDER PATCH: product/options first, then summary/render/price === -->
+<style id="ff-final-safe-right-order-product-options-top">
+/* 오른쪽 패널 최종 순서: 제품선택 → 데스크 옵션 이미지 → 선택내역/재질 → 렌더링 → 가격 */
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+/* 1. 추가할 제품을 선택하세요 / 제품선택 카드 */
+#preview-panel > #set-product-selector{
+  order:10 !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  max-width:100% !important;
+  position:relative !important;
+  clear:both !important;
+  float:none !important;
+  margin:0 0 14px 0 !important;
+  z-index:5 !important;
+}
+#preview-panel > #set-product-selector[style*="display: block"],
+#preview-panel > #set-product-selector[style*="display:block"],
+#preview-panel > #set-product-selector[style*="display: grid"],
+#preview-panel > #set-product-selector[style*="display:grid"],
+#preview-panel > #set-product-selector.ff-visible,
+#preview-panel > #set-product-selector[data-visible="true"]{
+  display:block !important;
+}
+
+/* 2. 기존 데스크 옵션 이미지 영역 */
+#preview-panel > #ff-static-option-preview,
+#preview-panel > #ff90-option-summary,
+#preview-panel > #ff71-selection-gallery,
+#preview-panel > #desk-option-preview,
+#preview-panel > #desk-option-images{
+  order:20 !important;
+  display:block !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  max-width:100% !important;
+  min-height:260px !important;
+  position:relative !important;
+  clear:both !important;
+  float:none !important;
+  margin:0 0 24px 0 !important;
+  padding:16px !important;
+  overflow:visible !important;
+  z-index:4 !important;
+}
+
+/* 옵션 이미지 내부가 선택내역 위로 겹치지 않도록 강제 */
+#ff-static-option-preview *,
+#ff90-option-summary *,
+#ff71-selection-gallery *,
+#desk-option-preview *,
+#desk-option-images *{
+  box-sizing:border-box !important;
+}
+#ff-static-option-preview img,
+#ff90-option-summary img,
+#ff71-selection-gallery img,
+#desk-option-preview img,
+#desk-option-images img{
+  max-height:130px !important;
+  object-fit:contain !important;
+}
+
+/* 3. 선택내역/재질선택값 + 렌더링 + 가격 대시보드 */
+#preview-panel > #ff-clean-right-dashboard{
+  order:30 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  position:relative !important;
+  clear:both !important;
+  float:none !important;
+  margin:0 !important;
+  z-index:1 !important;
+}
+#ff-clean-right-dashboard > .ff-clean-info-grid{
+  order:10 !important;
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:14px !important;
+}
+#ff-clean-right-dashboard > .ff-clean-preview-card{ order:20 !important; }
+#ff-clean-right-dashboard > .ff-clean-total-card{ order:30 !important; }
+
+/* 구형 모듈은 중복 표시 방지 */
+#preview-panel > #ff-dashboard-hero,
+#preview-panel > #texture-preview,
+#preview-panel > #product-preview-box,
+#preview-panel > #screen-composite-preview,
+#preview-panel > #pegboard-ref-panel,
+#preview-panel > #recommend-panel,
+#preview-panel > #wip-group,
+#preview-panel > #preview-items,
+#preview-panel > #total-box,
+#preview-panel > h2{
+  display:none !important;
+}
+
+@media(max-width:760px){
+  #ff-clean-right-dashboard > .ff-clean-info-grid{
+    grid-template-columns:1fr !important;
+  }
+}
+</style>
+
 </body>
 
 
