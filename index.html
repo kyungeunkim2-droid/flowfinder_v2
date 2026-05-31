@@ -24036,7 +24036,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var suffix = screenSuffix();
     var base = screen ? previewPath(suffix || 'front') : previewPath(deskFolder());
     var payload = {
-      mode: screen ? 'strict-screen-texture-only-preview-path-v2' : 'strict-desk-texture-only-preview-path-v2',
+      mode: screen ? 'strict-screen-plus-desk-texture-only-preview-path-v3' : 'strict-desk-texture-only-preview-path-v2',
       materialEditOnly: true,
       preserveSourceImage: true,
       preserveTransparentBackground: true,
@@ -24048,19 +24048,19 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       screenImage: screen ? base : '',
       screenSelected: !!screen,
       screenLabel: screen ? (s.screenLabel || s.screen || suffix || '스크린') : '',
-      topTexture: screen ? '' : m.topTexture,
-      legTexture: screen ? '' : m.legTexture,
+      topTexture: m.topTexture,
+      legTexture: m.legTexture,
       screenTexture: screen ? m.screenTexture : '',
       frontScreenTexture: (screen && suffix === 'frontside') ? (m.frontScreenTexture || m.screenTexture) : '',
       sideScreenTexture: (screen && suffix === 'frontside') ? (m.sideScreenTexture || m.screenTexture) : '',
-      topCode: screen ? '' : m.topCode,
-      legCode: screen ? '' : m.legCode,
+      topCode: m.topCode,
+      legCode: m.legCode,
       screenCode: screen ? m.screenCode : '',
       legType: s.legType || s.legShape || '',
       casterType: s.casterType || s.mobility || '',
       topShape: s.topShape || '',
       size: screen ? {screenH:s.screenH||'', screenTopGap:s.screenTopGap||''} : (s.size || {w:s.w||'', d:s.d||'', h:s.h||''}),
-      // 중요: 스크린도 반드시 images/previews/{desk}/{leg}_{move}_{top}_{screen}.png 원본만 사용
+      // 중요: 스크린 렌더도 원본 preview 안의 데스크 상판/다리 + 스크린에 선택 texture만 맵핑
       previewPathRule: 'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
       forbidGeneration: true
     };
