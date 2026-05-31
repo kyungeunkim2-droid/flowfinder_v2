@@ -22801,63 +22801,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     setTimeout(showProductOriginal, 900);
   });
 
-  document.addEventListener('click', function(e){
-    var target = e.target && e.target.closest && e.target.closest('.choice-btn,.material-btn,.confirm-btn,.back-btn,#send-btn,#ff-clean-render-btn,#quick-ai-preview-btn');
-    if(!target) return;
-    setTimeout(showProductOriginal, 80);
-    setTimeout(fixExistingProductImgs, 100);
-    setTimeout(showProductOriginal, 450);
-  }, true);
 
-  var prevFetch = window.fetch;
-  window.fetch = function(input, init){
-    var url = String(input || '');
-    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    var kind = currentKind();
-
-    if(isNano && init && init.body){
-      try{
-        var payload = JSON.parse(init.body || '{}') || {};
-        kind = currentKind();
-        payload = kind === 'screen' ? screenPayload(payload) : deskPayload(payload);
-        init = Object.assign({}, init, {body: JSON.stringify(payload)});
-        showProductOriginal();
-        setRenderLoading(kind);
-        console.log('[FF_CLEAN_PREVIEWS_RENDER_FINAL] payload', {
-          kind:kind,
-          current:currentName(),
-          deskImage:payload.deskImage,
-          screenImage:payload.screenImage,
-          guideImage:payload.guideImage,
-          topTexture:payload.topTexture,
-          legTexture:payload.legTexture,
-          screenTexture:payload.screenTexture,
-          frontScreenTexture:payload.frontScreenTexture,
-          sideScreenTexture:payload.sideScreenTexture
-        });
-      }catch(e){
-        console.warn('[FF_CLEAN_PREVIEWS_RENDER_FINAL] payload patch failed', e);
-      }
-    }
-
-    return prevFetch.call(this, input, init).then(function(res){
-      if(!isNano) return res;
-      try{
-        res.clone().json().then(function(data){
-          var src = responseImage(data);
-          if(src) setRenderResult(kind, src, '');
-          else setRenderResult(kind, '', (data && (data.error || data.detail)) || '이미지 결과를 받지 못했습니다.');
-        }).catch(function(err){
-          setRenderResult(kind, '', err && err.message ? err.message : '응답을 읽지 못했습니다.');
-        });
-      }catch(e){}
-      return res;
-    }).catch(function(err){
-      if(isNano) setRenderResult(kind, '', err && err.message ? err.message : String(err));
-      throw err;
-    });
-  };
-})();
 </script>
 
 
@@ -22950,22 +22894,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     }
   }, true);
 
-  var prevFetch = window.fetch;
-  window.fetch = function(input, init){
-    var url = String(input || '');
-    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    if(isNano){
-      init = fixGuidePathInOutgoingBody(init);
-      showRenderPanel();
-    }
-    return prevFetch.call(this, input, init).then(function(res){
-      if(isNano) showRenderPanel();
-      return res;
-    }).catch(function(err){
-      if(isNano) showRenderPanel();
-      throw err;
-    });
-  };
+
 
   // 기존 패치가 렌더 결과 패널을 나중에 생성해도 곧바로 숨김/표시 규칙 적용
   var mo = new MutationObserver(function(){
@@ -23089,25 +23018,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     }
   }, true);
 
-  var prevFetch = window.fetch;
-  window.fetch = function(input, init){
-    var url = String(input || '');
-    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    if(isNano && init && init.body){
-      try{
-        var payload = JSON.parse(init.body || '{}');
-        var isFrontSide = /frontside|front_side/i.test(String(payload.mode || payload.renderStep || payload.deskImage || payload.screenImage || '')) || bothFrontSideSelected();
-        if(isFrontSide){
-          payload.guideImage = './images/guides/frontside_guide.png';
-          init = Object.assign({}, init, {body: JSON.stringify(payload)});
-          console.log('[FF_FRONT_SIDE_MATERIAL_ROWS_ONLY] guide sent:', payload.guideImage);
-        }
-      }catch(e){}
-      setTimeout(ensureRows, 150);
-    }
-    return prevFetch.call(this, input, init);
-  };
-})();
+
 </script>
 
 
@@ -23365,14 +23276,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     }
   }, true);
 
-  var prevFetch = window.fetch;
-  window.fetch = function(input, init){
-    var url = String(input || '');
-    var isNano = url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1;
-    if(isNano) init = ensurePayloadSplit(init);
-    return prevFetch.call(this, input, init);
-  };
-})();
+ 
 </script>
 
 
