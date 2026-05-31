@@ -24546,3 +24546,74 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+<!-- === FF LSHAPE CONFIRM ADVANCE FIX === -->
+<script id="ff-lshape-confirm-advance-fix">
+(function(){
+  if(window.__ffLshapeConfirmAdvanceFix) return;
+  window.__ffLshapeConfirmAdvanceFix = true;
+
+  function applyDir(dir){
+    dir = dir === 'right' ? 'right' : 'left';
+    window.__ffLshapeDirection = dir;
+    window.__ffPendingLshapeDirection = dir;
+    window.__ffNanoTarget = 'screen';
+    try{
+      if(typeof window.ffApplyLshapeDirectionToPreviewKey === 'function'){
+        window.ffApplyLshapeDirectionToPreviewKey(dir);
+      }
+    }catch(e){ console.warn('[LSHAPE_CONFIRM_ADVANCE] apply key failed', e); }
+  }
+
+  function goNext(){
+    try{
+      if(typeof window.confirmSetSelection === 'function'){
+        window.confirmSetSelection();
+        return true;
+      }
+    }catch(e){ console.warn('[LSHAPE_CONFIRM_ADVANCE] confirmSetSelection failed', e); }
+
+    try{
+      var btn = document.getElementById('set-confirm-btn') || document.getElementById('ff71-confirm-btn');
+      if(btn && !btn.disabled){ btn.click(); return true; }
+    }catch(e){ console.warn('[LSHAPE_CONFIRM_ADVANCE] set confirm click failed', e); }
+    return false;
+  }
+
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('.ff-lshape-confirm');
+    if(!btn) return;
+
+    if(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    var dir = window.__ffPendingLshapeDirection || window.__ffLshapeDirection || 'left';
+    applyDir(dir);
+
+    btn.classList.add('selected');
+    btn.disabled = true;
+    btn.textContent = '선택 완료';
+
+    setTimeout(goNext, 0);
+    return false;
+  }, true);
+
+  // 좌/우 버튼이 다른 줄에 있고 선택완료 버튼이 밖에 있어도 활성화되게 보강
+  document.addEventListener('click', function(e){
+    var dirBtn = e.target && e.target.closest && e.target.closest('.ff-lshape-dir');
+    if(!dirBtn) return;
+    var dir = dirBtn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+    applyDir(dir);
+    setTimeout(function(){
+      var bubble = dirBtn.closest('.bubble') || dirBtn.closest('.msg') || document;
+      var confirm = bubble.querySelector('.ff-lshape-confirm');
+      if(confirm) confirm.disabled = false;
+    }, 0);
+  }, true);
+
+  console.log('✅ FF LSHAPE CONFIRM ADVANCE FIX LOADED');
+})();
+</script>
