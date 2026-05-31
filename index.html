@@ -18318,6 +18318,336 @@ html, body{ height:100vh !important; overflow:hidden !important; }
 </script>
 <!-- === /FF STEP7 === -->
 
+
+
+<!-- FF FINAL PATCH: final quote render image + option thumbnail hover -->
+<style id="ff-final-render-and-option-hover-style">
+  .ff-final-render-shot-v2{
+    margin:12px 0 14px !important;
+    border:1px solid #d9e2ef !important;
+    background:#f8fafc !important;
+    border-radius:16px !important;
+    padding:12px !important;
+    color:#0f172a !important;
+  }
+  .ff-final-render-shot-v2 h4{
+    margin:0 0 8px !important;
+    font-size:13px !important;
+    font-weight:1000 !important;
+    color:#111827 !important;
+    letter-spacing:-.2px !important;
+  }
+  .ff-final-render-shot-v2 .ff-final-render-frame{
+    width:100% !important;
+    height:220px !important;
+    border-radius:12px !important;
+    border:1px solid #e5e7eb !important;
+    background:#fff !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    overflow:hidden !important;
+  }
+  .ff-final-render-shot-v2 img{
+    max-width:100% !important;
+    max-height:100% !important;
+    width:auto !important;
+    height:auto !important;
+    object-fit:contain !important;
+    display:block !important;
+  }
+  .ff-final-render-shot-v2 small{
+    display:block !important;
+    margin-top:6px !important;
+    font-size:10px !important;
+    color:#64748b !important;
+  }
+  .final-quote-modal .final-quote-wrap{
+    background:#ffffff !important;
+    color:#111827 !important;
+  }
+  .final-quote-modal .final-quote-title,
+  .final-quote-modal .final-item-name,
+  .final-quote-modal .final-summary-card b,
+  .final-quote-modal .final-chip-box b,
+  .final-quote-modal .final-price-line b,
+  .final-quote-modal .final-total-box span{
+    color:#111827 !important;
+  }
+  .final-quote-modal .final-summary-card,
+  .final-quote-modal .final-item-card,
+  .final-quote-modal .final-chip-box,
+  .final-quote-modal .final-info-box{
+    background:#f8fafc !important;
+    border-color:#e5e7eb !important;
+    color:#111827 !important;
+  }
+  .final-quote-modal .final-quote-head{
+    border-bottom-color:#e5e7eb !important;
+  }
+  .final-quote-modal .final-quote-meta,
+  .final-quote-modal .final-summary-card small,
+  .final-quote-modal .final-chip-box small,
+  .final-quote-modal .final-info-box ul,
+  .final-quote-modal .final-price-line span{
+    color:#64748b !important;
+  }
+  .final-quote-modal .final-total-box{
+    background:linear-gradient(135deg,#f97316,#7c3aed) !important;
+    border:0 !important;
+  }
+  .final-quote-modal .final-total-box span,
+  .final-quote-modal .final-total-box b,
+  .final-quote-modal .final-total-box small{
+    color:#fff !important;
+  }
+  #ff-option-hover-preview{
+    position:fixed !important;
+    display:none;
+    z-index:100000 !important;
+    width:240px !important;
+    padding:10px !important;
+    border-radius:18px !important;
+    border:1px solid rgba(45,245,210,.55) !important;
+    background:#07111f !important;
+    box-shadow:0 22px 70px rgba(0,0,0,.45),0 0 28px rgba(45,245,210,.18) !important;
+    pointer-events:none !important;
+  }
+  #ff-option-hover-preview.show{ display:block !important; }
+  #ff-option-hover-preview .ff-oh-title{
+    font-size:12px !important;
+    color:#e5f9ff !important;
+    font-weight:900 !important;
+    margin-bottom:8px !important;
+    white-space:nowrap !important;
+    overflow:hidden !important;
+    text-overflow:ellipsis !important;
+  }
+  #ff-option-hover-preview img{
+    width:100% !important;
+    height:170px !important;
+    object-fit:contain !important;
+    border-radius:12px !important;
+    background:#fff !important;
+    display:block !important;
+  }
+</style>
+<script id="ff-final-render-and-option-hover-js">
+(function(){
+  if(window.__ffFinalRenderOptionHoverPatch) return;
+  window.__ffFinalRenderOptionHoverPatch = true;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function isUsableImage(src){
+    src = String(src || '').trim();
+    if(!src) return false;
+    if(src === window.location.href) return false;
+    if(/^about:blank/i.test(src)) return false;
+    if(/data:image\/svg\+xml[^,]*,%3Csvg/i.test(src)) return false;
+    if(/blank|placeholder/i.test(src) && !/^data:image\//i.test(src)) return false;
+    return /^(data:image\/|blob:|https?:\/\/|\.\/|\/|images\/|products\/)/i.test(src);
+  }
+  function rememberRender(src){
+    if(!isUsableImage(src)) return;
+    window.__ffFinalQuoteRenderImage = src;
+    if(window.PREVIEW) window.PREVIEW.finalRenderImage = src;
+    if(window.FlowFinderFastPreview && window.FlowFinderFastPreview.state){
+      window.FlowFinderFastPreview.state.finalRenderImage = src;
+    }
+  }
+  function canvasDataUrl(id){
+    var c = $(id);
+    if(!c || !c.tagName || c.tagName.toLowerCase() !== 'canvas') return '';
+    if(!c.width || !c.height || c.width < 20 || c.height < 20) return '';
+    try { return c.toDataURL('image/png'); } catch(e){ return ''; }
+  }
+  function pickFinalRenderImage(){
+    var direct = window.__ffFinalQuoteRenderImage || (window.PREVIEW && window.PREVIEW.finalRenderImage) || '';
+    if(isUsableImage(direct)) return direct;
+
+    var imgIds = [
+      'ff-clean-preview-img',
+      'ff-hero-img',
+      'ff-render-result-img',
+      'ff-ai-live-img',
+      'product-preview-img',
+      'screen-composite-img'
+    ];
+    for(var i=0;i<imgIds.length;i++){
+      var im = $(imgIds[i]);
+      if(im && im.src && im.offsetParent !== null && isUsableImage(im.src)){
+        rememberRender(im.src);
+        return im.src;
+      }
+    }
+
+    var selectedImgs = document.querySelectorAll('#preview-panel img, .ff-clean-preview-box img, .ff-hero-image-card img');
+    for(var j=selectedImgs.length-1;j>=0;j--){
+      var src = selectedImgs[j].currentSrc || selectedImgs[j].src || selectedImgs[j].getAttribute('src') || '';
+      if(isUsableImage(src) && selectedImgs[j].offsetParent !== null){
+        rememberRender(src);
+        return src;
+      }
+    }
+
+    var canvasIds = ['ff-clean-preview-canvas','ff-hero-canvas','ff-render-canvas','set-composite-canvas','screen-composite-canvas','product-3d-canvas'];
+    for(var k=0;k<canvasIds.length;k++){
+      var data = canvasDataUrl(canvasIds[k]);
+      if(isUsableImage(data)){
+        rememberRender(data);
+        return data;
+      }
+    }
+    return '';
+  }
+
+  function injectFinalRenderImage(){
+    var modal = $('final-quote-modal');
+    if(!modal) return;
+    var wrap = modal.querySelector('.final-quote-wrap');
+    if(!wrap) return;
+    var old = wrap.querySelector('.final-render-shot, .ff-final-render-shot-v2');
+    if(old) old.remove();
+
+    var img = pickFinalRenderImage();
+    if(!img) return;
+
+    var block = document.createElement('div');
+    block.className = 'ff-final-render-shot-v2';
+    block.innerHTML = '<h4>최종 렌더링 이미지</h4>' +
+      '<div class="ff-final-render-frame"><img src="' + esc(img) + '" alt="최종 렌더링 이미지"></div>' +
+      '<small>고해상도 렌더링 결과 1장을 기준으로 견적서에 반영했습니다.</small>';
+
+    var head = wrap.querySelector('.final-quote-head');
+    if(head && head.nextSibling) wrap.insertBefore(block, head.nextSibling);
+    else wrap.insertBefore(block, wrap.firstChild);
+  }
+
+  function watchRenderedImages(){
+    var ids = ['ff-clean-preview-img','ff-hero-img','ff-render-result-img','ff-ai-live-img','product-preview-img','screen-composite-img'];
+    ids.forEach(function(id){
+      var im = $(id);
+      if(im && im.src) rememberRender(im.src);
+    });
+    document.querySelectorAll('#preview-panel img, .ff-clean-preview-box img, .ff-hero-image-card img').forEach(function(im){
+      var src = im.currentSrc || im.src || im.getAttribute('src') || '';
+      if(src) rememberRender(src);
+    });
+  }
+
+  var originalFetch = window.fetch;
+  if(originalFetch && !window.__ffFetchFinalRenderHooked){
+    window.__ffFetchFinalRenderHooked = true;
+    window.fetch = function(){
+      return originalFetch.apply(this, arguments).then(function(res){
+        try{
+          var url = String((arguments && arguments[0]) || res.url || '');
+          if(/generate-preview|generate-screen-preview/i.test(url)){
+            var cloned = res.clone();
+            cloned.json().then(function(data){
+              var src = data && (data.imageUrl || data.image || data.url || data.previewUrl || data.output || '');
+              rememberRender(src);
+            }).catch(function(){});
+          }
+        }catch(e){}
+        return res;
+      });
+    };
+  }
+
+  var mo = new MutationObserver(function(muts){
+    var shouldCheck = false;
+    muts.forEach(function(m){
+      if(m.type === 'attributes' && m.attributeName === 'src') shouldCheck = true;
+      if(m.addedNodes && m.addedNodes.length) shouldCheck = true;
+    });
+    if(shouldCheck){
+      setTimeout(watchRenderedImages, 30);
+      setTimeout(injectFinalRenderImage, 120);
+    }
+  });
+  try{ mo.observe(document.documentElement, {childList:true, subtree:true, attributes:true, attributeFilter:['src','style','class']}); }catch(e){}
+
+  var baseShow = window.showFinalQuote;
+  if(typeof baseShow === 'function' && !baseShow.__ffFinalRenderWrapped){
+    var wrapped = function(){
+      var r = baseShow.apply(this, arguments);
+      setTimeout(function(){ watchRenderedImages(); injectFinalRenderImage(); }, 80);
+      setTimeout(injectFinalRenderImage, 300);
+      return r;
+    };
+    wrapped.__ffFinalRenderWrapped = true;
+    window.showFinalQuote = wrapped;
+  }
+
+  document.addEventListener('click', function(e){
+    setTimeout(watchRenderedImages, 60);
+    setTimeout(injectFinalRenderImage, 160);
+  }, true);
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(watchRenderedImages, 400); });
+
+  function ensureHoverBox(){
+    var box = $('ff-option-hover-preview');
+    if(box) return box;
+    box = document.createElement('div');
+    box.id = 'ff-option-hover-preview';
+    box.innerHTML = '<div class="ff-oh-title"></div><img alt="옵션 이미지 확대">';
+    document.body.appendChild(box);
+    return box;
+  }
+  function isOptionImage(img){
+    if(!img || !img.tagName || img.tagName.toLowerCase() !== 'img') return false;
+    var src = img.getAttribute('src') || img.src || '';
+    if(/options\/accessories|accessories\//i.test(src)) return true;
+    return !!img.closest('.ff-opt-row-v2,.ff-opt-row,.ff-option-row,.ff-user-final-options-v2,.ff-opt-card,.option-card,.accessory-card');
+  }
+  function optionTitle(img){
+    var row = img.closest('.ff-opt-row-v2,.ff-opt-row,.ff-option-row,.ff-opt-card,.option-card,.accessory-card');
+    if(row){
+      var t = row.querySelector('b,.ff-opt-name,.option-name,.name,strong,span');
+      if(t && t.textContent.trim()) return t.textContent.trim();
+      if(row.textContent.trim()) return row.textContent.trim().replace(/\s+/g,' ').slice(0,42);
+    }
+    return img.getAttribute('alt') || '옵션 이미지';
+  }
+  function moveHoverBox(e){
+    var box = $('ff-option-hover-preview');
+    if(!box || !box.classList.contains('show')) return;
+    var pad = 18;
+    var x = e.clientX + pad;
+    var y = e.clientY + pad;
+    var rectW = 240, rectH = 215;
+    if(x + rectW > window.innerWidth - 8) x = e.clientX - rectW - pad;
+    if(y + rectH > window.innerHeight - 8) y = e.clientY - rectH - pad;
+    box.style.left = Math.max(8, x) + 'px';
+    box.style.top = Math.max(8, y) + 'px';
+  }
+  document.addEventListener('mouseover', function(e){
+    var img = e.target && e.target.closest ? e.target.closest('img') : null;
+    if(!isOptionImage(img)) return;
+    var src = img.currentSrc || img.src || img.getAttribute('src') || '';
+    if(!isUsableImage(src)) return;
+    var box = ensureHoverBox();
+    box.querySelector('.ff-oh-title').textContent = optionTitle(img);
+    box.querySelector('img').src = src;
+    box.classList.add('show');
+    moveHoverBox(e);
+  }, true);
+  document.addEventListener('mousemove', moveHoverBox, true);
+  document.addEventListener('mouseout', function(e){
+    var img = e.target && e.target.closest ? e.target.closest('img') : null;
+    if(!isOptionImage(img)) return;
+    var box = $('ff-option-hover-preview');
+    if(box) box.classList.remove('show');
+  }, true);
+})();
+</script>
+
 </body>
 
 
