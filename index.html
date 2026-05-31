@@ -17143,7 +17143,7 @@ window.showPanel = function(){
       throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택한 뒤 최종 렌더링해야 합니다.');
     }
 
-const finalScreenTexture = screenTexture || scrTex;
+const finalScreenTexture = screenTexture;
 
 if(hasScreen() && !isFrontside && !finalScreenTexture){
   throw new Error('스크린 재질을 먼저 선택해야 합니다.');
@@ -17260,188 +17260,11 @@ if(hasScreen() && !isFrontside && !finalScreenTexture){
   });
 })();
 </script>
-<script>
-(function(){
 
-  window.prepareNanoBananaPreview = async function(){
-
-    try{
-      if(typeof buildPayload !== 'function'){
-        throw new Error('buildPayload 함수를 찾을 수 없습니다.');
-      }
-
-      const payload = buildPayload();
-
-      payload.materialEditOnly = true;
-      payload.preserveSourceImage = true;
-      payload.preserveTransparentBackground = true;
-      payload.forbidGeneration = true;
-
-      payload.composedPreview = '';
-      payload.previousRenderedImage = '';
-      payload.lastRenderedImage = '';
-      payload.imageUrl = '';
-
-      payload.sourceImage = payload.sourceImage || payload.baseImage || payload.deskImage;
-      payload.baseImage = payload.baseImage || payload.deskImage;
-      payload.deskImage = payload.baseImage;
-
-      if(payload.productType === 'screen' || payload.targetType === 'screen' || payload.screenType){
-        payload.screenImage = payload.screenImage || payload.baseImage;
-      }
-
-      console.log('[FINAL_OVERRIDE]', payload);
-
-      const res = await fetch('/api/generate-preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      console.log('[FINAL_RESPONSE]', data);
-
-      return data;
-
-    }catch(err){
-      console.error('[FINAL_OVERRIDE_ERROR]', err);
-      throw err;
-    }
-
-  };
-
-})();
-</script>
-  <script>
-var screenTexture = window.screenTexture || '';
-
-(function(){
-
-  window.prepareNanoBananaPreview = async function(){
-
-    try{
-      if(typeof buildPayload !== 'function'){
-        throw new Error('buildPayload 함수를 찾을 수 없습니다.');
-      }
-
-      const payload = buildPayload();
-
-      payload.materialEditOnly = true;
-      payload.preserveSourceImage = true;
-      payload.preserveTransparentBackground = true;
-      payload.forbidGeneration = true;
-
-      payload.composedPreview = '';
-      payload.previousRenderedImage = '';
-      payload.lastRenderedImage = '';
-      payload.imageUrl = '';
-
-      payload.sourceImage = payload.sourceImage || payload.baseImage || payload.deskImage;
-      payload.baseImage = payload.baseImage || payload.deskImage;
-      payload.deskImage = payload.baseImage;
-
-      if(payload.productType === 'screen' || payload.targetType === 'screen' || payload.screenType){
-        payload.screenImage = payload.screenImage || payload.baseImage;
-      }
-
-      console.log('[FINAL_OVERRIDE]', payload);
-
-      const res = await fetch('/api/generate-preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      const data = await res.json();
-      console.log('[FINAL_RESPONSE]', data);
-
-      return data;
-
-    }catch(err){
-      console.error('[FINAL_OVERRIDE_ERROR]', err);
-      throw err;
-    }
-
-  };
-
-})();
-</script>
 </body>
 
 
-<script>
-(function(){
 
-  console.log('✅ FF FINAL BUTTON OVERRIDE LOADED');
-
-  async function finalRender(e){
-    if(e && e.preventDefault) e.preventDefault();
-
-    try{
-      if(typeof buildPayload !== 'function'){
-        throw new Error('buildPayload 함수를 찾을 수 없습니다.');
-      }
-
-      var payload = buildPayload();
-
-      payload.materialEditOnly = true;
-      payload.preserveSourceImage = true;
-      payload.preserveTransparentBackground = true;
-      payload.forbidGeneration = true;
-
-      payload.composedPreview = '';
-      payload.previousRenderedImage = '';
-      payload.lastRenderedImage = '';
-      payload.imageUrl = '';
-
-      payload.sourceImage = payload.sourceImage || payload.baseImage || payload.deskImage;
-      payload.baseImage = payload.baseImage || payload.deskImage;
-      payload.deskImage = payload.baseImage;
-
-      if(payload.productType === 'screen' || payload.targetType === 'screen' || payload.screenType){
-        payload.screenImage = payload.screenImage || payload.baseImage;
-      }
-
-      console.log('✅ FINAL_BUTTON_PAYLOAD', payload);
-
-      var res = await fetch('/api/generate-preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-
-      var data = await res.json();
-      console.log('✅ FINAL_BUTTON_RESPONSE', data);
-
-      return data;
-
-    }catch(err){
-      console.error('❌ FINAL_BUTTON_ERROR', err);
-      throw err;
-    }
-  }
-
-  window.prepareNanoBananaPreview = finalRender;
-
-  function bindFinalButton(){
-    ['quick-ai-preview-btn','ff-clean-render-btn'].forEach(function(id){
-      var btn = document.getElementById(id);
-      if(!btn) return;
-
-      var clone = btn.cloneNode(true);
-      btn.parentNode.replaceChild(clone, btn);
-
-      clone.onclick = finalRender;
-    });
-  }
-
-  bindFinalButton();
-  setTimeout(bindFinalButton, 300);
-  setTimeout(bindFinalButton, 1000);
-  setTimeout(bindFinalButton, 2000);
-
-})();
-</script>
 </html>
 <style id="ff-fixed40-portrait-chat-preview">
 /* === Fixed40: fixed38 base, no dashboard, chat:preview = 9:16 === */
@@ -25144,9 +24967,9 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     if(frontside && (!fs.front || !fs.side)){
       throw new Error('전면+사이드는 전면 재질과 사이드 재질을 각각 모두 선택해야 합니다.');
     }
-   const finalScreenTexture = screenTexture || scrTex;
+    const finalScreenTexture = scrTex;
 
-if(hasScreen() && !isFrontside && !finalScreenTexture){
+    if(hasScreen() && !frontside && !finalScreenTexture){
   throw new Error('스크린 재질을 먼저 선택해야 합니다.');
 }
     return {
@@ -25157,7 +24980,7 @@ if(hasScreen() && !isFrontside && !finalScreenTexture){
       preserveTransparentBackground:true,
       canvasAspect:'16:9',
       targetType:hasScreen()?'screen':'desk',
-      productType:hasScreen()?'desk_screen':'desk',
+      productType:hasScreen()?'screen':'desk',
 
       deskImage:path,
       screenImage:path,
@@ -25194,6 +25017,7 @@ if(hasScreen() && !isFrontside && !finalScreenTexture){
       instruction:[
         'Use ONLY the source preview image as the base.',
         'Never create a new desk, screen, room, background, angle, crop, shadow, or product shape.',
+        sfx==='lshape' ? 'For L-shape screen: keep the exact existing L-shaped screen geometry, left/right direction, angle, panel size and position. Only material-map/recolor the existing L-shaped screen surface. Do not redraw or replace it.' : '',
         'Map topTexture to the existing tabletop only.',
         'Map legTexture to the existing legs only.',
         frontside ? 'Map frontScreenTexture to the existing FRONT screen only and sideScreenTexture to the existing SIDE screen only.' : 'Map screenTexture to the existing screen panel only.',
@@ -25262,3 +25086,165 @@ if(hasScreen() && !isFrontside && !finalScreenTexture){
 })();
 </script>
 
+
+
+<!-- === FF FINAL SAFE OVERRIDE: original preview only / L-shape stable === -->
+<script id="ff-final-safe-override-original-only">
+(function(){
+  console.log('✅ FF FINAL SAFE OVERRIDE LOADED');
+
+  window.screenTexture = window.screenTexture || '';
+
+  function $(id){ return document.getElementById(id); }
+  function showMsg(text, isError){
+    var note = $('quick-ai-preview-note');
+    if(note){
+      note.style.display='block';
+      note.className = isError ? 'ai-error' : 'ai-loading';
+      note.innerHTML = text;
+    }
+  }
+  function getImageUrl(data){
+    return (typeof data === 'string') ? data : (data && (data.imageUrl || data.image || data.url || data.previewUrl || ''));
+  }
+  function showResultImage(src){
+    if(!src) return;
+    window.__ffLastDisplayedRenderOnly = src;
+    window.__ffRenderedInputForbidden = true;
+    var img = $('ff-hero-img') || $('product-preview-img') || $('screen-composite-img');
+    if(img && img.tagName && img.tagName.toLowerCase() === 'img'){
+      img.src = src;
+      img.style.display = 'block';
+    }
+    var out = $('quick-ai-preview-note');
+    if(out){
+      out.style.display='block';
+      out.className='ai-result';
+      out.innerHTML='<b>완료</b><br><img src="'+src+'" style="width:100%;border-radius:16px;background:#fff;object-fit:contain;" alt="재질 적용 결과">';
+    }
+  }
+  function normalizePayload(payload){
+    payload = payload || {};
+    payload.materialEditOnly = true;
+    payload.preserveSourceImage = true;
+    payload.preserveTransparentBackground = true;
+    payload.forbidGeneration = true;
+    payload.noGeneration = true;
+    payload.originalOnly = true;
+
+    payload.composedPreview = '';
+    payload.previousRenderedImage = '';
+    payload.lastRenderedImage = '';
+    payload.imageUrl = '';
+
+    payload.sourceImage = payload.sourceImage || payload.baseImage || payload.deskImage || payload.screenImage;
+    payload.baseImage = payload.baseImage || payload.sourceImage || payload.deskImage || payload.screenImage;
+    payload.deskImage = payload.baseImage;
+
+    var hasScreen = !!(payload.screenSelected || payload.screenTexture || payload.frontScreenTexture || payload.sideScreenTexture || /screen|lshape|front|side|straight/i.test(String(payload.screenLabel || payload.screenType || payload.targetType || payload.productType || '')));
+    if(hasScreen){
+      payload.targetType = 'screen';
+      payload.productType = 'screen';
+      payload.screenImage = payload.baseImage;
+    }else{
+      payload.targetType = 'desk';
+      payload.productType = 'desk';
+      payload.screenImage = '';
+      payload.screenTexture = '';
+      payload.frontScreenTexture = '';
+      payload.sideScreenTexture = '';
+    }
+
+    var label = String(payload.screenLabel || payload.screenType || payload.originalPreviewPath || payload.baseImage || '').toLowerCase();
+    if(label.indexOf('lshape') >= 0){
+      payload.screenLabel = 'lshape';
+      payload.screenType = 'lshape';
+      payload.guideImage = '';
+      payload.instruction = [
+        payload.instruction || '',
+        'CRITICAL L-SHAPE SCREEN EDIT: Use the base image exactly. Keep the existing L-shaped screen panel, left/right direction, angle, size, position, desk, background, crop, camera, shadows and lighting unchanged. Only apply the provided screenTexture onto the existing L-shaped screen surface. Do not create, redraw, replace, redesign, expand, move, or add any screen panel. Return the same original product photo composition with materials changed only.'
+      ].join('\n');
+    }
+    return payload;
+  }
+
+  async function finalRender(e){
+    if(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+    var btn = $('quick-ai-preview-btn') || $('ff-clean-render-btn');
+    try{
+      if(typeof window.buildPayload !== 'function' && typeof buildPayload !== 'function'){
+        throw new Error('buildPayload 함수를 찾을 수 없습니다.');
+      }
+      var payload = (typeof buildPayload === 'function') ? buildPayload() : window.buildPayload();
+      payload = normalizePayload(payload);
+
+      console.log('✅ FINAL_CAPTURE_PAYLOAD', payload);
+      showMsg('<b>원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">원본 preview 이미지만 서버로 전송합니다.</span>', false);
+      if(btn){ btn.disabled=true; btn.textContent='생성 중...'; }
+
+      var res = await fetch('/api/generate-preview', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
+      });
+      var data = await res.json();
+      console.log('✅ FINAL_CAPTURE_RESPONSE', data);
+      var src = getImageUrl(data);
+      if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      showResultImage(src);
+      return data;
+    }catch(err){
+      console.error('❌ FINAL_CAPTURE_ERROR', err);
+      showMsg('<b>확인 필요</b><br>'+String(err && err.message ? err.message : err), true);
+      throw err;
+    }finally{
+      if(btn){ btn.disabled=false; btn.textContent='✨ 원본 사진에 재질 적용'; }
+    }
+  }
+
+  window.__ffFinalRender = finalRender;
+  window.prepareNanoBananaPreview = finalRender;
+
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('#quick-ai-preview-btn, #ff-clean-render-btn');
+    if(!btn) return;
+    finalRender(e);
+  }, true);
+
+  function forceBind(){
+    ['quick-ai-preview-btn','ff-clean-render-btn'].forEach(function(id){
+      var b=$(id);
+      if(b){ b.onclick = finalRender; }
+    });
+  }
+  forceBind();
+  setTimeout(forceBind, 300);
+  setTimeout(forceBind, 1000);
+  setTimeout(forceBind, 2000);
+
+  // L형 방향 선택 확인 버튼 보강
+  document.addEventListener('click', function(e){
+    var dir = e.target && e.target.closest && e.target.closest('.ff-lshape-final-dir,.ff-lshape-dir-a');
+    if(!dir) return;
+    window.__ffLshapeDirection = dir.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+    var wrap = dir.parentElement;
+    if(wrap && !wrap.querySelector('.ff-lshape-confirm-added')){
+      var confirm = document.createElement('button');
+      confirm.type='button';
+      confirm.className='choice-btn ff-lshape-confirm-added selected';
+      confirm.textContent='방향 선택 완료';
+      confirm.style.marginLeft='8px';
+      confirm.onclick=function(ev){
+        if(ev){ev.preventDefault(); ev.stopPropagation();}
+        confirm.textContent = (window.__ffLshapeDirection === 'right' ? '우측 L형' : '좌측 L형') + ' 선택 완료';
+        return false;
+      };
+      wrap.appendChild(confirm);
+    }
+  }, true);
+})();
+</script>
