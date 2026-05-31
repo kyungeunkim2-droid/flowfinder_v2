@@ -3934,7 +3934,7 @@ function getFlowActiveIndexFromState(obj) {
   var c = obj.current || {};
   var active = 0;
 
-  // 0 제품선택 → 1 색상입력 → 2 사이즈입력 → 3 옵션선택 → 4 견적확인
+  // 0 제품선택 → 1 사이즈입력 → 2 색상선택 → 3 추가옵션 → 4 견적확인
   if (c.product || (obj.selectedCategories && obj.selectedCategories.length)) active = 1;
   if (c.color || obj.color || obj._deskTopColor || obj._deskLegColor || obj.colorType) active = 2;
   if (c.size || obj.w || obj.d || obj.h) active = 3;
@@ -3954,7 +3954,7 @@ function getFlowActiveIndexFromState(obj) {
 function updateFlowBar() {
   var bar = document.getElementById('flow-bar');
   if (!bar) return;
-  var steps = ['01 제품 선택', '02 색상 선택', '03 사이즈 입력', '04 옵션 선택', '05 견적 확인'];
+  var steps = ['01 제품선택', '02 사이즈입력', '03 색상선택', '04 추가옵션', '05 견적확인'];
   var active = getFlowActiveIndexFromState(state);
   state._maxFlowIndex = Math.max(state._maxFlowIndex || 0, active);
   var maxReachable = Math.max(active, state._maxFlowIndex || active);
@@ -7253,7 +7253,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
 
   window.updateFlowBar = function(){
     var bar=$('flow-bar'); if(!bar) return;
-    var steps=['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
+    var steps=['01 제품선택','02 사이즈입력','03 색상선택','04 추가옵션','05 견적확인'];
     var active=0;
     try{ active=getFlowActiveIndexFromState(state); }catch(e){}
     bar.innerHTML='';
@@ -7438,7 +7438,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
   window.updateFlowBar = function(){
     var bar=document.getElementById('flow-bar');
     if(!bar){ if(__oldUpdateFlowBar) return __oldUpdateFlowBar(); return; }
-    var steps=['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
+    var steps=['01 제품선택','02 사이즈입력','03 색상선택','04 추가옵션','05 견적확인'];
     var active=0;
     try{ active=getFlowActiveIndexFromState(state); }catch(e){}
     bar.innerHTML='';
@@ -7682,7 +7682,7 @@ body.ff-dashboard-preview #preview-panel{
   window.updateFlowBar = function(){
     var bar = document.getElementById('flow-bar');
     if(!bar){ if(oldUpdateFlow) oldUpdateFlow(); return; }
-    var labels = ['01 제품 선택','02 색상 선택','03 사이즈 입력','04 옵션 선택','05 견적 확인'];
+    var labels = ['01 제품선택','02 사이즈입력','03 색상선택','04 추가옵션','05 견적확인'];
     var active = activeIndex();
     bar.innerHTML='';
     labels.forEach(function(label,i){
@@ -17168,6 +17168,221 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
   console.log('✅ FF LSHAPE DIRECTION TO PREVIEW KEY FIX LOADED');
 })();
 </script>
+
+<!-- === FF FINAL RIGHT PANEL EXISTING ORDER FIX === -->
+<style id="ff-final-right-panel-existing-order-fix">
+/* 상단 프로세스 버튼: 긴 문구가 버튼 안에 들어가도록 축소 */
+#flow-bar{
+  gap:0 !important;
+  overflow-x:auto !important;
+}
+#flow-bar .flow-step{
+  font-size:10px !important;
+  padding:0 14px 0 20px !important;
+  min-width:auto !important;
+  letter-spacing:-.6px !important;
+  white-space:nowrap !important;
+}
+#flow-bar .flow-step:first-child{
+  padding-left:14px !important;
+}
+
+/* 오른쪽 패널은 기존 섹션을 새로 만들지 않고 기존 DOM 순서만 정리 */
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+
+/* 기존 제품선택 카드 */
+#preview-panel > #set-product-selector{
+  order:10 !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  margin:0 0 14px 0 !important;
+  position:relative !important;
+  z-index:5 !important;
+}
+
+/* 기존 데스크 옵션 이미지 카드 */
+#preview-panel > #ff-static-option-preview,
+#preview-panel > #ff90-option-summary,
+#preview-panel > #ff71-selection-gallery,
+#preview-panel > #desk-option-preview,
+#preview-panel > #desk-option-images{
+  order:20 !important;
+  display:block !important;
+  flex:0 0 auto !important;
+  width:100% !important;
+  margin:0 0 14px 0 !important;
+  position:relative !important;
+  z-index:4 !important;
+}
+
+/* 선택내역 + 재질선택값 + 렌더링 + 가격은 기존 clean dashboard를 사용 */
+#preview-panel > #ff-clean-right-dashboard{
+  order:30 !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+  width:100% !important;
+  flex:0 0 auto !important;
+}
+
+/* clean dashboard 내부 순서: 선택내역/재질 → 렌더링 → 가격 */
+#ff-clean-right-dashboard > .ff-clean-info-grid{
+  order:10 !important;
+}
+#ff-clean-right-dashboard > .ff-clean-preview-card{
+  order:20 !important;
+}
+#ff-clean-right-dashboard > .ff-clean-total-card{
+  order:30 !important;
+}
+
+/* 이전 중복 섹션은 로직 유지용으로 DOM에는 남기되 화면에서는 숨김 */
+#preview-panel > #ff-dashboard-hero,
+#preview-panel > #texture-preview,
+#preview-panel > #product-preview-box,
+#preview-panel > #screen-composite-preview,
+#preview-panel > #pegboard-ref-panel,
+#preview-panel > #recommend-panel,
+#preview-panel > #wip-group,
+#preview-panel > #preview-items,
+#preview-panel > #total-box,
+#preview-panel > h2{
+  display:none !important;
+}
+
+/* 데스크 옵션 이미지 카드 내부 여백/이미지 정리 */
+#ff-static-option-preview,
+#ff90-option-summary,
+#ff71-selection-gallery,
+#desk-option-preview,
+#desk-option-images{
+  border:1px solid rgba(45,245,210,.35) !important;
+  background:linear-gradient(180deg,rgba(8,22,36,.96),rgba(5,16,28,.98)) !important;
+  border-radius:22px !important;
+  padding:16px !important;
+  color:#fff !important;
+  overflow:visible !important;
+}
+#ff-static-option-preview .ff-option-grid,
+#ff90-option-summary .ff90-grid{
+  display:grid !important;
+  grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+  gap:12px !important;
+}
+#ff-static-option-preview img,
+#ff90-option-summary img,
+#ff71-selection-gallery img,
+#desk-option-preview img,
+#desk-option-images img{
+  max-height:130px !important;
+  object-fit:contain !important;
+}
+
+/* 선택내역/재질선택값 2열 유지 */
+#ff-clean-right-dashboard .ff-clean-info-grid{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:14px !important;
+}
+@media(max-width:760px){
+  #flow-bar .flow-step{font-size:9px !important;padding:0 10px 0 16px !important;}
+  #ff-clean-right-dashboard .ff-clean-info-grid{grid-template-columns:1fr !important;}
+}
+</style>
+
+<script id="ff-final-right-panel-existing-order-fix-js">
+(function(){
+  if(window.__ffFinalExistingRightPanelOrderFix) return;
+  window.__ffFinalExistingRightPanelOrderFix = true;
+
+  function $(id){ return document.getElementById(id); }
+
+  function moveAfter(ref, node){
+    if(!ref || !node || !ref.parentNode) return;
+    if(node.parentNode !== ref.parentNode){
+      ref.parentNode.insertBefore(node, ref.nextSibling);
+    }else if(ref.nextSibling !== node){
+      ref.parentNode.insertBefore(node, ref.nextSibling);
+    }
+  }
+
+  function moveBefore(ref, node){
+    if(!ref || !node || !ref.parentNode) return;
+    if(node.parentNode !== ref.parentNode){
+      ref.parentNode.insertBefore(node, ref);
+    }else if(ref.previousSibling !== node){
+      ref.parentNode.insertBefore(node, ref);
+    }
+  }
+
+  function keepExistingRightOrder(){
+    var panel = $('preview-panel');
+    if(!panel) return;
+
+    var product = $('set-product-selector');
+    var clean = $('ff-clean-right-dashboard');
+
+    if(product && product.parentNode !== panel){
+      panel.insertBefore(product, panel.firstChild);
+    }
+
+    /* 기존 데스크 옵션 이미지 섹션은 texture-preview 안에 생성되기도 하므로 밖으로 이동 */
+    var optionIds = [
+      'ff-static-option-preview',
+      'ff90-option-summary',
+      'ff71-selection-gallery',
+      'desk-option-preview',
+      'desk-option-images'
+    ];
+
+    var last = product || null;
+    optionIds.forEach(function(id){
+      var el = $(id);
+      if(!el) return;
+      if(el.parentNode !== panel){
+        if(last) moveAfter(last, el);
+        else panel.insertBefore(el, panel.firstChild);
+      }else if(last && last.nextSibling !== el){
+        moveAfter(last, el);
+      }
+      last = el;
+    });
+
+    if(clean){
+      if(clean.parentNode !== panel){
+        if(last) moveAfter(last, clean);
+        else panel.appendChild(clean);
+      }else if(last && last.nextSibling !== clean){
+        moveAfter(last, clean);
+      }
+
+      var info = clean.querySelector('.ff-clean-info-grid');
+      var render = clean.querySelector('.ff-clean-preview-card');
+      var total = clean.querySelector('.ff-clean-total-card');
+
+      if(info) clean.insertBefore(info, clean.firstChild);
+      if(render && info) moveAfter(info, render);
+      if(total && render) moveAfter(render, total);
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', keepExistingRightOrder);
+  window.addEventListener('load', keepExistingRightOrder);
+  document.addEventListener('click', function(){ setTimeout(keepExistingRightOrder, 80); setTimeout(keepExistingRightOrder, 300); }, true);
+  setTimeout(keepExistingRightOrder, 100);
+  setTimeout(keepExistingRightOrder, 600);
+  setInterval(keepExistingRightOrder, 1500);
+
+  console.log('✅ FF EXISTING RIGHT PANEL ORDER FIX LOADED');
+})();
+</script>
+
 </body>
 
 
@@ -24754,5 +24969,46 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   }, true);
 
   console.log('✅ FF LSHAPE CONFIRM ADVANCE FIX LOADED');
+})();
+</script>
+
+<!-- === FF_FLOW_LABELS_REQUESTED_FINAL_SAFE === -->
+<script id="ff-flow-labels-requested-final-safe">
+(function(){
+  var FLOW_LABELS = ['01 제품선택','02 사이즈입력','03 색상선택','04 추가옵션','05 견적확인'];
+  function renderFlowLabelsOnly(){
+    var bar = document.getElementById('flow-bar');
+    if(!bar) return;
+    var active = 0;
+    try{
+      if(typeof getFlowActiveIndexFromState === 'function') active = getFlowActiveIndexFromState(window.state || {});
+    }catch(e){}
+    if(!active && window.state && typeof window.state._maxFlowIndex === 'number') active = window.state._maxFlowIndex || 0;
+    bar.innerHTML = '';
+    FLOW_LABELS.forEach(function(label,i){
+      var sp = document.createElement('button');
+      sp.type = 'button';
+      sp.className = 'flow-step ' + (i < active ? 'done clickable' : (i === active ? 'active' : 'pending'));
+      sp.textContent = label;
+      sp.title = label;
+      if(i < active && typeof goToFlowStep === 'function'){
+        sp.disabled = false;
+        sp.onclick = function(){ goToFlowStep(i); };
+      }else{
+        sp.disabled = i !== active;
+      }
+      bar.appendChild(sp);
+    });
+  }
+  var oldUpdate = window.updateFlowBar;
+  window.updateFlowBar = function(){
+    if(typeof oldUpdate === 'function'){
+      try{ oldUpdate.apply(this, arguments); }catch(e){}
+    }
+    renderFlowLabelsOnly();
+  };
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(renderFlowLabelsOnly, 0); setTimeout(renderFlowLabelsOnly, 500); });
+  setTimeout(renderFlowLabelsOnly, 0);
+  console.log('✅ FF FLOW LABELS REQUESTED FINAL SAFE LOADED');
 })();
 </script>
