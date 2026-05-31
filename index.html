@@ -16348,6 +16348,15 @@ window.showPanel = function(){
     var t=selectedText();
     return /frontside|front_side|전면\+사이드|전면.*사이드|사이드.*전면/i.test(t);
   }
+  function currentIsScreenFlow(){
+    var s=S();
+    var cat=String(s._currentCatName||s.currentCatName||'');
+    if(!cat) return false;
+    return /스크린|screen|front|side|straight|lshape|frontside/i.test(cat);
+  }
+  function isFrontsideFlow(){
+    return currentIsScreenFlow() && isFrontside();
+  }
   function setFrontsideState(){
     var s=S();
     s.screenKey=s.selectedScreenKey=s.currentScreenKey='frontside';
@@ -16451,7 +16460,7 @@ window.showPanel = function(){
 
   var oldAfterSize=window.afterSizeInput;
   window.afterSizeInput=function(parsed){
-    if(isFrontside()){
+    if(isFrontsideFlow()){
       setFrontsideState();
       askFrontsideSize('front');
       return;
@@ -16463,7 +16472,7 @@ window.showPanel = function(){
   ['ffFinalSubmitTopGap','ffScreenTopGapSubmitFinal','submitTopGapForm','ff98SubmitTopGap'].forEach(function(name){
     var old=window[name];
     window[name]=function(){
-      if(isFrontside()){
+      if(isFrontsideFlow()){
         var s=setFrontsideState();
         var fid=arguments[0];
         var el=$('screen-top-final-'+fid)||$('screen-top-'+fid);
