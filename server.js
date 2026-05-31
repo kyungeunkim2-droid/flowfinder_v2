@@ -238,7 +238,7 @@ function ffBuildStrictMappingPrompt({
     size && (size.w || size.d || size.h) ? `Approximate size reference only: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm. Do not change the visible proportions from the base photo.` : '',
     '',
     'OUTPUT REQUIREMENT:',
-    'Return one photorealistic edited catalog image that looks like the original base photo, with only the requested material changes.',
+    'Return only a photorealistic edited version of the original base photo, with only the requested material changes. Do not synthesize a new product image.',
   ];
 
   return [
@@ -254,6 +254,7 @@ function ffBuildStrictMappingPrompt({
 
 app.post('/api/generate-preview', async (req, res) => {
   console.log('[NanoBanana] /api/generate-preview called');
+  console.log('[SERVER_PREVIEWS_BASE_IMAGE_ONLY] active');
   console.log('[SERVER_AUTO_GUIDE_BY_BASENAME] active');
   try {
     if (!process.env.GEMINI_API_KEY) {
@@ -420,81 +421,156 @@ console.log('[NanoBanana] response keys:', Object.keys(response || {}));
   }
 });
 
+
 app.post('/api/generate-screen-preview', async (req, res) => {
+  console.log('[NanoBanana] /api/generate-screen-preview called');
+  console.log('[SERVER_STRICT_SCREEN_PREVIEW_NO_ADD_SCREEN] active');
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        error: 'GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요.',
+      });
+    }
+
     const baseUrl = `${req.protocol}://${req.get('host')}/`;
 
-   const {
-  deskAiImage,
-  screenImage,
-  screenTexture,
-  guideImage,
-  frontScreenTexture,
-  sideScreenTexture,
-  frontScreenCode,
-  sideScreenCode,
-} = req.body || {};
+    const {
+      deskAiImage,
+      screenImage,
+      screenTexture,
+      guideImage,
+      frontScreenTexture,
+      sideScreenTexture,
+      frontScreenCode,
+      sideScreenCode,
+      topTexture,
+      legTexture,
+      topCode,
+      legCode,
+    } = req.body || {};
+
+    // IMPORTANT:
+    // For screen rendering, screenImage from ./images/previews/... is already the correct desk+screen base photo.
+    // Do NOT add a screen product. Do NOT use screenImage as an object reference to compose into deskAiImage.
+    const baseImage = screenImage || deskAiImage;
+
+    console.log('[SCREEN RENDER BODY]', {
+      baseImage,
+      screenImage,
+      deskAiImage,
+      screenTexture,
+      guideImage,
+      frontScreenTexture,
+      sideScreenTexture,
+      frontScreenCode,
+      sideScreenCode,
+      topTexture,
+      legTexture,
+      topCode,
+      legCode,
+    });
+
     const parts = [];
 
     parts.push({
-   text: [
-  'CRITICAL: This is an IMAGE EDITING / MATERIAL MAPPING task, not a new image generation task.',
-  'Use the provided desk image as the exact base photo. Preserve camera angle, perspective, geometry, crop, background, shadows, and lighting.',
-  'Do not create a new desk, new screen, or new scene.',
-  'Apply the provided screen material only to the existing screen panel surfaces.',
-  'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
-  'Do not show masks, outlines, guide lines, pen-tool paths, labels, or overlays.',
-  guideImage ? 'Use the guide image only as an area map: white area = FRONT screen panel only, red area = SIDE screen panel only. Do not render guide colors.' : '',
-  'Return one photorealistic edited catalog image that looks like the original base photo with only screen material changed.'
-].filter(Boolean).join('\n')
+      text: [
+        'CRITICAL: This is an IMAGE EDITING / MATERIAL MAPPING task, not a new image generation task.',
+        'Use the FIRST provided image named "base furniture product image" as the exact base photo.',
+        'The base image already contains the desk and screen panel. Do NOT add a new screen.',
+        'Do NOT create a new desk. Do NOT create a new screen. Do NOT create a new scene.',
+        'Do NOT redesign, replace, move, resize, rotate, or reinterpret any product part.',
+        'Preserve camera angle, perspective, crop, framing, product geometry, screen position, desk position, background, shadows, and lighting exactly.',
+        'Only replace material/color on the specified existing surfaces.',
+        'Texture references are material samples only. Never use them as the background or as a full-image overlay.',
+        topTexture ? 'Apply the top material only to the existing tabletop surface.' : '',
+        legTexture ? 'Apply the leg material only to the existing legs/frame.' : '',
+        screenTexture ? 'Apply the screen material only to the existing screen panel surface.' : '',
+        frontScreenTexture ? 'Apply the front screen material only to the existing FRONT screen panel.' : '',
+        sideScreenTexture ? 'Apply the side screen material only to the existing SIDE screen panel.' : '',
+        frontScreenCode ? `Front screen material code: ${frontScreenCode}.` : '',
+        sideScreenCode ? `Side screen material code: ${sideScreenCode}.` : '',
+        topCode ? `Top material code: ${topCode}.` : '',
+        legCode ? `Leg/frame material code: ${legCode}.` : '',
+        guideImage ? 'Use the guide image only as an area map aligned to the base photo. White area = FRONT screen panel only. Red area = SIDE screen panel only. Do not render guide colors, labels, arrows, or overlays.' : '',
+        'Cable duct/tray under the desktop must remain matte white.',
+        'Final output must look like the original base photo with only requested material changes.',
+      ].filter(Boolean).join('\n')
     });
 
-   const imageInputs = [
-  ['generated desk image', deskAiImage],
-  ['screen product image', screenImage],
-  ['screen material texture reference', screenTexture],
-  ['front screen material texture reference', frontScreenTexture],
-  ['side screen material texture reference', sideScreenTexture],
-  ['front/side guide image', guideImage],
-];
+    const imageInputs = [
+      ['base furniture product image', baseImage],
+      ['desktop material texture reference', topTexture],
+      ['legs and frame material color reference', legTexture],
+      ['screen material texture reference', screenTexture],
+      ['front screen material texture reference', frontScreenTexture],
+      ['side screen material texture reference', sideScreenTexture],
+      ['front/side guide image', guideImage],
+    ];
+
     for (const [label, src] of imageInputs) {
       if (!src) continue;
-
       const part = await loadImagePart(src, label, baseUrl).catch((err) => {
         console.warn(err.message);
         return null;
       });
-
-      if (part) parts.push(part);
+      if (part) {
+        parts.push({ text: `Reference image provided: ${label}. Use this according to the instructions.` });
+        parts.push(part);
+      }
     }
 
- const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const modelCandidates = Array.from(new Set([
+      MODEL,
+      'gemini-2.5-flash-image-preview',
+      'gemini-3-pro-image-preview',
+    ].filter(Boolean)));
 
- const result = await ai.models.generateContent({
-  model: MODEL,
-  contents: [{ role: 'user', parts }],
-  config: { responseModalities: ['TEXT', 'IMAGE'] },
-});
+    let lastText = '';
+    let lastModel = '';
 
-    const partsOut =
-      result?.candidates?.[0]?.content?.parts ||
-      result?.response?.candidates?.[0]?.content?.parts ||
-      [];
+    for (const model of modelCandidates) {
+      lastModel = model;
+      console.log(`[NanoBanana] trying model: ${model}`);
+      console.log('[NanoBanana] screen prompt mode flags:', {
+        hasBaseImage: Boolean(baseImage),
+        hasScreenTexture: Boolean(screenTexture),
+        hasFrontScreenTexture: Boolean(frontScreenTexture),
+        hasSideScreenTexture: Boolean(sideScreenTexture),
+        hasGuideImage: Boolean(guideImage),
+      });
+      console.log('[NanoBanana] parts count:', parts.length);
+      console.time('[NanoBanana] generateContent');
 
-    const inlinePart = partsOut.find(
-      p => p.inlineData?.data || p.inline_data?.data
-    );
+      const result = await ai.models.generateContent({
+        model,
+        contents: [{ role: 'user', parts }],
+        config: { responseModalities: ['TEXT', 'IMAGE'] },
+      });
 
-    const inline = inlinePart?.inlineData || inlinePart?.inline_data || null;
+      console.timeEnd('[NanoBanana] generateContent');
+      console.log('[NanoBanana] response received');
 
-    if (!inline?.data) {
-      return res.status(502).json({
-        error: '스크린 이미지 결과를 받지 못했습니다.'
+      const inline = extractInlineImage(result);
+      console.log('[NanoBanana] inline image found:', !!inline?.data, inline?.mimeType);
+
+      if (inline?.data) {
+        return res.json({
+          imageUrl: `data:${inline.mimeType || 'image/png'};base64,${inline.data}`
+        });
+      }
+
+      lastText = extractText(result);
+      console.warn('[NanoBanana] no inline image returned', {
+        model,
+        text: lastText?.slice(0, 800),
       });
     }
 
-    res.json({
-      imageUrl: `data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`
+    return res.status(502).json({
+      error: '스크린 이미지 결과를 받지 못했습니다.',
+      detail: lastText || 'Gemini 응답에 inline image data가 없습니다.',
+      model: lastModel,
     });
 
   } catch (error) {
