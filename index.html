@@ -17221,15 +17221,7 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
   z-index:4 !important;
 }
 
-/* 선택내역 + 재질선택값 + 렌더링 + 가격은 기존 clean dashboard를 사용 */
-#preview-panel > #ff-clean-right-dashboard{
-  order:30 !important;
-  display:flex !important;
-  flex-direction:column !important;
-  gap:14px !important;
-  width:100% !important;
-  flex:0 0 auto !important;
-}
+
 
 /* clean dashboard 내부 순서: 선택내역/재질 → 렌더링 → 가격 */
 #ff-clean-right-dashboard > .ff-clean-info-grid{
@@ -17295,93 +17287,34 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
   #ff-clean-right-dashboard .ff-clean-info-grid{grid-template-columns:1fr !important;}
 }
 </style>
+<style id="ff-right-panel-one-order-final">
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+}
 
-<script id="ff-final-right-panel-existing-order-fix-js">
-(function(){
-  if(window.__ffFinalExistingRightPanelOrderFix) return;
-  window.__ffFinalExistingRightPanelOrderFix = true;
+#set-product-selector{
+  order:1 !important;
+}
 
-  function $(id){ return document.getElementById(id); }
+#desk-option-images,
+#desk-option-preview,
+#desk-option-section{
+  order:2 !important;
+}
 
-  function moveAfter(ref, node){
-    if(!ref || !node || !ref.parentNode) return;
-    if(node.parentNode !== ref.parentNode){
-      ref.parentNode.insertBefore(node, ref.nextSibling);
-    }else if(ref.nextSibling !== node){
-      ref.parentNode.insertBefore(node, ref.nextSibling);
-    }
-  }
+#ff-clean-right-dashboard{
+  order:3 !important;
+}
 
-  function moveBefore(ref, node){
-    if(!ref || !node || !ref.parentNode) return;
-    if(node.parentNode !== ref.parentNode){
-      ref.parentNode.insertBefore(node, ref);
-    }else if(ref.previousSibling !== node){
-      ref.parentNode.insertBefore(node, ref);
-    }
-  }
+#texture-preview{
+  order:4 !important;
+}
 
-  function keepExistingRightOrder(){
-    var panel = $('preview-panel');
-    if(!panel) return;
-
-    var product = $('set-product-selector');
-    var clean = $('ff-clean-right-dashboard');
-
-    if(product && product.parentNode !== panel){
-      panel.insertBefore(product, panel.firstChild);
-    }
-
-    /* 기존 데스크 옵션 이미지 섹션은 texture-preview 안에 생성되기도 하므로 밖으로 이동 */
-    var optionIds = [
-      'ff-static-option-preview',
-      'ff90-option-summary',
-      'ff71-selection-gallery',
-      'desk-option-preview',
-      'desk-option-images'
-    ];
-
-    var last = product || null;
-    optionIds.forEach(function(id){
-      var el = $(id);
-      if(!el) return;
-      if(el.parentNode !== panel){
-        if(last) moveAfter(last, el);
-        else panel.insertBefore(el, panel.firstChild);
-      }else if(last && last.nextSibling !== el){
-        moveAfter(last, el);
-      }
-      last = el;
-    });
-
-    if(clean){
-      if(clean.parentNode !== panel){
-        if(last) moveAfter(last, clean);
-        else panel.appendChild(clean);
-      }else if(last && last.nextSibling !== clean){
-        moveAfter(last, clean);
-      }
-
-      var info = clean.querySelector('.ff-clean-info-grid');
-      var render = clean.querySelector('.ff-clean-preview-card');
-      var total = clean.querySelector('.ff-clean-total-card');
-
-      if(info) clean.insertBefore(info, clean.firstChild);
-      if(render && info) moveAfter(info, render);
-      if(total && render) moveAfter(render, total);
-    }
-  }
-
-  document.addEventListener('DOMContentLoaded', keepExistingRightOrder);
-  window.addEventListener('load', keepExistingRightOrder);
-  document.addEventListener('click', function(){ setTimeout(keepExistingRightOrder, 80); setTimeout(keepExistingRightOrder, 300); }, true);
-  setTimeout(keepExistingRightOrder, 100);
-  setTimeout(keepExistingRightOrder, 600);
-  setInterval(keepExistingRightOrder, 1500);
-
-  console.log('✅ FF EXISTING RIGHT PANEL ORDER FIX LOADED');
-})();
-</script>
+#total-box{
+  order:5 !important;
+}
+</style>
 
 </body>
 
