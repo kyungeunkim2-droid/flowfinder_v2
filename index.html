@@ -16874,7 +16874,7 @@ window.showPanel = function(){
   function askLshapeDirection(){
     if(window.__ffAskedLshapeDirection) return;
     window.__ffAskedLshapeDirection = true;
-    addBot('L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div>');
+    addBot('L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div><div style="margin-top:12px"><button class="choice-btn ff-lshape-confirm" disabled>선택 완료</button></div><span class="hint">좌측/우측을 선택한 뒤 <b>선택 완료</b>를 눌러주세요.</span>');
   }
   function hideRightLshapeButtons(){
     Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,[data-set-name]')).forEach(function(b){
@@ -16889,9 +16889,20 @@ window.showPanel = function(){
     if(!btn) return;
     var t=text(btn);
     if(btn.classList.contains('ff-lshape-dir')){
-      window.__ffLshapeDirection = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      window.__ffPendingLshapeDirection = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      var group = btn.closest('.btn-group') || document;
+      Array.prototype.slice.call(group.querySelectorAll('.ff-lshape-dir')).forEach(function(x){ x.classList.remove('selected'); });
       btn.classList.add('selected');
-      addBot((window.__ffLshapeDirection === 'right' ? '우측 L형' : '좌측 L형') + '으로 설정했습니다.');
+      var confirmBtn = group.querySelector('.ff-lshape-confirm');
+      if(confirmBtn) confirmBtn.disabled = false;
+      return;
+    }
+    if(btn.classList.contains('ff-lshape-confirm')){
+      if(!window.__ffPendingLshapeDirection) return;
+      window.__ffLshapeDirection = window.__ffPendingLshapeDirection;
+      btn.classList.add('selected');
+      btn.disabled = true;
+      btn.textContent = '선택 완료';
       return;
     }
     if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t)){
@@ -16908,6 +16919,117 @@ window.showPanel = function(){
 })();
 </script>
 
+
+
+<!-- === FF_LSHAPE_DIRECTION_TO_PREVIEW_KEY_FIX === -->
+<script id="ff-lshape-direction-to-preview-key-fix">
+(function(){
+  if(window.__ffLshapeDirectionToPreviewKeyFix) return;
+  window.__ffLshapeDirectionToPreviewKeyFix = true;
+
+  function S(){
+    window.state = window.state || {};
+    return window.state;
+  }
+  function txt(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
+  function legKey(v){ v=String(v||''); if(/원형|round/i.test(v)) return 'round'; if(/A자|A형|aframe|에이/i.test(v)) return 'aframe'; return 'ladder'; }
+  function moveKey(v){ v=String(v||''); return /캐스터|caster|바퀴/i.test(v) ? 'caster' : 'glide'; }
+  function topKey(v){ v=String(v||''); return /라운드|round/i.test(v) ? 'round' : 'rect'; }
+  function deskFolder(){
+    var s=S();
+    var raw=[s.deskKey,s.selectedDeskKey,s.productKey,s.product,s.deskLabel,s.currentProduct].join(' ');
+    return /덕트|duct/i.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function baseName(){
+    var s=S();
+    return [legKey(s.legType||s.legShape), moveKey(s.casterType||s.mobility), topKey(s.topShape)].join('_');
+  }
+  function previewPathFor(key){
+    if(window.ffPreviewImageForKey){
+      try{ return window.ffPreviewImageForKey(key); }catch(e){}
+    }
+    return './images/previews/' + deskFolder() + '/' + baseName() + '_' + key + '.png';
+  }
+  function selectedScreenTexture(){
+    var s=S();
+    return s.screenTexture || s.screenTex || s._screenTexture ||
+      (window._screenPreviewState && window._screenPreviewState.screen && window._screenPreviewState.screen.texUrl) || '';
+  }
+  function selectedScreenCode(){
+    var s=S();
+    var el=document.getElementById('quick-screen-code');
+    return (el && txt(el) && txt(el) !== '-') ? txt(el) : (s.screenCode || s.screenColor || s.screen || '');
+  }
+  function applyLshapeDirection(dir){
+    dir = (dir === 'right' || dir === 'R' || dir === 'r') ? 'right' : 'left';
+    var key = dir === 'right' ? 'lshape_R' : 'lshape';
+    var s = S();
+
+    // 핵심: L/R 선택값을 렌더 원본 경로 결정값에도 저장한다.
+    window.__ffLshapeDirection = dir;
+    window.__ffPendingLshapeDirection = dir;
+    window.__ffNanoTarget = 'screen';
+
+    s.screenKey = key;
+    s.selectedScreenKey = key;
+    s.currentScreenKey = key;
+    s.screenType = key;
+    s.screenLabel = key;
+    s._currentCatName = 'L형 스크린';
+    s.currentCatName = 'L형 스크린';
+
+    var path = previewPathFor(key);
+    var img = document.getElementById('quick-screen-img');
+    if(img) img.src = path;
+    var label = document.getElementById('quick-screen-label');
+    if(label) label.textContent = dir === 'right' ? 'L형 스크린(우측)' : 'L형 스크린';
+
+    // 기존 빠른 미리보기 클로저에도 L형 선택을 다시 주입한다.
+    if(typeof window.updateScreenComposite === 'function'){
+      try{ window.updateScreenComposite('L형 스크린', selectedScreenCode(), selectedScreenTexture()); }catch(e){}
+      setTimeout(function(){
+        var img2=document.getElementById('quick-screen-img');
+        if(img2) img2.src = path;
+        var label2=document.getElementById('quick-screen-label');
+        if(label2) label2.textContent = dir === 'right' ? 'L형 스크린(우측)' : 'L형 스크린';
+      }, 0);
+    }
+
+    console.log('[LSHAPE_KEY_FIXED]', {direction:dir, screenKey:key, preview:path});
+  }
+
+  window.ffApplyLshapeDirectionToPreviewKey = applyLshapeDirection;
+
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('button,.choice-btn,[data-set-name]');
+    if(!btn) return;
+    var t = txt(btn);
+
+    if(btn.classList.contains('ff-lshape-dir')){
+      var dir = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      window.__ffPendingLshapeDirection = dir;
+      setTimeout(function(){ applyLshapeDirection(dir); }, 0);
+      return;
+    }
+
+    if(btn.classList.contains('ff-lshape-confirm')){
+      var dir2 = window.__ffPendingLshapeDirection || window.__ffLshapeDirection || 'left';
+      setTimeout(function(){ applyLshapeDirection(dir2); }, 0);
+      return;
+    }
+
+    if(/L형\s*스크린/.test(t)){
+      setTimeout(function(){
+        if(window.__ffLshapeDirection){
+          applyLshapeDirection(window.__ffLshapeDirection);
+        }
+      }, 80);
+    }
+  }, true);
+
+  console.log('✅ FF LSHAPE DIRECTION TO PREVIEW KEY FIX LOADED');
+})();
+</script>
 </body>
 
 
@@ -24385,16 +24507,27 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function askLshapeDirection(){
     if(window.__ffAskedLshapeDirection) return;
     window.__ffAskedLshapeDirection = true;
-    addBot('L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div>');
+    addBot('L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div><div style="margin-top:12px"><button class="choice-btn ff-lshape-confirm" disabled>선택 완료</button></div><span class="hint">좌측/우측을 선택한 뒤 <b>선택 완료</b>를 눌러주세요.</span>');
   }
   document.addEventListener('click', function(e){
     var btn = e.target && e.target.closest && e.target.closest('button,.choice-btn');
     if(!btn) return;
     var t = txt(btn);
     if(btn.classList.contains('ff-lshape-dir')){
-      window.__ffLshapeDirection = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      window.__ffPendingLshapeDirection = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      var group = btn.closest('.btn-group') || document;
+      Array.prototype.slice.call(group.querySelectorAll('.ff-lshape-dir')).forEach(function(x){ x.classList.remove('selected'); });
       btn.classList.add('selected');
-      addBot((window.__ffLshapeDirection === 'right' ? '우측 L형' : '좌측 L형') + '으로 설정했습니다.');
+      var confirmBtn = group.querySelector('.ff-lshape-confirm');
+      if(confirmBtn) confirmBtn.disabled = false;
+      return;
+    }
+    if(btn.classList.contains('ff-lshape-confirm')){
+      if(!window.__ffPendingLshapeDirection) return;
+      window.__ffLshapeDirection = window.__ffPendingLshapeDirection;
+      btn.classList.add('selected');
+      btn.disabled = true;
+      btn.textContent = '선택 완료';
       return;
     }
     if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t)){
