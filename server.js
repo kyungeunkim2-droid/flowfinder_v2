@@ -126,7 +126,11 @@ app.post('/api/generate-preview', async (req, res) => {
       topTexture,
       legTexture,
       screenTexture,
+      frontScreenTexture,
+      sideScreenTexture,
       screenCode,
+      frontScreenCode,
+      sideScreenCode,
       screenImage,
       SCREEN_MASK,
       topCode,
@@ -143,19 +147,26 @@ app.post('/api/generate-preview', async (req, res) => {
 
     parts.push({
       text: [
-        'Use the base furniture product image as the exact reference.',
-        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
-        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
-        'Apply the provided leg material naturally only to the vertical desk legs.',
-        screenTexture ? 'Apply the provided screen material texture naturally only to the screen panel area.' : '',
+        'THIS IS STRICT IMAGE EDITING, NOT IMAGE GENERATION.',
+        'Use the FIRST provided image as the exact fixed base image.',
+        'Do not generate, redraw, redesign, resize, crop, rotate, or replace the product.',
+        'Do not create a new desk, new screen, new room, new background, or new camera angle.',
+        'Preserve the original camera angle, perspective, proportions, silhouette, dimensions, background, lighting, shadows, crop, screen shape, desk shape, leg shape, and caster wheels.',
+        'Only change the material appearance on the selected surface.',
+        'Do not alter any other area.',
+        'Apply the provided top material texture naturally only to the existing desktop/tabletop surface.',
+        'Apply the provided leg material naturally only to the existing vertical desk legs/frame.',
+        screenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
+        frontScreenTexture ? 'Apply the front screen material texture only to the existing FRONT screen panel area.' : '',
+        sideScreenTexture ? 'Apply the side screen material texture only to the existing SIDE screen panel area.' : '',
         screenCode ? `Screen material code: ${screenCode}.` : '',
+        frontScreenCode ? `Front screen material code: ${frontScreenCode}.` : '',
+        sideScreenCode ? `Side screen material code: ${sideScreenCode}.` : '',
         'If a screen panel exists in the base image, preserve it and recolor only the screen surface.',
         'Do not leave the screen panel black if a screen texture reference is provided.',
-
-'Keep the cable duct / cable tray area under the desktop matte white.',
-
-'Do not recolor the duct/tray section.',
-        'Do not redraw the product.',
+        'Keep the cable duct / cable tray area under the desktop matte white.',
+        'Do not recolor the duct/tray section.',
+        'If the selected surface cannot be identified, return the original base image unchanged.',
         'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
         topCode ? `Top material code: ${topCode}.` : '',
         legCode ? `Leg/frame material code: ${legCode}.` : '',
@@ -164,7 +175,6 @@ app.post('/api/generate-preview', async (req, res) => {
         casterType ? `Selected bottom support: ${casterType}. Preserve it if visible.` : '',
         topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
         size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
-        'Create one photorealistic office furniture catalog render.',
         guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply each selected material only to the matching labeled panel.' : '',
       ].filter(Boolean).join('\n'),
     });
@@ -174,6 +184,8 @@ app.post('/api/generate-preview', async (req, res) => {
       ['desktop material texture reference', topTexture],
       ['legs and frame material color reference', legTexture],
       ['screen material texture reference', screenTexture],
+      ['front screen material texture reference', frontScreenTexture],
+      ['side screen material texture reference', sideScreenTexture],
       ['screen product reference', screenImage],
       ['front/side guide image', guideImage],
     ];
@@ -241,84 +253,134 @@ console.log('[NanoBanana] response keys:', Object.keys(response || {}));
 });
 
 app.post('/api/generate-screen-preview', async (req, res) => {
+  console.log('[NanoBanana] /api/generate-screen-preview called');
+  console.log('[SERVER_STRICT_SCREEN_ORIGINAL_ONLY] active');
   try {
+    if (!process.env.GEMINI_API_KEY) {
+      return res.status(500).json({
+        error: 'GEMINI_API_KEY가 설정되지 않았습니다. .env 파일을 확인해주세요.',
+      });
+    }
+
     const baseUrl = `${req.protocol}://${req.get('host')}/`;
 
-   const {
-  deskAiImage,
-  screenImage,
-  screenTexture,
-  guideImage,
-  frontScreenTexture,
-  sideScreenTexture,
-  frontScreenCode,
-  sideScreenCode,
-} = req.body || {};
-    const parts = [];
+    const {
+      deskImage,
+      baseImage,
+      sourceImage,
+      screenImage,
+      screenTexture,
+      guideImage,
+      frontScreenTexture,
+      sideScreenTexture,
+      screenCode,
+      frontScreenCode,
+      sideScreenCode,
+      screenLabel,
+      legType,
+      casterType,
+      topShape,
+    } = req.body || {};
 
+    // IMPORTANT: never use a previously AI-rendered data URL as the base for screen mapping.
+    // The base must be the original preview image that already contains the screen.
+    const originalScreenBase = screenImage || deskImage || baseImage || sourceImage;
+    if (!originalScreenBase) {
+      return res.status(400).json({ error: '스크린 원본 preview 이미지 경로가 없습니다.' });
+    }
+
+    const parts = [];
     parts.push({
-   text: [
-  'Use the provided AI-generated desk image as the exact base image.',
-  'Use the provided screen/base product image as the exact source image. Do not add a new screen; only edit existing screen material.',
-  'Apply the provided screen material only to the screen panel.',
-  'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
-  'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
-  'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
-  'Create one photorealistic office furniture catalog render.',
-  guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply front screen material only to FRONT and side screen material only to SIDE.' : ''
-].filter(Boolean).join('\n')
+      text: [
+        'THIS IS STRICT IMAGE EDITING, NOT IMAGE GENERATION.',
+        'Use the FIRST provided image as the exact fixed base image.',
+        'The FIRST image is the original product preview that already contains the existing screen panel.',
+        'Do not use any previously AI-generated render as the source image.',
+        'Do not generate, redraw, redesign, resize, crop, rotate, or replace the product.',
+        'Do not create a new desk, new screen, new room, new background, or new camera angle.',
+        'Only apply the provided screen material to the existing screen panel surface.',
+        'Do not modify the desktop, desk legs, wheels, cable duct, shadows, background, crop, perspective, or product silhouette.',
+        'Preserve the exact original screen shape, desk shape, leg shape, caster wheels, camera angle, lighting, shadows, background, and crop.',
+        screenTexture ? 'Apply the single screen material texture only to all selected existing screen panel areas.' : '',
+        frontScreenTexture ? 'Apply the front screen material texture only to the existing FRONT screen panel area.' : '',
+        sideScreenTexture ? 'Apply the side screen material texture only to the existing SIDE screen panel area.' : '',
+        screenCode ? `Screen material code: ${screenCode}.` : '',
+        frontScreenCode ? `Front screen material code: ${frontScreenCode}.` : '',
+        sideScreenCode ? `Side screen material code: ${sideScreenCode}.` : '',
+        screenLabel ? `Selected screen: ${screenLabel}. Preserve its geometry.` : '',
+        legType ? `Selected leg shape: ${legType}. Preserve it if visible.` : '',
+        casterType ? `Selected bottom support: ${casterType}. Preserve it if visible.` : '',
+        topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
+        guideImage ? 'Use the guide image only as a hidden area reference. FRONT means front screen panel, SIDE means side screen panel. Do not draw the guide colors or outlines.' : '',
+        'If the screen panel cannot be identified, return the original base image unchanged.',
+        'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
+      ].filter(Boolean).join('\n'),
     });
 
-   const imageInputs = [
-  ['generated desk image', deskAiImage],
-  ['screen product image', screenImage],
-  ['screen material texture reference', screenTexture],
-  ['front screen material texture reference', frontScreenTexture],
-  ['side screen material texture reference', sideScreenTexture],
-  ['front/side guide image', guideImage],
-];
+    const imageInputs = [
+      ['original screen-included product preview image', originalScreenBase],
+      ['screen material texture reference', screenTexture],
+      ['front screen material texture reference', frontScreenTexture],
+      ['side screen material texture reference', sideScreenTexture],
+      ['front/side guide image', guideImage],
+    ];
+
     for (const [label, src] of imageInputs) {
       if (!src) continue;
-
       const part = await loadImagePart(src, label, baseUrl).catch((err) => {
         console.warn(err.message);
         return null;
       });
-
-      if (part) parts.push(part);
+      if (part) {
+        parts.push({ text: `Reference image provided: ${label}. Use this according to the instructions.` });
+        parts.push(part);
+      }
     }
 
- const result = await ai.models.generateContent({
-  model: MODEL,
-  contents: [{ role: 'user', parts }],
-  config: { responseModalities: ['TEXT', 'IMAGE'] },
-});
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    const modelCandidates = Array.from(new Set([
+      MODEL,
+      'gemini-2.5-flash-image-preview',
+      'gemini-3-pro-image-preview',
+    ].filter(Boolean)));
 
-    const partsOut =
-      result?.candidates?.[0]?.content?.parts ||
-      result?.response?.candidates?.[0]?.content?.parts ||
-      [];
+    let lastText = '';
+    let lastModel = '';
 
-    const inlinePart = partsOut.find(
-      p => p.inlineData?.data || p.inline_data?.data
-    );
+    for (const model of modelCandidates) {
+      lastModel = model;
+      console.log(`[NanoBanana] trying screen model: ${model}`);
+      console.log('[NanoBanana] screen parts count:', parts.length);
+      console.time('[NanoBanana] screen generateContent');
+      const response = await ai.models.generateContent({
+        model,
+        contents: [{ role: 'user', parts }],
+        config: { responseModalities: ['TEXT', 'IMAGE'] },
+      });
+      console.timeEnd('[NanoBanana] screen generateContent');
 
-    const inline = inlinePart?.inlineData || inlinePart?.inline_data || null;
+      const inline = extractInlineImage(response);
+      console.log('[NanoBanana] screen inline image found:', !!inline?.data, inline?.mimeType);
+      if (inline?.data) {
+        return res.json({ imageUrl: `data:${inline.mimeType};base64,${inline.data}` });
+      }
 
-    if (!inline?.data) {
-      return res.status(502).json({
-        error: '스크린 이미지 결과를 받지 못했습니다.'
+      lastText = extractText(response);
+      console.warn('[NanoBanana] no screen inline image returned', {
+        model,
+        text: lastText?.slice(0, 800),
       });
     }
 
-    res.json({
-      imageUrl: `data:${inline.mimeType || inline.mime_type || 'image/png'};base64,${inline.data}`
+    return res.status(500).json({
+      error: '스크린 이미지 결과를 받지 못했습니다.',
+      detail: lastText || 'Gemini 응답에 inline image data가 없습니다.',
+      model: lastModel,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      error: error.message || '스크린 생성 실패'
+      error: error.message || '스크린 재질 적용 실패',
     });
   }
 });
