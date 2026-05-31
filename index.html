@@ -6703,9 +6703,27 @@ function setPreviewGlow(part) {
       PREVIEW.legTex = textureFor(upper, cat);
     } else if ((USER_CATEGORIES[cat] || {}).isScreen || cat.indexOf('스크린') !== -1) {
       part = 'screen';
-      PREVIEW.screen = code;
-      PREVIEW.screenTex = textureFor(code, cat);
-      PREVIEW.screenKey = productKeyFromCatName(cat) || PREVIEW.screenKey;
+  PREVIEW.screenKey = key || PREVIEW.screenKey;
+
+var tex = normalizeTex(texUrl) || textureFor(colorCode, type);
+var isFrontside = PREVIEW.screenKey === 'frontside' || key === 'frontside';
+
+if(isFrontside){
+  if(/사이드/.test(type)){
+    PREVIEW.sideScreen = colorCode || PREVIEW.sideScreen;
+    PREVIEW.sideScreenTex = tex;
+  } else if(/전면/.test(type)){
+    PREVIEW.frontScreen = colorCode || PREVIEW.frontScreen;
+    PREVIEW.frontScreenTex = tex;
+  } else {
+    PREVIEW.screen = colorCode || PREVIEW.screen;
+    PREVIEW.screenTex = tex;
+  }
+  PREVIEW.screenKey = 'frontside';
+} else {
+  PREVIEW.screen = colorCode || PREVIEW.screen;
+  PREVIEW.screenTex = tex;
+}
     } else {
       part = 'top';
       PREVIEW.top = code;
@@ -6747,23 +6765,36 @@ function setPreviewGlow(part) {
     }
     if (btn) { btn.disabled = true; btn.textContent = '생성 중...'; }
     try {
-      var payload = {
-        deskImage: getBase(PREVIEW.deskKey),
-        topTexture: PREVIEW.topTex || '',
-        legTexture: PREVIEW.legTex || '',
-        topCode: PREVIEW.top || '',
-        legCode: PREVIEW.leg || '',
-        screenTexture: PREVIEW.screenTex || '',
-        screenImage: getBase(PREVIEW.screenKey) || '',
-        screenCode: PREVIEW.screen || '',
-        screenMaterialCode: (document.getElementById('quick-screen-code') && document.getElementById('quick-screen-code').textContent ? document.getElementById('quick-screen-code').textContent.trim() : ''),
-        screenInstruction: '스크린에는 선택된 스크린 재질 이미지를 반드시 적용하세요.',
-        deskLabel: productLabel(PREVIEW.deskKey),
-        legType: (state.legType || ''),
-        casterType: (state.casterType || ''),
-        topShape: (state.topShape || ''),
-        size: { w: state.w || '', d: state.d || '', h: state.h || '' }
-      };
+  var isFrontside = PREVIEW.screenKey === 'frontside';
+
+var payload = {
+  deskImage: getBase(PREVIEW.deskKey),
+
+  topTexture: PREVIEW.topTex || '',
+  legTexture: PREVIEW.legTex || '',
+
+  topCode: PREVIEW.top || '',
+  legCode: PREVIEW.leg || '',
+
+  screenTexture: isFrontside ? '' : (PREVIEW.screenTex || ''),
+
+  frontScreenTexture: isFrontside ? (PREVIEW.frontScreenTex || '') : '',
+  sideScreenTexture: isFrontside ? (PREVIEW.sideScreenTex || '') : '',
+
+  screenGuide: isFrontside ? './images/guides/frontside_guide.png' : '',
+  screenImage: getBase(PREVIEW.screenKey) || '',
+  screenCode: PREVIEW.screen || '',
+
+  screenInstruction: isFrontside
+    ? 'Use frontside_guide. Apply frontScreenTexture only to the front screen area and sideScreenTexture only to the side screen area.'
+    : 'Apply screenTexture only to the existing screen area.',
+
+  deskLabel: productLabel(PREVIEW.deskKey),
+  legType: state.legType || '',
+  casterType: state.casterType || '',
+  topShape: state.topShape || '',
+  size: { w: state.w || '', d: state.d || '', h: state.h || '' }
+};
       var res = await fetch('/api/generate-preview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
