@@ -16614,6 +16614,651 @@ window.showPanel = function(){
 })();
 </script>
 
+
+<script id="ff-final-screen-strict-frontside-lshape-guard-v3">
+(function(){
+  if(window.__ffFinalScreenStrictFrontsideLshapeGuardV3) return;
+  window.__ffFinalScreenStrictFrontsideLshapeGuardV3 = true;
+
+  function $(id){ return document.getElementById(id); }
+  function text(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+  function S(){
+    var a = window.state || window.appState || {};
+    var b = (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};
+    var o = {};
+    [a,b].forEach(function(src){
+      for(var k in src){
+        if(src[k] !== undefined && src[k] !== null && src[k] !== '') o[k] = src[k];
+      }
+    });
+    return o;
+  }
+
+  function selectedText(){
+    var arr = window._setSelected || [];
+    var selected = Array.prototype.slice.call(document.querySelectorAll('.choice-btn.selected,.choice-btn.multi-selected,[data-set-name].selected-set-card'))
+      .map(text).join(' ');
+    return String(arr.join(' ') + ' ' + selected);
+  }
+
+  function legKey(v){
+    v = String(v || '');
+    if(/원형|round/i.test(v)) return 'round';
+    if(/A자|에이|aframe|\bA\b/i.test(v)) return 'aframe';
+    return 'ladder';
+  }
+  function moveKey(v){
+    v = String(v || '');
+    return /캐스터|바퀴|caster/i.test(v) ? 'caster' : 'glide';
+  }
+  function topKey(v){
+    v = String(v || '');
+    return /라운드|round/i.test(v) ? 'round' : 'rect';
+  }
+  function deskFolder(){
+    var s = S();
+    var raw = [s.deskKey, s.selectedDeskKey, s.productKey, s.product, s.deskLabel, s.currentProduct, selectedText()].join(' ');
+    return /duct|덕트/i.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function baseName(){
+    var s = S();
+    return [legKey(s.legType || s.legShape), moveKey(s.casterType || s.mobility), topKey(s.topShape)].join('_');
+  }
+  function normScreenKey(v){
+    v = String(v || '').trim().replace(/^screen_/, '');
+    if(/frontside|front_side/i.test(v)) return 'frontside';
+    if(/straight|일자/i.test(v)) return 'straight';
+    if(/lshape_R|우측|오른쪽|right/i.test(v)) return 'lshape_R';
+    if(/lshape|L형|l형/i.test(v)) return window.__ffLshapeDirection === 'right' ? 'lshape_R' : 'lshape';
+    if(/side|사이드/i.test(v)) return 'side';
+    if(/front|전면/i.test(v)) return 'front';
+    return v;
+  }
+  function bothFrontSide(){
+    var raw = selectedText();
+    return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
+  }
+  function screenSuffix(){
+    var s = S();
+    if(bothFrontSide()) return 'frontside';
+    var raw = s.screenKey || s.selectedScreenKey || s.screenType || s.screenLabel || s.screen || s._currentCatName || s.currentCatName || selectedText();
+    var key = normScreenKey(raw);
+    return ['front','side','straight','lshape','lshape_R','frontside'].indexOf(key) >= 0 ? key : 'front';
+  }
+  function previewPath(suffix){
+    suffix = normScreenKey(suffix || '');
+    var folder = deskFolder();
+    var base = baseName();
+    if(['front','side','straight','lshape','lshape_R','frontside'].indexOf(suffix) >= 0){
+      return './images/previews/' + folder + '/' + base + '_' + suffix + '.png';
+    }
+    return './images/previews/' + folder + '/' + base + '.png';
+  }
+
+  window.ffPreviewImageForKey = function(key){
+    key = String(key || '').replace(/^screen_/,'');
+    if(key === 'desk_standard') return './images/previews/desk_standard/' + baseName() + '.png';
+    if(key === 'desk_duct') return './images/previews/desk_duct/' + baseName() + '.png';
+    return previewPath(key);
+  };
+  window.productImage = window.ffPreviewImageForKey;
+  window.ffBuildPreviewPath = function(){ return previewPath(screenSuffix()); };
+
+  function bgUrl(id){
+    var el = $(id); if(!el) return '';
+    var bg = (el.style && el.style.backgroundImage) || getComputedStyle(el).backgroundImage || '';
+    var m = bg.match(/url\(["']?(.+?)["']?\)/);
+    return m ? m[1].replace(/\\/g,'/') : '';
+  }
+  function textById(id){ var el=$(id); return el ? text(el) : ''; }
+
+  function screenMaterialPayload(){
+    var s = S();
+    var screenTex = bgUrl('quick-screen-chip') || s.screenTexture || s.screenTex || s.screenMaterialImg || '';
+    var frontTex = s.frontScreenTexture || (window._screenPreviewState && window._screenPreviewState.front && window._screenPreviewState.front.texUrl) || '';
+    var sideTex = s.sideScreenTexture || (window._screenPreviewState && window._screenPreviewState.side && window._screenPreviewState.side.texUrl) || '';
+
+    // frontside는 전면/사이드 각각 선택값이 있으면 그것을 우선 사용한다.
+    // 없으면 단일 screenTex로 대체하지 않고 렌더를 막는다.
+    return {
+      screenCode: textById('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '',
+      screenTexture: screenTex,
+      frontScreenTexture: frontTex,
+      sideScreenTexture: sideTex
+    };
+  }
+
+  function ensureRenderPanel(kind){
+    var panel = $('ff-cpf-render-panel');
+    if(!panel){
+      var host = $('texture-preview') || $('preview-panel') || document.body;
+      panel = document.createElement('div');
+      panel.id = 'ff-cpf-render-panel';
+      panel.innerHTML = '<div class="ff-cpf-head"><div class="ff-cpf-title">렌더링 결과</div><div class="ff-cpf-status" id="ff-cpf-render-status">대기</div></div><div class="ff-cpf-box" id="ff-cpf-render-box"></div>';
+      host.appendChild(panel);
+    }
+    panel.classList.add('ff-cpf-visible','ff-cpf-has-run');
+    panel.style.display = 'block';
+    var title = panel.querySelector('.ff-cpf-title');
+    if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과';
+    return panel;
+  }
+  function showErr(msg){
+    ensureRenderPanel('screen');
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent='확인 필요';
+    if(box) box.innerHTML='<div style="padding:14px;color:#fca5a5;font-weight:900;line-height:1.55;">'+esc(msg)+'</div>';
+  }
+  function setLoading(kind){
+    ensureRenderPanel(kind);
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent='생성 중';
+    if(box) box.innerHTML='<div style="padding:18px;color:#2ef2c9;font-weight:900;">원본 사진에 재질을 맵핑 중입니다...</div>';
+  }
+  function setResult(kind, src){
+    ensureRenderPanel(kind);
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent='생성완료';
+    if(box) box.innerHTML='<img src="'+esc(src)+'" alt="렌더링 결과" style="width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px;display:block;">';
+  }
+  function xhrJson(url, payload, timeoutMs){
+    return new Promise(function(resolve, reject){
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.timeout = timeoutMs || 90000;
+      xhr.setRequestHeader('Content-Type','application/json');
+      xhr.onload = function(){
+        var data = {};
+        try{ data = JSON.parse(xhr.responseText || '{}'); }catch(e){ data = xhr.responseText || {}; }
+        if(xhr.status >= 200 && xhr.status < 300) resolve(data);
+        else reject(new Error((data && (data.error || data.detail)) || ('HTTP ' + xhr.status)));
+      };
+      xhr.onerror = function(){ reject(new Error('서버 연결 실패')); };
+      xhr.ontimeout = function(){ reject(new Error('렌더링 응답 시간이 초과되었습니다.')); };
+      xhr.send(JSON.stringify(payload));
+    });
+  }
+
+  function isScreenRender(targetType){
+    if(targetType === 'screen') return true;
+    if(targetType === 'desk') return false;
+    if(window.__ffNanoTarget === 'screen') return true;
+    if(window.__ffNanoTarget === 'desk') return false;
+    var s=S();
+    var raw=[s._currentCatName,s.currentCatName,s.screenLabel,s.screenKey,s.selectedScreenKey,selectedText()].join(' ');
+    return /스크린|screen|전면|사이드|일자|L형|lshape|straight|front|side/i.test(raw) && !/데스크.*재질|상판.*다리/i.test(raw);
+  }
+
+  var oldPrepare = window.prepareNanoBananaPreview;
+  window.prepareNanoBananaPreview = async function(targetType){
+    var screen = isScreenRender(targetType);
+    if(!screen && typeof oldPrepare === 'function'){
+      return oldPrepare.apply(this, arguments);
+    }
+
+    var suffix = screenSuffix();
+
+    if(suffix === 'lshape' && !window.__ffLshapeDirection){
+      showErr('L형스크린은 먼저 방향을 선택해야 합니다. 좌측 L형 또는 우측 L형을 선택한 뒤 렌더링해주세요.');
+      askLshapeDirection();
+      return;
+    }
+
+    var m = screenMaterialPayload();
+
+    if(suffix === 'frontside'){
+      if(!m.frontScreenTexture || !m.sideScreenTexture){
+        showErr('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택한 뒤 렌더링해야 합니다.');
+        return;
+      }
+    }else{
+      if(!m.screenTexture){
+        showErr('스크린 재질을 먼저 선택한 뒤 렌더링해주세요.');
+        return;
+      }
+    }
+
+    var base = previewPath(suffix);
+    var payload = {
+      mode: 'strict-screen-texture-only-preview-path-v4',
+      materialEditOnly: true,
+      preserveSourceImage: true,
+      preserveTransparentBackground: true,
+      canvasAspect: '16:9',
+      targetType: 'screen',
+      productType: 'screen',
+      deskImage: base,
+      fallbackDeskImage: base,
+      screenImage: base,
+      screenSelected: true,
+      screenLabel: suffix,
+      topTexture: '',
+      legTexture: '',
+      screenTexture: suffix === 'frontside' ? '' : m.screenTexture,
+      frontScreenTexture: suffix === 'frontside' ? m.frontScreenTexture : '',
+      sideScreenTexture: suffix === 'frontside' ? m.sideScreenTexture : '',
+      screenCode: m.screenCode,
+      size: {screenH:(S().screenH||''), screenTopGap:(S().screenTopGap||'')},
+      previewPathRule: 'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
+      renderSourceImage: base,
+      forbidGeneration: true,
+      instruction: 'Use the source preview image exactly. Do not create a new desk, screen, room, background, camera angle, shape, or layout. Only map the provided screen texture to the existing screen area. Keep the desk top and legs unchanged.'
+    };
+
+    setLoading('screen');
+    var btn=$('quick-ai-preview-btn') || $('ff-clean-render-btn');
+    if(btn){btn.disabled=true;btn.textContent='생성 중...';}
+    try{
+      var data=await xhrJson('/api/generate-preview', payload, 90000);
+      var src=(typeof data==='string') ? data : (data.imageUrl || data.image || data.url || data.previewUrl || '');
+      if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      setResult('screen', src);
+      return data;
+    }catch(e){
+      showErr(e && e.message ? e.message : String(e));
+      throw e;
+    }finally{
+      if(btn){btn.disabled=false;btn.textContent='✨ 원본 사진에 재질 적용';}
+    }
+  };
+
+  function addBot(html){
+    if(typeof window.addMsg === 'function'){ try{ window.addMsg('bot', html); return; }catch(e){} }
+    var messages=$('messages'); if(!messages) return;
+    var row=document.createElement('div'); row.className='msg bot';
+    row.innerHTML='<div class="bot-icon">AI</div><div class="bubble">'+html+'</div>';
+    messages.appendChild(row); messages.scrollTop=messages.scrollHeight;
+  }
+  function askLshapeDirection(){
+    if(window.__ffAskedLshapeDirection) return;
+    window.__ffAskedLshapeDirection = true;
+    addBot('L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div>');
+  }
+  function hideRightLshapeButtons(){
+    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,[data-set-name]')).forEach(function(b){
+      if(/L형\s*스크린\s*\(우측\)|L형스크린\s*\(우측\)/.test(text(b))) {
+        b.style.display='none';
+        b.setAttribute('aria-hidden','true');
+      }
+    });
+  }
+  document.addEventListener('click', function(e){
+    var btn=e.target && e.target.closest && e.target.closest('button,.choice-btn,[data-set-name]');
+    if(!btn) return;
+    var t=text(btn);
+    if(btn.classList.contains('ff-lshape-dir')){
+      window.__ffLshapeDirection = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      btn.classList.add('selected');
+      addBot((window.__ffLshapeDirection === 'right' ? '우측 L형' : '좌측 L형') + '으로 설정했습니다.');
+      return;
+    }
+    if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t)){
+      window.__ffAskedLshapeDirection = false;
+      setTimeout(askLshapeDirection, 80);
+    }
+  }, true);
+
+  document.addEventListener('DOMContentLoaded', function(){
+    hideRightLshapeButtons();
+    var mo = new MutationObserver(hideRightLshapeButtons);
+    mo.observe(document.documentElement, {childList:true, subtree:true});
+  });
+})();
+</script>
+
+
+<script id="ff-unified-original-only-full-render-a-v1">
+(function(){
+  if(window.__ffUnifiedOriginalOnlyFullRenderAV1) return;
+  window.__ffUnifiedOriginalOnlyFullRenderAV1 = true;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function txt(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
+
+  function getState(){
+    var a = window.state || window.appState || {};
+    var b = (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};
+    var o = {};
+    [a,b].forEach(function(src){
+      for(var k in src){
+        if(src[k] !== undefined && src[k] !== null && src[k] !== '') o[k] = src[k];
+      }
+    });
+    return o;
+  }
+
+  function selectedText(){
+    var arr = window._setSelected || [];
+    var dom = Array.prototype.slice.call(document.querySelectorAll('.choice-btn.selected,.choice-btn.multi-selected,[data-set-name].selected-set-card,.material-btn.active,.material-btn.selected'))
+      .map(txt).join(' ');
+    return String(arr.join(' ') + ' ' + dom);
+  }
+
+  function bgUrl(id){
+    var el=$(id); if(!el) return '';
+    var bg=(el.style && el.style.backgroundImage) || getComputedStyle(el).backgroundImage || '';
+    var m=bg.match(/url\(["']?(.+?)["']?\)/);
+    return m ? m[1].replace(/\\/g,'/') : '';
+  }
+
+  function codeText(id){
+    var el=$(id);
+    return el ? txt(el) : '';
+  }
+
+  function findTextureByPart(part){
+    var s=getState();
+
+    var direct = '';
+    if(part === 'top'){
+      direct = bgUrl('quick-top-chip') || s.topTexture || s.topTex || s.topMaterialImg || s.topTextureUrl || '';
+    }else if(part === 'leg'){
+      direct = bgUrl('quick-leg-chip') || s.legTexture || s.legTex || s.legMaterialImg || s.legTextureUrl || '';
+    }else{
+      direct = bgUrl('quick-screen-chip') || s.screenTexture || s.screenTex || s.screenMaterialImg || s.screenTextureUrl || '';
+    }
+    if(direct) return direct;
+
+    var words = part === 'top' ? /상판|TOP/i : (part === 'leg' ? /다리|LEG/i : /스크린|SCREEN/i);
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.material-btn.active,.material-btn.selected,.choice-btn.material-btn.active,.choice-btn.material-btn.selected'));
+    for(var i=0;i<btns.length;i++){
+      var b=btns[i];
+      var sec = b.closest('.material-button-section,.quick-materials,.bubble,.material-button-group');
+      var around = sec ? txt(sec) : txt(b);
+      if(!words.test(around)) continue;
+      var thumb = b.querySelector('.mat-thumb,.tex-chip,em');
+      if(thumb){
+        var bg = (thumb.style && thumb.style.backgroundImage) || getComputedStyle(thumb).backgroundImage || '';
+        var m = bg.match(/url\(["']?(.+?)["']?\)/);
+        if(m) return m[1].replace(/\\/g,'/');
+      }
+      var data = b.getAttribute('data-texture') || b.getAttribute('data-src') || b.getAttribute('data-img') || '';
+      if(data) return data;
+    }
+    return '';
+  }
+
+  function findCodeByPart(part){
+    var s=getState();
+    if(part === 'top') return codeText('quick-top-code') || s.topCode || s.top || s.topColor || '';
+    if(part === 'leg') return codeText('quick-leg-code') || s.legCode || s.leg || s.legColor || '';
+    return codeText('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '';
+  }
+
+  function legKey(v){
+    v=String(v||'');
+    if(/원형|round/i.test(v)) return 'round';
+    if(/A자|에이|aframe|\bA\b/i.test(v)) return 'aframe';
+    return 'ladder';
+  }
+  function moveKey(v){
+    v=String(v||'');
+    return /캐스터|바퀴|caster/i.test(v) ? 'caster' : 'glide';
+  }
+  function topShapeKey(v){
+    v=String(v||'');
+    return /라운드|round/i.test(v) ? 'round' : 'rect';
+  }
+  function deskFolder(){
+    var s=getState();
+    var raw=[s.deskKey,s.selectedDeskKey,s.productKey,s.product,s.deskLabel,s.currentProduct,selectedText()].join(' ');
+    return /duct|덕트/i.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function baseName(){
+    var s=getState();
+    return [
+      legKey(s.legType || s.legShape || s.currentLegType || window.selectedLegType || window.currentLegType),
+      moveKey(s.casterType || s.mobility || s.currentMoveType || window.selectedMoveType || window.currentMoveType),
+      topShapeKey(s.topShape || s.currentTopShape || window.selectedTopShape || window.currentTopShape)
+    ].join('_');
+  }
+
+  function hasScreen(){
+    var s=getState();
+    var raw=[s.screenKey,s.selectedScreenKey,s.screenType,s.screenLabel,s.screen,s._currentCatName,s.currentCatName,selectedText()].join(' ');
+    return /스크린|screen|전면|사이드|일자|L형|lshape|straight|front|side|frontside/i.test(raw);
+  }
+  function bothFrontSide(){
+    var raw=selectedText();
+    return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
+  }
+  function normScreen(v){
+    v=String(v||'').trim().replace(/^screen_/,'');
+    if(/frontside|front_side/i.test(v)) return 'frontside';
+    if(/straight|일자/i.test(v)) return 'straight';
+    if(/lshape_R|우측|오른쪽|right/i.test(v)) return 'lshape_R';
+    if(/lshape|L형|l형/i.test(v)) return window.__ffLshapeDirection === 'right' ? 'lshape_R' : 'lshape';
+    if(/side|사이드/i.test(v)) return 'side';
+    if(/front|전면/i.test(v)) return 'front';
+    return v;
+  }
+  function screenSuffix(){
+    var s=getState();
+    if(bothFrontSide()) return 'frontside';
+    var raw=s.screenKey || s.selectedScreenKey || s.screenType || s.screenLabel || s.screen || s._currentCatName || s.currentCatName || selectedText();
+    var key=normScreen(raw);
+    return ['front','side','straight','lshape','lshape_R','frontside'].indexOf(key)>=0 ? key : '';
+  }
+  function originalPreviewPath(){
+    var folder=deskFolder();
+    var base=baseName();
+    var suffix=hasScreen() ? screenSuffix() : '';
+    if(suffix) return './images/previews/' + folder + '/' + base + '_' + suffix + '.png';
+    return './images/previews/' + folder + '/' + base + '.png';
+  }
+
+  function frontSideMaterials(){
+    var s=getState();
+    var frontTex = s.frontScreenTexture || s.frontTexture || s.screenFrontTexture ||
+      (window._screenPreviewState && window._screenPreviewState.front && window._screenPreviewState.front.texUrl) || '';
+    var sideTex = s.sideScreenTexture || s.sideTexture || s.screenSideTexture ||
+      (window._screenPreviewState && window._screenPreviewState.side && window._screenPreviewState.side.texUrl) || '';
+
+    // DOM fallback: look for labels containing 전면/사이드
+    if(!frontTex || !sideTex){
+      var rows=Array.prototype.slice.call(document.querySelectorAll('.ff-screen-split-row,.material-chip-row,.quick-materials > *'));
+      rows.forEach(function(row){
+        var t=txt(row);
+        var em=row.querySelector('em,.mat-thumb,.tex-chip');
+        if(!em) return;
+        var bg=(em.style && em.style.backgroundImage) || getComputedStyle(em).backgroundImage || '';
+        var m=bg.match(/url\(["']?(.+?)["']?\)/);
+        if(!m) return;
+        if(/전면|front/i.test(t) && !frontTex) frontTex=m[1].replace(/\\/g,'/');
+        if(/사이드|side/i.test(t) && !sideTex) sideTex=m[1].replace(/\\/g,'/');
+      });
+    }
+    return {front:frontTex, side:sideTex};
+  }
+
+  function ensurePanel(){
+    var panel=$('ff-cpf-render-panel');
+    if(!panel){
+      var host=$('texture-preview') || $('preview-panel') || document.body;
+      panel=document.createElement('div');
+      panel.id='ff-cpf-render-panel';
+      panel.innerHTML='<div class="ff-cpf-head"><div class="ff-cpf-title">최종 렌더링 결과</div><div class="ff-cpf-status" id="ff-cpf-render-status">대기</div></div><div class="ff-cpf-box" id="ff-cpf-render-box"></div>';
+      host.appendChild(panel);
+    }
+    panel.classList.add('ff-cpf-visible','ff-cpf-has-run');
+    panel.style.display='block';
+    return panel;
+  }
+  function setMsg(title, msg, error){
+    ensurePanel();
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent=title;
+    if(box) box.innerHTML='<div style="padding:16px;line-height:1.55;font-weight:900;color:'+(error?'#fca5a5':'#2ef2c9')+';">'+esc(msg)+'</div>';
+  }
+  function setImage(src){
+    ensurePanel();
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent='생성완료';
+    if(box) box.innerHTML='<img src="'+esc(src)+'" alt="최종 렌더링 결과" style="width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px;display:block;">';
+  }
+  function xhrJson(url, payload, timeoutMs){
+    return new Promise(function(resolve, reject){
+      var xhr=new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.timeout=timeoutMs || 120000;
+      xhr.setRequestHeader('Content-Type','application/json');
+      xhr.onload=function(){
+        var data={};
+        try{ data=JSON.parse(xhr.responseText || '{}'); }catch(e){ data=xhr.responseText || {}; }
+        if(xhr.status>=200 && xhr.status<300) resolve(data);
+        else reject(new Error((data && (data.error || data.detail)) || ('HTTP '+xhr.status)));
+      };
+      xhr.onerror=function(){ reject(new Error('서버 연결 실패')); };
+      xhr.ontimeout=function(){ reject(new Error('렌더링 응답 시간이 초과되었습니다.')); };
+      xhr.send(JSON.stringify(payload));
+    });
+  }
+
+  function askLshapeDirection(){
+    if(window.__ffAskedLshapeDirectionA) return;
+    window.__ffAskedLshapeDirectionA=true;
+    var html='L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir-a" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir-a" data-dir="right">우측 L형</button></div>';
+    if(typeof window.addMsg==='function'){ try{ window.addMsg('bot', html); return; }catch(e){} }
+    var messages=$('messages'); if(messages){ var row=document.createElement('div'); row.className='msg bot'; row.innerHTML='<div class="bot-icon">AI</div><div class="bubble">'+html+'</div>'; messages.appendChild(row); messages.scrollTop=messages.scrollHeight; }
+  }
+
+  function buildPayload(){
+    var suffix=screenSuffix();
+    if(suffix==='lshape' && /L형|lshape/i.test(selectedText()) && !window.__ffLshapeDirection){
+      askLshapeDirection();
+      throw new Error('L형스크린은 좌측/우측 방향을 먼저 선택해야 합니다.');
+    }
+
+    var topTexture=findTextureByPart('top');
+    var legTexture=findTextureByPart('leg');
+    var screenTexture=findTextureByPart('screen');
+    var fs=frontSideMaterials();
+    var path=originalPreviewPath();
+    var isFrontside=suffix==='frontside';
+
+    if(isFrontside && (!fs.front || !fs.side)){
+      throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택한 뒤 최종 렌더링해야 합니다.');
+    }
+
+    if(hasScreen() && !isFrontside && !screenTexture){
+      throw new Error('스크린 재질을 먼저 선택해야 합니다.');
+    }
+
+    return {
+      mode:'strict-full-material-mapping-original-preview-only-v1',
+      materialEditOnly:true,
+      preserveSourceImage:true,
+      preserveTransparentBackground:true,
+      canvasAspect:'16:9',
+
+      targetType:'full',
+      productType: hasScreen() ? 'desk_screen' : 'desk',
+
+      // 절대 이전 렌더 결과를 원본으로 쓰지 않는다.
+      deskImage:path,
+      screenImage:path,
+      fallbackDeskImage:path,
+      composedPreview:'',
+      previousRenderedImage:'',
+      lastRenderedImage:'',
+      imageUrl:'',
+
+      topTexture:topTexture,
+      legTexture:legTexture,
+      screenTexture:isFrontside ? '' : screenTexture,
+      frontScreenTexture:isFrontside ? fs.front : '',
+      sideScreenTexture:isFrontside ? fs.side : '',
+
+      topCode:findCodeByPart('top'),
+      legCode:findCodeByPart('leg'),
+      screenCode:findCodeByPart('screen'),
+
+      screenSelected:hasScreen(),
+      screenLabel:suffix,
+      legType:legKey(getState().legType || getState().legShape),
+      casterType:moveKey(getState().casterType || getState().mobility),
+      topShape:topShapeKey(getState().topShape),
+      size:getState().size || {w:getState().w||'', d:getState().d||'', h:getState().h||'', screenH:getState().screenH||'', screenTopGap:getState().screenTopGap||''},
+
+      renderSourceImage:path,
+      originalPreviewPath:path,
+      previewPathRule:'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
+      forbidGeneration:true,
+      instruction:[
+        'Use ONLY the source preview image as the base.',
+        'Do not create a new product, desk, screen, room, background, camera angle, shadow, crop, shape, or layout.',
+        'Map topTexture only onto the existing desk tabletop.',
+        'Map legTexture only onto the existing desk legs.',
+        isFrontside ? 'Map frontScreenTexture only onto the existing front screen and sideScreenTexture only onto the existing side screen.' : 'Map screenTexture only onto the existing screen panel.',
+        'If a texture is empty, keep that part unchanged.',
+        'Return the same image composition with materials changed only.'
+      ].join(' ')
+    };
+  }
+
+  var oldPrepare=window.prepareNanoBananaPreview;
+  window.prepareNanoBananaPreview=async function(){
+    var btn=$('quick-ai-preview-btn') || $('ff-clean-render-btn');
+    try{
+      var payload=buildPayload();
+      setMsg('생성 중','원본 preview 이미지에서 현재 선택한 상판/다리/스크린 재질만 맵핑 중입니다.',false);
+      if(btn){ btn.disabled=true; btn.textContent='생성 중...'; }
+      var data=await xhrJson('/api/generate-preview', payload, 120000);
+      var src=(typeof data==='string') ? data : (data.imageUrl || data.image || data.url || data.previewUrl || '');
+      if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      // 결과는 화면 표시용으로만 보관. 다음 렌더 input으로 사용하지 않음.
+      window.__ffLastDisplayedRenderOnly = src;
+      setImage(src);
+      return data;
+    }catch(e){
+      setMsg('확인 필요', e && e.message ? e.message : String(e), true);
+      throw e;
+    }finally{
+      if(btn){ btn.disabled=false; btn.textContent='✨ 원본 사진에 재질 적용'; }
+    }
+  };
+
+  // 재질/제품을 바꾸면 이전 렌더 결과는 표시용 기록만 남기고 input 후보에서 제거
+  document.addEventListener('click', function(e){
+    var b=e.target && e.target.closest && e.target.closest('.choice-btn,.material-btn,.confirm-btn,.back-btn,#send-btn');
+    if(!b) return;
+    window.__ffRenderedInputForbidden = true;
+    window.__ffLastRenderInput = '';
+    window.__ffNanoTarget = '';
+    if(b.classList.contains('ff-lshape-dir-a')){
+      window.__ffLshapeDirection = b.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      b.classList.add('selected');
+      if(typeof window.addMsg==='function'){
+        try{ window.addMsg('bot', (window.__ffLshapeDirection==='right'?'우측 L형':'좌측 L형') + '으로 설정했습니다.'); }catch(err){}
+      }
+    }
+    var label=txt(b);
+    if(/L형\s*스크린/.test(label) && !/우측|오른쪽/.test(label)){
+      window.__ffAskedLshapeDirectionA=false;
+      setTimeout(askLshapeDirection,80);
+    }
+  }, true);
+
+  function hideRightLshapeButton(){
+    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,[data-set-name]')).forEach(function(b){
+      if(/L형\s*스크린\s*\(우측\)|L형스크린\s*\(우측\)/.test(txt(b))){
+        b.style.display='none';
+        b.setAttribute('aria-hidden','true');
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    hideRightLshapeButton();
+    var mo=new MutationObserver(hideRightLshapeButton);
+    mo.observe(document.documentElement,{childList:true,subtree:true});
+  });
+})();
+</script>
+
 </body>
 
 
