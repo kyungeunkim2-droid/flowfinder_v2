@@ -6690,7 +6690,34 @@ function setPreviewGlow(part) {
     if (name) name.textContent = activePart === 'top' ? '상판 선택' : activePart === 'leg' ? '다리 선택' : activePart === 'screen' ? '스크린 선택' : '선택값';
     setChip('quick-top-row','quick-top-code','quick-top-chip',PREVIEW.top,PREVIEW.topTex,activePart==='top'?'active-top':'');
     setChip('quick-leg-row','quick-leg-code','quick-leg-chip',PREVIEW.leg,PREVIEW.legTex,activePart==='leg'?'active-leg':'');
-    setChip('quick-screen-row','quick-screen-code','quick-screen-chip',PREVIEW.screen,PREVIEW.screenTex,activePart==='screen'?'active-screen':'');
+   if(PREVIEW.screenKey === 'frontside'){
+  setChip(
+    'quick-screen-row',
+    'quick-screen-code',
+    'quick-screen-chip',
+    '전면 ' + (PREVIEW.frontScreen || ''),
+    PREVIEW.frontScreenTex,
+    activePart==='screen' ? 'active-screen' : ''
+  );
+
+  setChip(
+    'quick-side-screen-row',
+    'quick-side-screen-code',
+    'quick-side-screen-chip',
+    '사이드 ' + (PREVIEW.sideScreen || ''),
+    PREVIEW.sideScreenTex,
+    activePart==='screen' ? 'active-screen' : ''
+  );
+}else{
+  setChip(
+    'quick-screen-row',
+    'quick-screen-code',
+    'quick-screen-chip',
+    PREVIEW.screen,
+    PREVIEW.screenTex,
+    activePart==='screen' ? 'active-screen' : ''
+  );
+}
   }
   window.showTexturePreview = function(colorCode){
     var code = (colorCode || '').toString();
