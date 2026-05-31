@@ -16732,14 +16732,44 @@ window.showPanel = function(){
     var screenTex = bgUrl('quick-screen-chip') || s.screenTexture || s.screenTex || s.screenMaterialImg || '';
     var frontTex = s.frontScreenTexture || (window._screenPreviewState && window._screenPreviewState.front && window._screenPreviewState.front.texUrl) || '';
     var sideTex = s.sideScreenTexture || (window._screenPreviewState && window._screenPreviewState.side && window._screenPreviewState.side.texUrl) || '';
+    var isFrontside =
+  /전면\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || '')) &&
+  /사이드\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || ''));
+
+if(!isFrontside && typeof screenSuffix === 'function'){
+  try{
+    isFrontside = screenSuffix() === 'frontside';
+  }catch(e){}
+}
+
+if(isFrontside && (!frontTex || !sideTex)){
+  throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택해야 합니다.');
+}
+      return {
+    screenCode: textById('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '',
+    screenTexture: isFrontside ? '' : screenTex,
+    frontScreenTexture: frontTex,
+    sideScreenTexture: sideTex
+  };
+}
 
     // frontside는 전면/사이드 각각 선택값이 있으면 그것을 우선 사용한다.
     // 없으면 단일 screenTex로 대체하지 않고 렌더를 막는다.
-    return {
-      screenCode: textById('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '',
-      screenTexture: screenTex,
       frontScreenTexture: frontTex,
       sideScreenTexture: sideTex
+  var isFrontside =
+  /전면\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || '')) &&
+  /사이드\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || ''));
+
+if(!isFrontside && typeof screenSuffix === 'function'){
+  try{
+    isFrontside = screenSuffix() === 'frontside';
+  }catch(e){}
+}
+
+if(isFrontside && (!frontTex || !sideTex)){
+  throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택해야 합니다.');
+}
     };
   }
 
@@ -16820,7 +16850,9 @@ window.showPanel = function(){
     }
 
     var m = screenMaterialPayload();
-
+var topTex = bgUrl('quick-top-chip') || S().topTexture || S().topTex || S().topMaterialImg || '';
+var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legMaterialImg || '';
+    
     if(suffix === 'frontside'){
       if(!m.frontScreenTexture || !m.sideScreenTexture){
         showErr('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택한 뒤 렌더링해야 합니다.');
@@ -16834,32 +16866,49 @@ window.showPanel = function(){
     }
 
     var base = previewPath(suffix);
-    var payload = {
-      mode: 'strict-screen-texture-only-preview-path-v4',
-      materialEditOnly: true,
-      preserveSourceImage: true,
-      preserveTransparentBackground: true,
-      canvasAspect: '16:9',
-      targetType: 'screen',
-      productType: 'screen',
-      deskImage: base,
-      fallbackDeskImage: base,
-      screenImage: base,
-      screenSelected: true,
-      screenLabel: suffix,
-      topTexture: '',
-      legTexture: '',
-      screenTexture: suffix === 'frontside' ? '' : m.screenTexture,
-      frontScreenTexture: suffix === 'frontside' ? m.frontScreenTexture : '',
-      sideScreenTexture: suffix === 'frontside' ? m.sideScreenTexture : '',
-      screenCode: m.screenCode,
-      size: {screenH:(S().screenH||''), screenTopGap:(S().screenTopGap||'')},
-      previewPathRule: 'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
-      renderSourceImage: base,
-      forbidGeneration: true,
-      instruction: 'Use the source preview image exactly. Do not create a new desk, screen, room, background, camera angle, shape, or layout. Only map the provided screen texture to the existing screen area. Keep the desk top and legs unchanged.'
-    };
+ var payload = {
+  mode: 'strict-screen-texture-only-preview-path-v4',
+  materialEditOnly: true,
+  preserveSourceImage: true,
+  preserveTransparentBackground: true,
+  canvasAspect: '16:9',
+  targetType: 'screen',
+  productType: 'screen',
 
+  deskImage: base,
+  fallbackDeskImage: base,
+  screenImage: base,
+  sourceImage: base,
+  baseImage: base,
+
+  screenSelected: true,
+  screenLabel: suffix,
+
+  topTexture: topTex,
+  legTexture: legTex,
+
+  screenTexture: suffix === 'frontside' ? '' : m.screenTexture,
+  frontScreenTexture: suffix === 'frontside' ? m.frontScreenTexture : '',
+  sideScreenTexture: suffix === 'frontside' ? m.sideScreenTexture : '',
+
+  screenCode: m.screenCode,
+  size: {
+    screenH: S().screenH || '',
+    screenTopGap: S().screenTopGap || ''
+  },
+
+  previewPathRule: 'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
+  renderSourceImage: base,
+  forbidGeneration: true,
+
+  instruction:
+    'Use the source preview image exactly. Do not create a new desk, screen, room, background, camera angle, shape, or layout. ' +
+    'Apply topTexture to the existing tabletop only. ' +
+    'Apply legTexture to the existing legs only. ' +
+    'Apply screenTexture/frontScreenTexture/sideScreenTexture to the existing screen area only. ' +
+    'For frontside screen, use frontScreenTexture only on the front screen area and sideScreenTexture only on the side screen area. ' +
+    'Keep the original composition unchanged.'
+};
     setLoading('screen');
     var btn=$('quick-ai-preview-btn') || $('ff-clean-render-btn');
     if(btn){btn.disabled=true;btn.textContent='생성 중...';}
