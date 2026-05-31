@@ -181,6 +181,7 @@ app.post('/api/generate-preview', async (req, res) => {
       mode,
       frontScreenTexture,
       sideScreenTexture,
+        screenGuide,
       frontScreenCode,
       sideScreenCode,
     } = req.body || {};
