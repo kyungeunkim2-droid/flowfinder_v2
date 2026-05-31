@@ -17369,7 +17369,79 @@ var screenTexture = window.screenTexture || '';
 </body>
 
 
+<script>
+(function(){
 
+  console.log('✅ FF FINAL BUTTON OVERRIDE LOADED');
+
+  async function finalRender(e){
+    if(e && e.preventDefault) e.preventDefault();
+
+    try{
+      if(typeof buildPayload !== 'function'){
+        throw new Error('buildPayload 함수를 찾을 수 없습니다.');
+      }
+
+      var payload = buildPayload();
+
+      payload.materialEditOnly = true;
+      payload.preserveSourceImage = true;
+      payload.preserveTransparentBackground = true;
+      payload.forbidGeneration = true;
+
+      payload.composedPreview = '';
+      payload.previousRenderedImage = '';
+      payload.lastRenderedImage = '';
+      payload.imageUrl = '';
+
+      payload.sourceImage = payload.sourceImage || payload.baseImage || payload.deskImage;
+      payload.baseImage = payload.baseImage || payload.deskImage;
+      payload.deskImage = payload.baseImage;
+
+      if(payload.productType === 'screen' || payload.targetType === 'screen' || payload.screenType){
+        payload.screenImage = payload.screenImage || payload.baseImage;
+      }
+
+      console.log('✅ FINAL_BUTTON_PAYLOAD', payload);
+
+      var res = await fetch('/api/generate-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      var data = await res.json();
+      console.log('✅ FINAL_BUTTON_RESPONSE', data);
+
+      return data;
+
+    }catch(err){
+      console.error('❌ FINAL_BUTTON_ERROR', err);
+      throw err;
+    }
+  }
+
+  window.prepareNanoBananaPreview = finalRender;
+
+  function bindFinalButton(){
+    ['quick-ai-preview-btn','ff-clean-render-btn'].forEach(function(id){
+      var btn = document.getElementById(id);
+      if(!btn) return;
+
+      var clone = btn.cloneNode(true);
+      btn.parentNode.replaceChild(clone, btn);
+
+      clone.onclick = finalRender;
+    });
+  }
+
+  bindFinalButton();
+  setTimeout(bindFinalButton, 300);
+  setTimeout(bindFinalButton, 1000);
+  setTimeout(bindFinalButton, 2000);
+
+})();
+</script>
 </html>
 <style id="ff-fixed40-portrait-chat-preview">
 /* === Fixed40: fixed38 base, no dashboard, chat:preview = 9:16 === */
