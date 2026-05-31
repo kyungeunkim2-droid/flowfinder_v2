@@ -24293,109 +24293,114 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 
 
 
+
+
 <!-- === FF_OPTIONS_METHOD3_AND_QUOTE_SECTION3 === -->
 <style id="ff-options-method3-and-quote-section3-css">
-  /* 옵션추가창: 카드 클릭 방식 / 선택한 카드만 색상 활성화 */
   .msg.bot:has(.ff-user-final-options-v4) .bubble{
-    max-width:min(96%,720px)!important;
-    width:min(96%,720px)!important;
-    padding:12px!important;
+    max-width:min(96%,620px)!important;
+    width:min(96%,620px)!important;
+    padding:10px!important;
     overflow:hidden!important;
   }
   .ff-user-final-options-v4{
     width:100%!important;
-    max-width:720px!important;
+    max-width:620px!important;
     margin:0!important;
-    padding:18px!important;
-    border-radius:22px!important;
+    padding:14px!important;
+    border-radius:20px!important;
     border:1px solid rgba(46,242,201,.25)!important;
     background:linear-gradient(180deg,rgba(5,18,29,.98),rgba(3,14,24,.98))!important;
     box-sizing:border-box!important;
     overflow:hidden!important;
   }
   .ff-user-final-options-v4 h3{
-    margin:0 0 6px!important;
+    margin:0 0 7px!important;
     color:#2ef2c9!important;
-    font-size:24px!important;
+    font-size:22px!important;
     line-height:1.15!important;
     font-weight:1000!important;
     letter-spacing:-.5px!important;
   }
   .ff-user-final-options-v4>p{
-    margin:0 0 8px!important;
+    margin:0 0 5px!important;
     color:#e5edf7!important;
-    font-size:13px!important;
-    line-height:1.45!important;
+    font-size:12px!important;
+    line-height:1.4!important;
     font-weight:800!important;
   }
   .ff-opt-badge-v4{
     display:inline-flex!important;
-    float:right!important;
-    margin-top:-44px!important;
-    padding:8px 14px!important;
+    float:none!important;
+    margin:6px 0 4px!important;
+    padding:6px 10px!important;
     border-radius:999px!important;
     border:1px solid rgba(168,85,247,.35)!important;
     color:#f0abfc!important;
     background:rgba(88,28,135,.24)!important;
-    font-size:12px!important;
+    font-size:11px!important;
     font-weight:1000!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
   }
   .ff-opt-section-v4{
-    margin:12px 0!important;
-    padding:12px!important;
-    border-radius:18px!important;
+    margin:9px 0!important;
+    padding:10px!important;
+    border-radius:16px!important;
     border:1px solid rgba(255,255,255,.10)!important;
     background:rgba(7,23,34,.78)!important;
   }
   .ff-opt-section-title-v4{
-    margin:0 0 9px!important;
+    margin:0 0 8px!important;
     color:#2ef2c9!important;
-    font-size:18px!important;
+    font-size:17px!important;
     font-weight:1000!important;
     line-height:1!important;
   }
   .ff-opt-list-v4{
     display:flex!important;
     flex-direction:column!important;
-    gap:8px!important;
+    gap:7px!important;
   }
   .ff-opt-row-v4{
     display:grid!important;
-    grid-template-columns:132px minmax(0,1fr) 74px 142px!important;
+    grid-template-columns:96px minmax(0,1fr) 36px 76px!important;
     align-items:center!important;
-    gap:12px!important;
-    min-height:78px!important;
-    padding:10px 12px!important;
-    border-radius:16px!important;
+    gap:7px!important;
+    min-height:70px!important;
+    padding:8px!important;
+    border-radius:14px!important;
     border:1px solid rgba(148,163,184,.18)!important;
     background:linear-gradient(90deg,rgba(9,31,48,.94),rgba(6,22,35,.94))!important;
     box-sizing:border-box!important;
     cursor:pointer!important;
     transition:.16s ease!important;
+    max-width:100%!important;
+    overflow:hidden!important;
   }
   .ff-opt-row-v4:hover{
     border-color:rgba(46,242,201,.38)!important;
-    transform:translateY(-1px)!important;
   }
   .ff-opt-row-v4.active{
     border-color:#2ef2c9!important;
     background:linear-gradient(90deg,rgba(10,47,50,.96),rgba(7,30,42,.96))!important;
-    box-shadow:0 0 0 1px rgba(46,242,201,.18),0 0 22px rgba(46,242,201,.12)!important;
+    box-shadow:0 0 0 1px rgba(46,242,201,.18),0 0 18px rgba(46,242,201,.10)!important;
   }
   .ff-opt-img-v4{
-    width:132px!important;
-    height:58px!important;
+    width:96px!important;
+    height:52px!important;
     object-fit:contain!important;
     display:block!important;
-    border-radius:12px!important;
+    border-radius:10px!important;
     background:#eef3f8!important;
     border:1px solid rgba(255,255,255,.15)!important;
-    padding:4px!important;
+    padding:3px!important;
+    box-sizing:border-box!important;
   }
   .ff-opt-name-v4{
     min-width:0!important;
     color:#fff!important;
-    font-size:16px!important;
+    font-size:14px!important;
     font-weight:1000!important;
     line-height:1.2!important;
     overflow:hidden!important;
@@ -24404,23 +24409,26 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   }
   .ff-opt-color-label-v4{
     color:#dbeafe!important;
-    font-size:13px!important;
+    font-size:11px!important;
     font-weight:900!important;
     text-align:right!important;
   }
+  .ff-opt-color-v4{min-width:0!important;}
   .ff-opt-color-v4 select{
-    width:100%!important;
-    height:40px!important;
-    border-radius:12px!important;
-    padding:0 12px!important;
+    width:76px!important;
+    max-width:76px!important;
+    height:34px!important;
+    border-radius:10px!important;
+    padding:0 6px!important;
     border:1px solid rgba(46,242,201,.30)!important;
     background:#06131f!important;
     color:#fff!important;
-    font-size:15px!important;
+    font-size:13px!important;
     font-weight:1000!important;
     outline:none!important;
     opacity:.42!important;
     pointer-events:none!important;
+    box-sizing:border-box!important;
   }
   .ff-opt-row-v4.active .ff-opt-color-v4 select{
     opacity:1!important;
@@ -24428,26 +24436,26 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     border-color:rgba(46,242,201,.72)!important;
   }
   .ff-opt-help-v4{
-    margin:10px 0!important;
-    padding:10px 12px!important;
-    border-radius:15px!important;
+    margin:9px 0!important;
+    padding:9px 10px!important;
+    border-radius:14px!important;
     border:1px solid rgba(46,242,201,.16)!important;
     background:rgba(8,28,42,.72)!important;
     color:#cbd5e1!important;
-    font-size:12px!important;
-    line-height:1.5!important;
+    font-size:11px!important;
+    line-height:1.45!important;
   }
   .ff-opt-actions-v4{
     display:grid!important;
     grid-template-columns:1fr 1fr!important;
-    gap:12px!important;
-    margin-top:14px!important;
+    gap:10px!important;
+    margin-top:10px!important;
   }
   .ff-opt-actions-v4 button{
-    min-height:52px!important;
-    border-radius:16px!important;
+    min-height:46px!important;
+    border-radius:15px!important;
     border:1px solid rgba(255,255,255,.16)!important;
-    font-size:17px!important;
+    font-size:16px!important;
     font-weight:1000!important;
     cursor:pointer!important;
   }
@@ -24460,191 +24468,45 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     background:#17212d!important;
     color:#fff!important;
   }
-  @media(max-width:720px){
-    .ff-opt-row-v4{grid-template-columns:100px minmax(0,1fr);grid-template-areas:"img name" "img color";gap:8px!important;}
-    .ff-opt-img-v4{grid-area:img;width:100px!important;}
-    .ff-opt-name-v4{grid-area:name;font-size:14px!important;}
+  @media(max-width:520px){
+    .ff-opt-row-v4{
+      grid-template-columns:82px minmax(0,1fr) 68px!important;
+      grid-template-areas:"img name select"!important;
+      gap:7px!important;
+    }
+    .ff-opt-img-v4{grid-area:img;width:82px!important;height:48px!important;}
+    .ff-opt-name-v4{grid-area:name;font-size:13px!important;}
     .ff-opt-color-label-v4{display:none!important;}
-    .ff-opt-color-v4{grid-area:color;}
+    .ff-opt-color-v4{grid-area:select!important;}
+    .ff-opt-color-v4 select{width:68px!important;max-width:68px!important;font-size:12px!important;}
   }
 
-  /* 최종견적서: 추천안 3 기반 섹션 분리형 */
-  .ffq3-modal{
-    position:fixed!important;
-    inset:0!important;
-    z-index:99999!important;
-    background:rgba(2,6,23,.72)!important;
-    display:flex!important;
-    align-items:flex-start!important;
-    justify-content:center!important;
-    overflow:auto!important;
-    padding:28px!important;
-  }
-  .ffq3-wrap{
-    width:min(980px,96vw)!important;
-    background:#fff!important;
-    color:#0f172a!important;
-    border-radius:24px!important;
-    padding:28px!important;
-    box-shadow:0 30px 90px rgba(0,0,0,.35)!important;
-    font-family:Arial,"Noto Sans KR",sans-serif!important;
-  }
-  .ffq3-head{
-    display:flex!important;
-    justify-content:space-between!important;
-    gap:16px!important;
-    align-items:flex-start!important;
-    margin-bottom:18px!important;
-  }
-  .ffq3-head h2{
-    margin:0!important;
-    color:#0f172a!important;
-    font-size:28px!important;
-    line-height:1.1!important;
-    font-weight:1000!important;
-  }
-  .ffq3-meta{
-    text-align:right!important;
-    color:#64748b!important;
-    font-size:12px!important;
-    line-height:1.6!important;
-    font-weight:800!important;
-  }
-  .ffq3-summary{
-    display:grid!important;
-    grid-template-columns:repeat(3,1fr)!important;
-    gap:10px!important;
-    margin-bottom:18px!important;
-  }
-  .ffq3-summary-card{
-    background:#f8fafc!important;
-    border:1px solid #e5e7eb!important;
-    border-radius:14px!important;
-    padding:12px!important;
-    text-align:center!important;
-  }
-  .ffq3-summary-card small{
-    display:block!important;
-    color:#64748b!important;
-    font-size:11px!important;
-    font-weight:900!important;
-    margin-bottom:6px!important;
-  }
-  .ffq3-summary-card b{
-    color:#0f172a!important;
-    font-size:18px!important;
-    font-weight:1000!important;
-  }
-  .ffq3-render{
-    margin:0 0 20px!important;
-    border:1px solid #e5e7eb!important;
-    border-radius:18px!important;
-    padding:14px!important;
-    background:linear-gradient(180deg,#fbfdff,#f1f5f9)!important;
-  }
-  .ffq3-render h3,.ffq3-section h3{
-    margin:0 0 12px!important;
-    color:#0f172a!important;
-    font-size:18px!important;
-    font-weight:1000!important;
-  }
-  .ffq3-render-box{
-    height:300px!important;
-    display:flex!important;
-    align-items:center!important;
-    justify-content:center!important;
-    border-radius:14px!important;
-    background:#fff!important;
-    overflow:hidden!important;
-    border:1px solid #eef2f7!important;
-  }
-  .ffq3-render-box img{
-    width:100%!important;
-    height:100%!important;
-    object-fit:contain!important;
-    display:block!important;
-  }
-  .ffq3-section{
-    margin:18px 0!important;
-  }
-  .ffq3-product-grid,.ffq3-option-grid{
-    display:grid!important;
-    grid-template-columns:repeat(3,minmax(0,1fr))!important;
-    gap:12px!important;
-  }
-  .ffq3-card{
-    border:1px solid #e5e7eb!important;
-    border-radius:16px!important;
-    background:#fff!important;
-    padding:14px!important;
-    min-height:138px!important;
-  }
-  .ffq3-card h4{
-    margin:0 0 10px!important;
-    color:#0f172a!important;
-    font-size:15px!important;
-    font-weight:1000!important;
-  }
-  .ffq3-card p{
-    margin:6px 0!important;
-    color:#334155!important;
-    font-size:12px!important;
-    line-height:1.45!important;
-    font-weight:800!important;
-  }
-  .ffq3-card strong{
-    display:block!important;
-    color:#063b9a!important;
-    font-size:16px!important;
-    font-weight:1000!important;
-    text-align:right!important;
-    margin-top:10px!important;
-  }
-  .ffq3-total{
-    margin-top:18px!important;
-    border-radius:16px!important;
-    overflow:hidden!important;
-    border:1px solid #dbe4f0!important;
-  }
-  .ffq3-line{
-    display:flex!important;
-    justify-content:space-between!important;
-    padding:12px 16px!important;
-    background:#f8fafc!important;
-    border-bottom:1px solid #e5e7eb!important;
-    font-size:14px!important;
-    font-weight:900!important;
-  }
-  .ffq3-line.final{
-    background:#0b3a86!important;
-    color:#fff!important;
-    font-size:20px!important;
-    font-weight:1000!important;
-  }
-  .ffq3-actions{
-    display:flex!important;
-    justify-content:flex-end!important;
-    gap:8px!important;
-    margin-top:18px!important;
-  }
-  .ffq3-actions button{
-    border:1px solid #cbd5e1!important;
-    background:#fff!important;
-    color:#0f172a!important;
-    border-radius:12px!important;
-    padding:10px 16px!important;
-    font-weight:1000!important;
-    cursor:pointer!important;
-  }
-  .ffq3-actions .primary{
-    background:#0b3a86!important;
-    color:#fff!important;
-    border-color:#0b3a86!important;
-  }
-  @media(max-width:800px){
-    .ffq3-summary,.ffq3-product-grid,.ffq3-option-grid{grid-template-columns:1fr!important;}
-    .ffq3-render-box{height:230px!important;}
-  }
+  .ffq3-modal{position:fixed!important;inset:0!important;z-index:99999!important;background:rgba(2,6,23,.72)!important;display:flex!important;align-items:flex-start!important;justify-content:center!important;overflow:auto!important;padding:28px!important;}
+  .ffq3-wrap{width:min(980px,96vw)!important;background:#fff!important;color:#0f172a!important;border-radius:24px!important;padding:28px!important;box-shadow:0 30px 90px rgba(0,0,0,.35)!important;font-family:Arial,"Noto Sans KR",sans-serif!important;}
+  .ffq3-head{display:flex!important;justify-content:space-between!important;gap:16px!important;align-items:flex-start!important;margin-bottom:18px!important;}
+  .ffq3-head h2{margin:0!important;color:#0f172a!important;font-size:28px!important;line-height:1.1!important;font-weight:1000!important;}
+  .ffq3-meta{text-align:right!important;color:#64748b!important;font-size:12px!important;line-height:1.6!important;font-weight:800!important;}
+  .ffq3-summary{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:10px!important;margin-bottom:18px!important;}
+  .ffq3-summary-card{background:#f8fafc!important;border:1px solid #e5e7eb!important;border-radius:14px!important;padding:12px!important;text-align:center!important;}
+  .ffq3-summary-card small{display:block!important;color:#64748b!important;font-size:11px!important;font-weight:900!important;margin-bottom:6px!important;}
+  .ffq3-summary-card b{color:#0f172a!important;font-size:18px!important;font-weight:1000!important;}
+  .ffq3-render{margin:0 0 20px!important;border:1px solid #e5e7eb!important;border-radius:18px!important;padding:14px!important;background:linear-gradient(180deg,#fbfdff,#f1f5f9)!important;}
+  .ffq3-render h3,.ffq3-section h3{margin:0 0 12px!important;color:#0f172a!important;font-size:18px!important;font-weight:1000!important;}
+  .ffq3-render-box{height:300px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:14px!important;background:#fff!important;overflow:hidden!important;border:1px solid #eef2f7!important;}
+  .ffq3-render-box img{width:100%!important;height:100%!important;object-fit:contain!important;display:block!important;}
+  .ffq3-section{margin:18px 0!important;}
+  .ffq3-product-grid,.ffq3-option-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;}
+  .ffq3-card{border:1px solid #e5e7eb!important;border-radius:16px!important;background:#fff!important;padding:14px!important;min-height:138px!important;}
+  .ffq3-card h4{margin:0 0 10px!important;color:#0f172a!important;font-size:15px!important;font-weight:1000!important;}
+  .ffq3-card p{margin:6px 0!important;color:#334155!important;font-size:12px!important;line-height:1.45!important;font-weight:800!important;}
+  .ffq3-card strong{display:block!important;color:#063b9a!important;font-size:16px!important;font-weight:1000!important;text-align:right!important;margin-top:10px!important;}
+  .ffq3-total{margin-top:18px!important;border-radius:16px!important;overflow:hidden!important;border:1px solid #dbe4f0!important;}
+  .ffq3-line{display:flex!important;justify-content:space-between!important;padding:12px 16px!important;background:#f8fafc!important;border-bottom:1px solid #e5e7eb!important;font-size:14px!important;font-weight:900!important;}
+  .ffq3-line.final{background:#0b3a86!important;color:#fff!important;font-size:20px!important;font-weight:1000!important;}
+  .ffq3-actions{display:flex!important;justify-content:flex-end!important;gap:8px!important;margin-top:18px!important;}
+  .ffq3-actions button{border:1px solid #cbd5e1!important;background:#fff!important;color:#0f172a!important;border-radius:12px!important;padding:10px 16px!important;font-weight:1000!important;cursor:pointer!important;}
+  .ffq3-actions .primary{background:#0b3a86!important;color:#fff!important;border-color:#0b3a86!important;}
+  @media(max-width:800px){.ffq3-summary,.ffq3-product-grid,.ffq3-option-grid{grid-template-columns:1fr!important}.ffq3-render-box{height:230px!important;}}
 </style>
 <script id="ff-options-method3-and-quote-section3-js">
 (function(){
@@ -24659,15 +24521,15 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 
   var OPTIONS=[
     {cat:'멀티탭',note:'상판 주문품 요율 적용 가능',items:[
-      {name:'외장 3구 멀티탭',colors:['WW','BK'],img:'external_3outlet_powerstrip.png'},
-      {name:'매립형 3구 슬라이딩 멀티탭',colors:['WW','BK'],img:'sliding_3outlet_powerstrip.png'},
-      {name:'매립형 2구 멀티탭',colors:['WW','BK'],img:'built_in_2outlet_powerstrip.png'}
+      {name:'외장 3구 멀티탭',colors:['WW','BK'],img:'multitap_external_3outlet.png'},
+      {name:'매립형 3구 슬라이딩 멀티탭',colors:['WW','BK'],img:'multitap_sliding_3outlet.png'},
+      {name:'매립형 2구 멀티탭',colors:['WW','BK'],img:'multitap_embedded_2outlet.png'}
     ]},
     {cat:'PC홀더',note:'',items:[
-      {name:'행잉 PC홀더',colors:['WH','BK'],img:'pc_holder_hanging.png'}
+      {name:'PC홀더',colors:['WH','BK'],img:'pc_hanging.png'}
     ]},
     {cat:'기타',note:'',items:[
-      {name:'모니터암',colors:['BK'],img:'topmount_monitor_arm.png'},
+      {name:'모니터암',colors:['BK'],img:'monitor_arm_topmount.png'},
       {name:'가방걸이',colors:['XX(투명)'],img:'bag_hook.png'}
     ]}
   ];
@@ -24678,9 +24540,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var step=Number(img.getAttribute('data-step')||'0');
     var tries=[
       './images/options/accessories/'+file,
-      'images/options/accessories/'+file,
-      './images/options/accessories/'+file.replace(/ /g,'_'),
-      'images/options/accessories/'+file.replace(/ /g,'_')
+      'images/options/accessories/'+file
     ];
     step++;
     if(step<tries.length){img.setAttribute('data-step',String(step));img.src=tries[step];}
@@ -24699,9 +24559,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       +'<span class="ff-opt-badge-v4">상판 주문품 요율 적용 가능</span>';
 
     OPTIONS.forEach(function(group,gi){
-      html+='<section class="ff-opt-section-v4">'
-        +'<h4 class="ff-opt-section-title-v4">'+esc(group.cat)+'</h4>'
-        +'<div class="ff-opt-list-v4">';
+      html+='<section class="ff-opt-section-v4"><h4 class="ff-opt-section-title-v4">'+esc(group.cat)+'</h4><div class="ff-opt-list-v4">';
       group.items.forEach(function(item,ii){
         var id=rowId(gi,ii);
         var opts=(item.colors||['BK']).map(function(c){return '<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');
@@ -24732,10 +24590,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var sel=row.querySelector('select');
     if(sel) sel.disabled=!row.classList.contains('active');
   };
-  window.ffOptionColorV4=function(id,value){
-    var row=document.getElementById(id);
-    if(row) row.setAttribute('data-color',value||'');
-  };
+  window.ffOptionColorV4=function(id,value){var row=document.getElementById(id);if(row) row.setAttribute('data-color',value||'');};
   function selectedOptions(){
     return Array.prototype.slice.call(document.querySelectorAll('.ff-opt-row-v4.active')).map(function(row){
       var sel=row.querySelector('select');
@@ -24771,128 +24626,394 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   window.ffShowFinalOptions97=renderOptions;
   window.ffShowFinalOptionsUser=renderOptions;
 
-  function lastRenderImage(){
-    var img=document.querySelector('#ff-cpf-render-box img, #ff-render-result-box img, .ff-render-result-box img');
-    if(img && img.src) return img.src;
-    var s=getState();
-    return s._ffFinalRenderImage || s.renderedImage || s.renderImage || s.aiImage || '';
-  }
-  function getOptions(){
-    var s=getState();
-    if(Array.isArray(s.extraOptionItems) && s.extraOptionItems.length) return s.extraOptionItems;
-    if(Array.isArray(s._ffUserOptionsChosen) && s._ffUserOptionsChosen.length) return s._ffUserOptionsChosen;
-    if(Array.isArray(s.finalAddons) && s.finalAddons.length){
-      return s.finalAddons.map(function(name){return {cat:'추가 옵션',name:name,color:s.finalOptionColor||'-',qty:1};});
-    }
-    return [];
-  }
-  function productItems(){
-    var s=getState();
-    var arr=Array.isArray(s.cartItems)&&s.cartItems.length ? s.cartItems : [];
-    if(!arr.length && s.current){
-      arr=[{
-        product:s.current.product||s.product||'선택 제품',
-        w:s.w,d:s.d,h:s.h,
-        topShape:s.topShape,
-        legLabel:s.legLabel||s.legType,
-        casterType:s.casterType,
-        _deskTopColor:s._deskTopColor||s.topCode||s.top,
-        _deskLegColor:s._deskLegColor||s.legCode||s.leg,
-        color:s.color||s.screenCode||s.screenColor,
-        finalPrice:s.totalPrice||s.finalPrice||0
-      }];
-    }
-    return arr;
-  }
-  function materialSummary(){
-    var s=getState();
-    var top=s._deskTopColor||s.topCode||s.top||'';
-    var leg=s._deskLegColor||s.legCode||s.leg||'';
-    var front=s.frontScreenCode||((window._screenPreviewState&&_screenPreviewState.front&&_screenPreviewState.front.color)||'');
-    var side=s.sideScreenCode||((window._screenPreviewState&&_screenPreviewState.side&&_screenPreviewState.side.color)||'');
-    var screen=s.screenCode||s.screenColor||'';
-    return {top:top,leg:leg,front:front,side:side,screen:screen};
-  }
-  function sizeText(item){
-    var parts=[item.w&&('W'+item.w),item.d&&('D'+item.d),item.h&&('H'+item.h)].filter(Boolean);
-    return parts.join(' × ') || item.size || '-';
-  }
-  function productCard(item,idx){
-    var m=materialSummary();
-    var name=item.product||item.name||('제품 '+(idx+1));
-    var isScreen=/스크린|screen/i.test(name);
-    var mat=isScreen ? ((m.front||m.side) ? ('전면 '+(m.front||'-')+' / 사이드 '+(m.side||'-')) : (m.screen||item.color||'-')) : ('상판 '+(m.top||'-')+' / 다리 '+(m.leg||'-'));
-    var opts=[item.topShape,item.legLabel,item.casterType,item.rateLabel].filter(Boolean).join(', ') || '-';
-    return '<div class="ffq3-card"><h4>'+esc(name)+'</h4>'
-      +'<p>사이즈: '+esc(sizeText(item))+'</p>'
-      +'<p>재질: '+esc(mat)+'</p>'
-      +'<p>옵션: '+esc(opts)+'</p>'
-      +'<strong>'+won(item.finalPrice||item.price||0)+'</strong></div>';
-  }
-  function optionCard(opt){
-    return '<div class="ffq3-card"><h4>'+esc(opt.name||'옵션')+'</h4>'
-      +'<p>구분: '+esc(opt.cat||'추가 옵션')+'</p>'
-      +'<p>색상: '+esc(opt.color||'-')+'</p>'
-      +'<p>수량: '+esc(opt.qty||1)+'</p></div>';
-  }
-  function calcTotal(products){
-    var s=getState();
-    var total=Number(s.grandTotal||s.total||s.totalPrice||0);
-    if(!total) total=products.reduce(function(sum,x){return sum+Number(x.finalPrice||x.price||0);},0);
-    return total;
-  }
+  function lastRenderImage(){var img=document.querySelector('#ff-cpf-render-box img,#ff-render-result-box img,.ff-render-result-box img'); if(img&&img.src)return img.src; var s=getState(); return s._ffFinalRenderImage||s.renderedImage||s.renderImage||s.aiImage||'';}
+  function getOptions(){var s=getState(); if(Array.isArray(s.extraOptionItems)&&s.extraOptionItems.length)return s.extraOptionItems; if(Array.isArray(s._ffUserOptionsChosen)&&s._ffUserOptionsChosen.length)return s._ffUserOptionsChosen; if(Array.isArray(s.finalAddons)&&s.finalAddons.length)return s.finalAddons.map(function(name){return {cat:'추가 옵션',name:name,color:s.finalOptionColor||'-',qty:1};}); return [];}
+  function productItems(){var s=getState(); var arr=Array.isArray(s.cartItems)&&s.cartItems.length?s.cartItems:[]; if(!arr.length&&s.current){arr=[{product:s.current.product||s.product||'선택 제품',w:s.w,d:s.d,h:s.h,topShape:s.topShape,legLabel:s.legLabel||s.legType,casterType:s.casterType,_deskTopColor:s._deskTopColor||s.topCode||s.top,_deskLegColor:s._deskLegColor||s.legCode||s.leg,color:s.color||s.screenCode||s.screenColor,finalPrice:s.totalPrice||s.finalPrice||0}];} return arr;}
+  function materialSummary(){var s=getState();return {top:s._deskTopColor||s.topCode||s.top||'',leg:s._deskLegColor||s.legCode||s.leg||'',front:s.frontScreenCode||((window._screenPreviewState&&_screenPreviewState.front&&_screenPreviewState.front.color)||''),side:s.sideScreenCode||((window._screenPreviewState&&_screenPreviewState.side&&_screenPreviewState.side.color)||''),screen:s.screenCode||s.screenColor||''};}
+  function sizeText(item){var parts=[item.w&&('W'+item.w),item.d&&('D'+item.d),item.h&&('H'+item.h)].filter(Boolean);return parts.join(' × ')||item.size||'-';}
+  function productCard(item,idx){var m=materialSummary();var name=item.product||item.name||('제품 '+(idx+1));var isScreen=/스크린|screen/i.test(name);var mat=isScreen?((m.front||m.side)?('전면 '+(m.front||'-')+' / 사이드 '+(m.side||'-')):(m.screen||item.color||'-')):('상판 '+(m.top||'-')+' / 다리 '+(m.leg||'-'));var opts=[item.topShape,item.legLabel,item.casterType,item.rateLabel].filter(Boolean).join(', ')||'-';return '<div class="ffq3-card"><h4>'+esc(name)+'</h4><p>사이즈: '+esc(sizeText(item))+'</p><p>재질: '+esc(mat)+'</p><p>옵션: '+esc(opts)+'</p><strong>'+won(item.finalPrice||item.price||0)+'</strong></div>';}
+  function optionCard(opt){return '<div class="ffq3-card"><h4>'+esc(opt.name||'옵션')+'</h4><p>구분: '+esc(opt.cat||'추가 옵션')+'</p><p>색상: '+esc(opt.color||'-')+'</p><p>수량: '+esc(opt.qty||1)+'</p></div>';}
+  function calcTotal(products){var s=getState();var total=Number(s.grandTotal||s.total||s.totalPrice||0);if(!total)total=products.reduce(function(sum,x){return sum+Number(x.finalPrice||x.price||0);},0);return total;}
 
   window.showFinalQuote=function(){
-    var products=productItems();
-    var opts=getOptions();
-    var img=lastRenderImage();
-    var total=calcTotal(products);
-    var supply=total ? Math.round(total/1.1) : 0;
-    var vat=total ? total-supply : 0;
+    var products=productItems(), opts=getOptions(), img=lastRenderImage(), total=calcTotal(products), supply=total?Math.round(total/1.1):0, vat=total?total-supply:0;
     document.querySelectorAll('.ffq3-modal').forEach(function(x){x.remove();});
-
     var html='<div class="ffq3-modal" id="ffq3-modal"><div class="ffq3-wrap">'
       +'<div class="ffq3-head"><div><h2>최종 견적서</h2><div class="ffq3-meta" style="text-align:left">FlowFinder 견적 결과</div></div><div class="ffq3-meta">견적일: '+today()+'<br>VAT 포함 기준</div></div>'
-      +'<div class="ffq3-summary"><div class="ffq3-summary-card"><small>제품 수</small><b>'+products.length+'</b></div><div class="ffq3-summary-card"><small>추가 옵션</small><b>'+opts.length+'</b></div><div class="ffq3-summary-card"><small>배송/설치</small><b>협의</b></div></div>';
-
-    html+='<section class="ffq3-render"><h3>최종 렌더링 이미지</h3><div class="ffq3-render-box">'
-      +(img ? '<img src="'+esc(img)+'" alt="최종 렌더링 이미지">' : '<div style="color:#64748b;font-weight:900;">렌더링 이미지가 없습니다.</div>')
-      +'</div></section>';
-
-    html+='<section class="ffq3-section"><h3>1. 구성 제품</h3><div class="ffq3-product-grid">'+products.map(productCard).join('')+'</div></section>';
-
-    html+='<section class="ffq3-section"><h3>2. 추가 옵션</h3><div class="ffq3-option-grid">'
-      +(opts.length ? opts.map(optionCard).join('') : '<div class="ffq3-card"><h4>선택 없음</h4><p>추가 옵션이 없습니다.</p></div>')
-      +'</div></section>';
-
-    html+='<section class="ffq3-section"><h3>3. 견적 금액</h3><div class="ffq3-total">'
-      +'<div class="ffq3-line"><span>공급가액</span><b>'+won(supply)+'</b></div>'
-      +'<div class="ffq3-line"><span>부가세</span><b>'+won(vat)+'</b></div>'
-      +'<div class="ffq3-line final"><span>총 견적 금액</span><b>'+won(total)+'</b></div>'
-      +'</div></section>';
-
-    html+='<div class="ffq3-actions"><button onclick="window.print()">인쇄</button><button class="primary" onclick="document.getElementById(\'ffq3-modal\').remove()">닫기</button></div>'
-      +'</div></div>';
-
+      +'<div class="ffq3-summary"><div class="ffq3-summary-card"><small>제품 수</small><b>'+products.length+'</b></div><div class="ffq3-summary-card"><small>추가 옵션</small><b>'+opts.length+'</b></div><div class="ffq3-summary-card"><small>배송/설치</small><b>협의</b></div></div>'
+      +'<section class="ffq3-render"><h3>최종 렌더링 이미지</h3><div class="ffq3-render-box">'+(img?'<img src="'+esc(img)+'" alt="최종 렌더링 이미지">':'<div style="color:#64748b;font-weight:900;">렌더링 이미지가 없습니다.</div>')+'</div></section>'
+      +'<section class="ffq3-section"><h3>1. 구성 제품</h3><div class="ffq3-product-grid">'+products.map(productCard).join('')+'</div></section>'
+      +'<section class="ffq3-section"><h3>2. 추가 옵션</h3><div class="ffq3-option-grid">'+(opts.length?opts.map(optionCard).join(''):'<div class="ffq3-card"><h4>선택 없음</h4><p>추가 옵션이 없습니다.</p></div>')+'</div></section>'
+      +'<section class="ffq3-section"><h3>3. 견적 금액</h3><div class="ffq3-total"><div class="ffq3-line"><span>공급가액</span><b>'+won(supply)+'</b></div><div class="ffq3-line"><span>부가세</span><b>'+won(vat)+'</b></div><div class="ffq3-line final"><span>총 견적 금액</span><b>'+won(total)+'</b></div></div></section>'
+      +'<div class="ffq3-actions"><button onclick="window.print()">인쇄</button><button class="primary" onclick="document.getElementById(\'ffq3-modal\').remove()">닫기</button></div></div></div>';
     document.body.insertAdjacentHTML('beforeend',html);
   };
 
   var prevFetch=window.fetch;
-  window.fetch=function(input,init){
-    var url=String(input||'');
-    var isNano=url.indexOf('/api/generate-preview')>-1 || url.indexOf('/api/generate-screen-preview')>-1;
-    return prevFetch.call(this,input,init).then(function(res){
-      if(isNano){
-        try{
-          res.clone().json().then(function(data){
-            var src=(data&&(data.imageUrl||data.image||data.url||data.previewUrl||data.output))||'';
-            if(src && window.state) state._ffFinalRenderImage=src;
-          }).catch(function(){});
-        }catch(e){}
-      }
-      return res;
+  window.fetch=function(input,init){var url=String(input||''), isNano=url.indexOf('/api/generate-preview')>-1||url.indexOf('/api/generate-screen-preview')>-1;return prevFetch.call(this,input,init).then(function(res){if(isNano){try{res.clone().json().then(function(data){var src=(data&&(data.imageUrl||data.image||data.url||data.previewUrl||data.output))||'';if(src&&window.state)state._ffFinalRenderImage=src;}).catch(function(){});}catch(e){}}return res;});};
+})();
+</script>
+
+
+
+<!-- === FF_OPTIONS_ONE_SCREEN_FINAL === -->
+<style id="ff-options-one-screen-final-css">
+.msg.bot:has(.ff-user-final-options-v5) .bubble{max-width:min(96%,520px)!important;width:min(96%,520px)!important;padding:8px!important;overflow:hidden!important}
+.ff-user-final-options-v5{width:100%!important;max-width:520px!important;margin:0!important;padding:12px!important;border-radius:18px!important;border:1px solid rgba(46,242,201,.25)!important;background:linear-gradient(180deg,rgba(5,18,29,.98),rgba(3,14,24,.98))!important;box-sizing:border-box!important;overflow:hidden!important}
+.ff-user-final-options-v5 h3{margin:0 0 4px!important;color:#2ef2c9!important;font-size:22px!important;line-height:1.1!important;font-weight:1000!important}
+.ff-user-final-options-v5>p{margin:0 0 3px!important;color:#e5edf7!important;font-size:11px!important;line-height:1.25!important;font-weight:800!important}
+.ff-opt-badge-v5{display:inline-flex!important;margin:6px 0!important;padding:5px 9px!important;border-radius:999px!important;border:1px solid rgba(168,85,247,.35)!important;color:#f0abfc!important;background:rgba(88,28,135,.24)!important;font-size:10px!important;font-weight:1000!important}
+.ff-opt-section-v5{margin:7px 0!important;padding:8px!important;border-radius:15px!important;border:1px solid rgba(255,255,255,.10)!important;background:rgba(7,23,34,.78)!important}
+.ff-opt-section-title-v5{margin:0 0 6px!important;color:#2ef2c9!important;font-size:17px!important;font-weight:1000!important;line-height:1!important}
+.ff-opt-list-v5{display:flex!important;flex-direction:column!important;gap:6px!important}
+.ff-opt-row-v5{display:grid!important;grid-template-columns:78px minmax(0,1fr) 30px 68px!important;align-items:center!important;gap:6px!important;min-height:54px!important;padding:6px!important;border-radius:13px!important;border:1px solid rgba(148,163,184,.18)!important;background:linear-gradient(90deg,rgba(9,31,48,.94),rgba(6,22,35,.94))!important;box-sizing:border-box!important;cursor:pointer!important;max-width:100%!important;overflow:hidden!important}
+.ff-opt-row-v5.active{border-color:#2ef2c9!important;background:linear-gradient(90deg,rgba(10,47,50,.96),rgba(7,30,42,.96))!important;box-shadow:0 0 0 1px rgba(46,242,201,.18),0 0 14px rgba(46,242,201,.10)!important}
+.ff-opt-img-v5{width:78px!important;height:42px!important;object-fit:contain!important;display:block!important;border-radius:9px!important;background:#eef3f8!important;border:1px solid rgba(255,255,255,.15)!important;padding:2px!important;box-sizing:border-box!important}
+.ff-opt-name-v5{min-width:0!important;color:#fff!important;font-size:13px!important;font-weight:1000!important;line-height:1.15!important;overflow:hidden!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important}
+.ff-opt-color-label-v5{color:#dbeafe!important;font-size:10px!important;font-weight:900!important;text-align:right!important}
+.ff-opt-color-v5 select{width:68px!important;max-width:68px!important;height:30px!important;border-radius:9px!important;padding:0 5px!important;border:1px solid rgba(46,242,201,.30)!important;background:#06131f!important;color:#fff!important;font-size:12px!important;font-weight:1000!important;outline:none!important;opacity:.42!important;pointer-events:none!important;box-sizing:border-box!important}
+.ff-opt-row-v5.active .ff-opt-color-v5 select{opacity:1!important;pointer-events:auto!important;border-color:rgba(46,242,201,.72)!important}
+.ff-opt-help-v5{margin:7px 0!important;padding:8px 10px!important;border-radius:13px!important;border:1px solid rgba(46,242,201,.16)!important;background:rgba(8,28,42,.72)!important;color:#cbd5e1!important;font-size:10.5px!important;line-height:1.35!important}
+.ff-opt-actions-v5{display:grid!important;grid-template-columns:1fr 1fr!important;gap:8px!important;margin-top:8px!important}
+.ff-opt-actions-v5 button{min-height:42px!important;border-radius:14px!important;border:1px solid rgba(255,255,255,.16)!important;font-size:15px!important;font-weight:1000!important;cursor:pointer!important}
+.ff-opt-actions-v5 .primary{background:#2ef2c9!important;color:#031313!important;border-color:#2ef2c9!important}
+.ff-opt-actions-v5 .secondary{background:#17212d!important;color:#fff!important}
+</style>
+
+<script id="ff-options-one-screen-final-js">
+(function(){
+ if(window.__ffOptionsOneScreenFinal)return;window.__ffOptionsOneScreenFinal=true;
+ function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+ function bot(h){if(typeof window.addMsg==='function')window.addMsg('bot',h);}
+ var OPTIONS=[
+  {cat:'멀티탭',items:[
+   {name:'외장 3구 멀티탭',colors:['WW','BK'],img:'multitap_external_3outlet.png'},
+   {name:'매립형 3구 슬라이딩 멀티탭',colors:['WW','BK'],img:'multitap_sliding_3outlet.png'},
+   {name:'매립형 2구 멀티탭',colors:['WW','BK'],img:'multitap_embedded_2outlet.png'}]},
+  {cat:'PC홀더',items:[{name:'PC홀더',colors:['WH','BK'],img:'pc_hanging.png'}]},
+  {cat:'기타',items:[
+   {name:'모니터암',colors:['BK'],img:'monitor_arm_topmount.png'},
+   {name:'가방걸이',colors:['XX(투명)'],img:'bag_hook.png'}]}];
+ function imgSrc(f){return './images/options/accessories/'+f;}
+ window.ffOptionImgFallbackV5=function(img){var f=img.getAttribute('data-file')||'',s=Number(img.getAttribute('data-step')||'0'),t=['./images/options/accessories/'+f,'images/options/accessories/'+f];s++;if(s<t.length){img.setAttribute('data-step',String(s));img.src=t[s];}else img.style.visibility='hidden';};
+ function rowId(g,i){return'ff-opt-v5-'+g+'-'+i;}
+ function renderOptions(){
+  if(window.state){state.step='final_options';state._ff102OptionsVisible=true;}
+  if(typeof window.updateFlowBar==='function')window.updateFlowBar();
+  var h='<div class="ff102-options-card ff-user-final-options-v5"><h3>옵션을 추가하시겠습니까?</h3><p>필요한 옵션을 선택하고 색상만 지정해주세요.</p><p>선택하지 않은 옵션은 0으로 처리됩니다.</p>';
+  OPTIONS.forEach(function(g,gi){h+='<section class="ff-opt-section-v5"><h4 class="ff-opt-section-title-v5">'+esc(g.cat)+'</h4><div class="ff-opt-list-v5">';g.items.forEach(function(it,ii){var id=rowId(gi,ii),opts=(it.colors||['BK']).map(function(c){return'<option value="'+esc(c)+'">'+esc(c)+'</option>';}).join('');h+='<div class="ff-opt-row-v5" id="'+id+'" data-name="'+esc(it.name)+'" data-cat="'+esc(g.cat)+'" onclick="ffToggleOptionV5(\''+id+'\')"><img class="ff-opt-img-v5" data-file="'+esc(it.img)+'" data-step="0" src="'+esc(imgSrc(it.img))+'" onerror="ffOptionImgFallbackV5(this)" alt="'+esc(it.name)+'"><div class="ff-opt-name-v5">'+esc(it.name)+'</div><div class="ff-opt-color-label-v5">색상</div><label class="ff-opt-color-v5" onclick="event.stopPropagation()"><select disabled onchange="ffOptionColorV5(\''+id+'\',this.value)">'+opts+'</select></label></div>';});h+='</div></section>';});
+  h+='<div class="ff-opt-help-v5">ⓘ 카드 클릭으로 선택합니다. 선택된 카드만 색상 지정이 활성화됩니다.</div><div class="ff-opt-actions-v5"><button type="button" class="secondary" onclick="ffSkipOptionsV5()">건너뛰기</button><button type="button" class="primary" onclick="ffSaveOptionsV5()">선택 완료</button></div></div>';
+  bot(h);if(typeof window.scrollBottom==='function')window.scrollBottom();
+ }
+ window.ffToggleOptionV5=function(id){var r=document.getElementById(id);if(!r)return;r.classList.toggle('active');var s=r.querySelector('select');if(s)s.disabled=!r.classList.contains('active');};
+ window.ffOptionColorV5=function(id,v){var r=document.getElementById(id);if(r)r.setAttribute('data-color',v||'');};
+ function selectedOptions(){return Array.prototype.slice.call(document.querySelectorAll('.ff-opt-row-v5.active')).map(function(r){var s=r.querySelector('select');return{cat:r.getAttribute('data-cat')||'',name:r.getAttribute('data-name')||'',color:r.getAttribute('data-color')||(s&&s.value)||'',qty:1};});}
+ function saveChosen(ch){if(window.state){state.extraOptionItems=ch;state.finalAddons=ch.map(function(x){return x.name;});state.finalOptionQty=ch.length;state._ff102OptionsHandled=true;state._ff101OptionsHandled=true;state._ff100OptionsDone=true;state._ff96OptionsAsked=true;state._ff97FinalOptionsAsked=true;state._ffUserOptionsChosen=ch;state.step='next_actions';}if(typeof window.updateCurrent==='function')window.updateCurrent();if(typeof window.updatePreview==='function')window.updatePreview();bot(ch.length?('옵션 선택 완료:<br>'+ch.map(function(x){return'· '+esc(x.name)+' / '+esc(x.color);}).join('<br>')):'옵션은 선택하지 않는 것으로 처리했습니다.');if(typeof window.updateFlowBar==='function')window.updateFlowBar();if(typeof window.askContinue==='function'){try{window.askContinue();return;}catch(e){}}if(typeof window.showFinalQuote==='function'){try{window.showFinalQuote();return;}catch(e){}}}
+ window.ffSaveOptionsV5=function(){saveChosen(selectedOptions());};window.ffSkipOptionsV5=function(){saveChosen([]);};
+ window.ff102ShowOptions=renderOptions;window.ffShowFinalOptions70=renderOptions;window.ffShowFinalOptions96=renderOptions;window.ffShowFinalOptions97=renderOptions;window.ffShowFinalOptionsUser=renderOptions;
+})();
+</script>
+
+
+
+<!-- === FF_OPTIONS_NAME_FULL_NO_BADGE_FIX === -->
+<style id="ff-options-name-full-no-badge-fix-css">
+  /* 상단 보라 배지 제거 */
+  .ff-user-final-options-v5 .ff-opt-badge-v5{
+    display:none !important;
+  }
+
+  /* 제품명 말줄임 제거: 전체 이름이 보이도록 2~3줄 허용 */
+  .ff-user-final-options-v5 .ff-opt-row-v5{
+    grid-template-columns:78px minmax(0,1fr) 28px 68px !important;
+    min-height:62px !important;
+    align-items:center !important;
+  }
+  .ff-user-final-options-v5 .ff-opt-name-v5{
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    display:block !important;
+    -webkit-line-clamp:unset !important;
+    -webkit-box-orient:unset !important;
+    font-size:12.5px !important;
+    line-height:1.22 !important;
+    word-break:keep-all !important;
+  }
+  .ff-user-final-options-v5 .ff-opt-img-v5{
+    width:78px !important;
+    height:44px !important;
+  }
+
+  /* 안내문이 너무 길어지지 않게 */
+  .ff-user-final-options-v5>p{
+    font-size:11px !important;
+    line-height:1.25 !important;
+  }
+
+  @media(max-width:520px){
+    .ff-user-final-options-v5 .ff-opt-row-v5{
+      grid-template-columns:74px minmax(0,1fr) 64px !important;
+      grid-template-areas:"img name select" !important;
+      min-height:62px !important;
+    }
+    .ff-user-final-options-v5 .ff-opt-img-v5{
+      grid-area:img !important;
+      width:74px !important;
+      height:44px !important;
+    }
+    .ff-user-final-options-v5 .ff-opt-name-v5{
+      grid-area:name !important;
+      font-size:12px !important;
+      line-height:1.22 !important;
+    }
+    .ff-user-final-options-v5 .ff-opt-color-label-v5{
+      display:none !important;
+    }
+    .ff-user-final-options-v5 .ff-opt-color-v5{
+      grid-area:select !important;
+    }
+    .ff-user-final-options-v5 .ff-opt-color-v5 select{
+      width:64px !important;
+      max-width:64px !important;
+    }
+  }
+</style>
+<script id="ff-options-name-full-no-badge-fix-js">
+(function(){
+  if(window.__ffOptionsNameFullNoBadgeFix) return;
+  window.__ffOptionsNameFullNoBadgeFix = true;
+
+  function removeBadgeText(){
+    document.querySelectorAll('.ff-opt-badge-v5').forEach(function(el){ el.remove(); });
+    document.querySelectorAll('.ff-user-final-options-v5').forEach(function(card){
+      card.innerHTML = card.innerHTML.replace(/<span class="ff-opt-badge-v5">[\s\S]*?<\/span>/g, '');
+      card.innerHTML = card.innerHTML.replace(/상판 주문품 요율 적용 가능/g, '');
     });
-  };
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(removeBadgeText, 100);
+    setTimeout(removeBadgeText, 600);
+  });
+
+  document.addEventListener('click', function(){
+    setTimeout(removeBadgeText, 80);
+    setTimeout(removeBadgeText, 400);
+  }, true);
+})();
+</script>
+
+
+
+<!-- === FF_RIGHT_PANEL_PRODUCT_FIRST_RENDER_AFTER === -->
+<style id="ff-right-panel-product-first-render-after-css">
+  /* 오른쪽 패널 순서 고정:
+     1) 제품선택 6개 이미지
+     2) 렌더링 버튼/결과
+     3) 선택내역/재질/금액
+     4) 옵션추가 */
+  #preview-panel{
+    display:flex !important;
+    flex-direction:column !important;
+    gap:14px !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+  }
+
+  #set-product-selector{
+    order:1 !important;
+    display:block !important;
+    width:100% !important;
+    max-width:100% !important;
+    margin:0 0 14px !important;
+    position:relative !important;
+    float:none !important;
+    clear:both !important;
+    z-index:2 !important;
+  }
+
+  #ff-clean-right-dashboard{
+    order:2 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    gap:14px !important;
+    width:100% !important;
+  }
+
+  /* 렌더링 카드/버튼은 제품선택 아래에 오게 */
+  .ff-clean-preview-card{
+    order:1 !important;
+  }
+
+  /* 기존 선택내역/재질값/금액은 렌더링 아래로 */
+  .ff-clean-info-grid{
+    order:2 !important;
+  }
+  .ff-clean-total-card{
+    order:3 !important;
+  }
+
+  #ff-cpf-render-panel{
+    order:1 !important;
+  }
+
+  /* 다른 예전 미리보기/히어로가 다시 위로 올라오는 것 방지 */
+  #ff-dashboard-hero,
+  #product-preview-box,
+  #screen-composite-preview,
+  #preview-items,
+  #total-box{
+    order:3 !important;
+  }
+
+  .ff-user-final-options-v5,
+  .ff-user-final-options-v4,
+  .ff-user-final-options-v3,
+  .ff102-options-card{
+    order:4 !important;
+  }
+</style>
+<script id="ff-right-panel-product-first-render-after-js">
+(function(){
+  if(window.__ffRightPanelProductFirstRenderAfter) return;
+  window.__ffRightPanelProductFirstRenderAfter = true;
+
+  function placeProductFirst(){
+    var panel = document.getElementById('preview-panel');
+    var selector = document.getElementById('set-product-selector');
+    var dash = document.getElementById('ff-clean-right-dashboard');
+
+    if(panel && selector && dash && selector.parentElement === panel && dash.parentElement === panel){
+      if(panel.firstElementChild !== selector){
+        panel.insertBefore(selector, dash);
+      }
+    }
+
+    // 혹시 다른 패치가 order/display를 다시 덮어써도 복구
+    if(selector){
+      selector.style.order = '1';
+      selector.style.display = selector.innerHTML.trim() ? 'block' : selector.style.display;
+      selector.style.float = 'none';
+      selector.style.clear = 'both';
+    }
+    if(dash){
+      dash.style.order = '2';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(placeProductFirst, 100);
+    setTimeout(placeProductFirst, 700);
+    setTimeout(placeProductFirst, 1500);
+  });
+
+  document.addEventListener('click', function(){
+    setTimeout(placeProductFirst, 80);
+    setTimeout(placeProductFirst, 500);
+  }, true);
+
+  var mo = new MutationObserver(function(){
+    placeProductFirst();
+  });
+  if(document.documentElement){
+    mo.observe(document.documentElement, {childList:true, subtree:true});
+  }
+})();
+</script>
+
+
+
+<!-- === FF_SELECTION_TEXT_FULL_FIX === -->
+<style id="ff-selection-text-full-fix-css">
+  /* 선택내역/재질 선택값 텍스트 말줄임 제거 */
+  .ff-clean-summary-card,
+  .ff-clean-material-card{
+    min-width:0 !important;
+  }
+
+  .ff-clean-row{
+    grid-template-columns:58px minmax(0,1fr) !important;
+    align-items:start !important;
+    gap:8px !important;
+  }
+
+  .ff-clean-row span{
+    white-space:nowrap !important;
+  }
+
+  .ff-clean-row b,
+  #ff-clean-product,
+  #ff-clean-option,
+  #ff-clean-size,
+  #ff-clean-qty{
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    word-break:keep-all !important;
+    overflow-wrap:anywhere !important;
+    line-height:1.35 !important;
+    text-align:right !important;
+    max-width:none !important;
+  }
+
+  .ff-clean-material-row{
+    grid-template-columns:44px 48px minmax(0,1fr) !important;
+    gap:8px !important;
+    align-items:center !important;
+  }
+
+  .ff-clean-material-row b,
+  #ff-clean-top,
+  #ff-clean-leg,
+  #ff-clean-screen{
+    white-space:normal !important;
+    overflow:visible !important;
+    text-overflow:clip !important;
+    word-break:keep-all !important;
+    overflow-wrap:anywhere !important;
+    line-height:1.35 !important;
+    text-align:right !important;
+  }
+
+  /* 선택내역 카드가 너무 좁으면 1열로 내려서 전체 표시 */
+  @media(max-width:1280px){
+    .ff-clean-info-grid{
+      grid-template-columns:1fr !important;
+    }
+  }
+</style>
+<script id="ff-selection-text-full-fix-js">
+(function(){
+  if(window.__ffSelectionTextFullFix) return;
+  window.__ffSelectionTextFullFix = true;
+
+  function fixTitles(){
+    ['ff-clean-product','ff-clean-option','ff-clean-size','ff-clean-top','ff-clean-leg','ff-clean-screen'].forEach(function(id){
+      var el = document.getElementById(id);
+      if(!el) return;
+      el.style.whiteSpace = 'normal';
+      el.style.overflow = 'visible';
+      el.style.textOverflow = 'clip';
+      el.style.wordBreak = 'keep-all';
+      el.style.overflowWrap = 'anywhere';
+      el.title = el.textContent || '';
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(fixTitles,100);
+    setTimeout(fixTitles,700);
+  });
+  document.addEventListener('click', function(){
+    setTimeout(fixTitles,100);
+    setTimeout(fixTitles,500);
+  }, true);
+
+  var mo = new MutationObserver(fixTitles);
+  if(document.documentElement){
+    mo.observe(document.documentElement,{childList:true,subtree:true,characterData:true});
+  }
 })();
 </script>
 
