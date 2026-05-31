@@ -6738,27 +6738,31 @@ function setPreviewGlow(part) {
       var tex = textureFor(code, cat);
       var isFrontside = PREVIEW.screenKey === 'frontside' || screenKey === 'frontside' || ffIsFrontsideSelected() || (PREVIEW.frontScreen && PREVIEW.sideScreen);
 
-      if(isFrontside){
-        if(/사이드/.test(cat)){
-          PREVIEW.sideScreen = code;
-          PREVIEW.sideScreenTex = tex;
-          window.__ffSideScreen = code;
-          window.__ffSideScreenTex = tex;
-        } else if(/전면/.test(cat)){
-          PREVIEW.frontScreen = code;
-          PREVIEW.frontScreenTex = tex;
-          window.__ffFrontScreen = code;
-          window.__ffFrontScreenTex = tex;
-        } else {
-          PREVIEW.screen = code;
-          PREVIEW.screenTex = tex;
-        }
-        PREVIEW.screenKey = 'frontside';
-      } else {
-        PREVIEW.screen = code;
-        PREVIEW.screenTex = tex;
-        PREVIEW.screenKey = screenKey || PREVIEW.screenKey;
-      }
+if(isFrontside){
+  var marker = String(cat || '') + ' ' + String(screenKey || '') + ' ' + String(inputId || '');
+
+  if(/side|사이드/i.test(marker)){
+    PREVIEW.sideScreen = code;
+    PREVIEW.sideScreenTex = tex;
+    window.__ffSideScreen = code;
+    window.__ffSideScreenTex = tex;
+  } else if(/front|전면/i.test(marker)){
+    PREVIEW.frontScreen = code;
+    PREVIEW.frontScreenTex = tex;
+    window.__ffFrontScreen = code;
+    window.__ffFrontScreenTex = tex;
+  } else {
+    // frontside인데 구분이 안 되면 마지막 선택값으로 덮어쓰지 말고 임시 저장만
+    PREVIEW.screen = code;
+    PREVIEW.screenTex = tex;
+  }
+
+  PREVIEW.screenKey = 'frontside';
+} else {
+  PREVIEW.screen = code;
+  PREVIEW.screenTex = tex;
+  PREVIEW.screenKey = screenKey || PREVIEW.screenKey;
+}
     } else {
       part = 'top';
       PREVIEW.top = code;
@@ -6835,16 +6839,27 @@ var payload = {
 
   screenTexture: isFrontside ? '' : (PREVIEW.screenTex || ''),
 
-  frontScreenTexture: isFrontside ? (PREVIEW.frontScreenTex || '') : '',
-  sideScreenTexture: isFrontside ? (PREVIEW.sideScreenTex || '') : '',
+frontScreenTexture: isFrontside
+  ? (PREVIEW.frontScreenTex || window.__ffFrontScreenTex || '')
+  : '',
+
+sideScreenTexture: isFrontside
+  ? (PREVIEW.sideScreenTex || window.__ffSideScreenTex || '')
+  : '',
+
+frontScreenCode: isFrontside
+  ? (PREVIEW.frontScreen || window.__ffFrontScreen || '')
+  : '',
+
+sideScreenCode: isFrontside
+  ? (PREVIEW.sideScreen || window.__ffSideScreen || '')
+  : '',
 
   screenGuide: isFrontside ? './images/guides/frontside_guide.png' : '',
 screenImage: isFrontside ? getBase('frontside') : (getBase(PREVIEW.screenKey) || ''),
 screenLabel: isFrontside ? 'frontside' : (PREVIEW.screenKey || ''),
 screenType: isFrontside ? 'frontside' : (PREVIEW.screenKey || ''),
 screenCode: isFrontside ? '' : (PREVIEW.screen || ''),
-frontScreenCode: isFrontside ? (PREVIEW.frontScreen || '') : '',
-sideScreenCode: isFrontside ? (PREVIEW.sideScreen || '') : '',
 
 screenInstruction: isFrontside
   ? 'Use screenGuide to separate areas. White guide area means FRONT screen. Red guide area means SIDE screen. Apply frontScreenTexture only to the white/front area. Apply sideScreenTexture only to the red/side area. Do not apply one texture to both screens. Do not redraw or create a new screen.'
@@ -16999,10 +17014,18 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
   topTexture: topTex,
   legTexture: legTex,
 
-  screenTexture: suffix === 'frontside' ? '' : m.screenTexture,
-  frontScreenTexture: suffix === 'frontside' ? m.frontScreenTexture : '',
-  sideScreenTexture: suffix === 'frontside' ? m.sideScreenTexture : '',
+  screenTexture: PREVIEW.screenKey === 'frontside' ? '' : (PREVIEW.screenTex || ''),
 
+frontScreenTexture: PREVIEW.screenKey === 'frontside'
+  ? (PREVIEW.frontScreenTex || window.__ffFrontScreenTex || '')
+  : '',
+
+sideScreenTexture: PREVIEW.screenKey === 'frontside'
+  ? (PREVIEW.sideScreenTex || window.__ffSideScreenTex || '')
+  : '',
+
+screenLabel: PREVIEW.screenKey === 'frontside' ? 'frontside' : PREVIEW.screenKey,
+screenGuide: PREVIEW.screenKey === 'frontside' ? './images/guides/frontside_guide.png' : '',
   screenCode: m.screenCode,
   size: {
     screenH: S().screenH || '',
@@ -18096,6 +18119,204 @@ html, body{ height:100vh !important; overflow:hidden !important; }
   };
 })();
 </script>
+
+
+
+<!-- === FF STEP7: screen name labels for size/material flow === -->
+<script id="ff-step7-screen-name-labels-fixed">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function S(){ window.state = window.state || {}; return window.state; }
+  function isScreenCat(cat){
+    cat=String(cat||'');
+    var info=(window.USER_CATEGORIES&&window.USER_CATEGORIES[cat])||{};
+    return !!info.isScreen || /스크린|screen|전면|사이드|일자|L형|l형/i.test(cat);
+  }
+  function isDeskCat(cat){
+    cat=String(cat||'');
+    var info=(window.USER_CATEGORIES&&window.USER_CATEGORIES[cat])||{};
+    return !!info.isDesk || /데스크|desk/i.test(cat);
+  }
+  function screenDefaults(cat){
+    cat=String(cat||'');
+    if(/일자|L형|l형/i.test(cat)) return {total:590, above:350};
+    return {total:715, above:405};
+  }
+  function selectedHas(name){
+    var s=S();
+    return (s.selectedCategories||[]).some(function(x){return String(x||'').indexOf(name)>=0;});
+  }
+  function cleanScreenName(cat){
+    cat=String(cat||'').replace(/_L|_R/g,'').replace(/\s*\((좌|우|좌측|우측)\)\s*/g,'').trim();
+    var s=S();
+    if((s.screenKey==='frontside'||s._screenKey==='frontside'||s.productKey==='frontside') || (selectedHas('전면') && selectedHas('사이드'))){
+      if(/전면|사이드/.test(cat)) return '전면+사이드 스크린';
+    }
+    if(/frontside/i.test(cat)) return '전면+사이드 스크린';
+    return cat || '스크린';
+  }
+  function dataPack(cat){
+    var info=(window.USER_CATEGORIES&&window.USER_CATEGORIES[cat])||{};
+    var mode=(typeof window.ffDataTypeForMode==='function') ? window.ffDataTypeForMode(info) : (info.type||'unit');
+    var keys=(typeof window.ffUnitKeysForMode==='function') ? window.ffUnitKeysForMode(cat, info.keys||[]) : (info.keys||[]);
+    var key=keys[0]||'';
+    var data=(mode==='set') ? window.SET_DATA : window.UNIT_DATA;
+    return {mode:mode,key:key,items:(data&&data[key])||[]};
+  }
+  function buildSizeControl(label,desc,val,id,min,max,step){
+    step=step||10;
+    return '<div style="display:flex;flex-direction:column;gap:5px;min-width:120px;">'
+      + '<span style="font-size:12px;color:#26f5c9;font-weight:950;">'+esc(label)+'</span>'
+      + '<div class="ff-size-control" style="display:flex;gap:4px;align-items:center;">'
+      + '<button type="button" onclick="ffStep7SizeStep(\''+id+'\',-'+step+')">−</button>'
+      + '<input id="'+id+'" type="number" value="'+esc(val)+'" min="'+esc(min)+'" max="'+esc(max)+'" onkeydown="if(event.key===\'Enter\')submitSizeForm('+String(window._sizeFormId||0)+')" style="width:88px;background:#0b1220;border:1px solid #2ef2c9;color:#fff;border-radius:8px;padding:8px;text-align:center;font-weight:900;">'
+      + '<button type="button" onclick="ffStep7SizeStep(\''+id+'\','+step+')">+</button>'
+      + '</div><span style="font-size:10px;color:#7fa8a0;">'+esc(desc)+'</span></div>';
+  }
+  window.ffStep7SizeStep=function(id,delta){
+    var el=$(id); if(!el||el.disabled) return;
+    var min=parseInt(el.min,10)||0, max=parseInt(el.max,10)||9999, val=parseInt(el.value,10)||min;
+    el.value=Math.max(min,Math.min(max,val+delta));
+  };
+
+  var oldAskSize=window.askSizeInput;
+  window.askSizeInput=function(catName){
+    var s=S(); catName=catName||s._currentCatName||'';
+    s.step='input_size'; s._currentCatName=catName;
+    if(typeof window.updateFlowBar==='function') window.updateFlowBar();
+    var info=(window.USER_CATEGORIES&&window.USER_CATEGORIES[catName])||{};
+    if(!isDeskCat(catName) && !isScreenCat(catName)){
+      return oldAskSize ? oldAskSize.apply(this,arguments) : undefined;
+    }
+    window._sizeFormId=(window._sizeFormId||0)+1;
+    var fid=window._sizeFormId;
+    var fields='', hint='', title='';
+    if(isDeskCat(catName) && !isScreenCat(catName)){
+      var minW=/덕트/.test(catName)?1200:1000;
+      var defW=s.w||(/덕트/.test(catName)?1200:1400), defD=s.d||700, defH=s.h||720;
+      title='<b>'+esc(catName)+'</b>의 사이즈를 확인/조절해주세요:';
+      fields += buildSizeControl('W','가로',defW,'size-w-'+fid,minW,2400,100);
+      fields += buildSizeControl('D','세로',defD,'size-d-'+fid,560,900,10);
+      fields += buildSizeControl('H','높이',defH,'size-h-'+fid,650,900,10);
+      hint='<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">· 데스크 가로/세로/높이를 확인해주세요.</span>';
+    }else{
+      var nm=cleanScreenName(catName), def=screenDefaults(catName), h=s.h||def.total;
+      title='<b>'+esc(nm)+'</b>의 사이즈를 확인/조절해주세요:';
+      fields += buildSizeControl('H','높이',h,'size-h-'+fid,300,1400,10);
+      hint='<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">· '+esc(nm)+' H 기준 '+def.total+'mm / 상판위 기준 '+def.above+'mm<br>· 기본값 그대로 진행하려면 사이즈 확인을 눌러주세요.</span>';
+    }
+    var html=title
+      + '<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'+fields+'</div>'
+      + hint
+      + '<br><button class="confirm-btn" style="margin-top:10px;" onclick="submitSizeForm('+fid+')">사이즈 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    var input=$('user-input'); if(input){input.placeholder='위 칸에 입력해주세요'; input.disabled=true;}
+    setTimeout(function(){var first=$('size-w-'+fid)||$('size-h-'+fid); if(first) first.focus();},80);
+  };
+
+  var prevAfterSize=window.afterSizeInput;
+  function askScreenTopGapNamed(catName,newH){
+    var s=S(), nm=cleanScreenName(catName), def=screenDefaults(catName);
+    newH=parseInt(newH,10)||def.total;
+    s._currentCatName=catName; s._screenNewH=newH; s.h=newH; s.step='input_screen_top';
+    var fid='label'+Date.now(), above=Math.min(def.above,Math.max(1,newH-1));
+    var html='📐 <b>'+esc(nm)+'</b>의 상판위 사이즈를 입력해주세요.'
+      + '<div class="ff-screen-default-box" style="margin-top:8px;">'
+      + '전체 H: <b>'+newH+'mm</b><br>상판위 기준: <b>'+def.above+'mm</b>'
+      + '</div>'
+      + '<div style="display:flex;gap:10px;margin-top:10px;align-items:flex-end;flex-wrap:wrap;">'
+      + '<div style="display:flex;flex-direction:column;gap:5px;min-width:140px;">'
+      + '<span style="font-size:12px;color:#26f5c9;font-weight:950;">상판 위 높이</span>'
+      + '<div class="ff-size-control" style="display:flex;gap:4px;align-items:center;">'
+      + '<button type="button" onclick="ffStep7TopGapStep(\''+fid+'\',-50)">−</button>'
+      + '<input id="screen-top-'+fid+'" type="number" value="'+above+'" min="1" max="'+(newH-1)+'" onkeydown="if(event.key===\'Enter\')ffStep7SubmitTopGap(\''+fid+'\')" style="width:88px;background:#0b1220;border:1px solid #2ef2c9;color:#fff;border-radius:8px;padding:8px;text-align:center;font-weight:900;">'
+      + '<button type="button" onclick="ffStep7TopGapStep(\''+fid+'\',50)">+</button>'
+      + '</div><span style="font-size:10px;color:#7fa8a0;">mm</span></div></div>'
+      + '<button class="confirm-btn" style="margin-top:10px;" onclick="ffStep7SubmitTopGap(\''+fid+'\')">상판 위 값 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    var input=$('user-input'); if(input){input.disabled=true; input.placeholder='위 칸에 입력해주세요';}
+    setTimeout(function(){var el=$('screen-top-'+fid); if(el) el.focus();},80);
+  }
+  window.ffStep7TopGapStep=function(fid,delta){
+    var el=$('screen-top-'+fid); if(!el||el.disabled) return;
+    var min=parseInt(el.min,10)||1, max=parseInt(el.max,10)||9999, val=parseInt(el.value,10)||min;
+    el.value=Math.max(min,Math.min(max,val+delta));
+  };
+  window.ffStep7SubmitTopGap=function(fid){
+    var s=S(), cat=s._currentCatName, nm=cleanScreenName(cat), el=$('screen-top-'+fid);
+    if(!el||el.disabled) return;
+    var newH=parseInt(s._screenNewH||s.h||screenDefaults(cat).total,10), val=parseInt(el.value,10);
+    if(!val||val<1||val>=newH){el.style.borderColor='#f87171'; el.focus(); return;}
+    el.disabled=true; var btn=document.querySelector('[onclick="ffStep7SubmitTopGap(\''+fid+'\')"]'); if(btn) btn.disabled=true;
+    s._screenTopGap=val; s.screenTopGap=val; s.current=s.current||{}; s.current.size='H'+newH+' / 상판위 '+val+'mm'; s.current.screenTopGap=val;
+    if(typeof window.updateCurrent==='function') window.updateCurrent();
+    if(typeof window.addMsg==='function'){
+      window.addMsg('user','상판 위 '+val+'mm');
+      window.addMsg('bot','📐 '+esc(nm)+' 사이즈 정리:<br>· 전체 H: <b>'+newH+'mm</b><br>· 상판 위: <b>'+val+'mm</b><br>· 상판 아래: <b>'+(newH-val)+'mm</b><br><br>이제 <b>'+esc(nm)+'의 재질</b>을 선택해주세요.');
+    }
+    var input=$('user-input'); if(input){input.disabled=false; input.placeholder='입력하세요...';}
+    var pack=s._flowColorPack||dataPack(cat);
+    if(typeof window.askColorTypeFirst==='function') window.askColorTypeFirst(cat,pack.mode,pack.items,pack.key);
+  };
+  window.afterSizeInput=function(parsed){
+    var s=S(), cat=s._currentCatName;
+    if(isScreenCat(cat)){
+      parsed=parsed||{}; var def=screenDefaults(cat);
+      s.h=parseInt(parsed.h||s.h||def.total,10); s.w=parsed.w||s.w||null; s.d=parsed.d||s.d||null;
+      s.current=s.current||{}; s.current.product=s.current.product||cat; s.current.size='H'+s.h;
+      if(typeof window.updateCurrent==='function') window.updateCurrent();
+      if(typeof window.checkSizeRule==='function'){
+        var chk=window.checkSizeRule(cat,s.w,s.d,s.h);
+        if(chk && chk.ok===false){
+          if(typeof window.addMsg==='function') window.addMsg('bot','<div class="warning-box">⛔ 해당 사이즈는 주문이 불가합니다.<br>('+(chk.errors||[]).join(' / ')+')</div>');
+          return window.askSizeInput(cat);
+        }
+      }
+      askScreenTopGapNamed(cat,s.h);
+      return;
+    }
+    return (typeof prevAfterSize==='function') ? prevAfterSize.apply(this,arguments) : undefined;
+  };
+
+  var oldAskColorType=window.askColorTypeFirst;
+  var oldAskStd=window.askStdColorDrop;
+  window.askColorTypeFirst=function(catName,dataType,items,productKey){
+    var s=S(); s._currentCatName=catName; s._currentDataType=dataType; s._currentItems=items; s._currentProductKey=productKey;
+    if(isScreenCat(catName)) return window.askStdColorDrop(catName,dataType,items,productKey);
+    return oldAskColorType ? oldAskColorType.apply(this,arguments) : undefined;
+  };
+  window.askStdColorDrop=function(catName,dataType,items,productKey){
+    if(!isScreenCat(catName)) return oldAskStd ? oldAskStd.apply(this,arguments) : undefined;
+    var nm=cleanScreenName(catName), selId='std-color-sel-'+Date.now();
+    var standard=[]; if(window.STD_COLORS&&window.STD_COLORS[catName]) standard=window.STD_COLORS[catName].slice();
+    if(!standard.length && items){items.forEach(function(i){if(i&&i.color&&standard.indexOf(i.color)<0) standard.push(i.color);});}
+    var custom=(/일자|L형|l형/i.test(catName)) ? (window.CUSTOM_PET_COLORS_SCREEN||[]) : (window.CUSTOM_FABRIC_COLORS_SCREEN||[]);
+    function unique(a){var out=[];(a||[]).forEach(function(x){if(x&&out.indexOf(x)<0)out.push(x);});return out;}
+    function group(title,arr){
+      arr=unique(arr); if(!arr.length) return '';
+      var h='<div class="ff-color-category-card"><div class="ff-color-category-title"><span>'+esc(title)+'</span></div><div class="material-button-group">';
+      arr.forEach(function(c){
+        if(typeof window.ffMaterialBtnHtml==='function') h+=window.ffMaterialBtnHtml(c,selId,'screen',catName);
+        else h+='<button type="button" class="material-btn" onclick="document.getElementById(\''+selId+'\').value=\''+esc(c)+'\'">'+esc(c)+'</button>';
+      });
+      return h+'</div></div>';
+    }
+    var html='<b>'+esc(nm)+'</b>의 재질을 선택해주세요:'
+      + '<input class="material-hidden-input" id="'+selId+'" value="">'
+      + group('표준품 재질',standard)
+      + group((/일자|L형|l형/i.test(catName))?'PET 주문품 재질':'패브릭 주문품 재질',custom)
+      + '<div class="material-picker-hint">'+esc(nm)+'에 적용할 재질을 1개 선택해주세요.</div>'
+      + '<br><button class="confirm-btn" style="margin-top:10px;" onclick="confirmStdColorDrop(\''+catName+'\',\''+dataType+'\',\''+productKey+'\',\''+selId+'\')">재질 확인 ✓</button>';
+    if(typeof window.addMsg==='function') window.addMsg('bot',html);
+    var b=(typeof window.getLastBubble==='function')?window.getLastBubble():null;
+    if(b){var bb=document.createElement('button'); bb.className='back-btn'; bb.textContent='← 이전 단계로'; bb.onclick=function(){bb.disabled=true; if(typeof window.goBack==='function') window.goBack();}; b.appendChild(bb); if(typeof window.scrollBottom==='function') window.scrollBottom();}
+    if(typeof window.updateFlowBar==='function') window.updateFlowBar();
+  };
+})();
+</script>
+<!-- === /FF STEP7 === -->
 
 </body>
 
