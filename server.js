@@ -65,9 +65,48 @@ function dataUrlToImagePart(src) {
   };
 }
 
+
+function ffBaseFileNameFromImage(src) {
+  const raw = String(src || '').split('?')[0].split('#')[0].replace(/\\/g, '/');
+  const file = raw.split('/').pop() || '';
+  return file || '';
+}
+
+function ffUnique(values) {
+  const out = [];
+  for (const v of values || []) {
+    const s = String(v || '').trim();
+    if (s && !out.includes(s)) out.push(s);
+  }
+  return out;
+}
+
+function ffFrontsideGuideCandidates(guideImage, baseImage) {
+  const file = ffBaseFileNameFromImage(baseImage);
+  const normalizedFile = file
+    .replace(/front_side/gi, 'frontside')
+    .replace(/front-side/gi, 'frontside')
+    .replace(/front—side/gi, 'frontside');
+
+  const names = ffUnique([
+    normalizedFile,
+    normalizedFile.replace(/_/g, '-'),
+    normalizedFile.replace(/_/g, '—'),
+    normalizedFile.replace(/-/g, '_'),
+    normalizedFile.replace(/—/g, '_'),
+    'frontside_guide.png'
+  ]);
+
+  const fromFile = names.map((name) => `./images/guides/${name}`);
+  return ffUnique([
+    guideImage,
+    ...fromFile
+  ]);
+}
+
 async function loadImagePart(src, label, baseUrl) {
   const dataPart = dataUrlToImagePart(src);
-  if (dataPart) { console.log('[IMAGE PART LOADED]', label || 'data-url', 'data-url'); return dataPart; }
+  if (dataPart) return dataPart;
 
   const safeUrl = assertSafeUrl(src, baseUrl);
   if (!safeUrl) return null;
@@ -75,7 +114,6 @@ async function loadImagePart(src, label, baseUrl) {
   if (!response.ok) throw new Error(`이미지 로드 실패: ${label || src}`);
   const mimeType = response.headers.get('content-type')?.split(';')[0] || 'image/png';
   const bytes = Buffer.from(await response.arrayBuffer());
-  console.log('[IMAGE PART LOADED]', label || src, safeUrl, mimeType, bytes.length);
   return {
     inlineData: {
       mimeType,
@@ -112,8 +150,7 @@ function extractText(response) {
 
 app.post('/api/generate-preview', async (req, res) => {
   console.log('[NanoBanana] /api/generate-preview called');
-  console.log('[SERVER_DESK_TOP_LEG_STRICT_NO_GENERATION] active');
-  console.log('[SERVER_ROLLBACK_DESK_STABLE] active');
+  console.log('[SERVER_AUTO_GUIDE_BY_BASENAME] active');
   try {
     if (!process.env.GEMINI_API_KEY) {
       return res.status(500).json({
@@ -142,115 +179,92 @@ app.post('/api/generate-preview', async (req, res) => {
       targetType,
       productType,
       mode,
-      renderStep,
       frontScreenTexture,
       sideScreenTexture,
       frontScreenCode,
       sideScreenCode,
     } = req.body || {};
+console.log('[RENDER BODY]', {
+  deskImage,
+  screenImage,
+  guideImage,
 
-    const targetMode = String(targetType || productType || mode || renderStep || '').toLowerCase();
-    const hasScreenInput = Boolean(screenImage || screenTexture || frontScreenTexture || sideScreenTexture || /screen|스크린|frontside|front_side|side|front|lshape|straight/.test(targetMode));
-    const isScreenRender = hasScreenInput && !(/^desk$|desk-only|desk_only/.test(targetMode) && !screenImage && !screenTexture && !frontScreenTexture && !sideScreenTexture);
-    const isFrontsideRender = isScreenRender && /frontside|front_side/.test(String(mode || renderStep || screenImage || '').toLowerCase());
-    const activeGuideImage = isFrontsideRender ? guideImage : '';
-    const isDeskRender = !isScreenRender;
+  topTexture,
+  legTexture,
+  screenTexture,
 
-    // 스크린 렌더링일 때는 screenImage가 이미 스크린이 포함된 previews 원본이다.
-    // 절대 desk-only 이미지를 base로 쓰지 않는다.
-    const baseFurnitureImage = isScreenRender && screenImage ? screenImage : deskImage;
+  frontScreenTexture,
+  sideScreenTexture,
 
-    console.log('[RENDER BODY]', {
-      deskImage,
-      screenImage,
-      baseFurnitureImage,
-      guideImage: activeGuideImage,
-      topTexture,
-      legTexture,
-      screenTexture,
-      frontScreenTexture,
-      sideScreenTexture,
-      topCode,
-      legCode,
-      screenCode,
-      frontScreenCode,
-      sideScreenCode,
-      targetType,
-      productType,
-      mode,
-      renderStep,
-      isScreenRender,
-      isDeskRender,
-    });
+  topCode,
+  legCode,
+  screenCode,
+
+  targetType,
+  productType,
+  mode
+});
+    // FF_TARGET_MODE_SAFE_PATCH
+    const targetMode = String(targetType || productType || mode || '').toLowerCase();
+    const isScreenRender = /screen|스크린/.test(targetMode);
+    const isDeskRender = /desk|데스크/.test(targetMode) && !isScreenRender;
+
+    const effectiveScreenTexture = isDeskRender ? '' : screenTexture;
+    const effectiveScreenCode = isDeskRender ? '' : screenCode;
+    const effectiveScreenImage = isDeskRender ? '' : screenImage;
+    const effectiveGuideImage = isDeskRender ? '' : guideImage;
+    const effectiveGuideCandidates = isDeskRender ? [] : ffFrontsideGuideCandidates(effectiveGuideImage, effectiveScreenImage || deskImage);
+    console.log('[GUIDE CANDIDATES]', effectiveGuideCandidates);
+    const effectiveFrontScreenTexture = isDeskRender ? '' : frontScreenTexture;
+    const effectiveSideScreenTexture = isDeskRender ? '' : sideScreenTexture;
+    const effectiveFrontScreenCode = isDeskRender ? '' : frontScreenCode;
+    const effectiveSideScreenCode = isDeskRender ? '' : sideScreenCode;
 
     const parts = [];
 
-    const promptLines = isScreenRender
-      ? [
-          'STRICT IMAGE EDIT ONLY. This is NOT a new image generation request.',
-          'Use the provided base furniture product image as the exact source photo and preserve it.',
-          'The base photo already contains the desk and the screen panel. Do not add a new screen.',
-          'Do not create, redraw, redesign, replace, move, resize, rotate, remove, or add any product part.',
-          'Keep the original camera angle, perspective, proportions, silhouette, dimensions, crop, background, shadows, reflections, and lighting exactly the same.',
-          'Keep every non-target pixel unchanged. Only target material surfaces may change.',
-          'This task is texture/material mapping onto existing visible surfaces only.',
-          topTexture ? 'Map the provided top material texture only onto the existing desktop/tabletop surface.' : '',
-          legTexture ? 'Map the provided leg/frame material only onto the existing desk legs/frame.' : '',
-          screenTexture ? 'Map the provided screen material texture only onto the existing screen panel surface.' : '',
-          frontScreenTexture ? 'Map the provided front screen material only onto the FRONT screen panel.' : '',
-          sideScreenTexture ? 'Map the provided side screen material only onto the SIDE screen panel.' : '',
-          'Do not apply tabletop material to legs or screen. Do not apply leg material to tabletop or screen. Do not apply screen material to desk parts.',
-          screenCode ? `Screen material code: ${screenCode}.` : '',
-          frontScreenCode ? `Front screen material code: ${frontScreenCode}.` : '',
-          sideScreenCode ? `Side screen material code: ${sideScreenCode}.` : '',
-          activeGuideImage ? 'If a guide image is provided, use it only as a hidden area map: white area = front screen, red area = side screen. Do not show guide colors, marks, outlines, masks, borders, or overlays in the final image.' : '',
-          'Keep the cable duct / cable tray area under the desktop matte white. Do not recolor the duct/tray section.',
-          'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
-          topCode ? `Top material code: ${topCode}.` : '',
-          legCode ? `Leg/frame material code: ${legCode}.` : '',
-          deskLabel ? `Desk product: ${deskLabel}.` : '',
-          legType ? `Selected leg shape to preserve exactly: ${legType}.` : '',
-          casterType ? `Selected bottom support to preserve exactly: ${casterType}.` : '',
-          topShape ? `Selected tabletop shape to preserve exactly: ${topShape}.` : '',
-          size && (size.w || size.d || size.h) ? `Approximate size reference only: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm. Do not change visible proportions from the base photo.` : '',
-          'If uncertain, keep the original base photo unchanged rather than inventing a new product.',
-          'Return the same original product photo with only the requested material surfaces changed.'
-        ]
-      : [
-          'STRICT IMAGE EDIT ONLY. This is NOT a new image generation request.',
-          'Use the provided base furniture product image as the exact source photo and preserve it.',
-          'Do not create a new desk, new product, new scene, new camera angle, or alternate catalog render.',
-          'Do not redraw, redesign, replace, move, resize, rotate, add, or remove any desk part.',
-          'Keep the original camera angle, perspective, proportions, silhouette, dimensions, crop, background, shadows, reflections, and lighting exactly the same.',
-          'Keep every non-target pixel unchanged. Only target material surfaces may change.',
-          'This task is texture/material mapping onto existing visible surfaces only.',
-          topTexture ? 'Recognize the existing desktop/tabletop surface in the base photo. Map the provided top material texture only onto that tabletop surface.' : '',
-          legTexture ? 'Recognize the existing legs/frame in the base photo. Map the provided leg material/color only onto those legs/frame.' : '',
-          'Do not apply the top material to the legs. Do not apply the leg material to the tabletop.',
-          'Keep all non-target areas unchanged, including screen panels if present, floor/background, shadow, cable duct, tray, accessories, and edges.',
-          'Keep the cable duct / cable tray area under the desktop matte white. Do not recolor the duct/tray section.',
-          'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
-          topCode ? `Top material code: ${topCode}.` : '',
-          legCode ? `Leg/frame material code: ${legCode}.` : '',
-          deskLabel ? `Desk product: ${deskLabel}.` : '',
-          legType ? `Selected leg shape to preserve exactly: ${legType}.` : '',
-          casterType ? `Selected bottom support to preserve exactly: ${casterType}.` : '',
-          topShape ? `Selected tabletop shape to preserve exactly: ${topShape}.` : '',
-          size && (size.w || size.d || size.h) ? `Approximate size reference only: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm. Do not change visible proportions from the base photo.` : '',
-          'If uncertain, keep the original base photo unchanged rather than inventing a new product.',
-          'Return the same original product photo with only tabletop and leg/frame materials changed.'
-        ];
+    parts.push({
+      text: [
+        'Use the base furniture product image as the exact reference.',
+        'Keep the same camera angle, perspective, proportions, silhouette, dimensions, background, and lighting.',
+        'Apply the provided top material texture naturally only to the desktop/tabletop surface.',
+        'Apply the provided leg material naturally only to the vertical desk legs.',
+        isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
+        isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
+        effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
+        effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
+        effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.' : '',
+        effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
+        effectiveFrontScreenCode ? `Front screen material code: ${effectiveFrontScreenCode}.` : '',
+        effectiveSideScreenCode ? `Side screen material code: ${effectiveSideScreenCode}.` : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'If a screen panel exists in the base image, preserve it and recolor only the screen surface.' : '',
+        (effectiveScreenTexture || effectiveFrontScreenTexture || effectiveSideScreenTexture) ? 'Do not leave the screen panel black if a screen texture reference is provided.' : '',
 
-    parts.push({ text: promptLines.filter(Boolean).join('\n') });
+'Keep the cable duct / cable tray area under the desktop matte white.',
+
+'Do not recolor the duct/tray section.',
+        'Do not redraw the product.',
+        'Do not show masks, outlines, guide lines, pen-tool paths, red borders, wireframes, transparent overlays, or Figma artifacts.',
+        topCode ? `Top material code: ${topCode}.` : '',
+        legCode ? `Leg/frame material code: ${legCode}.` : '',
+        deskLabel ? `Desk product: ${deskLabel}.` : '',
+        legType ? `Selected leg shape: ${legType}. Preserve it if visible.` : '',
+        casterType ? `Selected bottom support: ${casterType}. Preserve it if visible.` : '',
+        topShape ? `Selected tabletop shape: ${topShape}. Preserve it if visible.` : '',
+        size && (size.w || size.d || size.h) ? `Approximate size reference: W ${size.w || 'default'}mm, D ${size.d || 'default'}mm, H ${size.h || 'default'}mm.` : '',
+        'Create one photorealistic office furniture catalog render.',
+        (effectiveGuideCandidates && effectiveGuideCandidates.length) ? 'Use the provided guide image only as an area map for the exact same base product image. White area = FRONT screen panel only. Red area = SIDE screen panel only. Apply frontScreenTexture only to the white area and sideScreenTexture only to the red area. Do not render guide colors, labels, arrows, annotations, or overlay marks in the final output.' : '',
+        (effectiveGuideCandidates && effectiveGuideCandidates.length) ? 'This is a material mapping edit. Keep the original product photo geometry, camera angle, crop, shadows, lighting, desk shape, and screen positions unchanged. Do not create a new desk, new screen, or new scene.' : '',
+      ].filter(Boolean).join('\n'),
+    });
 
     const imageInputs = [
-      ['base furniture product image', baseFurnitureImage],
+      ['base furniture product image', deskImage],
       ['desktop material texture reference', topTexture],
       ['legs and frame material color reference', legTexture],
-      ['screen material texture reference', screenTexture],
-      ['front screen material texture reference', frontScreenTexture],
-      ['side screen material texture reference', sideScreenTexture],
-      ['front/side guide image', activeGuideImage],
+      ['screen material texture reference', effectiveScreenTexture],
+      ['front screen material texture reference', effectiveFrontScreenTexture],
+      ['side screen material texture reference', effectiveSideScreenTexture],
+      ...((effectiveGuideCandidates || []).map((src, idx) => [`front/side guide image candidate ${idx + 1}`, src])),
     ];
 
     for (const [label, src] of imageInputs) {
@@ -278,8 +292,7 @@ app.post('/api/generate-preview', async (req, res) => {
       lastModel = model;
       console.log(`[NanoBanana] trying model: ${model}`);
 
-    console.log('[DESK STRICT CHECK]', { isDeskRender, isScreenRender, isFrontsideRender, baseFurnitureImage, hasTopTexture: Boolean(topTexture), hasLegTexture: Boolean(legTexture), activeGuideImage });
-      console.log('[NanoBanana] parts count:', parts.length);
+    console.log('[NanoBanana] parts count:', parts.length);
 console.time('[NanoBanana] generateContent');
 
 const response = await ai.models.generateContent({
@@ -334,13 +347,13 @@ app.post('/api/generate-screen-preview', async (req, res) => {
 
     parts.push({
    text: [
-  'STRICT IMAGE EDIT ONLY. Do not create a new image, product, desk, screen, scene, or catalog render.',
-  'Use the provided screen/base product image as the exact source image.',
-  'Do not add a new screen; only edit the existing visible screen material.',
-  'Apply the provided screen material only to the existing screen panel.',
-  'Do not modify the desktop, desk legs, cable duct, background, shadows, crop, camera angle, or existing desk materials.',
-  'Keep every non-target pixel unchanged.',
+  'Use the provided AI-generated desk image as the exact base image.',
+  'Add the provided screen product naturally to the desk.',
+  'Apply the provided screen material only to the screen panel.',
+  'Do not modify the desktop, desk legs, cable duct, or existing desk materials.',
+  'Keep the same camera angle, perspective, lighting, proportions, and clean catalog background.',
   'Do not show masks, outlines, guide lines, pen-tool paths, or overlays.',
+  'Create one photorealistic office furniture catalog render.',
   guideImage ? 'Use the guide image to identify screen panels: FRONT means front screen panel, SIDE means side screen panel. Apply front screen material only to FRONT and side screen material only to SIDE.' : ''
 ].filter(Boolean).join('\n')
     });
