@@ -15870,6 +15870,103 @@ window.showPanel = function(){
 })();
 </script>
 
+
+
+<!-- === FF FINAL STABLE HOTFIX: strict material mapping + frontside combined flow === -->
+<style id="ff-final-stable-hotfix-css">
+  .ff-fs-panel{display:none; margin:12px 0; padding:18px; border-radius:22px; border:1px solid rgba(46,242,201,.32); background:linear-gradient(180deg,rgba(5,18,31,.96),rgba(3,13,23,.96)); color:#fff; max-width:620px;}
+  body.ff-frontside-active .ff-fs-panel{display:block;}
+  .ff-fs-panel h3{margin:0 0 8px; color:#2ef2c9; font-size:22px; font-weight:1000;}
+  .ff-fs-desc{margin:0 0 14px; color:#cbd5e1; font-size:13px; line-height:1.5;}
+  .ff-fs-size-grid,.ff-fs-material-grid{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;}
+  .ff-fs-size-card,.ff-fs-material-card{border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:12px; background:rgba(7,23,34,.75); min-width:0;}
+  .ff-fs-size-card>b,.ff-fs-material-head b{display:block; color:#fff; font-size:15px; font-weight:1000; margin-bottom:10px;}
+  .ff-fs-size-row{display:grid; grid-template-columns:70px 1fr; align-items:center; gap:8px; margin:8px 0; color:#9fb1c8; font-size:12px; font-weight:900;}
+  .ff-fs-size-row input{width:100%; height:40px; border-radius:12px; border:1px solid rgba(46,242,201,.28); background:#06131f; color:#fff; font-weight:900; text-align:center;}
+  .ff-fs-material-head{display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:8px;}
+  .ff-fs-selected{color:#2ef2c9; font-size:12px; font-weight:1000;}
+  .ff-fs-search{width:100%; height:38px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#06131f; color:#fff; padding:0 10px; margin-bottom:10px;}
+  .ff-fs-chip-list{display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; max-height:220px; overflow:auto; padding-right:4px;}
+  .ff-fs-chip{display:flex; flex-direction:column; align-items:center; gap:5px; min-height:62px; border-radius:12px; border:1px solid rgba(255,255,255,.14); background:#0b1523; color:#fff; cursor:pointer; font-size:11px; font-weight:900;}
+  .ff-fs-chip em{display:block; width:38px; height:26px; border-radius:8px; background:#222 center/cover no-repeat; border:1px solid rgba(255,255,255,.18); margin-top:7px;}
+  .ff-fs-chip.active{border-color:#2ef2c9; box-shadow:0 0 0 2px rgba(46,242,201,.22);}
+  .ff-fs-summary{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; color:#cbd5e1; font-size:13px;}
+  .ff-fs-summary div{border:1px solid rgba(255,255,255,.10); border-radius:14px; padding:10px; background:rgba(255,255,255,.04);}
+  .ff-fs-summary b{float:right; color:#2ef2c9;}
+  .ff-fs-actions button{width:100%; min-height:46px; border-radius:16px; border:0; background:#2ef2c9; color:#031313; font-size:15px; font-weight:1000; cursor:pointer;}
+  body:not(.ff-frontside-active) .ff-screen-split-row[data-ff-screen-split],
+  body:not(.ff-frontside-active) [data-ff-frontside-rows="1"]{display:none!important;}
+  @media(max-width:720px){.ff-fs-size-grid,.ff-fs-material-grid,.ff-fs-summary{grid-template-columns:1fr}.ff-fs-chip-list{grid-template-columns:repeat(4,minmax(0,1fr));}}
+</style>
+<script id="ff-final-stable-hotfix-js">
+(function(){
+  if(window.__ffFinalStableHotfix) return;
+  window.__ffFinalStableHotfix = true;
+
+  function $(id){return document.getElementById(id);}
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function S(){return Object.assign({}, window.state||{}, (window.FlowFinderFastPreview&&window.FlowFinderFastPreview.state)||{});}
+  function setS(k,v){try{if(window.state) window.state[k]=v;}catch(e){} try{if(window.FlowFinderFastPreview&&window.FlowFinderFastPreview.state) window.FlowFinderFastPreview.state[k]=v;}catch(e){}}
+  function selectedText(){try{return String((window._setSelected||[]).join(' '));}catch(e){return '';}}
+  function isFrontside(){var s=S(), raw=selectedText()+' '+String(s.screenKey||s.selectedScreenKey||s.screenLabel||s.screen||s.currentScreenKey||''); return /전면|front/i.test(raw)&&/사이드|side/i.test(raw) || /front[_-]?side|frontside/i.test(raw);}
+  function syncFrontsideClass(){document.body.classList.toggle('ff-frontside-active', !!isFrontside());}
+  function normScreenKey(k){k=String(k||'').toLowerCase().replace(/front_side|front-side/g,'frontside'); if(k==='frontside')return 'frontside'; return k;}
+  function legKey(v){v=String(v||''); if(/원형|round/i.test(v))return 'round'; if(/A|에이|aframe/i.test(v))return 'aframe'; return 'ladder';}
+  function moveKey(v){v=String(v||''); return /캐스터|caster/i.test(v)?'caster':'glide';}
+  function topKey(v){v=String(v||''); return /라운드|round/i.test(v)?'round':'rect';}
+  function deskFolder(){var s=S(); var t=String(s.deskKey||s.productKey||s.deskLabel||s.product||(s.current&&s.current.product)||''); return /duct|덕트/i.test(t)?'desk_duct':'desk_standard';}
+  function screenKey(){var s=S(); var raw=String(s.screenKey||s.selectedScreenKey||s.currentScreenKey||s.screenLabel||s.screen||selectedText()||''); if(isFrontside())return 'frontside'; if(/사이드|side/i.test(raw))return 'side'; if(/일자|straight/i.test(raw))return 'straight'; if(/L형|lshape|l-shape/i.test(raw))return 'lshape'; if(/전면|front/i.test(raw))return 'front'; return 'front';}
+  function deskKey(){var s=S(); return s.deskKey||s.selectedDeskKey||s.productKey||deskFolder();}
+  function previewPath(key, screen){
+    key=normScreenKey(key);
+    try{if(window.ffPreviewImageForKey){var p=window.ffPreviewImageForKey(key); if(p)return p;}}catch(e){}
+    var s=S(); var base=[legKey(s.legType||s.legShape), moveKey(s.casterType||s.mobility), topKey(s.topShape)].join('_');
+    if(screen){base+='_'+normScreenKey(screen);} 
+    return './images/previews/'+deskFolder()+'/'+base+'.png';
+  }
+  function bgUrl(id){var el=$(id); if(!el)return ''; var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=bg.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:'';}
+  function txt(id){var el=$(id); return el?(el.textContent||'').trim():'';}
+  function clean(v){v=String(v||'').trim(); return (v==='-'||v==='none')?'':v;}
+  function textureFor(code, part){code=String(code||'').trim(); if(!code)return ''; var isStd=/^(3F1|3F2|061|064|067)$/i.test(code); return './images/textures/screen/'+(part==='side'?'side':'front')+'/'+(isStd?'standard':'custom')+'/'+code+'.jpg';}
+  function frontsideState(){
+    var s=S(), st=window._screenPreviewState||{};
+    return {
+      frontCode:(st.front&&(st.front.color||st.front.code))||s.frontScreenCode||'',
+      sideCode:(st.side&&(st.side.color||st.side.code))||s.sideScreenCode||'',
+      frontTex:(st.front&&(st.front.texUrl||st.front.texture))||s.frontScreenTexture||'',
+      sideTex:(st.side&&(st.side.texUrl||st.side.texture))||s.sideScreenTexture||''
+    };
+  }
+  function updateFSLabels(){var v=frontsideState(); ['ff-fs-front-selected','ff-fs-sum-front'].forEach(function(id){var e=$(id);if(e)e.textContent=v.frontCode||'미선택';}); ['ff-fs-side-selected','ff-fs-sum-side'].forEach(function(id){var e=$(id);if(e)e.textContent=v.sideCode||'미선택';});}
+  function chip(code,part){var tex=textureFor(code,part); return '<button type="button" class="ff-fs-chip" data-part="'+part+'" data-code="'+esc(code)+'" onclick="ffFrontsidePickMaterialStable(\''+part+'\',\''+esc(code)+'\',this)"><em style="background-image:url(\''+esc(tex)+'\')"></em><span>'+esc(code)+'</span></button>';}
+  function colorList(){return ['3F1','3F2','061','064','067','458','007','MGR','BL','DG','BR','LG','BK'];}
+  window.ffFrontsideFilterStable=function(part,id){var q=String(($(id)||{}).value||'').toLowerCase(); document.querySelectorAll('.ff-fs-chip[data-part="'+part+'"]').forEach(function(b){var c=String(b.getAttribute('data-code')||'').toLowerCase(); b.style.display=(!q||c.indexOf(q)>-1)?'flex':'none';});};
+  window.ffFrontsidePickMaterialStable=function(part,code,btn){window._screenPreviewState=window._screenPreviewState||{}; var tex=textureFor(code,part); window._screenPreviewState[part]={code:code,color:code,texUrl:tex,texture:tex}; if(part==='front'){setS('frontScreenCode',code);setS('frontScreenTexture',tex);} else {setS('sideScreenCode',code);setS('sideScreenTexture',tex);} setS('screenCode',code); setS('screenTexture',tex); setS('screenTex',tex); document.querySelectorAll('.ff-fs-chip[data-part="'+part+'"]').forEach(function(x){x.classList.remove('active');}); if(btn)btn.classList.add('active'); updateFSLabels();};
+  window.ffFrontsideConfirmCombinedStable=function(){var v=frontsideState(); if(!v.frontCode||!v.sideCode){if(window.addMsg)window.addMsg('bot','<span class="error-msg">전면스크린 재질과 사이드스크린 재질을 모두 선택해주세요.</span>'); return;} setS('_frontsideCombinedReady',true); setS('_currentCatName','전면+사이드 스크린'); setS('frontScreenSize',{h:(($('ff-fs-front-h')||{}).value||715),topGap:(($('ff-fs-front-top')||{}).value||405)}); setS('sideScreenSize',{h:(($('ff-fs-side-h')||{}).value||715),topGap:(($('ff-fs-side-top')||{}).value||405)}); try{if(window.state){window.state.current=window.state.current||{}; window.state.current.product=window.state.current.product||'전면+사이드 스크린'; window.state.current.size='전면 H'+window.state.frontScreenSize.h+' / 상판위 '+window.state.frontScreenSize.topGap+' · 사이드 H'+window.state.sideScreenSize.h+' / 상판위 '+window.state.sideScreenSize.topGap;}}catch(e){} if(window.updateCurrent)window.updateCurrent(); if(window.addMsg)window.addMsg('bot','전면+사이드 설정이 저장됐습니다. 오른쪽 <b>고해상도 렌더링하기</b>를 누르면 원본 사진에 재질만 맵핑합니다.');};
+  window.ffFrontsideShowCombinedPanelStable=function(){syncFrontsideClass(); if(!isFrontside())return false; if(document.querySelector('.ff-fs-panel')){updateFSLabels();return true;} var colors=colorList(); var h='<div class="ff-fs-panel"><h3>전면+사이드 스크린 설정</h3><p class="ff-fs-desc">전면과 사이드의 사이즈/재질을 각각 선택한 뒤, 오른쪽 고해상도 렌더링하기를 한 번만 눌러주세요.</p><div class="ff-fs-size-grid"><div class="ff-fs-size-card"><b>전면스크린 사이즈</b><div class="ff-fs-size-row"><span>전체 H</span><input id="ff-fs-front-h" type="number" value="715"></div><div class="ff-fs-size-row"><span>상판 위</span><input id="ff-fs-front-top" type="number" value="405"></div></div><div class="ff-fs-size-card"><b>사이드스크린 사이즈</b><div class="ff-fs-size-row"><span>전체 H</span><input id="ff-fs-side-h" type="number" value="715"></div><div class="ff-fs-size-row"><span>상판 위</span><input id="ff-fs-side-top" type="number" value="405"></div></div></div><div class="ff-fs-material-grid"><div class="ff-fs-material-card"><div class="ff-fs-material-head"><b>전면스크린 재질</b><span class="ff-fs-selected" id="ff-fs-front-selected">미선택</span></div><input class="ff-fs-search" id="ff-fs-front-search" placeholder="재질 검색" oninput="ffFrontsideFilterStable(\'front\',\'ff-fs-front-search\')"><div class="ff-fs-chip-list">'+colors.map(function(c){return chip(c,'front');}).join('')+'</div></div><div class="ff-fs-material-card"><div class="ff-fs-material-head"><b>사이드스크린 재질</b><span class="ff-fs-selected" id="ff-fs-side-selected">미선택</span></div><input class="ff-fs-search" id="ff-fs-side-search" placeholder="재질 검색" oninput="ffFrontsideFilterStable(\'side\',\'ff-fs-side-search\')"><div class="ff-fs-chip-list">'+colors.map(function(c){return chip(c,'side');}).join('')+'</div></div></div><div class="ff-fs-summary"><div>전면 선택값 <b id="ff-fs-sum-front">미선택</b></div><div>사이드 선택값 <b id="ff-fs-sum-side">미선택</b></div></div><div class="ff-fs-actions"><button type="button" onclick="ffFrontsideConfirmCombinedStable()">전면+사이드 설정 완료</button></div></div>'; if(window.addMsg)window.addMsg('bot',h); else document.body.insertAdjacentHTML('beforeend',h); updateFSLabels(); if(window.scrollBottom)window.scrollBottom(); return true;};
+
+  var oldTopGap=window.ffFinalSubmitTopGap;
+  if(typeof oldTopGap==='function'){
+    window.ffFinalSubmitTopGap=function(){var r=oldTopGap.apply(this,arguments); setTimeout(function(){syncFrontsideClass(); if(isFrontside()) window.ffFrontsideShowCombinedPanelStable(); else {var s=S(), cat=s._currentCatName||s.screenLabel||'스크린'; if(/스크린|screen/i.test(cat) && typeof window.askColorTypeFirst==='function' && !document.querySelector('#messages .msg:last-child .material-btn')){try{var pack=s._flowColorPack||{}; window.askColorTypeFirst(cat, pack.mode||s._currentDataType||'unit', pack.items||s._currentItems||[], pack.key||s._currentProductKey||'');}catch(e){}}}},120); return r;};
+  }
+
+  function xhrJson(url,payload,timeout){return new Promise(function(resolve,reject){var x=new XMLHttpRequest(); x.open('POST',url,true); x.timeout=timeout||60000; x.setRequestHeader('Content-Type','application/json'); x.onreadystatechange=function(){if(x.readyState===4){var data={}; try{data=JSON.parse(x.responseText||'{}');}catch(e){} if(x.status>=200&&x.status<300)resolve(data); else reject(new Error(data.error||data.detail||('HTTP '+x.status)));}}; x.onerror=function(){reject(new Error('서버 연결 실패'));}; x.ontimeout=function(){reject(new Error('렌더링 시간이 초과되었습니다.'));}; x.send(JSON.stringify(payload));});}
+  window.prepareNanoBananaPreview=async function(targetType){
+    if(window.__ffStableNanoBusy)return; window.__ffStableNanoBusy=true;
+    var s=S(), fs=isFrontside(), cat=String(s._currentCatName||s.currentCatName||s.product||'');
+    var target=(targetType==='screen'||targetType==='desk')?targetType:((fs||/스크린|screen/i.test(cat)||window.__ffNanoTarget==='screen')?'screen':'desk');
+    var isScreen=target==='screen'; var sk=fs?'frontside':screenKey(); var base=isScreen?previewPath(sk,sk):previewPath(deskKey(),'');
+    var v=frontsideState(); var payload={mode:isScreen?'strict-screen-material-mapping-stable':'strict-desk-material-mapping-stable',materialEditOnly:true,preserveSourceImage:true,preserveTransparentBackground:true,targetType:target,productType:target,deskImage:base,fallbackDeskImage:base,screenImage:isScreen?base:'',deskLabel:isScreen?'':(s.deskLabel||s.product||''),screenSelected:isScreen,screenLabel:isScreen?(fs?'전면+사이드 스크린':(s.screenLabel||s.screen||'스크린')):'',topTexture:isScreen?'':clean(bgUrl('quick-top-chip')||s.topTex||s.topTexture||''),legTexture:isScreen?'':clean(bgUrl('quick-leg-chip')||s.legTex||s.legTexture||''),screenTexture:(isScreen&&!fs)?clean(bgUrl('quick-screen-chip')||s.screenTex||s.screenTexture||''):'',topCode:isScreen?'':clean(txt('quick-top-code')||s.top||s.topCode||''),legCode:isScreen?'':clean(txt('quick-leg-code')||s.leg||s.legCode||''),screenCode:(isScreen&&!fs)?clean(txt('quick-screen-code')||s.screen||s.screenCode||''):'',frontScreenCode:fs?(v.frontCode||''):'',sideScreenCode:fs?(v.sideCode||''):'',frontScreenTexture:fs?(v.frontTex||textureFor(v.frontCode,'front')):'',sideScreenTexture:fs?(v.sideTex||textureFor(v.sideCode,'side')):'',guideImage:fs?'./images/guides/frontside_guide.png':'',legType:isScreen?'':(s.legType||s.legShape||''),casterType:isScreen?'':(s.casterType||s.mobility||''),topShape:isScreen?'':(s.topShape||''),size:fs?{front:s.frontScreenSize||{},side:s.sideScreenSize||{}}:(isScreen?{screenH:s.screenH||s.h||'',screenTopGap:s.screenTopGap||s._screenTopGap||''}:{w:s.w||'',d:s.d||'',h:s.h||''})};
+    var note=$('quick-ai-preview-note'), btn=$('quick-ai-preview-btn');
+    try{if(note){note.className='ai-loading';note.style.display='block';note.innerHTML='<b>원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">베이스: '+esc(base)+'</span>';} if(btn){btn.disabled=true;btn.textContent='생성 중...';} var data=await xhrJson('/api/generate-preview',payload,90000); var src=(typeof data==='string')?data:(data.imageUrl||data.image||data.url||''); if(!src)throw new Error('이미지 결과를 받지 못했습니다.'); if(note){note.className='ai-result';note.style.display='block';note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 미리보기 · '+(isScreen?'스크린':'데스크')+'</div><img src="'+esc(src)+'" alt="재질 미리보기" style="width:100%;border-radius:16px;border:1px solid rgba(46,242,201,.22);background:#fff;display:block;max-height:560px;object-fit:contain;"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">원본 제품 이미지에 선택 재질만 맵핑한 결과입니다.</div>';}}
+    catch(err){if(note){note.className='ai-error';note.style.display='block';note.innerHTML='<b style="color:#fca5a5">재질 적용 실패</b><br><span style="color:#ddd">'+esc(err.message||err)+'</span>';}}
+    finally{window.__ffStableNanoBusy=false;if(btn){btn.disabled=false;btn.textContent='✨ 원본 사진에 재질 적용';}}
+  };
+  function bind(){syncFrontsideClass(); var btn=$('quick-ai-preview-btn'); if(btn){btn.onclick=function(e){if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false;};} if(isFrontside()) setTimeout(window.ffFrontsideShowCombinedPanelStable,150);}
+  document.addEventListener('DOMContentLoaded',bind); window.addEventListener('load',bind); document.addEventListener('click',function(){setTimeout(bind,120);},true); document.addEventListener('change',function(){setTimeout(bind,120);},true); setInterval(syncFrontsideClass,1500);
+})();
+</script>
+
 </body>
 
 
