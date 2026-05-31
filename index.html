@@ -23874,3 +23874,248 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+
+<script id="ff-final-screen-preview-path-force-v2">
+(function(){
+  if(window.__ffFinalScreenPreviewPathForceV2) return;
+  window.__ffFinalScreenPreviewPathForceV2 = true;
+
+  function $(id){ return document.getElementById(id); }
+  function txt(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function S(){
+    var a = window.state || window.appState || {};
+    var b = (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};
+    var o = {};
+    [a,b].forEach(function(src){ for(var k in src){ if(src[k] !== undefined && src[k] !== null && src[k] !== '') o[k] = src[k]; } });
+    return o;
+  }
+  function selectedText(){
+    var arr = window._setSelected || [];
+    return String(arr.join(' ') + ' ' + txt(document.querySelector('.choice-btn.selected,.choice-btn.multi-selected')));
+  }
+  function normScreenKey(v){
+    v = String(v || '').trim();
+    v = v.replace(/^screen_/, '');
+    if(/frontside|front_side/i.test(v)) return 'frontside';
+    if(/lshape_R|우측|오른쪽|right/i.test(v)) return 'lshape_R';
+    if(/lshape|L형|l형/i.test(v)) return (window.__ffLshapeDirection === 'right') ? 'lshape_R' : 'lshape';
+    if(/straight|일자/i.test(v)) return 'straight';
+    if(/side|사이드/i.test(v)) return 'side';
+    if(/front|전면/i.test(v)) return 'front';
+    return v;
+  }
+  function bothFrontSide(){
+    var raw = selectedText();
+    return /전면|front/i.test(raw) && /사이드|side/i.test(raw);
+  }
+  function screenSuffix(){
+    var s = S();
+    if(bothFrontSide()) return 'frontside';
+    var raw = s.screenKey || s.selectedScreenKey || s.screenType || s.screenLabel || s.screen || s._currentCatName || s.currentCatName || selectedText();
+    var key = normScreenKey(raw);
+    if(['front','side','straight','lshape','lshape_R','frontside'].indexOf(key) >= 0) return key;
+    return '';
+  }
+  function isScreenRender(targetType){
+    if(targetType === 'screen') return true;
+    if(targetType === 'desk') return false;
+    if(window.__ffNanoTarget === 'screen') return true;
+    if(window.__ffNanoTarget === 'desk') return false;
+    var s = S();
+    var raw = [s._currentCatName, s.currentCatName, s.screenLabel, s.screenKey, s.selectedScreenKey, selectedText()].join(' ');
+    return /스크린|screen|전면|사이드|일자|L형|lshape|straight|front|side/i.test(raw) && !/데스크.*재질|상판.*다리/i.test(raw);
+  }
+  function legKey(v){
+    v = String(v || '');
+    if(/원형|round/i.test(v)) return 'round';
+    if(/A자|에이|aframe|\bA\b/i.test(v)) return 'aframe';
+    return 'ladder';
+  }
+  function moveKey(v){ v = String(v || ''); return /캐스터|바퀴|caster/i.test(v) ? 'caster' : 'glide'; }
+  function topKey(v){ v = String(v || ''); return /라운드|round/i.test(v) ? 'round' : 'rect'; }
+  function deskFolder(){
+    var s = S();
+    var raw = [s.deskKey, s.selectedDeskKey, s.productKey, s.product, s.deskLabel, s.currentProduct, selectedText()].join(' ');
+    return /duct|덕트/i.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function baseName(){
+    var s = S();
+    return [legKey(s.legType || s.legShape), moveKey(s.casterType || s.mobility), topKey(s.topShape)].join('_');
+  }
+  function previewPath(key){
+    key = String(key || '').trim();
+    if(/^\.?\/?images\/previews\//i.test(key)) return key.replace(/^\/?/, './');
+    var folder = deskFolder();
+    var base = baseName();
+    var suffix = normScreenKey(key);
+    if(key === 'desk_standard') return './images/previews/desk_standard/' + base + '.png';
+    if(key === 'desk_duct') return './images/previews/desk_duct/' + base + '.png';
+    if(['front','side','straight','lshape','lshape_R','frontside'].indexOf(suffix) >= 0) return './images/previews/' + folder + '/' + base + '_' + suffix + '.png';
+    return './images/previews/' + folder + '/' + base + '.png';
+  }
+  window.ffPreviewImageForKey = previewPath;
+  window.productImage = previewPath;
+  window.ffBuildPreviewPath = function(){
+    var suffix = screenSuffix();
+    return suffix ? previewPath(suffix) : previewPath(deskFolder());
+  };
+
+  function textById(id){ var el = $(id); return el ? txt(el) : ''; }
+  function bgUrl(id){
+    var el = $(id); if(!el) return '';
+    var bg = (el.style && el.style.backgroundImage) || getComputedStyle(el).backgroundImage || '';
+    var m = bg.match(/url\(["']?(.+?)["']?\)/);
+    return m ? m[1].replace(/\\/g,'/') : '';
+  }
+  function materialPayload(){
+    var s = S();
+    return {
+      topCode: textById('quick-top-code') || s.topCode || s.top || s.topColor || '',
+      legCode: textById('quick-leg-code') || s.legCode || s.leg || s.legColor || '',
+      screenCode: textById('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '',
+      topTexture: bgUrl('quick-top-chip') || s.topTexture || s.topTex || s.topMaterialImg || '',
+      legTexture: bgUrl('quick-leg-chip') || s.legTexture || s.legTex || s.legMaterialImg || '',
+      screenTexture: bgUrl('quick-screen-chip') || s.screenTexture || s.screenTex || s.screenMaterialImg || '',
+      frontScreenTexture: s.frontScreenTexture || ((window._screenPreviewState && window._screenPreviewState.front && window._screenPreviewState.front.texUrl) || ''),
+      sideScreenTexture: s.sideScreenTexture || ((window._screenPreviewState && window._screenPreviewState.side && window._screenPreviewState.side.texUrl) || '')
+    };
+  }
+  function ensureRenderPanel(kind){
+    var panel = $('ff-cpf-render-panel');
+    if(!panel){
+      var host = $('texture-preview') || $('preview-panel') || document.body;
+      panel = document.createElement('div');
+      panel.id = 'ff-cpf-render-panel';
+      panel.innerHTML = '<div class="ff-cpf-head"><div class="ff-cpf-title">렌더링 결과</div><div class="ff-cpf-status" id="ff-cpf-render-status">대기</div></div><div class="ff-cpf-box" id="ff-cpf-render-box"></div>';
+      host.appendChild(panel);
+    }
+    panel.classList.add('ff-cpf-visible','ff-cpf-has-run');
+    panel.style.display = 'block';
+    var title = panel.querySelector('.ff-cpf-title');
+    if(title) title.textContent = kind === 'screen' ? '스크린 렌더링 결과' : '데스크 렌더링 결과';
+    return panel;
+  }
+  function setRenderLoading(kind){
+    ensureRenderPanel(kind);
+    var st = $('ff-cpf-render-status'), box = $('ff-cpf-render-box');
+    if(st) st.textContent = '생성 중';
+    if(box) box.innerHTML = '<div style="padding:18px;color:#2ef2c9;font-weight:900;">원본 사진에 재질을 맵핑 중입니다...</div>';
+  }
+  function setRenderResult(kind, src, err){
+    ensureRenderPanel(kind);
+    var st = $('ff-cpf-render-status'), box = $('ff-cpf-render-box');
+    if(st) st.textContent = err ? '오류' : '생성완료';
+    if(!box) return;
+    if(err) box.innerHTML = '<div style="padding:14px;color:#fca5a5;">' + esc(err) + '</div>';
+    else box.innerHTML = '<img src="' + esc(src) + '" alt="렌더링 결과" style="width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px;display:block;">';
+  }
+  function xhrJson(url, payload, timeoutMs){
+    return new Promise(function(resolve, reject){
+      var xhr = new XMLHttpRequest();
+      xhr.open('POST', url, true);
+      xhr.timeout = timeoutMs || 60000;
+      xhr.setRequestHeader('Content-Type','application/json');
+      xhr.onload = function(){
+        var data = {};
+        try{ data = JSON.parse(xhr.responseText || '{}'); }catch(e){ data = xhr.responseText || {}; }
+        if(xhr.status >= 200 && xhr.status < 300) resolve(data);
+        else reject(new Error((data && (data.error || data.detail)) || ('HTTP ' + xhr.status)));
+      };
+      xhr.onerror = function(){ reject(new Error('서버 연결 실패')); };
+      xhr.ontimeout = function(){ reject(new Error('렌더링 응답 시간이 초과되었습니다.')); };
+      xhr.send(JSON.stringify(payload));
+    });
+  }
+  window.prepareNanoBananaPreview = async function(targetType){
+    var screen = isScreenRender(targetType);
+    var kind = screen ? 'screen' : 'desk';
+    var s = S();
+    var m = materialPayload();
+    var suffix = screenSuffix();
+    var base = screen ? previewPath(suffix || 'front') : previewPath(deskFolder());
+    var payload = {
+      mode: screen ? 'strict-screen-texture-only-preview-path-v2' : 'strict-desk-texture-only-preview-path-v2',
+      materialEditOnly: true,
+      preserveSourceImage: true,
+      preserveTransparentBackground: true,
+      canvasAspect: '16:9',
+      targetType: kind,
+      productType: kind,
+      deskImage: base,
+      fallbackDeskImage: base,
+      screenImage: screen ? base : '',
+      screenSelected: !!screen,
+      screenLabel: screen ? (s.screenLabel || s.screen || suffix || '스크린') : '',
+      topTexture: screen ? '' : m.topTexture,
+      legTexture: screen ? '' : m.legTexture,
+      screenTexture: screen ? m.screenTexture : '',
+      frontScreenTexture: (screen && suffix === 'frontside') ? (m.frontScreenTexture || m.screenTexture) : '',
+      sideScreenTexture: (screen && suffix === 'frontside') ? (m.sideScreenTexture || m.screenTexture) : '',
+      topCode: screen ? '' : m.topCode,
+      legCode: screen ? '' : m.legCode,
+      screenCode: screen ? m.screenCode : '',
+      legType: s.legType || s.legShape || '',
+      casterType: s.casterType || s.mobility || '',
+      topShape: s.topShape || '',
+      size: screen ? {screenH:s.screenH||'', screenTopGap:s.screenTopGap||''} : (s.size || {w:s.w||'', d:s.d||'', h:s.h||''}),
+      // 중요: 스크린도 반드시 images/previews/{desk}/{leg}_{move}_{top}_{screen}.png 원본만 사용
+      previewPathRule: 'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
+      forbidGeneration: true
+    };
+    setRenderLoading(kind);
+    var btn = $('quick-ai-preview-btn') || $('ff-clean-render-btn');
+    if(btn){ btn.disabled = true; btn.textContent = '생성 중...'; }
+    try{
+      var data = await xhrJson('/api/generate-preview', payload, 90000);
+      var src = (typeof data === 'string') ? data : (data.imageUrl || data.image || data.url || data.previewUrl || '');
+      if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      setRenderResult(kind, src, '');
+      return data;
+    }catch(e){
+      setRenderResult(kind, '', e && e.message ? e.message : String(e));
+      throw e;
+    }finally{
+      if(btn){ btn.disabled = false; btn.textContent = '✨ 원본 사진에 재질 적용'; }
+    }
+  };
+
+  function addBot(html){
+    if(typeof window.addMsg === 'function') { try{ window.addMsg('bot', html); return; }catch(e){} }
+    var messages = $('messages'); if(!messages) return;
+    var row = document.createElement('div'); row.className = 'msg bot';
+    row.innerHTML = '<div class="bot-icon">AI</div><div class="bubble">' + html + '</div>';
+    messages.appendChild(row); messages.scrollTop = messages.scrollHeight;
+  }
+  function askLshapeDirection(){
+    if(window.__ffAskedLshapeDirection) return;
+    window.__ffAskedLshapeDirection = true;
+    addBot('L형 방향을 선택해주세요.<div class="btn-group"><button class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div>');
+  }
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('button,.choice-btn');
+    if(!btn) return;
+    var t = txt(btn);
+    if(btn.classList.contains('ff-lshape-dir')){
+      window.__ffLshapeDirection = btn.getAttribute('data-dir') === 'right' ? 'right' : 'left';
+      btn.classList.add('selected');
+      addBot((window.__ffLshapeDirection === 'right' ? '우측 L형' : '좌측 L형') + '으로 설정했습니다.');
+      return;
+    }
+    if(/L형\s*스크린/.test(t) && !/우측|오른쪽/.test(t)){
+      window.__ffAskedLshapeDirection = false;
+      setTimeout(askLshapeDirection, 80);
+    }
+    if(/L형\s*스크린\s*\(우측\)|우측\s*L형/.test(t)){
+      window.__ffLshapeDirection = 'right';
+    }
+  }, true);
+  document.addEventListener('DOMContentLoaded', function(){
+    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn')).forEach(function(b){
+      if(/L형\s*스크린\s*\(우측\)/.test(txt(b))) b.style.display='none';
+    });
+  });
+})();
+</script>
+
