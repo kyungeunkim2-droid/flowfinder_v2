@@ -18507,25 +18507,36 @@ html, body{ height:100vh !important; overflow:hidden !important; }
   }
 
   function injectFinalRenderImage(){
-    // STEP9: 중복 방지 - 최종견적서 렌더 이미지는 STEP6 견적서 내부 한 곳에서만 표시한다.
-    return;
+    var modal = $('final-quote-modal');
+    if(!modal) return;
+    var wrap = modal.querySelector('.final-quote-wrap');
+    if(!wrap) return;
+    var old = wrap.querySelector('.final-render-shot, .ff-final-render-shot-v2');
+    if(old) old.remove();
+
+    var img = pickFinalRenderImage();
+    if(!img) return;
+
+    var block = document.createElement('div');
+    block.className = 'ff-final-render-shot-v2';
+    block.innerHTML = '<h4>최종 렌더링 이미지</h4>' +
+      '<div class="ff-final-render-frame"><img src="' + esc(img) + '" alt="최종 렌더링 이미지"></div>' +
+      '<small>고해상도 렌더링 결과 1장을 기준으로 견적서에 반영했습니다.</small>';
+
+    var head = wrap.querySelector('.final-quote-head');
+    if(head && head.nextSibling) wrap.insertBefore(block, head.nextSibling);
+    else wrap.insertBefore(block, wrap.firstChild);
   }
 
   function watchRenderedImages(){
-    // STEP9: 원본/옵션 썸네일이 최종렌더 이미지로 저장되는 것을 방지.
-    // 실제 Nano Banana 결과 영역 또는 API 응답 이미지만 저장한다.
-    var selectors = [
-      '#ff-cpf-render-panel img',
-      '#quick-ai-preview-note.ai-result img',
-      '#quick-ai-preview-note img',
-      '.ai-result img',
-      '#ff-render-result-panel img'
-    ];
-    selectors.forEach(function(sel){
-      document.querySelectorAll(sel).forEach(function(im){
-        var src = im.currentSrc || im.src || im.getAttribute('src') || '';
-        if(src) rememberRender(src);
-      });
+    var ids = ['ff-clean-preview-img','ff-hero-img','ff-render-result-img','ff-ai-live-img','product-preview-img','screen-composite-img'];
+    ids.forEach(function(id){
+      var im = $(id);
+      if(im && im.src) rememberRender(im.src);
+    });
+    document.querySelectorAll('#preview-panel img, .ff-clean-preview-box img, .ff-hero-image-card img').forEach(function(im){
+      var src = im.currentSrc || im.src || im.getAttribute('src') || '';
+      if(src) rememberRender(src);
     });
   }
 
@@ -18634,525 +18645,6 @@ html, body{ height:100vh !important; overflow:hidden !important; }
     var box = $('ff-option-hover-preview');
     if(box) box.classList.remove('show');
   }, true);
-})();
-</script>
-
-
-<style id="ff-step9-final-quote-compact-fix-css">
-/* STEP9: 견적서 100% 화면 맞춤 + 중복 렌더 이미지 제거 */
-.final-quote-modal{
-  align-items:flex-start !important;
-  justify-content:center !important;
-  padding:8px !important;
-  overflow:auto !important;
-}
-.final-quote-wrap.ff-step6-quote-wrap{
-  width:min(94vw,900px) !important;
-  max-width:900px !important;
-  max-height:none !important;
-  padding:12px 14px 12px !important;
-  border-radius:14px !important;
-  transform:scale(.92) !important;
-  transform-origin:top center !important;
-  margin:0 auto !important;
-}
-.final-quote-wrap.ff-step6-quote-wrap .ff-final-render-shot-v2,
-.final-quote-wrap.ff-step6-quote-wrap .final-render-shot{
-  display:none !important;
-}
-.ff-step6-header{
-  padding-bottom:7px !important;
-  margin-bottom:8px !important;
-}
-.ff-step6-title h1{font-size:22px !important;}
-.ff-step6-title p{font-size:9px !important;margin-top:2px !important;}
-.ff-step6-logo{font-size:18px !important;}
-.ff-step6-logo small{font-size:8px !important;margin-top:2px !important;}
-.ff-step6-meta{
-  gap:6px !important;
-  margin-bottom:8px !important;
-}
-.ff-step6-meta div{
-  padding:5px 8px !important;
-  font-size:9px !important;
-  border-radius:8px !important;
-}
-.ff-step6-meta b{font-size:10px !important;}
-.ff-step6-hero{
-  grid-template-columns:minmax(0,1.35fr) minmax(240px,.65fr) !important;
-  gap:10px !important;
-  margin-bottom:8px !important;
-}
-.ff-step6-render{
-  height:190px !important;
-  min-height:190px !important;
-  border-radius:10px !important;
-}
-.ff-step6-render img{
-  max-height:190px !important;
-}
-.ff-step6-render:before{
-  font-size:9px !important;
-  padding:3px 7px !important;
-  left:8px !important;
-  top:8px !important;
-}
-.ff-step6-card-title{
-  padding:7px 10px !important;
-  font-size:12px !important;
-}
-.ff-step6-spec-body{padding:5px 10px !important;}
-.ff-step6-row{
-  grid-template-columns:76px 1fr !important;
-  min-height:25px !important;
-  padding:4px 0 !important;
-  gap:7px !important;
-}
-.ff-step6-row span{font-size:9px !important;}
-.ff-step6-row b{font-size:10px !important;}
-.ff-step6-swatch{
-  width:20px !important;
-  height:15px !important;
-  background-size:cover !important;
-  background-position:center !important;
-}
-.ff-step6-mid{
-  gap:8px !important;
-  margin-bottom:8px !important;
-}
-.ff-step6-section{border-radius:10px !important;}
-.ff-step6-section h3{
-  padding:6px 9px !important;
-  font-size:11px !important;
-}
-.ff-step6-table{font-size:9.5px !important;}
-.ff-step6-table th,
-.ff-step6-table td{
-  padding:5px 6px !important;
-}
-.ff-step6-table th{font-size:9px !important;}
-.ff-step6-bottom{
-  gap:8px !important;
-}
-.ff-step6-note{
-  padding:8px !important;
-  border-radius:10px !important;
-}
-.ff-step6-note h3{font-size:11px !important;margin-bottom:5px !important;}
-.ff-step6-note ul{font-size:9px !important;line-height:1.35 !important;}
-.ff-step6-dealer-box{
-  margin-top:6px !important;
-  padding:6px 8px !important;
-  font-size:9px !important;
-  line-height:1.45 !important;
-}
-.ff-step6-price{border-radius:10px !important;}
-.ff-step6-price h3{
-  padding:7px 10px !important;
-  font-size:11px !important;
-}
-.ff-step6-price-line{
-  padding:6px 10px !important;
-  font-size:10px !important;
-}
-.ff-step6-grand{
-  padding:10px !important;
-}
-.ff-step6-grand span{font-size:12px !important;}
-.ff-step6-grand b{font-size:22px !important;}
-@media(max-height:820px){
-  .final-quote-wrap.ff-step6-quote-wrap{transform:scale(.86) !important;}
-}
-@media(max-height:720px){
-  .final-quote-wrap.ff-step6-quote-wrap{transform:scale(.78) !important;}
-}
-@media(max-width:920px){
-  .final-quote-wrap.ff-step6-quote-wrap{transform:none !important;}
-}
-@media print{
-  .final-quote-wrap.ff-step6-quote-wrap{transform:none !important;}
-}
-</style>
-<script id="ff-step9-final-render-option-hover-fix-js">
-(function(){
-  if(window.__ffStep9FinalRenderOptionHoverFix) return;
-  window.__ffStep9FinalRenderOptionHoverFix = true;
-
-  function usable(src){
-    src=String(src||'').trim();
-    return !!src && !/^about:blank/i.test(src) && !/data:image\/svg\+xml/i.test(src);
-  }
-
-  var origFetch = window.fetch;
-  if(origFetch && !window.__ffStep9FetchHooked){
-    window.__ffStep9FetchHooked = true;
-    window.fetch = function(){
-      return origFetch.apply(this, arguments).then(function(res){
-        try{
-          var url = String((arguments && arguments[0]) || res.url || '');
-          if(/generate-preview|generate-screen-preview/i.test(url)){
-            res.clone().json().then(function(data){
-              var src = (typeof data === 'string') ? data : (data && (data.imageUrl || data.image || data.url || data.previewUrl || data.output || ''));
-              if(usable(src)){
-                window.__ffLatestApiRenderImage = src;
-                window.__ffFinalQuoteRenderImage = src;
-                if(window.PREVIEW) window.PREVIEW.finalRenderImage = src;
-                if(window.FlowFinderFastPreview && window.FlowFinderFastPreview.state){
-                  window.FlowFinderFastPreview.state.finalRenderImage = src;
-                }
-              }
-            }).catch(function(){});
-          }
-        }catch(e){}
-        return res;
-      });
-    };
-  }
-
-  // 옵션추가 이미지 hover 확대는 유지
-  function ensureBox(){
-    var box=document.getElementById('ff-option-hover-preview');
-    if(box) return box;
-    box=document.createElement('div');
-    box.id='ff-option-hover-preview';
-    box.innerHTML='<div class="ff-oh-title"></div><img alt="옵션 이미지 확대">';
-    document.body.appendChild(box);
-    return box;
-  }
-  function isOptionImg(img){
-    if(!img || !img.tagName || img.tagName.toLowerCase()!=='img') return false;
-    var src=img.getAttribute('src') || img.src || '';
-    return /options\/accessories|accessories\//i.test(src) ||
-      !!img.closest('.ff-opt-row-v2,.ff-opt-row,.ff-option-row,.ff-user-final-options-v2,.ff-opt-card,.option-card,.accessory-card');
-  }
-  function title(img){
-    var row=img.closest('.ff-opt-row-v2,.ff-opt-row,.ff-option-row,.ff-opt-card,.option-card,.accessory-card');
-    if(row){
-      var t=row.querySelector('b,.ff-opt-name,.option-name,.name,strong,span');
-      if(t && t.textContent.trim()) return t.textContent.trim();
-    }
-    return img.alt || '옵션 이미지';
-  }
-  function move(e){
-    var box=document.getElementById('ff-option-hover-preview');
-    if(!box || !box.classList.contains('show')) return;
-    var x=e.clientX+18, y=e.clientY+18, w=240, h=215;
-    if(x+w>window.innerWidth-8) x=e.clientX-w-18;
-    if(y+h>window.innerHeight-8) y=e.clientY-h-18;
-    box.style.left=Math.max(8,x)+'px';
-    box.style.top=Math.max(8,y)+'px';
-  }
-  document.addEventListener('mouseover',function(e){
-    var img=e.target && e.target.closest ? e.target.closest('img') : null;
-    if(!isOptionImg(img)) return;
-    var src=img.currentSrc || img.src || img.getAttribute('src') || '';
-    if(!usable(src)) return;
-    var box=ensureBox();
-    box.querySelector('.ff-oh-title').textContent=title(img);
-    box.querySelector('img').src=src;
-    box.classList.add('show');
-    move(e);
-  },true);
-  document.addEventListener('mousemove',move,true);
-  document.addEventListener('mouseout',function(e){
-    var img=e.target && e.target.closest ? e.target.closest('img') : null;
-    if(!isOptionImg(img)) return;
-    var box=document.getElementById('ff-option-hover-preview');
-    if(box) box.classList.remove('show');
-  },true);
-})();
-</script>
-
-
-<style id="ff-step10-print-a4-final-quote-only-css">
-/* STEP10: 인쇄/PDF 저장 시 웹사이트 전체가 아니라 최종견적서 1장만 출력 */
-@page{
-  size:A4 portrait;
-  margin:8mm;
-}
-
-@media print{
-  html, body{
-    width:210mm !important;
-    min-height:297mm !important;
-    height:auto !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:#fff !important;
-    overflow:visible !important;
-  }
-
-  /* 웹사이트 전체 숨김 */
-  body > *:not(#final-quote-modal){
-    display:none !important;
-    visibility:hidden !important;
-  }
-
-  /* 견적서 모달만 출력 */
-  #final-quote-modal{
-    display:block !important;
-    visibility:visible !important;
-    position:static !important;
-    inset:auto !important;
-    width:100% !important;
-    height:auto !important;
-    margin:0 !important;
-    padding:0 !important;
-    background:#fff !important;
-    box-shadow:none !important;
-    overflow:visible !important;
-    backdrop-filter:none !important;
-  }
-
-  #final-quote-modal *{
-    visibility:visible !important;
-    -webkit-print-color-adjust:exact !important;
-    print-color-adjust:exact !important;
-  }
-
-  .final-modal-close,
-  .final-actions,
-  .ff-post-final-actions,
-  #input-area,
-  #chat-panel,
-  #preview-panel,
-  #flow-bar{
-    display:none !important;
-    visibility:hidden !important;
-  }
-
-  /* A4 한 장 안에 들어가게 강제 */
-  .final-quote-wrap.ff-step6-quote-wrap{
-    display:block !important;
-    width:194mm !important;
-    max-width:194mm !important;
-    min-height:auto !important;
-    max-height:none !important;
-    margin:0 auto !important;
-    padding:0 !important;
-    border:0 !important;
-    border-radius:0 !important;
-    box-shadow:none !important;
-    transform:none !important;
-    background:#fff !important;
-    color:#111827 !important;
-    page-break-inside:avoid !important;
-    break-inside:avoid !important;
-    overflow:visible !important;
-    font-family:'Pretendard','Segoe UI',Arial,sans-serif !important;
-  }
-
-  /* 중복 렌더 이미지 블록 완전 제거 */
-  .final-quote-wrap.ff-step6-quote-wrap .ff-final-render-shot-v2,
-  .final-quote-wrap.ff-step6-quote-wrap .final-render-shot{
-    display:none !important;
-    visibility:hidden !important;
-  }
-
-  .ff-step6-header{
-    padding-bottom:5mm !important;
-    margin-bottom:4mm !important;
-    border-bottom:1.6pt solid #111827 !important;
-  }
-
-  .ff-step6-title h1{
-    font-size:22pt !important;
-    line-height:1.05 !important;
-  }
-
-  .ff-step6-title p{
-    font-size:8pt !important;
-    margin-top:2mm !important;
-  }
-
-  .ff-step6-logo{
-    font-size:18pt !important;
-  }
-
-  .ff-step6-logo small{
-    font-size:7pt !important;
-    margin-top:1mm !important;
-  }
-
-  .ff-step6-meta{
-    display:grid !important;
-    grid-template-columns:repeat(3,1fr) !important;
-    gap:2mm !important;
-    margin-bottom:4mm !important;
-  }
-
-  .ff-step6-meta div{
-    padding:2mm 3mm !important;
-    border-radius:2mm !important;
-    font-size:7pt !important;
-  }
-
-  .ff-step6-meta b{
-    font-size:8.5pt !important;
-  }
-
-  .ff-step6-hero{
-    display:grid !important;
-    grid-template-columns:1.28fr .72fr !important;
-    gap:4mm !important;
-    margin-bottom:4mm !important;
-  }
-
-  .ff-step6-render{
-    height:68mm !important;
-    min-height:68mm !important;
-    border-radius:2.5mm !important;
-  }
-
-  .ff-step6-render img{
-    width:100% !important;
-    height:100% !important;
-    max-height:68mm !important;
-    object-fit:contain !important;
-  }
-
-  .ff-step6-render:before{
-    font-size:7pt !important;
-    padding:1mm 2mm !important;
-    left:2mm !important;
-    top:2mm !important;
-  }
-
-  .ff-step6-card-title{
-    padding:2.3mm 3mm !important;
-    font-size:10pt !important;
-  }
-
-  .ff-step6-spec-body{
-    padding:1.5mm 3mm !important;
-  }
-
-  .ff-step6-row{
-    grid-template-columns:24mm 1fr !important;
-    min-height:7.2mm !important;
-    padding:1.3mm 0 !important;
-    gap:2mm !important;
-  }
-
-  .ff-step6-row span{
-    font-size:7pt !important;
-  }
-
-  .ff-step6-row b{
-    font-size:7.8pt !important;
-  }
-
-  .ff-step6-swatch{
-    width:6mm !important;
-    height:4.5mm !important;
-    border-radius:1.2mm !important;
-    margin-right:1.5mm !important;
-    background-size:cover !important;
-    background-position:center !important;
-  }
-
-  .ff-step6-mid{
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:3mm !important;
-    margin-bottom:3mm !important;
-  }
-
-  .ff-step6-section{
-    border-radius:2.5mm !important;
-    page-break-inside:avoid !important;
-    break-inside:avoid !important;
-  }
-
-  .ff-step6-section h3{
-    padding:2mm 3mm !important;
-    font-size:9pt !important;
-  }
-
-  .ff-step6-table{
-    font-size:7.2pt !important;
-  }
-
-  .ff-step6-table th,
-  .ff-step6-table td{
-    padding:1.8mm 2mm !important;
-  }
-
-  .ff-step6-table th{
-    font-size:6.8pt !important;
-  }
-
-  .ff-step6-bottom{
-    display:grid !important;
-    grid-template-columns:1fr 1fr !important;
-    gap:3mm !important;
-  }
-
-  .ff-step6-note{
-    padding:3mm !important;
-    border-radius:2.5mm !important;
-  }
-
-  .ff-step6-note h3{
-    font-size:9pt !important;
-    margin-bottom:2mm !important;
-  }
-
-  .ff-step6-note ul{
-    font-size:7pt !important;
-    line-height:1.35 !important;
-  }
-
-  .ff-step6-dealer-box{
-    margin-top:2mm !important;
-    padding:2mm 3mm !important;
-    font-size:7pt !important;
-    line-height:1.45 !important;
-  }
-
-  .ff-step6-price{
-    border-radius:2.5mm !important;
-  }
-
-  .ff-step6-price h3{
-    padding:2mm 3mm !important;
-    font-size:9pt !important;
-  }
-
-  .ff-step6-price-line{
-    padding:2mm 3mm !important;
-    font-size:8pt !important;
-  }
-
-  .ff-step6-grand{
-    padding:3mm !important;
-  }
-
-  .ff-step6-grand span{
-    font-size:10pt !important;
-  }
-
-  .ff-step6-grand b{
-    font-size:20pt !important;
-  }
-}
-</style>
-
-<script id="ff-step10-print-final-quote-only-js">
-(function(){
-  if(window.__ffStep10PrintFinalQuoteOnly) return;
-  window.__ffStep10PrintFinalQuoteOnly = true;
-
-  // PDF 저장 버튼은 브라우저 전체가 아니라 현재 최종견적서 모달만 인쇄하게 유도
-  window.printFinalQuote = function(){
-    var modal = document.getElementById('final-quote-modal');
-    if(!modal && typeof window.showFinalQuote === 'function'){
-      window.showFinalQuote();
-      setTimeout(function(){ window.print(); }, 250);
-      return;
-    }
-    window.print();
-  };
 })();
 </script>
 
@@ -27184,48 +26676,11 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     return img.src;
   }
   function canvasSrc(c){try{ if(c && c.width && c.height) return c.toDataURL('image/png'); }catch(e){} return '';}
-  function isGoodRenderSrc(src){
-    src = String(src || '').trim();
-    if(!src) return false;
-    if(/^about:blank/i.test(src)) return false;
-    if(/data:image\/svg\+xml/i.test(src)) return false;
-    if(/blank|placeholder/i.test(src) && !/^data:image\//i.test(src)) return false;
-    return /^(data:image\/|blob:|https?:\/\/|\.\/|\/|images\/|products\/)/i.test(src);
-  }
   function finalRenderSrc(){
-    // STEP9: 최종견적서는 "최종 렌더링 이미지 1장"만 사용한다.
-    // 1순위: /api/generate-preview 응답으로 저장된 이미지
-    var direct =
-      window.__ffLatestApiRenderImage ||
-      window.__ffFinalQuoteRenderImage ||
-      (window.PREVIEW && window.PREVIEW.finalRenderImage) ||
-      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state && window.FlowFinderFastPreview.state.finalRenderImage) ||
-      '';
-    if(isGoodRenderSrc(direct)) return direct;
-
-    // 2순위: 실제 AI 결과가 들어가는 영역. 원본 제품/옵션 썸네일보다 먼저 확인.
-    var selectors=[
-      '#ff-cpf-render-panel img',
-      '#quick-ai-preview-note.ai-result img',
-      '#quick-ai-preview-note img',
-      '.ai-result img',
-      '#ff-render-result-panel img',
-      '#ff-clean-preview-img.show'
-    ];
-    for(var a=0;a<selectors.length;a++){
-      var list=document.querySelectorAll(selectors[a]);
-      for(var b=list.length-1;b>=0;b--){
-        var im=list[b];
-        var src=(im.currentSrc || im.src || im.getAttribute('src') || '');
-        if(visibleSrc(im) && isGoodRenderSrc(src)){
-          window.__ffLatestApiRenderImage = src;
-          window.__ffFinalQuoteRenderImage = src;
-          return src;
-        }
-      }
-    }
-
-    // 3순위: canvas 기반 미리보기
+    var ids=['ff-clean-preview-img','ff-ai-live-img','product-preview-img','screen-composite-img','ff-hero-img'];
+    for(var i=0;i<ids.length;i++){ var s=visibleSrc($(ids[i])); if(s) return s; }
+    var q=document.querySelector('#quick-ai-preview-note.ai-result img, #quick-ai-preview-note img, .ff-cpf-result img');
+    var qs=visibleSrc(q); if(qs) return qs;
     return canvasSrc($('ff-clean-preview-canvas')) || canvasSrc($('ff-hero-canvas')) || canvasSrc($('screen-composite-canvas')) || '';
   }
   function normalizeItems(){
@@ -27269,30 +26724,6 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       if(i.frontScreenColor) rows.push(['전면 스크린',i.frontScreenColor,i.frontScreenTexture||'']);
       if(i.sideScreenColor) rows.push(['사이드 스크린',i.sideScreenColor,i.sideScreenTexture||'']);
     });
-
-    // STEP9: cartItems에 texture가 비어 있을 때 오른쪽 재질선택값 상태에서 보강한다.
-    var pv = Object.assign({},
-      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {},
-      window.PREVIEW || {},
-      window.state || {}
-    );
-    function has(label){ return rows.some(function(r){ return r[0] === label; }); }
-    function add(label, code, tex){
-      if(!code && !tex) return;
-      if(!has(label)) rows.push([label, code || '-', tex || '']);
-    }
-    add('상판', pv.top || pv.topCode || pv.topColor, pv.topTex || pv.topTexture || pv.topMaterialImg);
-    add('다리', pv.leg || pv.legCode || pv.legColor, pv.legTex || pv.legTexture || pv.legMaterialImg);
-    if(pv.frontScreen || pv.frontScreenTex || window.__ffFrontScreen || window.__ffFrontScreenTex){
-      add('전면 스크린', pv.frontScreen || window.__ffFrontScreen, pv.frontScreenTex || window.__ffFrontScreenTex);
-    }
-    if(pv.sideScreen || pv.sideScreenTex || window.__ffSideScreen || window.__ffSideScreenTex){
-      add('사이드 스크린', pv.sideScreen || window.__ffSideScreen, pv.sideScreenTex || window.__ffSideScreenTex);
-    }
-    if(!has('전면 스크린') && !has('사이드 스크린')){
-      add('스크린', pv.screen || pv.screenCode || pv.screenColor, pv.screenTex || pv.screenTexture || pv.screenMaterialImg);
-    }
-
     var seen={};
     return rows.filter(function(r){var k=r[0]+'|'+r[1]; if(seen[k]) return false; seen[k]=1; return true;});
   }
@@ -27357,5 +26788,418 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     if(window.state){ state.step='done'; }
     if(typeof updateFlowBar==='function') updateFlowBar();
   };
+})();
+</script>
+
+<!-- === FF FINAL PATCH: one render image + A4 one-page quote-only print === -->
+<style id="ff-final-onepage-patch-css">
+  /* 화면에서도 최종 견적서는 한 장 느낌으로 더 컴팩트하게 */
+  #final-quote-modal .final-render-shot,
+  #final-quote-modal .ff-final-render-shot-v2{
+    display:none !important;
+  }
+  #final-quote-modal .final-quote-wrap.ff-step6-quote-wrap{
+    max-width:980px !important;
+    padding:18px !important;
+  }
+  #final-quote-modal .ff-step6-header{padding-bottom:10px !important;margin-bottom:10px !important;}
+  #final-quote-modal .ff-step6-title h1{font-size:26px !important;}
+  #final-quote-modal .ff-step6-meta{gap:8px !important;margin-bottom:10px !important;}
+  #final-quote-modal .ff-step6-meta div{padding:8px 10px !important;}
+  #final-quote-modal .ff-step6-hero{
+    grid-template-columns: 42% 58% !important;
+    gap:12px !important;
+    margin-bottom:10px !important;
+  }
+  #final-quote-modal .ff-step6-render{
+    height:175px !important;
+    min-height:175px !important;
+    padding:8px !important;
+  }
+  #final-quote-modal .ff-step6-render img{
+    max-height:158px !important;
+    width:100% !important;
+    object-fit:contain !important;
+  }
+  #final-quote-modal .ff-step6-spec-card,
+  #final-quote-modal .ff-step6-section,
+  #final-quote-modal .ff-step6-note,
+  #final-quote-modal .ff-step6-price{
+    padding:10px !important;
+  }
+  #final-quote-modal .ff-step6-row{padding:6px 0 !important;}
+  #final-quote-modal .ff-step6-mid,
+  #final-quote-modal .ff-step6-bottom{gap:10px !important;margin-bottom:10px !important;}
+  #final-quote-modal .ff-step6-table th,
+  #final-quote-modal .ff-step6-table td{padding:5px 6px !important;font-size:11px !important;}
+  #final-quote-modal .ff-step6-section h3,
+  #final-quote-modal .ff-step6-note h3,
+  #final-quote-modal .ff-step6-price h3{margin-bottom:6px !important;font-size:12px !important;}
+  #final-quote-modal .ff-step6-note ul{font-size:10.5px !important;line-height:1.45 !important;}
+  #final-quote-modal .ff-step6-dealer-box{font-size:10.5px !important;line-height:1.55 !important;padding:7px !important;}
+  #final-quote-modal .ff-step6-price-line{padding:5px 0 !important;}
+  #final-quote-modal .ff-step6-grand{padding:10px !important;margin-top:8px !important;}
+  #final-quote-modal .ff-step6-grand b{font-size:25px !important;}
+
+  @page { size:A4 portrait; margin:0; }
+  @media print{
+    html, body{
+      width:210mm !important;
+      min-height:297mm !important;
+      height:auto !important;
+      margin:0 !important;
+      padding:0 !important;
+      background:#fff !important;
+      overflow:visible !important;
+      -webkit-print-color-adjust:exact !important;
+      print-color-adjust:exact !important;
+    }
+    body > *:not(#final-quote-modal){display:none !important;}
+    #final-quote-modal,
+    #final-quote-modal *{visibility:visible !important;}
+    #final-quote-modal{
+      display:block !important;
+      position:static !important;
+      inset:auto !important;
+      width:210mm !important;
+      min-height:297mm !important;
+      height:auto !important;
+      margin:0 !important;
+      padding:0 !important;
+      background:#fff !important;
+      overflow:visible !important;
+      backdrop-filter:none !important;
+      box-shadow:none !important;
+    }
+    #final-quote-modal .final-modal-close,
+    #final-quote-modal .final-actions,
+    #final-quote-modal .final-render-shot,
+    #final-quote-modal .ff-final-render-shot-v2{display:none !important;}
+    #final-quote-modal .final-quote-wrap.ff-step6-quote-wrap{
+      box-sizing:border-box !important;
+      width:210mm !important;
+      max-width:210mm !important;
+      min-height:auto !important;
+      max-height:296mm !important;
+      margin:0 !important;
+      padding:6mm 7mm !important;
+      border:0 !important;
+      border-radius:0 !important;
+      box-shadow:none !important;
+      transform:none !important;
+      overflow:hidden !important;
+      page-break-inside:avoid !important;
+      page-break-after:avoid !important;
+    }
+    #final-quote-modal .ff-step6-header{padding-bottom:5mm !important;margin-bottom:3mm !important;}
+    #final-quote-modal .ff-step6-title h1{font-size:20pt !important;}
+    #final-quote-modal .ff-step6-title p,
+    #final-quote-modal .ff-step6-logo small{font-size:7pt !important;}
+    #final-quote-modal .ff-step6-logo{font-size:13pt !important;}
+    #final-quote-modal .ff-step6-meta{grid-template-columns:repeat(3,1fr) !important;gap:2mm !important;margin-bottom:3mm !important;}
+    #final-quote-modal .ff-step6-meta div{padding:2mm 2.5mm !important;font-size:7pt !important;}
+    #final-quote-modal .ff-step6-meta b{font-size:8pt !important;}
+    #final-quote-modal .ff-step6-hero{grid-template-columns:43% 57% !important;gap:3mm !important;margin-bottom:3mm !important;}
+    #final-quote-modal .ff-step6-render{height:50mm !important;min-height:50mm !important;padding:2mm !important;}
+    #final-quote-modal .ff-step6-render img{max-height:46mm !important;}
+    #final-quote-modal .ff-step6-spec-card,
+    #final-quote-modal .ff-step6-section,
+    #final-quote-modal .ff-step6-note,
+    #final-quote-modal .ff-step6-price{padding:2.4mm !important;}
+    #final-quote-modal .ff-step6-card-title,
+    #final-quote-modal .ff-step6-section h3,
+    #final-quote-modal .ff-step6-note h3,
+    #final-quote-modal .ff-step6-price h3{font-size:8.5pt !important;margin-bottom:1.6mm !important;}
+    #final-quote-modal .ff-step6-row{padding:1.5mm 0 !important;grid-template-columns:26mm 1fr !important;}
+    #final-quote-modal .ff-step6-row span,
+    #final-quote-modal .ff-step6-row b{font-size:7.5pt !important;}
+    #final-quote-modal .ff-step6-mid{grid-template-columns:1.08fr .92fr !important;gap:3mm !important;margin-bottom:3mm !important;}
+    #final-quote-modal .ff-step6-bottom{grid-template-columns:1fr .9fr !important;gap:3mm !important;margin-bottom:0 !important;}
+    #final-quote-modal .ff-step6-table th,
+    #final-quote-modal .ff-step6-table td{padding:1.3mm 1.8mm !important;font-size:7pt !important;line-height:1.25 !important;}
+    #final-quote-modal .ff-step6-table small{font-size:6.3pt !important;}
+    #final-quote-modal .ff-step6-options-empty{padding:2.2mm !important;font-size:7pt !important;}
+    #final-quote-modal .ff-step6-note ul{font-size:7pt !important;line-height:1.35 !important;margin:0 0 1.5mm !important;}
+    #final-quote-modal .ff-step6-dealer-box{font-size:7pt !important;line-height:1.45 !important;padding:2mm !important;}
+    #final-quote-modal .ff-step6-price-line{padding:1.4mm 0 !important;font-size:7.5pt !important;}
+    #final-quote-modal .ff-step6-grand{padding:2.5mm !important;margin-top:2mm !important;}
+    #final-quote-modal .ff-step6-grand span{font-size:8pt !important;}
+    #final-quote-modal .ff-step6-grand b{font-size:18pt !important;}
+  }
+</style>
+<script id="ff-final-onepage-patch-js">
+(function(){
+  if(window.__ffFinalOnepagePatchLoaded) return;
+  window.__ffFinalOnepagePatchLoaded = true;
+  function $(id){return document.getElementById(id);}
+  function goodSrc(src){
+    src=String(src||'');
+    if(!src || src==='about:blank' || src.indexOf('data:,')===0) return '';
+    return src;
+  }
+  function imgSrcById(id){
+    var el=$(id);
+    if(!el) return '';
+    if(el.tagName && el.tagName.toLowerCase()==='img') return goodSrc(el.currentSrc || el.src);
+    var img=el.querySelector && el.querySelector('img');
+    return img ? goodSrc(img.currentSrc || img.src) : '';
+  }
+  function canvasSrcById(id){
+    var c=$(id);
+    try{ if(c && c.width && c.height) return c.toDataURL('image/png'); }catch(e){}
+    return '';
+  }
+  window.ffGetFinalRenderImage = function(){
+    /* 우선순위: AI 최종 결과 > 최종/라이브 미리보기 > 현재 히어로 캔버스 > 제품/스크린 캔버스 */
+    var selectors=[
+      '#quick-ai-preview-note.ai-result img',
+      '#quick-ai-preview-note img',
+      '.ff-cpf-result img',
+      '#ff-clean-preview-img',
+      '#ff-ai-live-img',
+      '#ff-hero-img',
+      '#product-preview-img',
+      '#screen-composite-img'
+    ];
+    for(var i=0;i<selectors.length;i++){
+      var el=document.querySelector(selectors[i]);
+      var s=el ? goodSrc(el.currentSrc || el.src) : '';
+      if(s) return s;
+    }
+    return canvasSrcById('ff-clean-preview-canvas') || canvasSrcById('ff-hero-canvas') || canvasSrcById('ff-render-canvas') || canvasSrcById('screen-composite-canvas') || '';
+  };
+  function cleanupFinalQuote(){
+    var modal=$('final-quote-modal');
+    if(!modal) return;
+    modal.querySelectorAll('.final-render-shot,.ff-final-render-shot-v2').forEach(function(n){n.remove();});
+    var renders=modal.querySelectorAll('.ff-step6-render');
+    renders.forEach(function(n,idx){ if(idx>0) n.remove(); });
+    var box=modal.querySelector('.ff-step6-render');
+    if(box){
+      var img=window.ffGetFinalRenderImage ? window.ffGetFinalRenderImage() : '';
+      if(img){ box.innerHTML='<img src="'+img.replace(/"/g,'&quot;')+'" alt="최종 렌더링 이미지">'; }
+      else { box.innerHTML='<div class="ff-step6-render-empty">최종 미리보기 생성 후<br>이미지가 표시됩니다.</div>'; }
+    }
+  }
+  var oldShow=window.showFinalQuote;
+  window.showFinalQuote=function(){
+    if(typeof oldShow==='function') oldShow.apply(this,arguments);
+    cleanupFinalQuote();
+  };
+  window.printFinalQuote=function(){
+    if(!$('final-quote-modal')) window.showFinalQuote();
+    cleanupFinalQuote();
+    setTimeout(function(){ window.print(); },80);
+  };
+})();
+</script>
+
+<!-- === FF PATCH: front+side screen split + desk material on screen-source render === -->
+<script id="ff-frontside-desk-material-composite-final-v1">
+(function(){
+  if(window.__ffFrontsideDeskMaterialCompositeFinalV1) return;
+  window.__ffFrontsideDeskMaterialCompositeFinalV1 = true;
+
+  function $(id){ return document.getElementById(id); }
+  function txt(id){ var el=$(id); return el ? String(el.textContent||'').trim() : ''; }
+  function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function bgUrl(id){
+    var el=$(id); if(!el) return '';
+    var bg=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||'';
+    var m=bg.match(/url\(["']?(.*?)["']?\)/);
+    return m ? m[1].replace(/\\/g,'/') : '';
+  }
+  function S(){
+    var out={}, list=[window.state||{}, (window.FlowFinderFastPreview&&window.FlowFinderFastPreview.state)||{}, window.PREVIEW||{}];
+    list.forEach(function(src){ for(var k in src){ if(src[k]!==undefined && src[k]!==null && src[k]!=='' && out[k]===undefined) out[k]=src[k]; }});
+    return out;
+  }
+  function selectedNames(){
+    var s=S(), arr=[];
+    try{ if(Array.isArray(window._setSelected)) arr=arr.concat(window._setSelected); }catch(e){}
+    try{ if(Array.isArray(window.state&&window.state.selectedCategories)) arr=arr.concat(window.state.selectedCategories); }catch(e){}
+    try{ document.querySelectorAll('[data-set-name].selected-set-card').forEach(function(el){ arr.push(el.getAttribute('data-set-name')||''); }); }catch(e){}
+    var label=[s.product,s.screenLabel,s.currentCatName,s._currentCatName,s.screen,s.screenKey].join(' ');
+    if(label) arr.push(label);
+    return arr.join(' ');
+  }
+  function isScreenTarget(targetType){
+    if(targetType==='screen') return true;
+    if(targetType==='desk') return false;
+    if(window.__ffNanoTarget==='screen') return true;
+    var t=selectedNames();
+    return /스크린|screen|front|side|straight|lshape|frontside/i.test(t);
+  }
+  function hasBothFrontSide(){
+    var s=S(), t=selectedNames();
+    return s.screenKey==='frontside' || s.selectedScreenKey==='frontside' || /frontside|front_side|전면.*사이드|사이드.*전면/i.test(t) || (/전면|front/i.test(t) && /사이드|side/i.test(t));
+  }
+  function screenSuffix(){
+    if(hasBothFrontSide()) return 'frontside';
+    var s=S(), t=selectedNames();
+    var raw=String(s.screenKey||s.selectedScreenKey||s.screenLabel||s.screen||t||'');
+    if(/lshape_R|우측/.test(raw)) return 'lshape_R';
+    if(/L형|lshape|엘형/i.test(raw)) return 'lshape';
+    if(/일자|straight/i.test(raw)) return 'straight';
+    if(/사이드|side/i.test(raw)) return 'side';
+    return 'front';
+  }
+  function deskKey(){
+    var s=S(), raw=String(s.deskKey||s.selectedDeskKey||s.deskLabel||s.product||selectedNames()||'');
+    return /덕트|duct/i.test(raw) ? 'desk_duct' : 'desk_standard';
+  }
+  function productImage(key){
+    try{ if(typeof window.ffPreviewImageForKey==='function'){ var p=window.ffPreviewImageForKey(key); if(p) return p; } }catch(e){}
+    return '';
+  }
+  function componentMaterial(){
+    var s=S();
+    var topTex = bgUrl('quick-top-chip') || s.topTexture || s.topTex || s.topMaterialImg || '';
+    var legTex = bgUrl('quick-leg-chip') || s.legTexture || s.legTex || s.legMaterialImg || '';
+    var screenTex = bgUrl('quick-screen-chip') || s.screenTexture || s.screenTex || s.screenMaterialImg || '';
+    var frontTex = bgUrl('quick-front-screen-chip') || s.frontScreenTexture || s.frontScreenTex || window.__ffFrontScreenTex || ((window._screenPreviewState&&window._screenPreviewState.front&&window._screenPreviewState.front.texUrl)||'');
+    var sideTex = bgUrl('quick-side-screen-chip') || s.sideScreenTexture || s.sideScreenTex || window.__ffSideScreenTex || ((window._screenPreviewState&&window._screenPreviewState.side&&window._screenPreviewState.side.texUrl)||'');
+    var frontCode = txt('quick-front-screen-code') || s.frontScreenCode || s.frontScreen || window.__ffFrontScreen || '';
+    var sideCode = txt('quick-side-screen-code') || s.sideScreenCode || s.sideScreen || window.__ffSideScreen || '';
+    var generalCode = txt('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '';
+    if(!frontTex && screenTex && hasBothFrontSide()) frontTex = screenTex;
+    if(!sideTex && screenTex && hasBothFrontSide()) sideTex = screenTex;
+    return {
+      topTexture: topTex,
+      legTexture: legTex,
+      screenTexture: screenTex,
+      frontScreenTexture: frontTex,
+      sideScreenTexture: sideTex,
+      topCode: txt('quick-top-code') || s.topCode || s.top || s.topColor || '',
+      legCode: txt('quick-leg-code') || s.legCode || s.leg || s.legColor || '',
+      screenCode: generalCode,
+      frontScreenCode: frontCode,
+      sideScreenCode: sideCode
+    };
+  }
+  function ensurePanel(kind){
+    var panel=$('ff-cpf-render-panel');
+    if(!panel){
+      var host=$('texture-preview') || $('preview-panel') || document.body;
+      panel=document.createElement('div');
+      panel.id='ff-cpf-render-panel';
+      panel.innerHTML='<div class="ff-cpf-head"><div class="ff-cpf-title">렌더링 결과</div><div class="ff-cpf-status" id="ff-cpf-render-status">대기</div></div><div class="ff-cpf-box" id="ff-cpf-render-box"></div>';
+      host.appendChild(panel);
+    }
+    panel.style.display='block'; panel.classList.add('ff-cpf-visible','ff-cpf-has-run');
+    var title=panel.querySelector('.ff-cpf-title'); if(title) title.textContent=kind==='screen'?'스크린+데스크 재질 렌더링 결과':'데스크 렌더링 결과';
+    return panel;
+  }
+  function setLoading(kind,msg){
+    ensurePanel(kind);
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent='생성 중';
+    if(box) box.innerHTML='<div style="padding:18px;color:#2ef2c9;font-weight:900;line-height:1.55;">'+esc(msg||'원본 사진에 재질을 맵핑 중입니다...')+'</div>';
+  }
+  function setResult(kind,src,err){
+    ensurePanel(kind);
+    var st=$('ff-cpf-render-status'), box=$('ff-cpf-render-box');
+    if(st) st.textContent=err?'오류':'생성완료';
+    if(!box) return;
+    if(err) box.innerHTML='<div style="padding:14px;color:#fca5a5;line-height:1.55;">'+esc(err)+'</div>';
+    else box.innerHTML='<img src="'+esc(src)+'" alt="렌더링 결과" style="width:100%;height:100%;object-fit:contain;background:#fff;border-radius:14px;display:block;">';
+  }
+  function postJson(url,payload,ms){
+    return new Promise(function(resolve,reject){
+      var xhr=new XMLHttpRequest(); xhr.open('POST',url,true); xhr.timeout=ms||90000; xhr.setRequestHeader('Content-Type','application/json');
+      xhr.onload=function(){ var data={}; try{data=JSON.parse(xhr.responseText||'{}');}catch(e){data=xhr.responseText||{};} if(xhr.status>=200&&xhr.status<300) resolve(data); else reject(new Error((data&&(data.error||data.detail))||('HTTP '+xhr.status))); };
+      xhr.onerror=function(){reject(new Error('서버 연결 실패'));};
+      xhr.ontimeout=function(){reject(new Error('렌더링 응답 시간이 초과되었습니다.'));};
+      xhr.send(JSON.stringify(payload));
+    });
+  }
+
+  window.prepareNanoBananaPreview = async function(targetType){
+    if(window.__ffFrontsideCompositeBusy) return;
+    var screen=isScreenTarget(targetType), kind=screen?'screen':'desk';
+    var suffix=screenSuffix(), mat=componentMaterial(), s=S();
+    var sourceImage = screen ? productImage(suffix) : productImage(deskKey());
+    if(!sourceImage) sourceImage = screen ? productImage('front') : productImage('desk_standard');
+    var frontside = screen && suffix==='frontside';
+
+    if(frontside && (!mat.frontScreenTexture || !mat.sideScreenTexture)){
+      setResult('screen','', '전면+사이드 스크린은 전면 재질과 사이드 재질을 각각 선택해야 합니다. 전면 선택 후 재질, 사이드 선택 후 재질을 따로 지정해주세요.');
+      return;
+    }
+
+    var payload={
+      mode: frontside ? 'frontside-guide-desk-screen-material-mapping-final-v2' : (screen ? 'screen-plus-desk-material-mapping-final-v2' : 'desk-material-mapping-final-v2'),
+      renderStep: frontside ? 'frontside_with_desk_top_leg_materials' : (screen ? 'screen_with_desk_top_leg_materials' : 'desk_top_leg_materials'),
+      materialEditOnly:true,
+      preserveSourceImage:true,
+      preserveTransparentBackground:true,
+      forbidGeneration:true,
+      canvasAspect:'16:9',
+      targetType:kind,
+      productType:kind,
+      sourceImage:sourceImage,
+      baseImage:sourceImage,
+      renderSourceImage:sourceImage,
+      deskImage:sourceImage,
+      fallbackDeskImage:sourceImage,
+      screenImage:screen ? sourceImage : '',
+      screenSelected:!!screen,
+      deskLabel:deskKey()==='desk_duct'?'덕트형 데스크':'일반형 데스크',
+      screenLabel:screen ? (frontside?'frontside':suffix) : '',
+      screenType:screen ? suffix : '',
+      // 핵심: 스크린 원본사진 안에 보이는 데스크에도 같은 상판/다리 재질 적용
+      topTexture:mat.topTexture,
+      legTexture:mat.legTexture,
+      topCode:mat.topCode,
+      legCode:mat.legCode,
+      // 단일 스크린용
+      screenTexture:screen && !frontside ? mat.screenTexture : '',
+      screenCode:screen && !frontside ? mat.screenCode : '',
+      // 전면+사이드 복수 선택용: 한 guide 안에서 전면/사이드 영역 분리
+      guideImage:frontside ? './images/guides/frontside_guide.png' : '',
+      screenGuide:frontside ? './images/guides/frontside_guide.png' : '',
+      frontsideGuide:frontside ? './images/guides/frontside_guide.png' : '',
+      guideLegend:frontside ? 'frontside_guide.png: white filled area = front screen, red/pink area = side screen, black/transparent = keep unchanged except desk top/legs guides inferred from source' : '',
+      frontScreenTexture:frontside ? mat.frontScreenTexture : '',
+      sideScreenTexture:frontside ? mat.sideScreenTexture : '',
+      frontScreenCode:frontside ? mat.frontScreenCode : '',
+      sideScreenCode:frontside ? mat.sideScreenCode : '',
+      applyDeskMaterialsInsideScreenSource:!!screen,
+      applyTopTextureToExistingTabletop:true,
+      applyLegTextureToExistingDeskLegs:true,
+      applyScreenTextureToExistingScreensOnly:true,
+      legType:s.legType || s.legShape || '',
+      casterType:s.casterType || s.mobility || '',
+      topShape:s.topShape || '',
+      size:screen ? {screenH:s.screenH||'', screenTopGap:s.screenTopGap||''} : (s.size || {w:s.w||'', d:s.d||'', h:s.h||''}),
+      previewPathRule:'images/previews/{desk_standard|desk_duct}/{leg}_{move}_{top}_{screen}.png',
+      instruction:(frontside ?
+        'Use the exact source preview image. Apply topTexture to the existing tabletop and legTexture to the existing desk legs visible in this screen-source image. Use frontside_guide.png to separate screen areas: white filled area is FRONT screen and must receive only frontScreenTexture; red/pink area is SIDE screen and must receive only sideScreenTexture. Do not apply the same texture to both screens. Do not redraw, add, remove, or move any desk, screen, room, camera angle, layout, object, or background.' :
+        (screen ? 'Use the exact source preview image. Apply topTexture to the existing tabletop and legTexture to the existing desk legs visible in this screen-source image. Apply screenTexture only to the existing screen area. Do not redraw, add, remove, or move objects.' : 'Use the exact source preview image. Apply topTexture only to the existing tabletop and legTexture only to the existing legs. Do not redraw, add, remove, or move objects.'))
+    };
+
+    var btn=$('quick-ai-preview-btn') || $('ff-clean-render-btn');
+    if(btn){ btn.disabled=true; btn.textContent='생성 중...'; }
+    window.__ffFrontsideCompositeBusy=true;
+    setLoading(kind, frontside ? '전면/사이드 스크린을 guide로 분리하고, 같은 원본 안의 데스크 상판/다리 재질까지 함께 적용 중입니다.' : (screen ? '스크린 원본 안의 데스크 상판/다리 재질까지 함께 적용 중입니다.' : '데스크 상판/다리 재질을 적용 중입니다.'));
+    try{
+      var data=await postJson('/api/generate-preview', payload, 90000);
+      var src=(typeof data==='string')?data:(data.imageUrl||data.image||data.url||data.previewUrl||'');
+      if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      setResult(kind, src, '');
+      window.__ffFinalQuoteRenderImage = src;
+      if(window.PREVIEW) window.PREVIEW.finalRenderImage = src;
+      return data;
+    }catch(e){
+      setResult(kind, '', e&&e.message?e.message:String(e));
+      throw e;
+    }finally{
+      window.__ffFrontsideCompositeBusy=false;
+      if(btn){ btn.disabled=false; btn.textContent='✨ 원본 사진에 재질 적용'; }
+    }
+  };
+
+  setTimeout(function(){ var btn=$('quick-ai-preview-btn'); if(btn){ btn.onclick=function(e){ if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false; }; } },0);
+  setTimeout(function(){ var btn=$('quick-ai-preview-btn'); if(btn){ btn.onclick=function(e){ if(e)e.preventDefault(); window.prepareNanoBananaPreview(); return false; }; } },700);
 })();
 </script>
