@@ -17312,6 +17312,60 @@ if(hasScreen() && !isFrontside && !finalScreenTexture){
 
 })();
 </script>
+  <script>
+var screenTexture = window.screenTexture || '';
+
+(function(){
+
+  window.prepareNanoBananaPreview = async function(){
+
+    try{
+      if(typeof buildPayload !== 'function'){
+        throw new Error('buildPayload 함수를 찾을 수 없습니다.');
+      }
+
+      const payload = buildPayload();
+
+      payload.materialEditOnly = true;
+      payload.preserveSourceImage = true;
+      payload.preserveTransparentBackground = true;
+      payload.forbidGeneration = true;
+
+      payload.composedPreview = '';
+      payload.previousRenderedImage = '';
+      payload.lastRenderedImage = '';
+      payload.imageUrl = '';
+
+      payload.sourceImage = payload.sourceImage || payload.baseImage || payload.deskImage;
+      payload.baseImage = payload.baseImage || payload.deskImage;
+      payload.deskImage = payload.baseImage;
+
+      if(payload.productType === 'screen' || payload.targetType === 'screen' || payload.screenType){
+        payload.screenImage = payload.screenImage || payload.baseImage;
+      }
+
+      console.log('[FINAL_OVERRIDE]', payload);
+
+      const res = await fetch('/api/generate-preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+      console.log('[FINAL_RESPONSE]', data);
+
+      return data;
+
+    }catch(err){
+      console.error('[FINAL_OVERRIDE_ERROR]', err);
+      throw err;
+    }
+
+  };
+
+})();
+</script>
 </body>
 
 
