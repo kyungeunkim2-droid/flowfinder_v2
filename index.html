@@ -25116,3 +25116,261 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+
+<!-- === FF_BACK_STEP_SCREEN_BASE_FORCE_FIX === -->
+<script id="ff-back-step-screen-base-force-fix-js">
+(function(){
+  if(window.__ffBackStepScreenBaseForceFix) return;
+  window.__ffBackStepScreenBaseForceFix = true;
+
+  function str(v){ return String(v == null ? '' : v); }
+  function selectedText(){
+    return [
+      (window._setSelected || []).join(' '),
+      window.state && state._currentCatName,
+      window.state && state.current && state.current.product,
+      window.state && state.product,
+      document.body && document.body.innerText && document.body.innerText.slice(-3000)
+    ].join(' ');
+  }
+  function screenSuffixFromContext(payload){
+    var hay = [
+      selectedText(),
+      payload && payload.screenLabel,
+      payload && payload.mode,
+      payload && payload.renderStep,
+      payload && payload.screenImage,
+      payload && payload.deskImage
+    ].join(' ').toLowerCase();
+
+    if((/전면|front/.test(hay) && /사이드|side/.test(hay)) || /frontside|front_side/.test(hay)) return 'frontside';
+    if(/l형|lshape|l_shape/.test(hay)) return 'lshape';
+    if(/일자|straight/.test(hay)) return 'straight';
+    if(/사이드|side/.test(hay)) return 'side';
+    if(/전면|front/.test(hay)) return 'front';
+    return '';
+  }
+  function hasScreenIntent(payload){
+    var hay = [
+      selectedText(),
+      payload && payload.targetType,
+      payload && payload.productType,
+      payload && payload.mode,
+      payload && payload.renderStep,
+      payload && payload.screenImage,
+      payload && payload.screenTexture,
+      payload && payload.frontScreenTexture,
+      payload && payload.sideScreenTexture
+    ].join(' ');
+    return /스크린|screen|front|side|frontside|lshape|straight|전면|사이드|일자|L형|l형/i.test(hay);
+  }
+  function makeScreenBaseFromDeskBase(src, suffix){
+    src = str(src).trim();
+    if(!src || !suffix) return src;
+    if(!/\/images\/previews\//.test(src)) return src;
+
+    var noQ = src.split('?')[0].split('#')[0];
+    if(new RegExp('_(frontside|front|side|straight|lshape)\\.png$', 'i').test(noQ)) return src;
+
+    return src.replace(/\.png(\?.*)?$/i, '_' + suffix + '.png$1');
+  }
+  function guideFromScreenBase(src){
+    var file = str(src).split('?')[0].split('#')[0].replace(/\\/g,'/').split('/').pop() || '';
+    if(!file) return './images/guides/frontside_guide.png';
+    return './images/guides/' + file.replace(/front_side/gi,'frontside').replace(/front-side/gi,'frontside');
+  }
+
+  function forceScreenBase(payload){
+    if(!payload || !hasScreenIntent(payload)) return payload;
+
+    var suffix = screenSuffixFromContext(payload);
+
+    // 이전단계로 돌아가면 targetType이 desk로 남는 경우가 있어서,
+    // 스크린 의도가 보이면 무조건 screen 렌더로 보정.
+    payload.targetType = 'screen';
+    payload.productType = 'screen';
+    payload.screenSelected = true;
+
+    var candidate =
+      payload.screenImage ||
+      makeScreenBaseFromDeskBase(payload.deskImage, suffix) ||
+      payload.deskImage ||
+      '';
+
+    // desk-only 원본이면 suffix 붙인 screen 포함 원본으로 강제 교체
+    candidate = makeScreenBaseFromDeskBase(candidate, suffix);
+
+    if(candidate){
+      payload.screenImage = candidate;
+      payload.deskImage = candidate;
+      payload.fallbackDeskImage = candidate;
+    }
+
+    if(suffix === 'frontside'){
+      payload.mode = 'frontside-guide-material-mapping-clean-final';
+      payload.renderStep = 'frontside_screen_clean_final';
+      payload.guideImage = payload.guideImage || guideFromScreenBase(candidate);
+    }else{
+      payload.mode = 'screen-material-mapping-clean-final';
+      payload.renderStep = 'screen_clean_final';
+      payload.guideImage = '';
+      payload.frontScreenTexture = '';
+      payload.sideScreenTexture = '';
+      payload.frontScreenCode = '';
+      payload.sideScreenCode = '';
+    }
+
+    console.log('[FF_BACK_STEP_SCREEN_BASE_FORCE_FIX]', {
+      suffix: suffix,
+      deskImage: payload.deskImage,
+      screenImage: payload.screenImage,
+      screenTexture: payload.screenTexture,
+      guideImage: payload.guideImage,
+      targetType: payload.targetType,
+      mode: payload.mode
+    });
+
+    return payload;
+  }
+
+  var prevFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = String(input || '');
+    if((url.indexOf('/api/generate-preview') > -1 || url.indexOf('/api/generate-screen-preview') > -1) && init && init.body){
+      try{
+        var payload = JSON.parse(init.body || '{}');
+        payload = forceScreenBase(payload);
+        init = Object.assign({}, init, { body: JSON.stringify(payload) });
+      }catch(e){
+        console.warn('[FF_BACK_STEP_SCREEN_BASE_FORCE_FIX] patch failed', e);
+      }
+    }
+    return prevFetch.call(this, input, init);
+  };
+})();
+</script>
+
+
+
+<!-- === FF_BACK_RESELECT_PRICE_STATE_FIX === -->
+<script id="ff-back-reselect-price-state-fix-js">
+(function(){
+  if(window.__ffBackReselectPriceStateFix) return;
+  window.__ffBackReselectPriceStateFix = true;
+
+  function resetTransientProductState(selected){
+    if(!window.state) return;
+    // 이전단계 후 다시 제품선택할 때, 이전 제품의 색상/사이즈/가격 검색 상태가 남아
+    // 새 제품 가격 매칭을 방해하는 문제 방지
+    state.product = null;
+    state.subKey = null;
+    state.code = null;
+    state.color = null;
+    state.colorType = null;
+    state.factory = null;
+    state.price = null;
+    state.basePrice = null;
+    state.w = null;
+    state.d = null;
+    state.h = null;
+    state.legType = null;
+    state.casterType = null;
+    state.topShape = null;
+    state.rateLabel = null;
+    state.rateVal = null;
+    state._legLabel = null;
+    state._deskTopColor = null;
+    state._deskLegColor = null;
+    state._screenTopGap = null;
+    state._screenNewH = null;
+
+    // 핵심: stale items/dataType/productKey 제거
+    state._currentItems = null;
+    state._currentDataType = null;
+    state._currentProductKey = null;
+    state._currentCatName = null;
+    state._stdColorItems = null;
+    state._deskTopItems = null;
+    state._deskLegItems = null;
+
+    if(Array.isArray(selected)){
+      state.selectedCategories = selected.slice();
+      state.currentCatIdx = 0;
+      state.current = {
+        type: '세트상품',
+        product: selected.join(' + ')
+      };
+    }
+    if(typeof window.updateCurrent === 'function') window.updateCurrent();
+  }
+
+  // 제품선택 버튼의 confirm callback 앞에 상태 초기화 주입
+  var oldAddProductSelectionButtons = window.addProductSelectionButtons;
+  if(typeof oldAddProductSelectionButtons === 'function'){
+    window.addProductSelectionButtons = function(confirmCb){
+      return oldAddProductSelectionButtons.call(this, function(sel){
+        resetTransientProductState(sel);
+        return confirmCb.apply(this, arguments);
+      });
+    };
+  }
+
+  // 오른쪽 제품선택 그리드 콜백도 동일하게 보정
+  var oldShowSetProductSelector = window.showSetProductSelector;
+  if(typeof oldShowSetProductSelector === 'function'){
+    window.showSetProductSelector = function(){
+      var r = oldShowSetProductSelector.apply(this, arguments);
+      setTimeout(function(){
+        var btn = document.getElementById('set-confirm-btn');
+        if(btn && !btn.__ffBackReselectPatched){
+          btn.__ffBackReselectPatched = true;
+          btn.addEventListener('click', function(){
+            if(Array.isArray(window._setSelected) && window._setSelected.length){
+              resetTransientProductState(window._setSelected);
+            }
+          }, true);
+        }
+      }, 80);
+      return r;
+    };
+  }
+
+  // goBack 직후 현재 제품과 맞지 않는 stale _currentItems 제거
+  var oldGoBack = window.goBack;
+  if(typeof oldGoBack === 'function'){
+    window.goBack = function(){
+      var r = oldGoBack.apply(this, arguments);
+      if(window.state){
+        // 제품선택 단계로 돌아온 상태면 가격 계산용 임시 데이터는 반드시 비움
+        var isProductStage = !state._currentCatName || state.step === 'init' || state.step === 'select_product';
+        if(isProductStage){
+          state._currentItems = null;
+          state._currentDataType = null;
+          state._currentProductKey = null;
+          state._stdColorItems = null;
+          state._deskTopItems = null;
+          state._deskLegItems = null;
+        }
+      }
+      return r;
+    };
+  }
+
+  // 가격 계산 직전 catName과 current data가 안 맞으면 강제 재로딩 유도
+  var oldCalcAndFinish = window.calcAndFinish;
+  if(typeof oldCalcAndFinish === 'function'){
+    window.calcAndFinish = function(catName){
+      if(window.state && catName && state._currentCatName && state._currentCatName !== catName){
+        state._currentItems = null;
+        state._currentDataType = null;
+        state._currentProductKey = null;
+      }
+      return oldCalcAndFinish.apply(this, arguments);
+    };
+  }
+
+  console.log('[FF_BACK_RESELECT_PRICE_STATE_FIX] active');
+})();
+</script>
+
