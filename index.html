@@ -25017,3 +25017,435 @@ const ORDER_LEG_COLORS=['DCR','TS'];
 })();
 </script>
 
+
+
+<!-- === FF_FRONTSIDE_ONE_FLOW_RENDER_ONCE === -->
+<style id="ff-frontside-one-flow-render-once-css">
+  .ff-fs-panel{
+    margin-top:10px!important;
+    padding:14px!important;
+    border-radius:18px!important;
+    border:1px solid rgba(46,242,201,.28)!important;
+    background:linear-gradient(180deg,rgba(5,18,29,.98),rgba(3,14,24,.98))!important;
+    color:#e5edf7!important;
+    max-width:720px!important;
+    overflow:hidden!important;
+  }
+  .ff-fs-panel h3{
+    margin:0 0 6px!important;
+    color:#2ef2c9!important;
+    font-size:18px!important;
+    font-weight:1000!important;
+    letter-spacing:-.2px!important;
+  }
+  .ff-fs-desc{
+    margin:0 0 10px!important;
+    color:#a9bdd1!important;
+    font-size:12px!important;
+    line-height:1.45!important;
+  }
+  .ff-fs-size-grid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+    margin:10px 0 12px!important;
+  }
+  .ff-fs-size-card{
+    padding:10px!important;
+    border-radius:15px!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    background:rgba(8,25,38,.9)!important;
+  }
+  .ff-fs-size-card b{
+    display:block!important;
+    color:#fff!important;
+    margin-bottom:8px!important;
+    font-size:13px!important;
+    font-weight:1000!important;
+  }
+  .ff-fs-size-row{
+    display:grid!important;
+    grid-template-columns:62px 1fr!important;
+    gap:8px!important;
+    align-items:center!important;
+    margin-top:6px!important;
+  }
+  .ff-fs-size-row span{
+    font-size:11px!important;
+    color:#9fb1c8!important;
+    font-weight:900!important;
+  }
+  .ff-fs-size-row input{
+    width:100%!important;
+    height:32px!important;
+    border-radius:10px!important;
+    border:1px solid rgba(46,242,201,.28)!important;
+    background:#06131f!important;
+    color:#fff!important;
+    padding:0 8px!important;
+    font-size:13px!important;
+    font-weight:900!important;
+    outline:none!important;
+  }
+  .ff-fs-material-grid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+  }
+  .ff-fs-material-card{
+    min-width:0!important;
+    padding:10px!important;
+    border-radius:15px!important;
+    border:1px solid rgba(255,255,255,.10)!important;
+    background:rgba(8,25,38,.9)!important;
+  }
+  .ff-fs-material-head{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    gap:8px!important;
+    margin-bottom:8px!important;
+  }
+  .ff-fs-material-head b{
+    color:#fff!important;
+    font-size:13px!important;
+    font-weight:1000!important;
+  }
+  .ff-fs-selected{
+    color:#2ef2c9!important;
+    font-size:11px!important;
+    font-weight:1000!important;
+    white-space:nowrap!important;
+  }
+  .ff-fs-search{
+    width:100%!important;
+    height:30px!important;
+    margin-bottom:7px!important;
+    border-radius:10px!important;
+    border:1px solid rgba(148,163,184,.20)!important;
+    background:#06131f!important;
+    color:#fff!important;
+    padding:0 9px!important;
+    font-size:12px!important;
+    outline:none!important;
+  }
+  .ff-fs-chip-grid{
+    display:grid!important;
+    grid-template-columns:repeat(4,minmax(0,1fr))!important;
+    gap:6px!important;
+    max-height:168px!important;
+    overflow-y:auto!important;
+    padding-right:3px!important;
+  }
+  .ff-fs-chip{
+    min-width:0!important;
+    min-height:50px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:4px!important;
+    padding:5px!important;
+    border-radius:11px!important;
+    border:1px solid rgba(148,163,184,.22)!important;
+    background:#071521!important;
+    color:#fff!important;
+    cursor:pointer!important;
+    font-size:10px!important;
+    font-weight:1000!important;
+  }
+  .ff-fs-chip em{
+    width:100%!important;
+    height:24px!important;
+    border-radius:7px!important;
+    background:#222 center/cover no-repeat!important;
+    border:1px solid rgba(255,255,255,.14)!important;
+  }
+  .ff-fs-chip span{
+    max-width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  .ff-fs-chip.active{
+    border-color:#2ef2c9!important;
+    box-shadow:0 0 0 1px rgba(46,242,201,.22),0 0 16px rgba(46,242,201,.12)!important;
+    background:#07302f!important;
+  }
+  .ff-fs-summary{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    margin-top:10px!important;
+  }
+  .ff-fs-summary div{
+    border-radius:12px!important;
+    background:#06131f!important;
+    border:1px solid rgba(46,242,201,.18)!important;
+    padding:8px!important;
+    color:#cbd5e1!important;
+    font-size:12px!important;
+    font-weight:900!important;
+  }
+  .ff-fs-summary b{
+    color:#2ef2c9!important;
+    float:right!important;
+  }
+  .ff-fs-actions{
+    display:grid!important;
+    grid-template-columns:1fr!important;
+    margin-top:10px!important;
+  }
+  .ff-fs-actions button{
+    min-height:42px!important;
+    border:0!important;
+    border-radius:14px!important;
+    background:linear-gradient(135deg,#2df5d2,#7c3aed)!important;
+    color:#07111f!important;
+    font-size:14px!important;
+    font-weight:1000!important;
+    cursor:pointer!important;
+  }
+  .ff-frontside-ready-note{
+    margin-top:8px!important;
+    padding:9px 11px!important;
+    border-radius:13px!important;
+    background:rgba(46,242,201,.10)!important;
+    border:1px solid rgba(46,242,201,.18)!important;
+    color:#dffcf8!important;
+    font-size:12px!important;
+    line-height:1.45!important;
+  }
+  @media(max-width:760px){
+    .ff-fs-size-grid,.ff-fs-material-grid,.ff-fs-summary{grid-template-columns:1fr!important;}
+    .ff-fs-chip-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;}
+  }
+</style>
+<script id="ff-frontside-one-flow-render-once-js">
+(function(){
+  if(window.__ffFrontsideOneFlowRenderOnce) return;
+  window.__ffFrontsideOneFlowRenderOnce = true;
+
+  function $(id){return document.getElementById(id);}
+  function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function S(){window.state=window.state||{}; return window.state;}
+  function selectedText(){return String((window._setSelected||[]).join(' '));}
+  function isFrontsideSelected(){var t=selectedText();return /전면|front/i.test(t)&&/사이드|side/i.test(t);}
+  function isScreenCat(c){return /스크린|screen|전면|사이드|front|side/i.test(String(c||''));}
+  function normalize(url){if(!url)return'';url=String(url).trim().replace(/\\/g,'/');if(url.indexOf('./')===0||url.indexOf('/')===0||url.indexOf('http')===0||url.indexOf('data:')===0)return url;return './'+url.replace(/^\/+/,'');}
+  function unique(a){var o=[];(a||[]).forEach(function(x){x=String(x||'').trim();if(x&&o.indexOf(x)<0)o.push(x);});return o;}
+  function textureFor(code, part){
+    if(!code)return'';
+    var cat=part==='front'?'전면 스크린':part==='side'?'사이드 스크린':'전면 스크린';
+    try{if(typeof window.ffTextureUrlForChoice==='function'){var p=window.ffTextureUrlForChoice(code,'screen',cat);if(p)return normalize(p);}}catch(e){}
+    try{if(typeof window._ffLocalTextureForCode==='function'){var p2=window._ffLocalTextureForCode(code,cat);if(p2)return normalize(p2);}}catch(e){}
+    try{if(typeof window.screenTextureUrl==='function'){var p3=window.screenTextureUrl(code,cat);if(p3)return normalize(p3);}}catch(e){}
+    var isStd=/^(3F1|3F2|061|064|067)$/i.test(code);
+    return './images/textures/screen/'+(part==='side'?'side':'front')+'/'+(isStd?'standard':'custom')+'/'+code+'.jpg';
+  }
+  function colorList(cat){
+    var arr=[];
+    try{if(window.STD_COLORS&&STD_COLORS[cat])arr=arr.concat(STD_COLORS[cat]);}catch(e){}
+    try{arr=arr.concat(window.CUSTOM_FABRIC_COLORS_SCREEN||[]);}catch(e){}
+    try{arr=arr.concat(window.CUSTOM_PET_COLORS_SCREEN||[]);}catch(e){}
+    var items=S()._currentItems||[];
+    items.forEach(function(i){if(i&&i.color)arr.push(i.color);});
+    if(!arr.length)arr=['3F1','3F2','061','064','067','458','007'];
+    return unique(arr);
+  }
+  function chipHtml(code, part){
+    var tex=textureFor(code,part);
+    return '<button type="button" class="ff-fs-chip" data-part="'+part+'" data-code="'+esc(code)+'" onclick="ffFrontsidePickMaterial(\''+part+'\',\''+esc(code)+'\',this)"><em style="background-image:url(\''+esc(tex)+'\')"></em><span>'+esc(code)+'</span></button>';
+  }
+  function currentFrontsideState(){
+    window._screenPreviewState=window._screenPreviewState||{};
+    var st=window._screenPreviewState;
+    var s=S();
+    return {
+      frontCode:(st.front&&(st.front.color||st.front.code))||s.frontScreenCode||'',
+      sideCode:(st.side&&(st.side.color||st.side.code))||s.sideScreenCode||'',
+      frontTex:(st.front&&(st.front.texUrl||st.front.texture))||s.frontScreenTexture||'',
+      sideTex:(st.side&&(st.side.texUrl||st.side.texture))||s.sideScreenTexture||''
+    };
+  }
+  function updateFSLabels(){
+    var v=currentFrontsideState();
+    var f=$('ff-fs-front-selected'), sd=$('ff-fs-side-selected'), fs=$('ff-fs-sum-front'), ss=$('ff-fs-sum-side');
+    if(f)f.textContent=v.frontCode||'미선택';
+    if(sd)sd.textContent=v.sideCode||'미선택';
+    if(fs)fs.textContent=v.frontCode||'-';
+    if(ss)ss.textContent=v.sideCode||'-';
+    updateRightMaterialRows();
+  }
+  function updateRightMaterialRows(){
+    var card=document.querySelector('.ff-clean-material-card');
+    if(!card)return;
+    var wrap=card.querySelector('[data-ff-frontside-rows="1"]');
+    if(!wrap){
+      var oldRows=Array.prototype.slice.call(card.querySelectorAll('.ff-clean-material-row,.material-chip-row')).filter(function(r){return /스크린|screen/i.test(r.textContent||'');});
+      oldRows.forEach(function(r){r.style.display='none';});
+      wrap=document.createElement('div');
+      wrap.setAttribute('data-ff-frontside-rows','1');
+      wrap.innerHTML='<div class="ff-screen-split-row" data-ff-screen-split="front"><span>전면스크린</span><b>-</b></div><div class="ff-screen-split-row" data-ff-screen-split="side"><span>사이드스크린</span><b>-</b></div>';
+      card.appendChild(wrap);
+    }
+    var v=currentFrontsideState();
+    var fb=wrap.querySelector('[data-ff-screen-split="front"] b');
+    var sb=wrap.querySelector('[data-ff-screen-split="side"] b');
+    if(fb)fb.textContent=v.frontCode||'-';
+    if(sb)sb.textContent=v.sideCode||'-';
+  }
+  function filterChips(input, part){
+    var q=String(input.value||'').toLowerCase();
+    document.querySelectorAll('.ff-fs-chip[data-part="'+part+'"]').forEach(function(btn){
+      var code=String(btn.getAttribute('data-code')||'').toLowerCase();
+      btn.style.display=!q||code.indexOf(q)>-1?'flex':'none';
+    });
+  }
+  window.ffFrontsideFilter=function(part,id){var input=$(id);if(input)filterChips(input,part);};
+  window.ffFrontsidePickMaterial=function(part,code,btn){
+    window._screenPreviewState=window._screenPreviewState||{};
+    var tex=textureFor(code,part);
+    window._screenPreviewState[part]={type:part==='front'?'전면 스크린':'사이드 스크린',color:code,code:code,texUrl:tex,texture:tex,updatedAt:Date.now()};
+    var s=S();
+    if(part==='front'){s.frontScreenCode=code;s.frontScreenTexture=tex;}
+    if(part==='side'){s.sideScreenCode=code;s.sideScreenTexture=tex;}
+    s.screenCode=code;s.screenTexture=tex;s.screenColor=code;s.screenTex=tex;
+    document.querySelectorAll('.ff-fs-chip[data-part="'+part+'"]').forEach(function(b){b.classList.remove('active');});
+    if(btn)btn.classList.add('active');
+    updateFSLabels();
+  };
+  function showCombinedPanel(){
+    if(!isFrontsideSelected())return false;
+    if(document.querySelector('.ff-fs-panel'))return true;
+    var colorsFront=colorList('전면 스크린');
+    var colorsSide=colorList('사이드 스크린');
+    var h =
+      '<div class="ff-fs-panel">'+
+      '<h3>전면+사이드 스크린 설정</h3>'+
+      '<p class="ff-fs-desc">전면과 사이드의 사이즈/재질을 한 번에 선택한 뒤, 오른쪽 <b>고해상도 렌더링하기</b>를 한 번만 눌러주세요.</p>'+
+      '<div class="ff-fs-size-grid">'+
+        '<div class="ff-fs-size-card"><b>전면스크린 사이즈</b><div class="ff-fs-size-row"><span>전체 H</span><input id="ff-fs-front-h" type="number" value="715"></div><div class="ff-fs-size-row"><span>상판 위</span><input id="ff-fs-front-top" type="number" value="405"></div></div>'+
+        '<div class="ff-fs-size-card"><b>사이드스크린 사이즈</b><div class="ff-fs-size-row"><span>전체 H</span><input id="ff-fs-side-h" type="number" value="715"></div><div class="ff-fs-size-row"><span>상판 위</span><input id="ff-fs-side-top" type="number" value="405"></div></div>'+
+      '</div>'+
+      '<div class="ff-fs-material-grid">'+
+        '<div class="ff-fs-material-card"><div class="ff-fs-material-head"><b>전면스크린 재질</b><span class="ff-fs-selected" id="ff-fs-front-selected">미선택</span></div><input class="ff-fs-search" id="ff-fs-front-search" placeholder="재질 검색" oninput="ffFrontsideFilter(\'front\',\'ff-fs-front-search\')"><div class="ff-fs-chip-grid">'+colorsFront.map(function(c){return chipHtml(c,'front');}).join('')+'</div></div>'+
+        '<div class="ff-fs-material-card"><div class="ff-fs-material-head"><b>사이드스크린 재질</b><span class="ff-fs-selected" id="ff-fs-side-selected">미선택</span></div><input class="ff-fs-search" id="ff-fs-side-search" placeholder="재질 검색" oninput="ffFrontsideFilter(\'side\',\'ff-fs-side-search\')"><div class="ff-fs-chip-grid">'+colorsSide.map(function(c){return chipHtml(c,'side');}).join('')+'</div></div>'+
+      '</div>'+
+      '<div class="ff-fs-summary"><div>전면 선택값 <b id="ff-fs-sum-front">-</b></div><div>사이드 선택값 <b id="ff-fs-sum-side">-</b></div></div>'+
+      '<div class="ff-fs-actions"><button type="button" onclick="ffFrontsideConfirmCombined()">전면+사이드 설정 완료</button></div>'+
+      '</div>';
+    if(typeof window.addMsg==='function')window.addMsg('bot',h);
+    else document.body.insertAdjacentHTML('beforeend',h);
+    updateFSLabels();
+    if(typeof window.scrollBottom==='function')window.scrollBottom();
+    return true;
+  }
+  window.ffFrontsideConfirmCombined=function(){
+    var v=currentFrontsideState();
+    if(!v.frontCode||!v.sideCode){
+      if(typeof window.addMsg==='function')window.addMsg('bot','<span class="error-msg">전면스크린 재질과 사이드스크린 재질을 모두 선택해주세요.</span>');
+      return;
+    }
+    var s=S();
+    s._frontsideCombinedReady=true;
+    s._currentCatName='전면+사이드 스크린';
+    s.frontScreenSize={h:($('ff-fs-front-h')&&$('ff-fs-front-h').value)||715,topGap:($('ff-fs-front-top')&&$('ff-fs-front-top').value)||405};
+    s.sideScreenSize={h:($('ff-fs-side-h')&&$('ff-fs-side-h').value)||715,topGap:($('ff-fs-side-top')&&$('ff-fs-side-top').value)||405};
+    s.current=s.current||{};
+    s.current.product=s.current.product||'전면+사이드 스크린';
+    s.current.size='전면 H'+s.frontScreenSize.h+' / 상판위 '+s.frontScreenSize.topGap+' · 사이드 H'+s.sideScreenSize.h+' / 상판위 '+s.sideScreenSize.topGap;
+    if(typeof window.updateCurrent==='function')window.updateCurrent();
+    if(typeof window.addMsg==='function')window.addMsg('bot','<div class="ff-frontside-ready-note">전면+사이드 설정이 저장됐습니다.<br>오른쪽 <b>고해상도 렌더링하기</b>를 한 번만 눌러 최종 이미지를 생성하세요.</div>');
+    updateFSLabels();
+  };
+  function shouldCombined(cat){return isFrontsideSelected() && isScreenCat(cat||((S()||{})._currentCatName));}
+  function wrap(name){
+    var old=window[name];
+    if(typeof old==='function' && !old.__ffFrontsideWrapped){
+      var fn=function(catName){
+        if(shouldCombined(catName)){
+          showCombinedPanel();
+          return;
+        }
+        return old.apply(this,arguments);
+      };
+      fn.__ffFrontsideWrapped=true;
+      window[name]=fn;
+    }
+  }
+  wrap('askStdColorDrop');
+  wrap('askColorTypeFirst');
+  wrap('ffEmergencyShowScreenColors');
+
+  function basename(src){src=String(src||'').split('?')[0].split('#')[0].replace(/\\/g,'/');return src.split('/').pop()||'';}
+  function guideForPayload(payload){
+    var file=basename(payload.screenImage||payload.deskImage||'');
+    if(!file)return './images/guides/frontside_guide.png';
+    return './images/guides/'+file.replace(/front_side/gi,'frontside').replace(/front-side/gi,'frontside');
+  }
+  function patchPayload(init){
+    try{
+      if(!init||!init.body)return init;
+      var payload=JSON.parse(init.body||'{}')||{};
+      var frontside=/frontside|front_side/i.test(String(payload.mode||payload.renderStep||payload.screenImage||payload.deskImage||''))||isFrontsideSelected();
+      if(!frontside)return init;
+      var v=currentFrontsideState();
+      payload.targetType='screen';
+      payload.productType='screen';
+      payload.mode='frontside-guide-material-mapping-clean-final';
+      payload.renderStep='frontside_screen_clean_final';
+      payload.guideImage=guideForPayload(payload);
+      payload.frontScreenCode=v.frontCode||payload.frontScreenCode||'';
+      payload.sideScreenCode=v.sideCode||payload.sideScreenCode||'';
+      payload.frontScreenTexture=v.frontTex||textureFor(payload.frontScreenCode,'front')||payload.frontScreenTexture||'';
+      payload.sideScreenTexture=v.sideTex||textureFor(payload.sideScreenCode,'side')||payload.sideScreenTexture||'';
+      if(payload.frontScreenTexture||payload.sideScreenTexture){
+        payload.screenTexture='';
+        payload.screenCode='';
+      }
+      console.log('[FF_FRONTSIDE_ONE_FLOW_RENDER_ONCE] patched payload', {
+        guideImage: payload.guideImage,
+        frontScreenCode: payload.frontScreenCode,
+        sideScreenCode: payload.sideScreenCode,
+        frontScreenTexture: payload.frontScreenTexture,
+        sideScreenTexture: payload.sideScreenTexture
+      });
+      init=Object.assign({},init,{body:JSON.stringify(payload)});
+    }catch(e){console.warn('[FF_FRONTSIDE_ONE_FLOW_RENDER_ONCE] payload patch failed',e);}
+    return init;
+  }
+  var prevFetch=window.fetch;
+  window.fetch=function(input,init){
+    var url=String(input||'');
+    if(url.indexOf('/api/generate-preview')>-1||url.indexOf('/api/generate-screen-preview')>-1){
+      init=patchPayload(init);
+    }
+    return prevFetch.call(this,input,init);
+  };
+
+  document.addEventListener('click',function(e){
+    if(e.target&&e.target.closest&&e.target.closest('.choice-btn,.confirm-btn,#send-btn')){
+      setTimeout(function(){ if(isFrontsideSelected() && !S()._frontsideCombinedReady) showCombinedPanel(); updateFSLabels(); },350);
+      setTimeout(function(){ if(isFrontsideSelected() && !S()._frontsideCombinedReady) showCombinedPanel(); updateFSLabels(); },1100);
+    }
+    if(e.target&&e.target.closest&&e.target.closest('#ff-clean-render-btn,#quick-ai-preview-btn')){
+      if(isFrontsideSelected()){
+        var v=currentFrontsideState();
+        if(!v.frontCode||!v.sideCode){
+          e.preventDefault();
+          e.stopPropagation();
+          showCombinedPanel();
+          if(typeof window.addMsg==='function')window.addMsg('bot','<span class="error-msg">전면+사이드 렌더링 전, 전면스크린/사이드스크린 재질을 모두 선택해주세요.</span>');
+          return false;
+        }
+      }
+    }
+  },true);
+
+  document.addEventListener('DOMContentLoaded',function(){
+    setTimeout(function(){ if(isFrontsideSelected()) showCombinedPanel(); updateFSLabels(); },800);
+  });
+})();
+</script>
+
