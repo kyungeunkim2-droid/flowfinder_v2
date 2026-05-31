@@ -17597,12 +17597,58 @@ html, body{ height:100vh !important; overflow:hidden !important; }
   function goSize(){
     try{
       window.state = window.state || {};
-      window.state._currentCatName = 'L형 스크린';
-      window.state.currentCatName = 'L형 스크린';
-      window.state.step = 'input_size';
+
+      var selected = [];
+      function add(v){
+        if(!v) return;
+        v = String(v).trim();
+        if(!v) return;
+        if(selected.indexOf(v) < 0) selected.push(v);
+      }
+
+      try{ (Array.isArray(_setSelected) ? _setSelected : []).forEach(add); }catch(e){}
+      try{ (Array.isArray(window._setSelected) ? window._setSelected : []).forEach(add); }catch(e){}
+
+      try{
+        var prod = (window.state.current && window.state.current.product) || window.state.product || '';
+        String(prod).split(/\s*\+\s*|\s*,\s*/).forEach(add);
+      }catch(e){}
+
+      try{
+        Array.prototype.slice.call(document.querySelectorAll('#set-product-selector .selected-set-card,[data-set-name].selected-set-card,#set-product-selector [aria-pressed="true"]')).forEach(function(el){
+          add(el.getAttribute('data-set-name') || (el.textContent || '').replace(/✓/g,'').trim());
+        });
+      }catch(e){}
+
+      var desks = (typeof DESK_ITEMS !== 'undefined' && DESK_ITEMS) ? DESK_ITEMS : ['일반형 데스크','덕트형 데스크'];
+      var screens = (typeof SCREEN_ITEMS !== 'undefined' && SCREEN_ITEMS) ? SCREEN_ITEMS : ['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+      var order = desks.concat(screens);
+      var ordered = order.filter(function(n){ return selected.indexOf(n) >= 0; });
+      if(ordered.indexOf('L형 스크린') < 0) ordered.push('L형 스크린');
+
+      window.state.selectedCategories = ordered;
+      window.state.currentCatIdx = 0;
+      window.state.current = window.state.current || {};
+      window.state.current.product = ordered.join(' + ');
+      try{ if(typeof updateCurrent === 'function') updateCurrent(); }catch(e){}
+
+      ['set-product-selector','set-composite-area','set-pegboard-note'].forEach(function(id){
+        var el = document.getElementById(id);
+        if(el) el.style.display = 'none';
+      });
+
+      if(!window.__ffLshapeSelectionEchoed){
+        window.__ffLshapeSelectionEchoed = true;
+        try{ if(typeof addMsg === 'function') addMsg('user', ordered.join(', ')); }catch(e){}
+      }
+
+      if(typeof window.processNextCategory === 'function') return window.processNextCategory();
+      if(typeof processNextCategory === 'function') return processNextCategory();
+
+      // fallback: only when the normal product flow function is unavailable
       if(typeof window.askSizeInput === 'function') return window.askSizeInput('L형 스크린');
       if(typeof askSizeInput === 'function') return askSizeInput('L형 스크린');
-    }catch(e){ console.warn('[STEP1_LSHAPE] go size failed', e); }
+    }catch(e){ console.warn('[STEP1_LSHAPE] go normal flow failed', e); }
   }
 
   document.addEventListener('click', function(e){
@@ -17642,6 +17688,412 @@ html, body{ height:100vh !important; overflow:hidden !important; }
   setInterval(removeDuplicateLshapeBoxes, 800);
   document.addEventListener('DOMContentLoaded', function(){ setTimeout(removeDuplicateLshapeBoxes, 300); });
   console.log('✅ FF STEP1 LSHAPE FLOW + LAYOUT FIX LOADED');
+})();
+</script>
+
+
+
+<!-- === FF STEP5: horizontal add-options + compact one-page final quote === -->
+<style id="ff-step5-options-quote-compact-css">
+  /* 추가옵션: 가로형 row로 정리 */
+  .ff100-options-card,
+  .ff101-options-card,
+  .ff102-options-card{
+    max-width:min(96%,820px)!important;
+    width:min(96%,820px)!important;
+    padding:16px!important;
+  }
+  .msg.bot .bubble:has(.ff100-options-card),
+  .msg.bot .bubble:has(.ff101-options-card),
+  .msg.bot .bubble:has(.ff102-options-card){
+    max-width:min(96%,860px)!important;
+    width:min(96%,860px)!important;
+  }
+  .ff100-option-list,
+  .ff101-option-list,
+  .ff102-option-list{
+    display:flex!important;
+    flex-direction:column!important;
+    gap:8px!important;
+  }
+  .ff100-option-row,
+  .ff101-option-row,
+  .ff102-option-row{
+    display:grid!important;
+    grid-template-columns:minmax(210px,1fr) 110px 132px!important;
+    align-items:center!important;
+    gap:10px!important;
+    min-height:68px!important;
+    padding:10px 12px!important;
+    border-radius:16px!important;
+    overflow:hidden!important;
+  }
+  .ff100-pick,
+  .ff101-pick,
+  .ff102-pick{
+    min-height:44px!important;
+    height:auto!important;
+    width:100%!important;
+    text-align:left!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    padding:9px 12px!important;
+    font-size:13px!important;
+    line-height:1.25!important;
+    white-space:normal!important;
+    word-break:keep-all!important;
+  }
+  .ff100-pick::before,
+  .ff101-pick::before,
+  .ff102-pick::before{
+    content:'+';
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:26px;
+    height:26px;
+    min-width:26px;
+    margin-right:9px;
+    border-radius:999px;
+    background:#2cf5d3;
+    color:#06111c;
+    font-weight:1000;
+    font-size:16px;
+  }
+  .ff100-option-row.active .ff100-pick::before,
+  .ff101-option-row.active .ff101-pick::before,
+  .ff102-option-row.active .ff102-pick::before{
+    content:'✓';
+  }
+  .ff100-field,
+  .ff101-field,
+  .ff102-field{
+    min-width:0!important;
+  }
+  .ff100-field label,
+  .ff101-field label,
+  .ff102-field label{
+    font-size:10px!important;
+    margin-bottom:4px!important;
+  }
+  .ff100-field select,
+  .ff101-field select,
+  .ff102-field select{
+    height:38px!important;
+    font-size:12px!important;
+    padding:0 8px!important;
+  }
+  .ff100-qty,
+  .ff101-qty,
+  .ff102-qty{
+    height:38px!important;
+    grid-template-columns:30px 1fr 30px!important;
+  }
+  .ff100-qty input,
+  .ff101-qty input,
+  .ff102-qty input{
+    font-size:13px!important;
+  }
+  .ff100-cat,
+  .ff101-cat,
+  .ff102-cat{
+    margin-top:12px!important;
+  }
+  .ff100-cat-title,
+  .ff101-cat-title,
+  .ff102-cat-title{
+    margin-bottom:7px!important;
+  }
+  .ff100-actions,
+  .ff101-actions,
+  .ff102-actions{
+    margin-top:14px!important;
+  }
+  @media(max-width:720px){
+    .ff100-option-row,
+    .ff101-option-row,
+    .ff102-option-row{
+      grid-template-columns:1fr!important;
+    }
+  }
+
+  /* 최종견적서: 스크롤 없는 compact 모달 */
+  .final-quote-modal{
+    align-items:flex-start!important;
+    justify-content:center!important;
+    padding:10px!important;
+    overflow:hidden!important;
+  }
+  .final-quote-modal .final-quote-wrap.ff-step5-quote-wrap{
+    width:min(940px,96vw)!important;
+    max-width:940px!important;
+    max-height:calc(100vh - 20px)!important;
+    overflow:hidden!important;
+    padding:14px!important;
+    border-radius:18px!important;
+    background:#f8fafc!important;
+    color:#0f172a!important;
+    box-shadow:0 24px 70px rgba(0,0,0,.42)!important;
+    transform:none!important;
+  }
+  .ff-step5-quote-wrap .final-quote-head{
+    padding-bottom:8px!important;
+    margin-bottom:10px!important;
+    border-bottom:1px solid #d7dee9!important;
+  }
+  .ff-step5-quote-wrap .final-quote-title{
+    font-size:18px!important;
+    color:#0b1b34!important;
+    margin-bottom:3px!important;
+  }
+  .ff-step5-quote-wrap .final-quote-meta{
+    font-size:10px!important;
+    line-height:1.45!important;
+    color:#64748b!important;
+  }
+  .ff-step5-quote-wrap .final-vat-badge{
+    padding:6px 10px!important;
+    font-size:10px!important;
+    background:#0b2a5b!important;
+    color:#fff!important;
+  }
+  .ff-step5-quote-hero{
+    display:grid!important;
+    grid-template-columns:1.35fr .65fr!important;
+    gap:12px!important;
+    margin-bottom:10px!important;
+  }
+  .ff-step5-render-card{
+    border:1px solid #d7dee9!important;
+    background:#fff!important;
+    border-radius:16px!important;
+    padding:10px!important;
+    min-height:210px!important;
+    max-height:250px!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    overflow:hidden!important;
+  }
+  .ff-step5-render-card img{
+    width:100%!important;
+    height:100%!important;
+    max-height:225px!important;
+    object-fit:contain!important;
+    display:block!important;
+  }
+  .ff-step5-render-empty{
+    color:#94a3b8!important;
+    font-size:12px!important;
+    text-align:center!important;
+    line-height:1.5!important;
+  }
+  .ff-step5-side-summary{
+    display:grid!important;
+    gap:8px!important;
+  }
+  .ff-step5-summary-box{
+    border:1px solid #d7dee9!important;
+    background:#fff!important;
+    border-radius:14px!important;
+    padding:10px!important;
+  }
+  .ff-step5-summary-box small{
+    display:block!important;
+    color:#64748b!important;
+    font-size:10px!important;
+    margin-bottom:4px!important;
+    font-weight:800!important;
+  }
+  .ff-step5-summary-box b{
+    display:block!important;
+    color:#0f172a!important;
+    font-size:15px!important;
+    line-height:1.25!important;
+  }
+  .ff-step5-section-grid{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:10px!important;
+    margin-bottom:10px!important;
+  }
+  .ff-step5-section{
+    border:1px solid #d7dee9!important;
+    background:#fff!important;
+    border-radius:14px!important;
+    padding:10px!important;
+    min-height:96px!important;
+  }
+  .ff-step5-section h4{
+    margin:0 0 8px!important;
+    color:#0b2a5b!important;
+    font-size:12px!important;
+    font-weight:1000!important;
+  }
+  .ff-step5-line{
+    display:flex!important;
+    align-items:flex-start!important;
+    justify-content:space-between!important;
+    gap:10px!important;
+    padding:3px 0!important;
+    border-bottom:1px solid #edf1f7!important;
+    font-size:11px!important;
+    color:#334155!important;
+  }
+  .ff-step5-line:last-child{border-bottom:0!important;}
+  .ff-step5-line span{color:#64748b!important;font-weight:800!important;min-width:58px!important;}
+  .ff-step5-line b{color:#0f172a!important;text-align:right!important;font-weight:900!important;}
+  .ff-step5-options-pill{
+    display:inline-flex!important;
+    align-items:center!important;
+    border:1px solid #d7dee9!important;
+    border-radius:999px!important;
+    padding:5px 8px!important;
+    margin:0 5px 5px 0!important;
+    font-size:10px!important;
+    color:#0f172a!important;
+    background:#f8fafc!important;
+    font-weight:800!important;
+  }
+  .ff-step5-total{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:space-between!important;
+    background:linear-gradient(135deg,#08245a,#0f766e)!important;
+    color:#fff!important;
+    border-radius:16px!important;
+    padding:12px 16px!important;
+    margin-top:8px!important;
+  }
+  .ff-step5-total span{font-size:13px!important;font-weight:1000!important;}
+  .ff-step5-total b{font-size:26px!important;letter-spacing:-.6px!important;color:#fff!important;}
+  .ff-step5-total small{display:block!important;font-size:9px!important;color:#dbeafe!important;text-align:right!important;margin-top:2px!important;}
+  .ff-step5-quote-wrap .final-actions{
+    display:none!important;
+  }
+  .ff-step5-quote-wrap .final-action-btn{
+    display:none!important;
+  }
+  @media(max-width:860px){
+    .ff-step5-quote-hero,
+    .ff-step5-section-grid{grid-template-columns:1fr!important;}
+    .final-quote-modal{overflow:auto!important;}
+    .final-quote-modal .final-quote-wrap.ff-step5-quote-wrap{max-height:none!important;}
+  }
+  @media print{
+    #final-quote-modal .ff-step5-quote-wrap{
+      width:190mm!important;
+      max-width:190mm!important;
+      max-height:none!important;
+      padding:7mm!important;
+      box-shadow:none!important;
+      border-radius:0!important;
+      background:#fff!important;
+    }
+    .ff-step5-render-card{max-height:62mm!important;min-height:50mm!important;}
+    .ff-step5-render-card img{max-height:58mm!important;}
+    .ff-step5-total b{font-size:22px!important;}
+  }
+</style>
+<script id="ff-step5-final-quote-compact-js">
+(function(){
+  if(window.__ffStep5QuoteCompactLoaded) return;
+  window.__ffStep5QuoteCompactLoaded = true;
+  function $(id){return document.getElementById(id);} 
+  function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function won(n){try{return (Number(n)||0).toLocaleString('ko-KR')+'원';}catch(e){return '0원';}}
+  function visibleSrc(img){
+    if(!img || !img.src) return '';
+    if(/^(about:blank)?$/.test(img.src)) return '';
+    var st=getComputedStyle(img);
+    if(st.display==='none' || st.visibility==='hidden' || img.offsetWidth===0 && img.offsetHeight===0) return '';
+    return img.src;
+  }
+  function canvasSrc(c){try{ if(c && c.width && c.height) return c.toDataURL('image/png'); }catch(e){} return '';}
+  function finalRenderSrc(){
+    var ids=['ff-clean-preview-img','ff-ai-live-img','product-preview-img','screen-composite-img'];
+    for(var i=0;i<ids.length;i++){ var s=visibleSrc($(ids[i])); if(s) return s; }
+    var q=document.querySelector('#quick-ai-preview-note.ai-result img, #quick-ai-preview-note img');
+    var qs=visibleSrc(q); if(qs) return qs;
+    var cs=canvasSrc($('ff-clean-preview-canvas')) || canvasSrc($('ff-hero-canvas')) || canvasSrc($('screen-composite-canvas'));
+    return cs || '';
+  }
+  function itemKind(item){
+    var p=String((item&&item.product)||'');
+    if(/스크린/.test(p)) return '스크린';
+    if(/데스크/.test(p)) return '데스크';
+    return '제품';
+  }
+  function collect(){
+    var st=window.state||{};
+    var items=(st.cartItems||[]).slice();
+    var total=items.reduce(function(s,i){return s+(Number(i&&i.finalPrice)||0);},0);
+    var products=items.map(function(i){return i.product||'제품';}).filter(Boolean);
+    var desk=items.find(function(i){return /데스크/.test(String(i.product||''));})||items[0]||{};
+    var screenItems=items.filter(function(i){return /스크린/.test(String(i.product||''));});
+    var allSize=items.map(function(i){
+      var v=[i.w&&('W'+i.w),i.d&&('D'+i.d),i.h&&('H'+i.h)].filter(Boolean).join(' × ');
+      return v?((i.product||'제품')+' '+v):'';
+    }).filter(Boolean).join(' / ') || '-';
+    var mat=[];
+    items.forEach(function(i){
+      if(i._deskTopColor) mat.push(['상판',i._deskTopColor]);
+      if(i._deskLegColor) mat.push(['다리',i._deskLegColor]);
+      if(i.color && /스크린/.test(String(i.product||''))) mat.push([i.product||'스크린',i.color]);
+      else if(i.screenColor) mat.push([i.product||'스크린',i.screenColor]);
+    });
+    var seen={}; mat=mat.filter(function(x){var k=x[0]+'|'+x[1]; if(seen[k]) return false; seen[k]=1; return true;});
+    var extra=(st.extraOptionItems||st.finalAddons||[]);
+    return {st:st,items:items,total:total,products:products,desk:desk,screenItems:screenItems,size:allSize,materials:mat,extra:extra};
+  }
+  window.showFinalQuote=function(){
+    var d=collect();
+    if(!d.items.length){ if(typeof addMsg==='function') addMsg('bot','선택된 항목이 없습니다.'); return; }
+    var today=new Date(), y=today.getFullYear(), m=String(today.getMonth()+1).padStart(2,'0'), day=String(today.getDate()).padStart(2,'0');
+    var img=finalRenderSrc();
+    var html='';
+    html+='<div class="final-quote-wrap ff-step5-quote-wrap">';
+    html+='<div class="final-quote-head"><div><div class="final-quote-title">최종 견적서</div><div class="final-quote-meta">견적번호: Q-'+y+'-'+String(d.items.length).padStart(4,'0')+'<br>작성일: '+y+'.'+m+'.'+day+' · 유효기간: 작성일로부터 7일</div></div><div class="final-vat-badge">VAT 별도</div></div>';
+    html+='<div class="ff-step5-quote-hero">';
+    html+='<div class="ff-step5-render-card">'+(img?'<img src="'+esc(img)+'" alt="최종 렌더링 이미지">':'<div class="ff-step5-render-empty">고해상도 렌더링 후<br>최종 렌더 이미지가 표시됩니다.</div>')+'</div>';
+    html+='<div class="ff-step5-side-summary">';
+    html+='<div class="ff-step5-summary-box"><small>제품 구성</small><b>'+esc(d.products.join(' + ')||'-')+'</b></div>';
+    html+='<div class="ff-step5-summary-box"><small>사이즈</small><b>'+esc(d.size)+'</b></div>';
+    html+='<div class="ff-step5-summary-box"><small>총 제품 수</small><b>'+d.items.length+'개</b></div>';
+    html+='</div></div>';
+    html+='<div class="ff-step5-section-grid">';
+    html+='<div class="ff-step5-section"><h4>01. 제품 정보</h4>';
+    d.items.forEach(function(item,idx){
+      var opts=[item.topShape,item.legLabel,item.casterType,item.rateLabel].filter(Boolean).join(' · ')||itemKind(item);
+      html+='<div class="ff-step5-line"><span>'+(idx+1)+'. '+esc(itemKind(item))+'</span><b>'+esc(item.product||'제품')+(opts?'<br><small>'+esc(opts)+'</small>':'')+'</b></div>';
+    });
+    html+='</div>';
+    html+='<div class="ff-step5-section"><h4>02. 선택 재질</h4>';
+    if(d.materials.length){
+      d.materials.forEach(function(x){ html+='<div class="ff-step5-line"><span>'+esc(x[0])+'</span><b>'+esc(x[1])+'</b></div>'; });
+    }else{
+      html+='<div class="ff-step5-line"><span>재질</span><b>선택값 없음</b></div>';
+    }
+    html+='</div></div>';
+    html+='<div class="ff-step5-section"><h4>03. 추가 옵션</h4>';
+    if(d.extra && d.extra.length){
+      d.extra.forEach(function(x){
+        if(typeof x==='string') html+='<span class="ff-step5-options-pill">'+esc(x)+'</span>';
+        else html+='<span class="ff-step5-options-pill">'+esc(x.name||x.category||'옵션')+(x.color?' · '+esc(x.color):'')+(x.qty?' · '+esc(x.qty)+'개':'')+'</span>';
+      });
+    }else{
+      html+='<span class="ff-step5-options-pill">추가 옵션 없음</span>';
+    }
+    html+='</div>';
+    html+='<div class="ff-step5-total"><span>총 견적 금액</span><div><b>'+won(d.total)+'</b><small>VAT 별도 · 배송/설치비 별도</small></div></div>';
+    html+='<div class="final-actions"><button class="final-action-btn primary" onclick="confirmFinalQuote&&confirmFinalQuote()">견적 확정</button><button class="final-action-btn" onclick="printFinalQuote&&printFinalQuote()">PDF 저장</button></div>';
+    html+='</div>';
+    var old=$('final-quote-modal'); if(old) old.remove();
+    var modal=document.createElement('div'); modal.id='final-quote-modal'; modal.className='final-quote-modal'; modal.innerHTML='<button class="final-modal-close" onclick="closeFinalQuoteModal&&closeFinalQuoteModal()" title="닫기">×</button>'+html; document.body.appendChild(modal);
+    if(window.state){ state.step='done'; }
+    if(typeof updateFlowBar==='function') updateFlowBar();
+  };
 })();
 </script>
 
