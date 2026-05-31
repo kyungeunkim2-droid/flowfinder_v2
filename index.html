@@ -6745,18 +6745,20 @@ function setPreviewGlow(part) {
     }
     if (btn) { btn.disabled = true; btn.textContent = '생성 중...'; }
     try {
+      var fixedDeskKey = state.deskPreviewKey || PREVIEW.deskKey;
+var fixedScreenKey = state.screenPreviewKey || PREVIEW.screenKey;
       var payload = {
-        deskImage: getBase(PREVIEW.deskKey),
+      deskImage: getBase(fixedDeskKey),
         topTexture: PREVIEW.topTex || '',
         legTexture: PREVIEW.legTex || '',
         topCode: PREVIEW.top || '',
         legCode: PREVIEW.leg || '',
         screenTexture: PREVIEW.screenTex || '',
-        screenImage: getBase(PREVIEW.screenKey) || '',
+     screenImage: getBase(fixedScreenKey) || '',
         screenCode: PREVIEW.screen || '',
         screenMaterialCode: (document.getElementById('quick-screen-code') && document.getElementById('quick-screen-code').textContent ? document.getElementById('quick-screen-code').textContent.trim() : ''),
         screenInstruction: '스크린에는 선택된 스크린 재질 이미지를 반드시 적용하세요.',
-        deskLabel: productLabel(PREVIEW.deskKey),
+      deskLabel: productLabel(fixedDeskKey),
         legType: (state.legType || ''),
         casterType: (state.casterType || ''),
         topShape: (state.topShape || ''),
@@ -12821,7 +12823,13 @@ ${map.move[move] || move}
     setSel(cur);
   };
   window.ff71PickProduct=window.ff90ToggleProduct;
-  window.ff71ConfirmProducts=function(){ if((window._setSelected||[]).length && typeof window.confirmSetSelection==='function') window.confirmSetSelection(); };
+window.ff71ConfirmProducts=function(){
+  if((window._setSelected||[]).length && typeof window.confirmSetSelection==='function') {
+    state.deskPreviewKey = PREVIEW.deskKey;
+    state.screenPreviewKey = PREVIEW.screenKey;
+    window.confirmSetSelection();
+  }
+};
   function refreshLeftProductButtons(){
     var sel=window._setSelected||[];
     document.querySelectorAll('.ff71-choice-btn[data-name]').forEach(function(btn){btn.classList.toggle('active',has(sel,btn.getAttribute('data-name')));});
