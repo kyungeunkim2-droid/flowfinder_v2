@@ -731,81 +731,6 @@ body.ff-dashboard-preview #preview-panel {
 .final-action-btn:hover{filter:brightness(1.15);}
 @media(max-width:760px){.final-summary-grid,.final-chip-grid,.final-info-grid{grid-template-columns:1fr}.final-quote-head,.final-total-box{flex-direction:column;align-items:flex-start}.final-total-box small{text-align:left}}
 
-  /* 최종견적서 A4 한눈에 보기 compact */
-.final-quote-wrap{
-  max-width:900px !important;
-  padding:14px !important;
-  margin:0 auto !important;
-  overflow:hidden !important;
-}
-
-.final-quote-head{
-  padding-bottom:8px !important;
-  margin-bottom:8px !important;
-}
-
-.final-quote-title{font-size:16px !important;}
-.final-quote-meta{font-size:10px !important;line-height:1.4 !important;}
-
-.final-summary-grid{
-  gap:8px !important;
-  margin-bottom:8px !important;
-}
-
-.final-summary-card{
-  padding:9px !important;
-  min-height:46px !important;
-}
-
-.final-summary-card b{font-size:13px !important;}
-
-.final-item-card{
-  padding:10px !important;
-  margin:8px 0 !important;
-}
-
-.final-chip-grid{
-  gap:6px !important;
-  margin-bottom:6px !important;
-}
-
-.final-chip-box{
-  padding:7px !important;
-  min-height:36px !important;
-}
-
-.final-chip-box b{font-size:10px !important;}
-
-.final-info-grid{
-  gap:8px !important;
-  margin:8px 0 !important;
-}
-
-.final-info-box{
-  padding:9px !important;
-}
-
-.final-info-box ul{
-  font-size:10px !important;
-  line-height:1.45 !important;
-}
-
-.final-total-box{
-  padding:11px 14px !important;
-  margin-top:8px !important;
-}
-
-.final-total-box b{font-size:22px !important;}
-
-.final-actions{
-  display:none !important;
-}
-
-/* 최종견적서 안 이미지 높이 제한 */
-.final-quote-wrap img{
-  max-height:220px !important;
-  object-fit:contain !important;
-}
 
 
 /* === Fixed27: readable layout + final quote full overlay === */
@@ -17359,9 +17284,6 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
 #ff71-selection-gallery img,
 #desk-option-preview img,
 #desk-option-images img{
-  min-height:260px !important;
-margin-bottom:24px !important;
-clear:both !important;
   max-height:130px !important;
   object-fit:contain !important;
 }
@@ -17377,6 +17299,35 @@ clear:both !important;
   #ff-clean-right-dashboard .ff-clean-info-grid{grid-template-columns:1fr !important;}
 }
 </style>
+<style id="ff-right-panel-one-order-final">
+#preview-panel{
+  display:flex !important;
+  flex-direction:column !important;
+}
+
+#set-product-selector{
+  order:1 !important;
+}
+
+#desk-option-images,
+#desk-option-preview,
+#desk-option-section{
+  order:2 !important;
+}
+
+#ff-clean-right-dashboard{
+  order:3 !important;
+}
+
+#texture-preview{
+  order:4 !important;
+}
+
+#total-box{
+  order:999 !important;
+}
+</style>
+
 
 
 <!-- === FF FINAL SAFE LAYOUT + FRONTSIDE + LSHAPE PATCH === -->
@@ -17570,131 +17521,165 @@ clear:both !important;
   console.log('✅ FF FINAL SAFE LAYOUT + FRONTSIDE + LSHAPE PATCH LOADED');
 })();
 </script>
-  <style id="ff-final-quote-one-page-compact">
-.final-quote-modal{
-  align-items:flex-start !important;
-  padding:10px !important;
-}
 
-.final-quote-modal .final-quote-wrap{
-  width:960px !important;
-  max-width:96vw !important;
-  max-height:96vh !important;
-  padding:14px !important;
-  overflow:hidden !important;
-  transform:scale(.92);
-  transform-origin:top center;
-}
 
-.final-quote-head{
-  padding-bottom:8px !important;
-  margin-bottom:8px !important;
-}
+<!-- === FF_FINAL_LSHAPE_CONFIRM_FLOW_PATCH === -->
+<script id="ff-final-lshape-confirm-flow-patch">
+(function(){
+  if(window.__ffFinalLshapeConfirmFlowPatch) return;
+  window.__ffFinalLshapeConfirmFlowPatch = true;
 
-.final-quote-title{
-  font-size:16px !important;
-  margin-bottom:4px !important;
-}
+  function txt(el){ return String(el && (el.textContent || el.innerText) || '').trim(); }
+  function hasLshapeText(v){ return /L\s*형|L형|lshape/i.test(String(v||'')); }
+  function selectedText(){
+    var arr=[];
+    try{ if(window.state){ Object.keys(window.state).forEach(function(k){ var v=window.state[k]; if(typeof v==='string') arr.push(v); }); } }catch(e){}
+    try{ if(Array.isArray(window._setSelected)) arr=arr.concat(window._setSelected); }catch(e){}
+    try{ Array.prototype.slice.call(document.querySelectorAll('.selected,.multi-selected,.selected-set-card,[aria-pressed="true"]')).forEach(function(el){ arr.push(txt(el)); }); }catch(e){}
+    return arr.join(' ');
+  }
+  function lshapeSelected(){ return hasLshapeText(selectedText()); }
+  function removeExistingLshapePrompt(){
+    Array.prototype.slice.call(document.querySelectorAll('.msg.bot .bubble')).forEach(function(b){
+      if(/L형\s*방향을\s*선택해주세요/.test(txt(b))){
+        var m=b.closest('.msg'); if(m) m.remove();
+      }
+    });
+  }
+  function addBot(html){
+    if(typeof window.addMsg==='function'){
+      try{ window.addMsg('bot', html); return; }catch(e){}
+    }
+    var messages=document.getElementById('messages'); if(!messages) return;
+    var row=document.createElement('div'); row.className='msg bot';
+    row.innerHTML='<div class="bot-icon">AI</div><div class="bubble">'+html+'</div>';
+    messages.appendChild(row); messages.scrollTop=messages.scrollHeight;
+  }
+  function showLshapePrompt(){
+    removeExistingLshapePrompt();
+    window.__ffAllowLshapePrompt = true;
+    window.__ffAskedLshapeDirection = true;
+    addBot('L형 방향을 선택해주세요.<div class="btn-group ff-lshape-direction-box"><button type="button" class="choice-btn ff-lshape-dir" data-dir="left">좌측 L형</button><button type="button" class="choice-btn ff-lshape-dir" data-dir="right">우측 L형</button></div><div style="margin-top:12px"><button type="button" class="choice-btn ff-lshape-confirm" disabled>선택 완료</button></div><span class="hint">좌측/우측을 선택한 뒤 <b>선택 완료</b>를 눌러주세요.</span>');
+  }
+  function currentLshapeCat(){
+    var s=window.state || {};
+    var cands=[s._currentCatName, s.currentCatName, s.screenLabel, s.screenType, s.screenKey, s.current && s.current.product, s.current && s.current.name];
+    for(var i=0;i<cands.length;i++){ if(hasLshapeText(cands[i])) return 'L형 스크린'; }
+    return 'L형 스크린';
+  }
+  function goAfterLshapeDirection(){
+    var cat=currentLshapeCat();
+    try{ if(typeof window.updateCurrent==='function') window.updateCurrent(); }catch(e){}
+    try{ if(typeof window.updateFlowBar==='function') window.updateFlowBar(); }catch(e){}
+    if(typeof window.askSizeInput==='function'){
+      window.askSizeInput(cat);
+      return;
+    }
+    if(typeof askSizeInput==='function'){
+      askSizeInput(cat);
+      return;
+    }
+  }
+  function applyDirection(dir){
+    dir = dir === 'right' ? 'right' : 'left';
+    window.__ffLshapeDirection = dir;
+    window.__ffPendingLshapeDirection = dir;
+    window.state = window.state || {};
+    window.state.screenKey = dir === 'right' ? 'lshape_R' : 'lshape';
+    window.state.selectedScreenKey = window.state.screenKey;
+    window.state.currentScreenKey = window.state.screenKey;
+    window.state.screenType = window.state.screenKey;
+    window.state.screenLabel = dir === 'right' ? 'L형 스크린(우측)' : 'L형 스크린';
+    window.state._currentCatName = 'L형 스크린';
+    window.state.currentCatName = 'L형 스크린';
+    if(typeof window.ffApplyLshapeDirectionToPreviewKey === 'function'){
+      try{ window.ffApplyLshapeDirectionToPreviewKey(dir); }catch(e){}
+    }
+  }
+  function isProductConfirm(btn){
+    if(!btn) return false;
+    if(btn.classList && (btn.classList.contains('ff-lshape-confirm') || btn.classList.contains('ff-lshape-dir'))) return false;
+    var id=btn.id || '';
+    var t=txt(btn);
+    if(/set-confirm-btn|ff71-confirm-btn|product-preview-confirm/.test(id)) return true;
+    if(btn.classList && btn.classList.contains('product-confirm-btn')) return true;
+    if(/옵션\s*선택\s*완료|선택\s*완료|선택완료/.test(t)){
+      var bubble=btn.closest && btn.closest('.bubble');
+      var inLshapePrompt=bubble && /L형\s*방향을\s*선택해주세요/.test(txt(bubble));
+      if(!inLshapePrompt) return true;
+    }
+    return false;
+  }
+  function relabelProductConfirm(){
+    if(!lshapeSelected()) return;
+    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,.confirm-btn')).forEach(function(btn){
+      if(btn.classList && (btn.classList.contains('ff-lshape-confirm') || btn.classList.contains('ff-lshape-dir'))) return;
+      if(/옵션\s*선택\s*완료/.test(txt(btn))){ btn.textContent='선택완료'; }
+    });
+  }
+  function hideRightLshapeProductButton(){
+    Array.prototype.slice.call(document.querySelectorAll('button,.choice-btn,[data-set-name]')).forEach(function(el){
+      if(/L형\s*스크린\s*R|L형\s*스크린\s*\(우측\)|L형스크린\s*R|L형스크린\s*\(우측\)/i.test(txt(el))){
+        el.style.display='none';
+        el.setAttribute('aria-hidden','true');
+      }
+    });
+  }
 
-.final-quote-meta{
-  font-size:10px !important;
-  line-height:1.4 !important;
-}
+  document.addEventListener('click', function(e){
+    var btn=e.target && e.target.closest && e.target.closest('button,.choice-btn,.confirm-btn,[data-set-name]');
+    if(!btn) return;
+    var t=txt(btn);
 
-.final-summary-grid{
-  grid-template-columns:repeat(3,1fr) !important;
-  gap:8px !important;
-  margin-bottom:8px !important;
-}
+    if(/L형\s*스크린/.test(t) && !/우측|오른쪽|\(우측\)|R\b/i.test(t)){
+      window.__ffNeedAskLshapeAfterSetConfirm = true;
+      window.__ffAllowLshapePrompt = false;
+      removeExistingLshapePrompt();
+      setTimeout(relabelProductConfirm, 30);
+    }
 
-.final-summary-card{
-  padding:9px !important;
-  min-height:48px !important;
-}
+    if(btn.classList && btn.classList.contains('ff-lshape-dir')){
+      if(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+      var dir=btn.getAttribute('data-dir')==='right' ? 'right' : 'left';
+      window.__ffPendingLshapeDirection=dir;
+      var box=btn.closest('.bubble') || document;
+      Array.prototype.slice.call(box.querySelectorAll('.ff-lshape-dir')).forEach(function(x){ x.classList.remove('selected'); });
+      btn.classList.add('selected');
+      var confirm=box.querySelector('.ff-lshape-confirm');
+      if(confirm) confirm.disabled=false;
+      return false;
+    }
 
-.final-summary-card small{
-  font-size:9px !important;
-  margin-bottom:3px !important;
-}
+    if(btn.classList && btn.classList.contains('ff-lshape-confirm')){
+      if(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+      applyDirection(window.__ffPendingLshapeDirection || window.__ffLshapeDirection || 'left');
+      btn.classList.add('selected');
+      btn.disabled=true;
+      btn.textContent='선택 완료';
+      window.__ffNeedAskLshapeAfterSetConfirm=false;
+      setTimeout(function(){ goAfterLshapeDirection(); }, 80);
+      return false;
+    }
 
-.final-summary-card b{
-  font-size:13px !important;
-}
+    if(isProductConfirm(btn) && lshapeSelected()){
+      if(e){ e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); }
+      window.__ffNeedAskLshapeAfterSetConfirm=false;
+      setTimeout(showLshapePrompt, 80);
+      return false;
+    }
+  }, true);
 
-.final-item-card{
-  padding:10px 12px !important;
-  margin:8px 0 !important;
-}
+  document.addEventListener('click', function(){ setTimeout(function(){ relabelProductConfirm(); hideRightLshapeProductButton(); }, 60); }, true);
+  document.addEventListener('DOMContentLoaded', function(){
+    hideRightLshapeProductButton();
+    relabelProductConfirm();
+    var mo=new MutationObserver(function(){ hideRightLshapeProductButton(); relabelProductConfirm(); });
+    mo.observe(document.documentElement, {childList:true, subtree:true, characterData:true});
+  });
 
-.final-item-top{
-  margin-bottom:6px !important;
-}
-
-.final-item-name,
-.final-item-price{
-  font-size:13px !important;
-}
-
-.final-chip-grid{
-  grid-template-columns:repeat(4,1fr) !important;
-  gap:6px !important;
-  margin-bottom:6px !important;
-}
-
-.final-chip-box{
-  padding:7px 8px !important;
-  min-height:38px !important;
-}
-
-.final-chip-box small{
-  font-size:8px !important;
-  margin-bottom:3px !important;
-}
-
-.final-chip-box b{
-  font-size:10px !important;
-}
-
-.final-info-grid{
-  gap:8px !important;
-  margin:8px 0 !important;
-}
-
-.final-info-box{
-  padding:9px !important;
-}
-
-.final-info-box h4{
-  font-size:11px !important;
-  margin-bottom:4px !important;
-}
-
-.final-info-box ul{
-  font-size:10px !important;
-  line-height:1.45 !important;
-}
-
-.final-total-box{
-  padding:11px 14px !important;
-  margin-top:8px !important;
-}
-
-.final-total-box span{
-  font-size:12px !important;
-}
-
-.final-total-box b{
-  font-size:22px !important;
-}
-
-.final-total-box small{
-  font-size:9px !important;
-}
-
-.final-actions{
-  display:none !important;
-}
-</style>
+  console.log('✅ FF FINAL LSHAPE CONFIRM FLOW PATCH LOADED');
+})();
+</script>
 </body>
 
 
