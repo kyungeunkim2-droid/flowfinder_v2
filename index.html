@@ -17143,7 +17143,7 @@ window.showPanel = function(){
       throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택한 뒤 최종 렌더링해야 합니다.');
     }
 
-const finalScreenTexture = screenTexture || scrTex;
+const finalScreenTexture = screenTexture;
 
 if(hasScreen() && !isFrontside && !finalScreenTexture){
   throw new Error('스크린 재질을 먼저 선택해야 합니다.');
@@ -24967,9 +24967,9 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     if(frontside && (!fs.front || !fs.side)){
       throw new Error('전면+사이드는 전면 재질과 사이드 재질을 각각 모두 선택해야 합니다.');
     }
-   const finalScreenTexture = screenTexture || scrTex;
+   const finalScreenTexture = scrTex;
 
-if(hasScreen() && !isFrontside && !finalScreenTexture){
+if(hasScreen() && !frontside && !finalScreenTexture){
   throw new Error('스크린 재질을 먼저 선택해야 합니다.');
 }
     return {
