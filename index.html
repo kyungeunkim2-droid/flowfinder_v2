@@ -8760,9 +8760,11 @@ input[type="number"]::placeholder,#user-input::placeholder{color:#6d8f89!importa
     if(!m || !code) return '';
     function find(list){
       if(!Array.isArray(list)) return '';
-      for(var i=0;i<list.length;i++){
-        if(String(list[i].code||'').toUpperCase() === code) return list[i].file || '';
-      }
+     for(var i=0;i<list.length;i++){
+  var item = list[i];
+  if(!item) continue;
+  if(String(item.code || '').toUpperCase() === code) return item.file || '';
+}
       return '';
     }
     if(part === 'leg') return find((m.leg && m.leg.standard || []).concat(m.leg && m.leg.custom || []));
@@ -12870,7 +12872,23 @@ ${map.move[move] || move}
     var topColors=isCustom ? (window.CUSTOM_VENEER_COLORS_DESK||[]) : ((window.DESK_TOP_COLORS&&DESK_TOP_COLORS[catName])||['WW','WWK','OCY','HW']);
     var legColors=isCustom ? (window.CUSTOM_LEG_COLORS||[]) : ((window.DESK_LEG_COLORS&&DESK_LEG_COLORS[catName])||['WW','DSG','BKM']);
     var uid=Date.now(), topId='desk-top-sel-'+uid, legId='desk-leg-sel-'+uid;
-    function btnGroup(arr,inputId,part){var h='<div class="material-button-group">';(arr||[]).forEach(function(c){h+=window.ffMaterialBtnHtml?ffMaterialBtnHtml(c,inputId,part,catName):'<button type="button" class="material-btn" onclick="document.getElementById(\''+inputId+'\').value=\''+c+'\'">'+c+'</button>';});return h+'</div>';}
+  function btnGroup(arr,inputId,part,catName){
+  arr=(arr||[]).filter(function(c){
+    return c !== undefined && c !== null && String(c).trim() !== '';
+  });
+
+  var h='<div class="material-button-group">';
+
+  arr.forEach(function(c){
+    if(window.ffMaterialBtnHtml){
+      h+=ffMaterialBtnHtml(c,inputId,part,catName);
+    }else{
+      h+='<button type="button" class="material-btn" onclick="document.getElementById(\''+inputId+'\').value=\''+c+'\'">'+c+'</button>';
+    }
+  });
+
+  return h+'</div>';
+}
     var topHtml='';
 if(isCustom){
 
