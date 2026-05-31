@@ -3618,7 +3618,7 @@ var USER_CATEGORIES = {
   'L형 페그보드':  { type: 'unit', keys: ['L형 페그보드 (L)', 'L형 페그보드 (R)'], isPegboard: true },
 };
 
-var QUICK_PRODUCTS = ['일반형 데스크', '덕트형 데스크', '전면 스크린', '사이드 스크린', '일자형 스크린', 'L형 스크린'];
+var QUICK_PRODUCTS = ['일반형 데스크', '덕트형 데스크', '전면 스크린', '사이드 스크린', '일자형 스크린', 'L형 스크린', 'L형 스크린(우측)'];
 
 var state = {
   step: 'init', type: null,
@@ -4943,7 +4943,7 @@ var _previewCallback = null;
 var _previewSelected = null;
 
 // PRODUCT_THUMBS는 아래 다이어그램 섹션에 정의됨
-var UNIT_PRODUCTS = ['일반형 데스크', '덕트형 데스크', '전면 스크린', '사이드 스크린', '일자형 스크린', 'L형 스크린'];
+var UNIT_PRODUCTS = ['일반형 데스크', '덕트형 데스크', '전면 스크린', '사이드 스크린', '일자형 스크린', 'L형 스크린', 'L형 스크린(우측)'];
 
 function showProductPreview(label, callback, allBtns) {
   _previewSelected = label;
@@ -6638,7 +6638,7 @@ function setPreviewGlow(part) {
     return '';
   }
   function productLabel(key){
-    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[key] || '-';
+    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[key] || '-';
   }
   function getBase(key){
     var m = window.FlowFinderMaskPreview && FlowFinderMaskPreview.manifest;
@@ -6936,8 +6936,8 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
     lshape:'https://planning-cdn.fursys.com/upload/product_info/1054/931/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774261195654'
   };
   function $(id){ return document.getElementById(id); }
-  function labelFor(k){ return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[k] || '-'; }
-  function catFor(k){ return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[k] || ''; }
+  function labelFor(k){ return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[k] || '-'; }
+  function catFor(k){ return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[k] || ''; }
   function ready(img){ return img && img.complete && img.naturalWidth > 0 && !img.__err; }
   window.FlowFinderImageCache = window.FlowFinderImageCache || {};
   function img(url, silent){
@@ -7699,7 +7699,7 @@ body.ff-dashboard-preview #preview-panel{
   function $(id){ return document.getElementById(id); }
   function pv(){ return (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {}; }
   function labelFor(key){
-    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[key] || '-';
+    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[key] || '-';
   }
   function moneyText(){ var el=$('total-price-display'); return el ? (el.textContent || '0원') : '0원'; }
   function heroKey(){
@@ -7857,7 +7857,7 @@ body.ff-dashboard-preview #preview-panel{
     lshape:'https://planning-cdn.fursys.com/upload/product_info/1054/931/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774261195654'
   };
   function labelFor(key){
-    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[key] || '-';
+    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[key] || '-';
   }
   function localProductImage(key){ return window.ffPreviewImageForKey ? window.ffPreviewImageForKey(key) : ''; }
   function localMaskPath(key, name){
@@ -10164,7 +10164,8 @@ button.material-btn{
   function $(id){return document.getElementById(id);} 
   function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
   var PRODUCT_IMG={
-    '일반형 데스크':'./images/previews/desk_standard/round_caster_round.png','덕트형 데스크':'./images/previews/desk_duct/round_caster_round.png','전면 스크린':'./images/previews/desk_standard/round_caster_round_front.png','사이드 스크린':'./images/previews/desk_standard/round_caster_round_side.png','일자형 스크린':'./images/previews/desk_standard/round_caster_round_straight.png','L형 스크린':'./images/previews/desk_standard/round_caster_round_lshape.png'
+    '일반형 데스크':'./images/previews/desk_standard/round_caster_round.png','덕트형 데스크':'./images/previews/desk_duct/round_caster_round.png','전면 스크린':'./images/previews/desk_standard/round_caster_round_front.png','사이드 스크린':'./images/previews/desk_standard/round_caster_round_side.png','일자형 스크린':'./images/previews/desk_standard/round_caster_round_straight.png','L형 스크린':'./images/previews/desk_standard/round_caster_round_lshape.png',
+  'L형 스크린(우측)':'./images/previews/desk_standard/round_caster_round_lshape_R.png'
   };
  var OPTION_IMG={
   leg:{
@@ -11947,7 +11948,7 @@ button.material-btn{
   }
   function getManifest(){return window.FlowFinderMaskPreview && window.FlowFinderMaskPreview.manifest;}
   function getPreview(){return (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};}
-  function catFor(k){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[k]||'';}
+  function catFor(k){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[k]||'';}
   function fallback(code){try{return colorFallback(String(code||'').replace(/^LEG_/,'').toUpperCase());}catch(e){return '#b8b8b8';}}
   function texFor(code,cat,part){
     if(!code) return '';
@@ -12099,7 +12100,7 @@ button.material-btn{
     return '';
   }
   function labelForKey(key){
-    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[key] || key || '';
+    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[key] || key || '';
   }
   function productImage(key){ return window.ffPreviewImageForKey ? window.ffPreviewImageForKey(key) : ''; }
   function currentCat(){return (appState()._currentCatName || appState().product || (appState().current&&appState().current.product) || '');}
@@ -12317,7 +12318,7 @@ ${map.move[move] || move}
   }
   function productImage(key){ return window.ffPreviewImageForKey ? window.ffPreviewImageForKey(key) : ''; }
   function labelForKey(key){
-    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[key] || key || '';
+    return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[key] || key || '';
   }
   function selectedDeskKey(){
     var s=mergedState();
@@ -12745,9 +12746,9 @@ ${map.move[move] || move}
   function S(){return window.state||{};}
   function has(arr,v){return arr.indexOf(v)>-1;}
   var DESKS=['일반형 데스크','덕트형 데스크'];
-  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린','L형 스크린(우측)'];
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
-  var SINGLE=['일자형 스크린','L형 스크린'];
+  var SINGLE=['일자형 스크린','L형 스크린','L형 스크린(우측)'];
  function normLeg(v){
 
   v = String(v || '').toLowerCase();
@@ -14467,6 +14468,7 @@ function screenKind(cat){
 
   if(/사이드|side/i.test(cat)) return 'side';
   if(/일자|straight/i.test(cat)) return 'straight';
+  if(/우측|오른쪽|right|lshape_R/i.test(cat)) return 'lshape_R';
   if(/L형|ㄴ형|엘|lshape/i.test(cat)) return 'lshape';
   if(/전면|front/i.test(cat)) return 'front';
 
@@ -14482,6 +14484,7 @@ function screenKind(cat){
 
   if(/사이드|side/i.test(raw)) return 'side';
   if(/일자|straight/i.test(raw)) return 'straight';
+  if(/우측|오른쪽|right|lshape_R/i.test(raw)) return 'lshape_R';
   if(/L형|ㄴ형|엘|lshape/i.test(raw)) return 'lshape';
   if(/전면|front/i.test(raw)) return 'front';
 
@@ -16567,6 +16570,50 @@ window.showPanel = function(){
 })();
 </script>
 
+
+
+<!-- === FF_LSHAPE_R_AND_PREVIEW_PATH_UNIFIER === -->
+<script id="ff-lshape-r-preview-path-unifier">
+(function(){
+  if(window.__ffLshapeRPreviewPathUnifier) return;
+  window.__ffLshapeRPreviewPathUnifier = true;
+  function S(){ return window.state || window.appState || {}; }
+  function txt(){
+    var s=S();
+    return String((s.current&&s.current.product)||s.product||s.screenLabel||s._currentCatName||s.screenKey||s.selectedScreenKey||s.currentScreenKey||'');
+  }
+  function normKey(key){
+    key=String(key||'').replace(/^screen_/,'').trim();
+    var raw=key || txt();
+    if(/frontside|front_side/i.test(raw)) return 'frontside';
+    if(/lshape_R|우측|오른쪽|right/i.test(raw)) return 'lshape_R';
+    if(/lshape|L형|l형|ㄴ형|엘/i.test(raw)) return 'lshape';
+    if(/straight|일자/i.test(raw)) return 'straight';
+    if(/side|사이드/i.test(raw)) return 'side';
+    if(/front|전면/i.test(raw)) return 'front';
+    return key;
+  }
+  function legKey(v){ v=String(v||''); if(/원형|round/i.test(v)) return 'round'; if(/A자|A형|aframe|에이/i.test(v)) return 'aframe'; return 'ladder'; }
+  function moveKey(v){ v=String(v||''); return /캐스터|caster/i.test(v) ? 'caster' : 'glide'; }
+  function topKey(v){ v=String(v||''); return /라운드|round/i.test(v) ? 'round' : 'rect'; }
+  function folder(){ var s=S(); var raw=String((s.current&&s.current.product)||s.product||s.deskLabel||''); return /덕트|duct/i.test(raw) ? 'desk_duct' : 'desk_standard'; }
+  function baseName(){ var s=S(); return [legKey(s.legType||s.legShape), moveKey(s.casterType||s.mobility), topKey(s.topShape)].join('_'); }
+  function previewPathFor(key){
+    key=String(key||'').trim();
+    if(/^images\/|^\.\/images\//.test(key)) return key;
+    if(key==='desk_standard') return './images/previews/desk_standard/'+baseName()+'.png';
+    if(key==='desk_duct') return './images/previews/desk_duct/'+baseName()+'.png';
+    var suffix=normKey(key);
+    var name=baseName();
+    if(['front','side','straight','lshape','lshape_R','frontside'].indexOf(suffix)>=0) name += '_' + suffix;
+    return './images/previews/' + folder() + '/' + name + '.png';
+  }
+  window.ffPreviewImageForKey = previewPathFor;
+  window.productImage = previewPathFor;
+  window.ffNormalizeScreenKey = normKey;
+})();
+</script>
+
 </body>
 
 
@@ -17975,7 +18022,7 @@ button.material-btn{
 (function(){
   function $(id){return document.getElementById(id);}
   function pv(){return (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};}
-  function productLabel(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린'})[key] || '-';}
+  function productLabel(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',front:'전면 스크린',side:'사이드 스크린',straight:'일자형 스크린',lshape:'L형 스크린',lshape_R:'L형 스크린(우측)'})[key] || '-';}
   function localProductImage(key){return key ? ((window.ffPreviewImageForKey ? window.ffPreviewImageForKey(key) : '')) : '';}
   function cleanUrl(url){return url || '';}
   function hideMaterialProductImages(){
@@ -18530,9 +18577,9 @@ button.material-btn{
 <script id="ff90-final-request-js">
 (function(){
   var DESKS=['일반형 데스크','덕트형 데스크'];
-  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린','L형 스크린(우측)'];
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
-  var SINGLE = ['일자형 스크린', 'L형 스크린'];
+  var SINGLE = ['일자형 스크린', 'L형 스크린', 'L형 스크린(우측)'];
 
 var PRODUCT_IMG = {
   '일반형 데스크':'./images/previews/desk_standard/round_caster_round.png',
@@ -18540,7 +18587,8 @@ var PRODUCT_IMG = {
   '전면 스크린':'./images/previews/desk_standard/round_caster_round_front.png',
   '사이드 스크린':'./images/previews/desk_standard/round_caster_round_side.png',
   '일자형 스크린':'./images/previews/desk_standard/round_caster_round_straight.png',
-  'L형 스크린':'./images/previews/desk_standard/round_caster_round_lshape.png'
+  'L형 스크린':'./images/previews/desk_standard/round_caster_round_lshape.png',
+  'L형 스크린(우측)':'./images/previews/desk_standard/round_caster_round_lshape_R.png'
 };
 
 var OPTION_IMG = {
@@ -18840,16 +18888,17 @@ var OPTION_IMG = {
 <script id="ff93-unified-summary-js">
 (function(){
   var DESKS=['일반형 데스크','덕트형 데스크'];
-  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린','L형 스크린(우측)'];
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
-  var SINGLE=['일자형 스크린','L형 스크린'];
+  var SINGLE=['일자형 스크린','L형 스크린','L형 스크린(우측)'];
   var PRODUCT_IMG={
     '일반형 데스크':'./images/previews/desk_standard/round_caster_round.png',
     '덕트형 데스크':'./images/previews/desk_duct/round_caster_round.png',
     '전면 스크린':'./images/previews/desk_standard/round_caster_round_front.png',
     '사이드 스크린':'./images/previews/desk_standard/round_caster_round_side.png',
     '일자형 스크린':'./images/previews/desk_standard/round_caster_round_straight.png',
-    'L형 스크린':'./images/previews/desk_standard/round_caster_round_lshape.png'
+    'L형 스크린':'./images/previews/desk_standard/round_caster_round_lshape.png',
+  'L형 스크린(우측)':'./images/previews/desk_standard/round_caster_round_lshape_R.png'
   };
  var OPTION_IMG={
   leg:{
@@ -19024,9 +19073,9 @@ var OPTION_IMG = {
 <script id="ff95-no-selected-product-gallery-js">
 (function(){
   var DESKS=['일반형 데스크','덕트형 데스크'];
-  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린','L형 스크린(우측)'];
   var FRONT_SIDE=['전면 스크린','사이드 스크린'];
-  var SINGLE=['일자형 스크린','L형 스크린'];
+  var SINGLE=['일자형 스크린','L형 스크린','L형 스크린(우측)'];
   function $(id){return document.getElementById(id);}
   function has(arr,v){return (arr||[]).indexOf(v)>-1;}
   function orderSelection(arr){return DESKS.concat(SCREENS).filter(function(n){return has(arr,n);});}
@@ -19143,7 +19192,7 @@ var OPTION_IMG = {
 <script id="ff96-option-step-js">
 (function(){
   var DESKS=['일반형 데스크','덕트형 데스크'];
-  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+  var SCREENS=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린','L형 스크린(우측)'];
   function has(a,v){return (a||[]).indexOf(v)>-1;}
   function hasDesk(sel){return DESKS.some(function(x){return has(sel,x);});}
   function hasScreen(sel){return SCREENS.some(function(x){return has(sel,x);});}
@@ -19303,7 +19352,7 @@ var OPTION_IMG = {
   window.ff71ConfirmProducts=function(){
     var sel=(window._setSelected||[]).slice();
     var desks=['일반형 데스크','덕트형 데스크'];
-    var screens=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린'];
+    var screens=['전면 스크린','사이드 스크린','일자형 스크린','L형 스크린','L형 스크린(우측)'];
     function hasAny(list){ return list.some(function(x){ return sel.indexOf(x)>-1; }); }
     if(!sel.length) return false;
     if(!hasAny(desks) || !hasAny(screens)){
@@ -20876,6 +20925,7 @@ var OPTION_IMG = {
     var s=st(); var p=String((s.current&&s.current.product)||s.product||s.screenLabel||s._currentCatName||'');
     if(p.indexOf('사이드')>-1) return 'side';
     if(p.indexOf('일자')>-1) return 'straight';
+    if(p.indexOf('우측')>-1 || p.indexOf('오른쪽')>-1 || /lshape_R|right/i.test(p)) return 'lshape_R';
     if(p.indexOf('L')>-1 || p.indexOf('엘')>-1) return 'lshape';
     return 'front';
   }
@@ -20886,6 +20936,7 @@ function productImage(key){
   if (key === 'side') key = 'side';
   if (key === 'straight') key = 'straight';
   if (key === 'lshape') key = 'lshape';
+  if (key === 'lshape_R' || key === 'screen_lshape_R') key = 'lshape_R';
   if (key === 'frontside' || key === 'front_side') key = 'frontside';
 
   if (key === 'desk_standard') {
@@ -20896,13 +20947,13 @@ function productImage(key){
     return './images/previews/desk_duct/round_caster_round.png';
   }
 
-  if (['front','side','straight','lshape','frontside'].includes(key)) {
+  if (['front','side','straight','lshape','lshape_R','frontside'].includes(key)) {
     return './images/previews/desk_standard/round_caster_round_' + key + '.png';
   }
 
   return key ? './images/previews/desk_standard/round_caster_round.png' : '';
 }
-  function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린'})[key]||key;}
+  function labelForKey(key){return ({desk_standard:'일반형 데스크',desk_duct:'덕트형 데스크',screen_front:'전면 스크린',screen_side:'사이드 스크린',screen_straight:'일자형 스크린',screen_lshape:'L형 스크린',screen_lshape_R:'L형 스크린(우측)'})[key]||key;}
   function materialState(){
     var s=st();
     return {
@@ -21394,6 +21445,7 @@ if(hasFront && hasSide) screen = 'frontside';
 else if(hasFront) screen = 'front';
 else if(hasSide) screen = 'side';
 else if(/일자/.test(raw)) screen = 'straight';
+else if(/우측|오른쪽|right|lshape_R/.test(raw)) screen = 'lshape_R';
 else if(/L형|ㄴ형/.test(raw)) screen = 'lshape';
     var arr=[];
     
@@ -21691,6 +21743,7 @@ arr.push(
     if(hasFront) return 'front';
     if(hasSide) return 'side';
     if(/일자|straight/i.test(raw)) return 'straight';
+    if(/우측|오른쪽|right|lshape_R/i.test(raw)) return 'lshape_R';
     if(/L형|ㄴ형|lshape|l-shape/i.test(raw)) return 'lshape';
     return '';
   }
@@ -21729,6 +21782,7 @@ arr.push(
     var sk = screenKey();
     var cat = '';
     if(sk === 'straight') cat = '일자형 스크린';
+    else if(sk === 'lshape_R') cat = 'L형 스크린(우측)';
     else if(sk === 'lshape') cat = 'L형 스크린';
     else if(sk === 'side') cat = '사이드 스크린';
     else if(sk === 'front' || sk === 'frontside') cat = '전면 스크린';
@@ -23340,12 +23394,13 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       screen_side:'side',
       screen_straight:'straight',
       screen_lshape:'lshape',
+      screen_lshape_R:'lshape_R',
       front_side:'frontside'
     };
     return map[key] || key;
   }
   function selectedText(){ return String((window._setSelected || []).join(' ')); }
-  function isScreenText(v){ return /스크린|screen|전면|사이드|일자형|L형|l형|front|side|straight|lshape/i.test(String(v||'')); }
+  function isScreenText(v){ return /스크린|screen|전면|사이드|일자형|L형|l형|우측|오른쪽|front|side|straight|lshape|lshape_R/i.test(String(v||'')); }
   function currentName(){
     var s = S();
     return String(s._currentCatName || (s.current && s.current.product) || s.product || '');
@@ -23358,6 +23413,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   function suffixFromKeyOrCurrent(raw){
     raw = normalizeKey(raw || currentName());
     if(/frontside|front_side/i.test(raw)) return 'frontside';
+    if(/우측|오른쪽|right|lshape_R/i.test(raw)) return 'lshape_R';
     if(/L형|l형|lshape/i.test(raw)) return 'lshape';
     if(/일자형|straight/i.test(raw)) return 'straight';
     if(/사이드|side/i.test(raw)) return bothFrontSideSelected() ? 'frontside' : 'side';
