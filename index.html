@@ -8574,7 +8574,13 @@ input[type="number"]::placeholder,#user-input::placeholder{color:#6d8f89!importa
     function find(list){
       if(!Array.isArray(list)) return '';
       for(var i=0;i<list.length;i++){
-        if(String(list[i].code||'').toUpperCase() === code) return list[i].file || '';
+        var item = list[i];
+        if(!item) continue;
+        if(typeof item === 'string') {
+          if(String(item||'').toUpperCase() === code) return '';
+          continue;
+        }
+        if(String(item.code||'').toUpperCase() === code) return item.file || '';
       }
       return '';
     }
