@@ -6663,7 +6663,7 @@ function setPreviewGlow(part) {
     if (src && img.src.indexOf(src) === -1) img.src = src;
     if (!src) img.removeAttribute('src');
   }
-  function (rowId, codeId, chipId, code, tex, cls){
+  function setChip(rowId, codeId, chipId, code, tex, cls){
     var row=$(rowId), codeEl=$(codeId), chip=$(chipId);
     if (codeEl) codeEl.textContent = code || '-';
     if (chip) {
@@ -6688,36 +6688,36 @@ function setPreviewGlow(part) {
     if (dl) dl.textContent = productLabel(PREVIEW.deskKey);
     if (sl) sl.textContent = PREVIEW.screenKey ? productLabel(PREVIEW.screenKey) : '선택 전';
     if (name) name.textContent = activePart === 'top' ? '상판 선택' : activePart === 'leg' ? '다리 선택' : activePart === 'screen' ? '스크린 선택' : '선택값';
-    ('quick-top-row','quick-top-code','quick-top-chip',PREVIEW.top,PREVIEW.topTex,activePart==='top'?'active-top':'');
-    ('quick-leg-row','quick-leg-code','quick-leg-chip',PREVIEW.leg,PREVIEW.legTex,activePart==='leg'?'active-leg':'');
-   if(PREVIEW.screenKey === 'frontside'){
-  (
-    'quick-screen-row',
-    'quick-screen-code',
-    'quick-screen-chip',
-    '전면 ' + (PREVIEW.frontScreen || ''),
-    PREVIEW.frontScreenTex,
-    activePart==='screen' ? 'active-screen' : ''
-  );
+    setChip('quick-top-row','quick-top-code','quick-top-chip',PREVIEW.top,PREVIEW.topTex,activePart==='top'?'active-top':'');
+    setChip('quick-leg-row','quick-leg-code','quick-leg-chip',PREVIEW.leg,PREVIEW.legTex,activePart==='leg'?'active-leg':'');
+    if(PREVIEW.screenKey === 'frontside'){
+      setChip(
+        'quick-screen-row',
+        'quick-screen-code',
+        'quick-screen-chip',
+        '전면 ' + (PREVIEW.frontScreen || ''),
+        PREVIEW.frontScreenTex,
+        activePart==='screen' ? 'active-screen' : ''
+      );
 
-  (
-    'quick-side-screen-row',
-    'quick-side-screen-code',
-    'quick-side-screen-chip',
-    '사이드 ' + (PREVIEW.sideScreen || ''),
-    PREVIEW.sideScreenTex,
-    activePart==='screen' ? 'active-screen' : ''
-  );
-}else{
-  (
-    'quick-screen-row',
-    'quick-screen-code',
-    'quick-screen-chip',
-    PREVIEW.screen,
-    PREVIEW.screenTex,
-    activePart==='screen' ? 'active-screen' : ''
-  );
-}
+      setChip(
+        'quick-side-screen-row',
+        'quick-side-screen-code',
+        'quick-side-screen-chip',
+        '사이드 ' + (PREVIEW.sideScreen || ''),
+        PREVIEW.sideScreenTex,
+        activePart==='screen' ? 'active-screen' : ''
+      );
+    }else{
+      setChip(
+        'quick-screen-row',
+        'quick-screen-code',
+        'quick-screen-chip',
+        PREVIEW.screen,
+        PREVIEW.screenTex,
+        activePart==='screen' ? 'active-screen' : ''
+      );
+    }
   }
   window.showTexturePreview = function(colorCode){
     var code = (colorCode || '').toString();
@@ -15831,7 +15831,7 @@ window.showPanel = function(){
     return url;
   }
 
-  function (id, code, part){
+  function setCleanChipBg(id, code, part){
     const el = document.getElementById(id);
     if(!el || !code || code === '-') return;
 
@@ -15919,9 +15919,9 @@ window.showPanel = function(){
     setText('ff-clean-screen', screen);
     setText('ff-clean-total', total);
 
-    ('ff-clean-top-chip', top, 'top');
-    ('ff-clean-leg-chip', leg, 'leg');
-    ('ff-clean-screen-chip', screen, 'screen');
+    setCleanChipBg('ff-clean-top-chip', top, 'top');
+    setCleanChipBg('ff-clean-leg-chip', leg, 'leg');
+    setCleanChipBg('ff-clean-screen-chip', screen, 'screen');
   }
 
   function requestSync(delay){
@@ -16833,25 +16833,6 @@ if(isFrontside && (!frontTex || !sideTex)){
   };
 }
 
-    // frontside는 전면/사이드 각각 선택값이 있으면 그것을 우선 사용한다.
-    // 없으면 단일 screenTex로 대체하지 않고 렌더를 막는다.
-      frontScreenTexture: frontTex,
-      sideScreenTexture: sideTex
-  var isFrontside =
-  /전면\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || '')) &&
-  /사이드\s*스크린/.test(String(s.screenLabel || s.screenType || s.screenKey || ''));
-
-if(!isFrontside && typeof screenSuffix === 'function'){
-  try{
-    isFrontside = screenSuffix() === 'frontside';
-  }catch(e){}
-}
-
-if(isFrontside && (!frontTex || !sideTex)){
-  throw new Error('전면+사이드 스크린은 전면 재질과 사이드 재질을 모두 선택해야 합니다.');
-}
-    };
-  }
 
   function ensureRenderPanel(kind){
     var panel = $('ff-cpf-render-panel');
