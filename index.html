@@ -5139,6 +5139,7 @@ function ffTextureUrlForChoice(code, part, catName) {
   return path.indexOf('textures/') === 0 ? path : (GITHUB_RAW + path);
 }
 function ffMaterialBtnHtml(code, inputId, part, catName) {
+  if(code === undefined || code === null || String(code).trim() === '') return '';
   if(!code) return '';
   var url = ffTextureUrlForChoice(code, part, catName || '');
   if (url && typeof window.ffPreloadMaterialTexture === 'function') window.ffPreloadMaterialTexture(url);
@@ -13253,9 +13254,7 @@ function btnGroup(arr,inputId,part,catName){
 
   var h='<div class="material-button-group">';
   arr.forEach(function(c){
-    if(typeof window.ffMaterialBtnHtml === 'function'){
-      h += window.ffMaterialBtnHtml(c,inputId,part,catName);
-    }
+    h += window.ffMaterialBtnHtml(c,inputId,part,catName);
   });
   h += '</div>';
   return h;
