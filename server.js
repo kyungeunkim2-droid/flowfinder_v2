@@ -257,8 +257,12 @@ console.log('[RENDER BODY]', {
       ].filter(Boolean).join('\n'),
     });
 
-    const imageInputs = [
-      ['base furniture product image', deskImage],
+ const baseProductImage = isScreenRender
+  ? (screenImage || deskImage)
+  : deskImage;
+
+const imageInputs = [
+  ['base furniture product image', baseProductImage],
       ['desktop material texture reference', topTexture],
       ['legs and frame material color reference', legTexture],
       ['screen material texture reference', effectiveScreenTexture],
@@ -329,7 +333,7 @@ console.log('[NanoBanana] response keys:', Object.keys(response || {}));
   }
 });
 
-app.post('/api/generate-screen-preview', async (req, res) => {
+app.post('/api/generate-preview', async (req, res) => {
   try {
     const baseUrl = `${req.protocol}://${req.get('host')}/`;
 
