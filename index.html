@@ -11846,28 +11846,7 @@ button.material-btn{
     if(texture && btn && btn.parentElement!==texture) texture.appendChild(btn);
     if(texture && note && note.parentElement!==texture) texture.appendChild(note);
   }
-  var oldPrepare=window.prepareNanoBananaPreview;
-  if(typeof oldPrepare==='function' && !window.__ff112WrappedNano){
-    window.__ff112WrappedNano=true;
-    window.prepareNanoBananaPreview=async function(){
-      ensureUnderMaterial();
-      return oldPrepare.apply(this, arguments);
-    };
-  }
-  function polishResult(){
-    var note=$('quick-ai-preview-note');
-    if(note && note.classList.contains('ai-result')){
-      var title=note.querySelector('div');
-      if(title) title.className='ff112-ai-title';
-      var caps=note.querySelectorAll('div');
-      if(caps.length>1) caps[caps.length-1].className='ff112-ai-caption';
-    }
-  }
-  function bind(){ ensureUnderMaterial(); polishResult(); }
-  bind();
-  window.addEventListener('load', bind);
-  setInterval(bind, 1200);
-})();
+
 </script>
 
 
@@ -21969,27 +21948,7 @@ arr.push(
       if(screen && desk) panel.insertBefore(screen, desk.nextSibling);
     }
   }
-  var oldPrepare=window.prepareNanoBananaPreview;
-  window.prepareNanoBananaPreview=async function(targetType){
-    if(window.__ffFinalNanoBusy) return;
-    var note=$('quick-ai-preview-note');
-    var btn=$('quick-ai-preview-btn');
-    var preview=choosePreview();
-    // 화면상 즉시 원본 preview 경로를 보여줘서, API 실패 시에도 어떤 원본을 쓰는지 확인 가능
-    if(note){
-      note.className='ai-loading'; note.style.display='block';
-      note.innerHTML='<b style="color:#fff">원본 사진 확인</b><br><span style="color:#9fb3bd">Nano Banana에 보낼 원본: '+esc(preview)+'</span><img src="'+esc(preview)+'" alt="원본 데스크 미리보기" style="margin-top:8px">';
-    }
-    relocateAiPanels();
-    try{
-      window.__ffFinalNanoBusy=true;
-      var r = await oldPrepare.call(this,targetType);
-      return r;
-    } finally {
-      window.__ffFinalNanoBusy=false;
-      setTimeout(function(){try{window.ff90RefreshOptionSummary();relocateAiPanels();}catch(e){}},80);
-    }
-  };
+
   // fetch payload의 deskImage가 잘못된 옵션 이미지로 들어가면 previews 경로로 교정
   var oldFetch=window.fetch;
   if(oldFetch && !window.__ffFinalPreviewFetchPatch){
