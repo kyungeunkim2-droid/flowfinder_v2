@@ -16321,6 +16321,243 @@ window.showPanel = function(){
 })();
 </script>
 
+<script id="ff-frontside-sequential-and-render-fix-v1">
+(function(){
+  if(window.__ffFrontsideSequentialRenderFixV1) return;
+  window.__ffFrontsideSequentialRenderFixV1 = true;
+
+  function $(id){ return document.getElementById(id); }
+  function S(){ return window.state || window.appState || {}; }
+  function esc(s){ return String(s||'').replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+  function cleanCode(v){ return String(v||'').trim().toUpperCase().replace(/^SCREEN_/,'').replace(/\s+/g,'').replace(/[^A-Z0-9]/g,''); }
+  function normUrl(u){ if(!u) return ''; u=String(u); if(/^https?:\/\//i.test(u)||u.indexOf('./')===0) return u; if(u.indexOf('/images/')===0) return '.'+u; if(u.indexOf('images/')===0) return './'+u; return u; }
+  function text(id){ var el=$(id); return el ? (el.textContent||'').trim() : ''; }
+  function bg(id){ var el=$(id); if(!el) return ''; var v=(el.style&&el.style.backgroundImage)||getComputedStyle(el).backgroundImage||''; var m=v.match(/url\(["']?(.*?)["']?\)/); return m?m[1]:''; }
+  function addBot(html){ if(typeof window.addMsg==='function') window.addMsg('bot',html); }
+  function addUser(html){ if(typeof window.addMsg==='function') window.addMsg('user',html); }
+  function scrollBottom(){ if(typeof window.scrollBottom==='function') window.scrollBottom(); var m=$('messages'); if(m) m.scrollTop=m.scrollHeight; }
+
+  function selectedText(){
+    var s=S();
+    var arr=[];
+    ['screenKey','selectedScreenKey','currentScreenKey','screen','screenLabel','_currentCatName','currentCatName'].forEach(function(k){ if(s[k]) arr.push(String(s[k])); });
+    if(window._setSelected) arr.push(String(window._setSelected));
+    return arr.join(' ');
+  }
+  function isFrontside(){
+    var t=selectedText();
+    return /frontside|front_side|전면\+사이드|전면.*사이드|사이드.*전면/i.test(t);
+  }
+  function setFrontsideState(){
+    var s=S();
+    s.screenKey=s.selectedScreenKey=s.currentScreenKey='frontside';
+    s.screenLabel=s._currentCatName=s.currentCatName='전면+사이드 스크린';
+    s._ffFrontsideSequential = true;
+    return s;
+  }
+
+  function screenDefaults(which){
+    return { h:715, top:405 };
+  }
+  window.ffFrontsideSeqStep=function(which, id, delta, field){
+    var el=$(field+'-'+which+'-'+id); if(!el) return;
+    var n=parseInt(el.value,10)||0; el.value=Math.max(1, n+delta);
+  };
+  function askFrontsideSize(which){
+    setFrontsideState();
+    var d=screenDefaults(which), id=Date.now();
+    var label=which==='front'?'전면 스크린':'사이드 스크린';
+    var html='<div class="ff-fs-seq-card" style="border:1px solid rgba(46,242,201,.28);background:#0f1724;border-radius:16px;padding:14px;margin-top:8px;">'
+      +'<b style="color:#fff;display:block;margin-bottom:8px;">'+label+' 사이즈를 입력해주세요</b>'
+      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">'
+      +'<label style="font-size:11px;color:#9fb3bd;">전체 H(mm)<div class="ff-num-control"><button type="button" onclick="ffFrontsideSeqStep(\''+which+'\','+id+',-50,\'h\')">-</button><input id="h-'+which+'-'+id+'" type="number" value="'+d.h+'"><button type="button" onclick="ffFrontsideSeqStep(\''+which+'\','+id+',50,\'h\')">+</button></div></label>'
+      +'<label style="font-size:11px;color:#9fb3bd;">상판 위(mm)<div class="ff-num-control"><button type="button" onclick="ffFrontsideSeqStep(\''+which+'\','+id+',-50,\'top\')">-</button><input id="top-'+which+'-'+id+'" type="number" value="'+d.top+'"><button type="button" onclick="ffFrontsideSeqStep(\''+which+'\','+id+',50,\'top\')">+</button></div></label>'
+      +'</div><button class="confirm-btn" style="margin-top:12px;" onclick="ffFrontsideSeqSubmitSize(\''+which+'\','+id+')">'+label+' 사이즈 확인 ✓</button></div>';
+    addBot(html); scrollBottom();
+  }
+  window.ffFrontsideSeqSubmitSize=function(which,id){
+    var h=parseInt(($('h-'+which+'-'+id)||{}).value,10)||715;
+    var top=parseInt(($('top-'+which+'-'+id)||{}).value,10)||405;
+    if(top>=h){ var el=$('top-'+which+'-'+id); if(el){el.style.borderColor='#f87171'; el.focus();} return; }
+    var s=setFrontsideState();
+    if(which==='front'){
+      s.frontScreenSize={h:h, screenH:h, topGap:top, screenTopGap:top};
+      s.frontScreenH=h; s.frontScreenTopGap=top;
+      addUser('전면 스크린 H '+h+'mm / 상판 위 '+top+'mm');
+      askFrontsideSize('side');
+    }else{
+      s.sideScreenSize={h:h, screenH:h, topGap:top, screenTopGap:top};
+      s.sideScreenH=h; s.sideScreenTopGap=top;
+      addUser('사이드 스크린 H '+h+'mm / 상판 위 '+top+'mm');
+      askFrontsideMaterial('front');
+    }
+  };
+
+  function codeList(which){
+    var std=[];
+    try{ std=(window.STD_COLORS && (window.STD_COLORS[which==='front'?'전면 스크린':'사이드 스크린']||window.STD_COLORS['전면 스크린']))||[]; }catch(e){}
+    var custom=[];
+    try{ custom=window.CUSTOM_FABRIC_COLORS_SCREEN || []; }catch(e){}
+    var pet=[]; try{ pet=window.CUSTOM_PET_COLORS_SCREEN || []; }catch(e){}
+    var out=[]; [std,custom,pet].forEach(function(a){ (a||[]).forEach(function(c){ c=cleanCode(c); if(c && out.indexOf(c)<0) out.push(c); }); });
+    return out.length ? out : ['061','064','067','3F1','3F2','MGR','1P4B','1P7'];
+  }
+  function textureFor(code, which){
+    code=cleanCode(code);
+    try{
+      if(typeof window.ffMaterialTextureUrl==='function'){
+        var u=window.ffMaterialTextureUrl(code, 'screen'); if(u) return normUrl(u);
+      }
+      if(typeof window._ffLocalTextureForCode==='function'){
+        var u2=window._ffLocalTextureForCode(code, which==='side'?'사이드 스크린':'전면 스크린'); if(u2) return normUrl(u2);
+      }
+    }catch(e){}
+    var std=['061','064','067','3F1','3F2','061K','064K','067K','3F1K','3F2K'];
+    var folder = which==='side' ? 'side' : 'front';
+    var type = std.indexOf(code)>=0 ? 'standard' : 'custom';
+    return './images/textures/screen/'+folder+'/'+type+'/'+code+'.jpg';
+  }
+  function askFrontsideMaterial(which){
+    setFrontsideState();
+    var label=which==='front'?'전면 스크린':'사이드 스크린';
+    var colors=codeList(which);
+    var html='<div class="ff-fs-seq-card" style="border:1px solid rgba(46,242,201,.28);background:#0f1724;border-radius:16px;padding:14px;margin-top:8px;">'
+      +'<b style="color:#fff;display:block;margin-bottom:8px;">'+label+' 재질을 선택해주세요</b>'
+      +'<div class="material-button-group">'+colors.map(function(c){ var tex=textureFor(c,which); return '<button type="button" class="material-btn" data-part="screen" data-code="'+esc(c)+'" onclick="ffFrontsideSeqPickMaterial(\''+which+'\',\''+esc(c)+'\')"><span class="mat-thumb" style="background-image:url(&quot;'+esc(tex)+'&quot;)"></span><span class="mat-code">'+esc(c)+'</span></button>'; }).join('')+'</div>'
+      +'<div class="material-picker-hint">전면과 사이드 재질을 순서대로 각각 선택합니다.</div></div>';
+    addBot(html); scrollBottom();
+  }
+  window.ffFrontsideSeqPickMaterial=function(which, code){
+    code=cleanCode(code); var tex=textureFor(code, which); var s=setFrontsideState();
+    if(which==='front'){
+      s.frontScreenCode=code; s.frontScreenTexture=tex;
+      addUser('전면 스크린 재질 '+code);
+      askFrontsideMaterial('side');
+    }else{
+      s.sideScreenCode=code; s.sideScreenTexture=tex;
+      s.screenCode=code; s.screenTexture=tex;
+      addUser('사이드 스크린 재질 '+code);
+      if(typeof window.updateCurrent==='function') window.updateCurrent();
+      updateQuickFrontsideRows();
+      addBot('전면+사이드 스크린 설정이 완료되었습니다.<br>오른쪽의 <b>원본 사진에 재질 적용</b> 버튼으로 렌더링하세요.');
+      scrollBottom();
+    }
+  };
+  function updateQuickFrontsideRows(){
+    var s=S();
+    var q=$('quick-screen-code'); if(q) q.textContent='전면 '+(s.frontScreenCode||'-')+' / 사이드 '+(s.sideScreenCode||'-');
+    var chip=$('quick-screen-chip'); if(chip) chip.style.backgroundImage='url("'+normUrl(s.frontScreenTexture||s.sideScreenTexture||'')+'")';
+  }
+
+  var oldAfterSize=window.afterSizeInput;
+  window.afterSizeInput=function(parsed){
+    if(isFrontside()){
+      setFrontsideState();
+      askFrontsideSize('front');
+      return;
+    }
+    if(typeof oldAfterSize==='function') return oldAfterSize.apply(this,arguments);
+  };
+
+  // 혹시 기존 흐름에서 상판 위 값 확인까지 온 경우도 frontside면 순차 재질로 연결
+  ['ffFinalSubmitTopGap','ffScreenTopGapSubmitFinal','submitTopGapForm','ff98SubmitTopGap'].forEach(function(name){
+    var old=window[name];
+    window[name]=function(){
+      if(isFrontside()){
+        var s=setFrontsideState();
+        var fid=arguments[0];
+        var el=$('screen-top-final-'+fid)||$('screen-top-'+fid);
+        var top=el?parseInt(el.value,10):0;
+        var h=parseInt(s._screenNewH||s.h||715,10);
+        if(top && top<h){ s.frontScreenSize={h:h,screenH:h,topGap:top,screenTopGap:top}; s.frontScreenH=h; s.frontScreenTopGap=top; addUser('전면 스크린 H '+h+'mm / 상판 위 '+top+'mm'); askFrontsideSize('side'); return; }
+      }
+      if(typeof old==='function') return old.apply(this,arguments);
+    };
+  });
+
+  function screenKind(){ var s=S(); var t=selectedText(); if(isFrontside()) return 'frontside'; if(/사이드|side/i.test(t)) return 'side'; if(/일자|straight/i.test(t)) return 'straight'; if(/L형|lshape/i.test(t)) return 'lshape'; return 'front'; }
+  function legKey(){ var s=S(); var v=String(s.legType||s.legShape||s.selectedLegType||s.currentLegType||''); if(/원형|round/i.test(v)) return 'round'; if(/A|에이|aframe/i.test(v)) return 'aframe'; return 'ladder'; }
+  function moveKey(){ var s=S(); var v=String(s.casterType||s.mobility||s.selectedMoveType||s.currentMoveType||''); return /캐스터|caster/i.test(v)?'caster':'glide'; }
+  function topKey(){ var s=S(); var v=String(s.topShape||s.selectedTopShape||s.currentTopShape||''); return /라운드|round/i.test(v)?'round':'rect'; }
+  function deskFolder(){ var s=S(); var v=String(s.deskLabel||s.product||s.deskKey||s.productKey||''); return /덕트|duct/i.test(v)?'desk_duct':'desk_standard'; }
+  function baseImage(isScreen){
+    var s=S();
+    if(typeof window.choosePreview==='function') { try{ var p=window.choosePreview(); if(p) return normUrl(p); }catch(e){} }
+    if(typeof window.ffPreviewImageForKey==='function') { try{ var key=isScreen?screenKind():(s.deskKey||s.productKey||'desk_standard'); var p2=window.ffPreviewImageForKey(key); if(p2) return normUrl(p2); }catch(e){} }
+    var base=legKey()+'_'+moveKey()+'_'+topKey();
+    if(isScreen) base += '_' + screenKind();
+    return './images/previews/'+deskFolder()+'/'+base+'.png';
+  }
+  function material(part){
+    var s=S();
+    if(part==='top') return {code:cleanCode(text('quick-top-code')||s.topCode||s.top||''), tex:normUrl(bg('quick-top-chip')||s.topTexture||s.topTex||'')};
+    if(part==='leg') return {code:cleanCode(text('quick-leg-code')||s.legCode||s.leg||''), tex:normUrl(bg('quick-leg-chip')||s.legTexture||s.legTex||'')};
+    return {code:cleanCode(text('quick-screen-code')||s.screenCode||s.screen||''), tex:normUrl(bg('quick-screen-chip')||s.screenTexture||s.screenTex||'')};
+  }
+  function noteBox(){
+    var note=$('quick-ai-preview-note'); var btn=$('quick-ai-preview-btn')||$('ff-clean-render-btn');
+    if(!note){ note=document.createElement('div'); note.id='quick-ai-preview-note'; var p=$('texture-preview')||$('preview-panel')||document.body; p.appendChild(note); }
+    note.style.display='block'; note.style.visibility='visible'; note.style.opacity='1';
+    return {note:note,btn:btn};
+  }
+  function xhrJson(url,payload,timeout){
+    return new Promise(function(resolve,reject){
+      var x=new XMLHttpRequest(); x.open('POST',url,true); x.timeout=timeout||90000; x.setRequestHeader('Content-Type','application/json');
+      x.onload=function(){ var d={}; try{d=JSON.parse(x.responseText||'{}');}catch(e){} if(x.status>=200&&x.status<300) resolve(d); else reject(new Error(d.error||d.detail||('HTTP '+x.status))); };
+      x.onerror=function(){reject(new Error('서버 연결 실패'));}; x.ontimeout=function(){reject(new Error('렌더링 응답 시간이 초과되었습니다.'));};
+      x.send(JSON.stringify(payload));
+    });
+  }
+  window.prepareNanoBananaPreview=function(targetType){
+    var s=S(); var isScreen=(targetType==='screen') || (targetType!=='desk' && (window.__ffNanoTarget==='screen' || /스크린|screen|frontside|front|side|straight|lshape/i.test(selectedText())));
+    var fs=isScreen && isFrontside(); var base=baseImage(isScreen); var top=material('top'), leg=material('leg'), scr=material('screen');
+    if(fs){ setFrontsideState(); }
+    var payload={
+      mode:isScreen?'strict-screen-material-mapping-final-sequential':'strict-desk-material-mapping-final-sequential',
+      materialEditOnly:true,
+      preserveSourceImage:true,
+      preserveTransparentBackground:true,
+      canvasAspect:'16:9',
+      targetType:isScreen?'screen':'desk',
+      productType:isScreen?'screen':'desk',
+      deskImage:base,
+      fallbackDeskImage:base,
+      composedPreview:'',
+      screenSelected:isScreen,
+      screenImage:isScreen?base:'',
+      screenLabel:isScreen?(fs?'전면+사이드 스크린':'스크린'):'',
+      topTexture:isScreen?'':top.tex,
+      legTexture:isScreen?'':leg.tex,
+      screenTexture:(isScreen&&!fs)?scr.tex:'',
+      topCode:isScreen?'':top.code,
+      legCode:isScreen?'':leg.code,
+      screenCode:(isScreen&&!fs)?scr.code:'',
+      frontScreenCode:fs?(s.frontScreenCode||''):'',
+      sideScreenCode:fs?(s.sideScreenCode||''):'',
+      frontScreenTexture:fs?normUrl(s.frontScreenTexture||''):'',
+      sideScreenTexture:fs?normUrl(s.sideScreenTexture||''):'',
+      guideImage:fs?'./images/guides/frontside_guide.png':'',
+      legType:isScreen?'':legKey(),
+      casterType:isScreen?'':moveKey(),
+      topShape:isScreen?'':topKey(),
+      size: fs ? {front:s.frontScreenSize||{}, side:s.sideScreenSize||{}} : (isScreen?{screenH:s.screenH||s.h||'',screenTopGap:s.screenTopGap||s._screenTopGap||''}:{w:s.w||'',d:s.d||'',h:s.h||''})
+    };
+    var ui=noteBox();
+    if(ui.btn){ ui.btn.disabled=true; ui.btn.textContent='생성 중...'; }
+    ui.note.className='ai-loading'; ui.note.innerHTML='<b style="color:#fff">원본 사진에 재질 적용 중...</b><br><span style="color:#9fb3bd">원본: '+esc(base)+'</span>';
+    return xhrJson('/api/generate-preview',payload,90000).then(function(data){
+      var src=(typeof data==='string')?data:(data.imageUrl||data.image||data.url||''); if(!src) throw new Error('이미지 결과를 받지 못했습니다.');
+      ui.note.className='ai-result'; ui.note.innerHTML='<div style="font-weight:900;color:#fff;margin-bottom:8px;">재질 미리보기 · '+(isScreen?'스크린':'데스크')+'</div><img src="'+esc(src)+'" alt="재질 미리보기" style="width:100%;border-radius:16px;border:1px solid rgba(46,242,201,.22);background:#fff;display:block;max-height:560px;object-fit:contain;"><div style="margin-top:8px;color:#8aa;font-size:11px;line-height:1.45;">원본 제품 이미지에 선택 재질만 맵핑한 결과입니다.</div>';
+      s._ffFinalRenderImage=src; return data;
+    }).catch(function(err){ ui.note.className='ai-error'; ui.note.innerHTML='<b style="color:#fca5a5">재질 적용 실패</b><br><span>'+esc(err.message||err)+'</span>'; throw err; })
+    .finally(function(){ if(ui.btn){ ui.btn.disabled=false; ui.btn.textContent='✨ 원본 사진에 재질 적용'; } });
+  };
+  function bindRender(){ ['quick-ai-preview-btn','ff-clean-render-btn'].forEach(function(id){ var b=$(id); if(b){ b.disabled=false; b.onclick=function(e){ if(e)e.preventDefault(); window.prepareNanoBananaPreview(isFrontside()||/스크린|screen/i.test(selectedText())?'screen':'desk'); return false; }; } }); }
+  document.addEventListener('DOMContentLoaded',function(){ setTimeout(bindRender,100); setTimeout(bindRender,800); });
+  document.addEventListener('click',function(e){ if(e.target&&e.target.closest&&e.target.closest('.material-btn[data-part="screen"]')) window.__ffNanoTarget='screen'; setTimeout(bindRender,50); },true);
+})();
+</script>
+
 </body>
 
 
