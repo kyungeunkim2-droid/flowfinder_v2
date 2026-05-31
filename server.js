@@ -236,7 +236,13 @@ console.log('[RENDER BODY]', {
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
         effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
         effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
-        effectiveSideScreenTexture ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.', 'If front and side textures are different, they must remain different. Never copy the side texture onto the front panel or the front texture onto the side panel.',' : '',
+       effectiveSideScreenTexture
+  ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.'
+  : '',
+
+(effectiveFrontScreenTexture && effectiveSideScreenTexture)
+  ? 'If front and side textures are different, they must remain different. Never copy the side texture onto the front panel or the front texture onto the side panel.'
+  : '',
         effectiveScreenCode ? `Screen material code: ${effectiveScreenCode}.` : '',
         effectiveFrontScreenCode ? `Front screen material code: ${effectiveFrontScreenCode}.` : '',
         effectiveSideScreenCode ? `Side screen material code: ${effectiveSideScreenCode}.` : '',
