@@ -234,6 +234,19 @@ console.log('[RENDER BODY]', {
         legTexture ? 'Apply the provided leg material naturally only to the vertical desk legs.' : 'No leg texture provided: keep the legs/frame unchanged.',
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
+        isScreenRender ? 'Important: the base image contains a desk and screen. During screen rendering, also apply topTexture to the tabletop and legTexture to the desk legs/frame whenever those textures are provided.' : '',
+
+isScreenRender ? 'The tabletop and desk legs are editable material areas. Do not treat them as background.' : '',
+
+isScreenRender ? 'Preserve the original product photo exactly. Do not create a black floor, black backdrop, studio scene, new room, new desk, or new lighting.' : '',
+
+(effectiveFrontScreenTexture && effectiveSideScreenTexture)
+  ? 'The source image contains TWO different screen panels. FRONT screen and SIDE screen must be treated as separate material areas.'
+  : '',
+
+(effectiveFrontScreenTexture && effectiveSideScreenTexture)
+  ? 'Apply frontScreenTexture only to the FRONT screen panel. Apply sideScreenTexture only to the SIDE screen panel.'
+  : '',
         effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
         effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
        effectiveSideScreenTexture
