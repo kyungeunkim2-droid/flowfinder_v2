@@ -3307,7 +3307,7 @@ function updateScreenComposite(type, colorCode, texUrl) {
   if (type === '전면 스크린') _screenPreviewState.front = entry;
   if (type === '사이드 스크린') _screenPreviewState.side = entry;
   if (type === '일자형 스크린') _screenPreviewState.straight = entry;
-  if (type === 'L형 스크린') _screenPreviewState.lshape = entry;
+  if (type === 'L형 스크린' || type === 'L형 스크린(L)' || type === 'L형 스크린(R)' || type.indexOf('L형 스크린') !== -1) _screenPreviewState.lshape = entry;
   _screenPreviewState.latest = entry;
   window.__ffPreviewScreen = colorCode;
   window.__ffActiveGlowPart = 'screen';
@@ -3340,7 +3340,7 @@ function _ffScreenProductKey(type) {
   if (type === '전면 스크린') return 'front';
   if (type === '사이드 스크린') return 'side';
   if (type === '일자형 스크린') return 'straight';
-  if (type === 'L형 스크린') return 'lshape';
+  if (type && type.indexOf('L형 스크린') !== -1) return 'lshape';
   return 'front';
 }
 function _ffDrawActualScreenPreview(ctx, W, H, entry) {
@@ -7484,7 +7484,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
         if(last.product && last.product.indexOf('전면')!==-1) pv.screenKey='front';
         if(last.product && last.product.indexOf('사이드')!==-1) pv.screenKey='side';
         if(last.product && last.product.indexOf('일자형')!==-1) pv.screenKey='straight';
-        if(last.product && last.product.indexOf('L형')!==-1) pv.screenKey='lshape';
+        if(last.product && (last.product.indexOf('L형')!==-1 || last.product.indexOf('l형')!==-1)) pv.screenKey='lshape';
         if(last._deskTopColor) pv.top=last._deskTopColor;
         if(last._deskLegColor) pv.leg=last._deskLegColor;
         if(last.color && last.product.indexOf('스크린')!==-1) pv.screen=last.color;
@@ -7497,7 +7497,7 @@ document.addEventListener('keydown', function(e){ if (e.key === 'Escape') { var 
   var oldShowProductPreview = window.showProductPreview;
   window.showProductPreview = function(label, callback, allBtns){
     if(oldShowProductPreview) oldShowProductPreview(label, callback, allBtns);
-    var key = ({'일반형 데스크':'desk_standard','덕트형 데스크':'desk_duct','전면 스크린':'front','사이드 스크린':'side','일자형 스크린':'straight','L형 스크린':'lshape'})[label];
+    var key = ({'일반형 데스크':'desk_standard','덕트형 데스크':'desk_duct','전면 스크린':'front','사이드 스크린':'side','일자형 스크린':'straight','L형 스크린':'lshape','L형 스크린(L)':'lshape','L형 스크린(R)':'lshape'})[label] || (label && label.indexOf('L형 스크린')!==-1 ? 'lshape' : undefined);
     var url = key && ({desk_standard:'https://planning-cdn.fursys.com/upload/product_info/1051/923/fixed_block/product_main_block/product_main_image.origin_img.png?_=1769673918078',desk_duct:'https://planning-cdn.fursys.com/upload/product_info/1052/924/fixed_block/product_main_block/product_main_image.origin_img.png?_=1770183829953',front:'https://planning-cdn.fursys.com/upload/product_info/11/129/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774415218404',side:'https://planning-cdn.fursys.com/upload/product_info/129/130/fixed_block/product_main_block/product_main_image.origin_img.png?_=1763017300488',straight:'https://planning-cdn.fursys.com/upload/product_info/1053/933/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774426828523',lshape:'https://planning-cdn.fursys.com/upload/product_info/1054/931/fixed_block/product_main_block/product_main_image.origin_img.png?_=1774261195654'})[key];
     var img=$('product-preview-img'); if(img && url){ img.src=url; img.style.maxHeight='185px'; img.style.objectFit='contain'; }
   };
@@ -8045,7 +8045,6 @@ body.ff-dashboard-preview #preview-panel{
     var s=pv();
     var deskKey=s.deskKey || 'desk_standard';
     var screenKey=s.screenKey || '';
-    var isFrontside = screenKey === 'frontside';
     var payload={
       mode:'nano-banana-reference-workflow',
       // Local product photos are used for Nano Banana reference editing.
@@ -8059,22 +8058,7 @@ body.ff-dashboard-preview #preview-panel{
       legType:s.legType || s.legShape || '',
       casterType:s.casterType || s.mobility || '',
       topShape:s.topShape || '',
-      size:s.size || {},
-      // 스크린 재질 정보 추가
-      screenKey: screenKey,
-      screenLabel: isFrontside ? 'frontside' : screenKey,
-      screenType: isFrontside ? 'frontside' : screenKey,
-      screenImage: isFrontside ? (s.frontscreenImage || localProductImage('frontside') || '') : (localProductImage(screenKey) || ''),
-      screenTexture: isFrontside ? '' : existingTexture(s.screenTex),
-      screenCode: isFrontside ? '' : (s.screen || ''),
-      frontScreenTexture: isFrontside ? existingTexture(s.frontScreenTex || s.screenTex) : '',
-      sideScreenTexture: isFrontside ? existingTexture(s.sideScreenTex) : '',
-      frontScreenCode: isFrontside ? (s.frontScreen || window.__ffFrontScreen || '') : '',
-      sideScreenCode: isFrontside ? (s.sideScreen || window.__ffSideScreen || '') : '',
-      screenGuide: isFrontside ? './images/guides/frontside_guide.png' : '',
-      screenInstruction: isFrontside
-        ? 'Use screenGuide to separate areas. White guide area means FRONT screen. Red guide area means SIDE screen. Apply frontScreenTexture only to the white/front area. Apply sideScreenTexture only to the red/side area. Do not apply one texture to both screens. Do not redraw or create a new screen.'
-        : 'Apply screenTexture only to the existing screen area. Do not redraw or create a new screen.'
+      size:s.size || {}
     };
     if(note){
       note.classList.remove('ai-result');
