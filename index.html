@@ -5906,10 +5906,18 @@ if (factoryForRate === 'F우레탄제품') factoryForRate = '충주제품';
 var rateKey = (factoryForRate && RATE_TABLE[factoryForRate])
   ? factoryForRate
   : '충주1제품';
-console.log('rateKey=', rateKey);
-console.log('factory=', factoryForRate);
-console.log('shrink=', RATE_TABLE[rateKey].shrink);
-  var baseItem = null, stdW = null, stdD = null;
+
+console.log('[PRICE CHECK]', {
+  catName: catName,
+  color: state.color,
+  h: state.h,
+  factoryForRate: factoryForRate,
+  rateKey: rateKey,
+  shrink: RATE_TABLE[rateKey].shrink,
+  finalPrice: finalPrice
+});
+
+var baseItem = null, stdW = null, stdD = null;
 
   // ── 세트 데이터: 레그+색상으로 베이스 아이템 찾기 ──
   if (dataType === 'set' && state.w) {
