@@ -6046,41 +6046,44 @@ function calcAndFinish(catName) {
       finalPrice = Math.floor(finalPrice * hRate / 1000) * 1000;
       rateLabel = state.h < screenBaseH ? 'H줄임' : 'H늘림';
     }
+function round100ThenCut1000(v){
+  return Math.floor((Math.round(v / 100) * 100) / 1000) * 1000;
+}
+   if (isFrontOrSide) {
+  // 전면/사이드: 인에이블 요율표 적용 (shrink)
+  if (state.colorType === '주문') {
+    finalPrice = round100ThenCut1000(finalPrice * RATE_TABLE[rateKey].shrink);
+    rateLabel = '주문품';
+  }
+} else if (isLineOrL) {
+  // 일자형/L형: H 없으면 PET(양지상품 ×1.5), H 있으면 패브릭
+  var isPET = (state.subKey === 'PET' || (state.subKey && state.subKey.indexOf('PET') !== -1));
+  var isFabric = state.h && state.h > 0;
 
-    if (isFrontOrSide) {
-      // 전면/사이드: 인에이블 요율표 적용 (shrink)
-      if (state.colorType === '주문') {
-        finalPrice = Math.floor(finalPrice * RATE_TABLE[rateKey].shrink / 1000) * 1000;
-        rateLabel = '주문품';
-      }
-    } else if (isLineOrL) {
-      // 일자형/L형: H 없으면 PET(양지상품 ×1.5), H 있으면 패브릭
-      var isPET = (state.subKey === 'PET' || (state.subKey && state.subKey.indexOf('PET') !== -1));
-      var isFabric = state.h && state.h > 0;
-
-      if (isPET || !isFabric) {
-        // PET 양지상품: ×1.5
-        if (state.factory === '양지상품') {
-          finalPrice = Math.floor(finalPrice * 1.5 / 1000) * 1000;
-          rateLabel = 'PET';
-        }
-      } else {
-        // 패브릭 스크린: ×1.1
-        finalPrice = Math.floor(finalPrice * 1.1 / 1000) * 1000;
-        rateLabel = '패브릭';
-      }
-      if (state.colorType === '주문') {
-        var scrRate = RATE_TABLE[rateKey].color;
-        finalPrice = Math.floor(finalPrice * scrRate / 1000) * 1000;
-        rateLabel = rateLabel ? rateLabel + '+주문품' : '주문품';
-      }
-    } else {
-      // 기타 (페그보드 등)
-      if (state.colorType === '주문') {
-        finalPrice = Math.floor(finalPrice * RATE_TABLE[rateKey].color / 1000) * 1000;
-        rateLabel = '주문품';
-      }
+  if (isPET || !isFabric) {
+    // PET 양지상품: ×1.5
+    if (state.factory === '양지상품') {
+      finalPrice = round100ThenCut1000(finalPrice * 1.5);
+      rateLabel = 'PET';
     }
+  } else {
+    // 패브릭 스크린: ×1.1
+    finalPrice = round100ThenCut1000(finalPrice * 1.1);
+    rateLabel = '패브릭';
+  }
+
+  if (state.colorType === '주문') {
+    var scrRate = RATE_TABLE[rateKey].color;
+    finalPrice = round100ThenCut1000(finalPrice * scrRate);
+    rateLabel = rateLabel ? rateLabel + '+주문품' : '주문품';
+  }
+} else {
+  // 기타 (페그보드 등)
+  if (state.colorType === '주문') {
+    finalPrice = round100ThenCut1000(finalPrice * RATE_TABLE[rateKey].color);
+    rateLabel = '주문품';
+  }
+}
   }
 
   var item = {
