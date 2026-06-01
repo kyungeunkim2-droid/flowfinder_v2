@@ -1776,6 +1776,169 @@ body.ff-pro-dashboard #preview-panel{
 })();
 </script>
 
+<!-- === Codex patch 2026-06-01: force Nano Banana to edit source preview only === -->
+<script id="codex-nanobanana-material-map-only">
+(function(){
+  'use strict';
+
+  var STRICT_MATERIAL_MAP_PROMPT = [
+    'TASK: Edit the supplied source furniture preview image only.',
+    'Do not create a new product image. Do not redesign the furniture.',
+    'Preserve the exact original camera angle, perspective, size, silhouette, desk shape, leg geometry, screen geometry, shadows, background, and composition.',
+    'Only replace visible materials/colors on the detected furniture regions:',
+    '- desk top: apply topTexture/topCode only to the tabletop surface',
+    '- desk legs/frame: apply legTexture/legCode only to the legs/frame',
+    '- screen, if present: apply screenTexture/screenCode only to the screen panel',
+    'Keep every unselected region identical to the source image.',
+    'If a region is not visible, leave it unchanged. Output the same image with material mapping only.'
+  ].join('\n');
+
+  function $(id){ return document.getElementById(id); }
+  function text(id){ var el = $(id); return el ? String(el.textContent || '').trim() : ''; }
+  function cssBg(id){
+    var el = $(id);
+    if(!el) return '';
+    var bg = (el.style && el.style.backgroundImage) || window.getComputedStyle(el).backgroundImage || '';
+    var m = bg.match(/url\(["']?(.+?)["']?\)/);
+    return m ? m[1].replace(/\\/g, '/') : '';
+  }
+  function state(){
+    return Object.assign({},
+      (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {},
+      window.PREVIEW || {},
+      window.state || {}
+    );
+  }
+  function pickImagePath(targetType){
+    try{
+      if(typeof window.ffBuildPreviewPath === 'function'){
+        var built = window.ffBuildPreviewPath();
+        if(built) return built;
+      }
+      if(typeof window.__ffChooseDeskPreviewPath === 'function'){
+        var chosen = window.__ffChooseDeskPreviewPath();
+        if(chosen) return chosen;
+      }
+      if(typeof window.ffChooseDeskPreview === 'function'){
+        var desk = window.ffChooseDeskPreview();
+        if(desk) return desk;
+      }
+    }catch(e){}
+
+    var s = state();
+    var folder = /duct|덕트/i.test([s.product, s.deskLabel, s.currentProduct, s._currentCatName].join(' ')) ? 'desk_duct' : 'desk_standard';
+    var leg = /round|원형/i.test(s.legType || s.legShape || '') ? 'round' : (/aframe|A형/i.test(s.legType || s.legShape || '') ? 'aframe' : 'ladder');
+    var move = /caster|바퀴|캐스터/i.test(s.casterType || s.mobility || '') ? 'caster' : 'glide';
+    var top = /round|라운드/i.test(s.topShape || s.topType || '') ? 'round' : 'rect';
+    var screenText = [s.screenKey, s.selectedScreenKey, s.screenType, s.screenLabel, s.screen, targetType].join(' ');
+    var suffix = '';
+    if(/frontside|전면.*사이드|front.*side/i.test(screenText)) suffix = '_frontside';
+    else if(/front|전면/i.test(screenText)) suffix = '_front';
+    else if(/side|사이드/i.test(screenText)) suffix = '_side';
+    else if(/straight|일자/i.test(screenText)) suffix = '_straight';
+    else if(/lshape_R|right|우측/i.test(screenText)) suffix = '_lshape_R';
+    else if(/lshape|L형/i.test(screenText)) suffix = '_lshape';
+    return './images/previews/' + folder + '/' + [leg, move, top].join('_') + suffix + '.png';
+  }
+  function materialPayload(){
+    var s = state();
+    return {
+      topCode: text('quick-top-code') || s.topCode || s.top || s.topColor || '',
+      legCode: text('quick-leg-code') || s.legCode || s.leg || s.legColor || '',
+      screenCode: text('quick-screen-code') || s.screenCode || s.screen || s.screenColor || '',
+      topTexture: cssBg('quick-top-chip') || s.topTexture || s.topTex || s.topMaterialImg || '',
+      legTexture: cssBg('quick-leg-chip') || s.legTexture || s.legTex || s.legMaterialImg || '',
+      screenTexture: cssBg('quick-screen-chip') || s.screenTexture || s.screenTex || s.screenMaterialImg || '',
+      frontScreenTexture: s.frontScreenTexture || (window._screenPreviewState && window._screenPreviewState.front && window._screenPreviewState.front.texUrl) || '',
+      sideScreenTexture: s.sideScreenTexture || (window._screenPreviewState && window._screenPreviewState.side && window._screenPreviewState.side.texUrl) || ''
+    };
+  }
+  function normalizeNanoPayload(payload, targetType){
+    payload = payload && typeof payload === 'object' ? payload : {};
+    var source = payload.sourceImage || payload.baseImage || payload.deskImage || payload.screenImage || pickImagePath(targetType || payload.targetType);
+    var m = materialPayload();
+    var screenSelected = !!(payload.screenSelected || payload.screenImage || payload.screenCode || m.screenCode || /screen|스크린/i.test(String(targetType || payload.targetType || '')));
+
+    Object.assign(payload, {
+      mode: screenSelected ? 'material-map-existing-desk-screen-only' : 'material-map-existing-desk-only',
+      editMode: 'inpaint-material-transfer',
+      materialEditOnly: true,
+      preserveSourceImage: true,
+      preserveOriginalImage: true,
+      preserveGeometry: true,
+      preserveComposition: true,
+      forbidGeneration: true,
+      forbidNewImage: true,
+      sourceImage: source,
+      baseImage: source,
+      deskImage: source,
+      fallbackDeskImage: source,
+      screenImage: screenSelected ? source : (payload.screenImage || ''),
+      targetType: screenSelected ? 'desk_screen' : 'desk',
+      productType: screenSelected ? 'desk_screen' : 'desk',
+      topCode: payload.topCode || m.topCode,
+      legCode: payload.legCode || m.legCode,
+      screenCode: screenSelected ? (payload.screenCode || m.screenCode) : '',
+      topTexture: payload.topTexture || m.topTexture,
+      legTexture: payload.legTexture || m.legTexture,
+      screenTexture: screenSelected ? (payload.screenTexture || m.screenTexture) : '',
+      frontScreenTexture: screenSelected ? (payload.frontScreenTexture || m.frontScreenTexture || m.screenTexture) : '',
+      sideScreenTexture: screenSelected ? (payload.sideScreenTexture || m.sideScreenTexture || m.screenTexture) : '',
+      prompt: STRICT_MATERIAL_MAP_PROMPT + '\n\nSelected material values:\n' + JSON.stringify({
+        topCode: payload.topCode || m.topCode,
+        legCode: payload.legCode || m.legCode,
+        screenCode: screenSelected ? (payload.screenCode || m.screenCode) : '',
+        hasTopTexture: !!(payload.topTexture || m.topTexture),
+        hasLegTexture: !!(payload.legTexture || m.legTexture),
+        hasScreenTexture: !!(screenSelected && (payload.screenTexture || m.screenTexture))
+      })
+    });
+    return payload;
+  }
+
+  var originalFetch = window.fetch;
+  if(originalFetch && !window.__codexNanoFetchPatched){
+    window.__codexNanoFetchPatched = true;
+    window.fetch = function(input, init){
+      var url = typeof input === 'string' ? input : (input && input.url) || '';
+      if(url.indexOf('/api/generate-preview') > -1 && init && typeof init.body === 'string'){
+        try{
+          var body = JSON.parse(init.body);
+          init = Object.assign({}, init, { body: JSON.stringify(normalizeNanoPayload(body, body && body.targetType)) });
+        }catch(e){}
+      }
+      return originalFetch.call(this, input, init);
+    };
+  }
+
+  var OriginalXHR = window.XMLHttpRequest;
+  if(OriginalXHR && !window.__codexNanoXhrPatched){
+    window.__codexNanoXhrPatched = true;
+    window.XMLHttpRequest = function(){
+      var xhr = new OriginalXHR();
+      var nanoUrl = '';
+      var originalOpen = xhr.open;
+      var originalSend = xhr.send;
+      xhr.open = function(method, url){
+        nanoUrl = String(url || '');
+        return originalOpen.apply(xhr, arguments);
+      };
+      xhr.send = function(body){
+        if(nanoUrl.indexOf('/api/generate-preview') > -1 && typeof body === 'string'){
+          try{
+            body = JSON.stringify(normalizeNanoPayload(JSON.parse(body)));
+          }catch(e){}
+        }
+        return originalSend.call(xhr, body);
+      };
+      return xhr;
+    };
+  }
+
+  window.ffNormalizeNanoBananaPayload = normalizeNanoPayload;
+})();
+</script>
+
 <style>
 
 /* === Fixed68: three-column scroll layout + dedicated AI result panel === */
