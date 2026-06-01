@@ -18250,7 +18250,11 @@ html, body{ height:100vh !important; overflow:hidden !important; }
       fields += buildSizeControl('W','가로',defW,'size-w-'+fid,minW,2400,100);
       fields += buildSizeControl('D','세로',defD,'size-d-'+fid,560,900,10);
       fields += buildSizeControl('H','높이',defH,'size-h-'+fid,650,900,10);
-      hint='<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">· 데스크 가로/세로/높이를 확인해주세요.</span>';
+      hint=
+'<span class="hint" style="margin-top:8px;color:#9ccfc7;display:block;">' +
+'· 데스크 가로/세로/높이를 확인해주세요.<br>' +
+'· D는 스페이서를 포함한 깊이입니다. (표준품 D: 700, 800)' +
+'</span>';
     }else{
       var nm=cleanScreenName(catName), def=screenDefaults(catName), h=s.h||def.total;
       title='<b>'+esc(nm)+'</b>의 사이즈를 확인/조절해주세요:';
