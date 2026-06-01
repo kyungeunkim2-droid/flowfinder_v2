@@ -16738,7 +16738,7 @@ legCode:leg.code || s.leg || s.legCode || '',
       sideScreenCode:fs?(s.sideScreenCode||''):'',
       frontScreenTexture:fs?normUrl(s.frontScreenTexture||''):'',
       sideScreenTexture:fs?normUrl(s.sideScreenTexture||''):'',
-      guideImage:fs?'./images/guides/frontside_guide.png':'',
+     guideImage:fs?'./images/guides/frontside_guide.png':'',
       legType:legKey(),
 casterType:moveKey(),
 topShape:topKey(),
@@ -25958,7 +25958,13 @@ const ORDER_LEG_COLORS=['DCR','TS'];
   if(window.__ffCleanPreviewsRenderFinal) return;
   window.__ffCleanPreviewsRenderFinal = true;
 
-  var GUIDE_FRONTSIDE = './images/guides/frontside_guide.png';
+function getFrontsideGuide(){
+  return './images/guides/' +
+    legKey() + '_' +
+    moveKey() + '_' +
+    topKey() +
+    '_frontside.png';
+}
 
   function $(id){ return document.getElementById(id); }
   function S(){
