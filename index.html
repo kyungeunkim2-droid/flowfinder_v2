@@ -26616,7 +26616,7 @@ const ORDER_LEG_COLORS=['DCR','TS'];
     var suffix = screenSuffix();
     var base = screen ? previewPath(suffix || 'front') : previewPath(deskFolder());
     var payload = {
-      mode: screen ? 'strict-screen-texture-only-preview-path-v2' : 'strict-desk-texture-only-preview-path-v2',
+     mode: screen ? 'strict-screen-and-desk-material-preview-path-v3' : 'strict-desk-texture-only-preview-path-v2',
       materialEditOnly: true,
       preserveSourceImage: true,
       preserveTransparentBackground: true,
