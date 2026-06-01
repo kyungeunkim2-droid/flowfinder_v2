@@ -1776,6 +1776,364 @@ body.ff-pro-dashboard #preview-panel{
 })();
 </script>
 
+<!-- === Codex patch 2026-06-02: L-shape direction should not restart desk size === -->
+<script id="codex-lshape-no-repeat-desk-size">
+(function(){
+  'use strict';
+
+  function isLshape(v){ return /L형\s*스크린|lshape/i.test(String(v || '')); }
+
+  function currentLshapeIndex(state){
+    var cats = (state && state.selectedCategories) || [];
+    for(var i = 0; i < cats.length; i++){
+      if(isLshape(cats[i])) return i;
+    }
+    return -1;
+  }
+
+  function continueAfterDirection(){
+    var s = window.state || {};
+    var cats = Array.isArray(s.selectedCategories) ? s.selectedCategories : [];
+    var lIndex = currentLshapeIndex(s);
+
+    // If the L-shape category has already been reached, keep the cursor after it.
+    // This prevents the desk category from being replayed after choosing left/right.
+    if(lIndex >= 0 && Number(s.currentCatIdx || 0) <= lIndex){
+      s.currentCatIdx = lIndex + 1;
+    }
+
+    // When the direction prompt appears before the flow starts, still allow normal start.
+    if(lIndex >= 0 && Number(s.currentCatIdx || 0) === 0){
+      s.currentCatIdx = 0;
+    }
+
+    setTimeout(function(){
+      try{
+        if(typeof window.processNextCategory === 'function') window.processNextCategory();
+      }catch(err){
+        console.warn('[codex-lshape-no-repeat-desk-size] continue failed', err);
+      }
+    }, 0);
+  }
+
+  window.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('.ff-lshape-confirm');
+    if(!btn) return;
+    var pending = window.__ffPendingLshapeDirection || window.__ffLshapeDirection;
+    if(!pending) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    var dir = pending === 'right' ? 'right' : 'left';
+    window.__ffLshapeDirection = dir;
+    window.__ffPendingLshapeDirection = dir;
+    window.__ffLshapeNeedsDirection = false;
+    window.__ffAwaitingLshapeDirection = false;
+
+    try{
+      if(typeof window.ffApplyLshapeDirectionToPreviewKey === 'function') window.ffApplyLshapeDirectionToPreviewKey(dir);
+    }catch(err){}
+
+    btn.disabled = true;
+    btn.classList.add('selected');
+    btn.textContent = '선택 완료';
+
+    continueAfterDirection();
+    return false;
+  }, true);
+})();
+</script>
+
+<!-- === Codex absolute-last patch 2026-06-02: source pixels must be embedded === -->
+<script id="codex-nanobanana-source-pixels-absolute-last">
+(function(){
+  'use strict';
+  function isData(v){ return /^data:image\//i.test(String(v || '')); }
+  function toAbs(src){ try{ return new URL(String(src || ''), document.baseURI).href; }catch(e){ return String(src || ''); } }
+  function imageToData(src){
+    return new Promise(function(resolve){
+      if(!src || isData(src)) return resolve(src || '');
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function(){
+        try{
+          var c = document.createElement('canvas');
+          c.width = img.naturalWidth || img.width;
+          c.height = img.naturalHeight || img.height;
+          if(!c.width || !c.height) return resolve('');
+          c.getContext('2d').drawImage(img, 0, 0);
+          resolve(c.toDataURL('image/png'));
+        }catch(e){ console.warn('[codex absolute last] source canvas failed', e); resolve(''); }
+      };
+      img.onerror = function(){ console.warn('[codex absolute last] source image missing', src); resolve(''); };
+      img.src = toAbs(src);
+    });
+  }
+  async function normalize(payload){
+    payload = payload && typeof payload === 'object' ? payload : {};
+    if(typeof window.ffNormalizeNanoBananaPayload === 'function'){
+      try{ payload = window.ffNormalizeNanoBananaPayload(payload, payload.targetType); }catch(e){}
+    }
+    var source = payload.sourceImage || payload.baseImage || payload.deskImage || payload.screenImage || '';
+    if(!source && typeof window.ffBuildPreviewPath === 'function'){
+      try{ source = window.ffBuildPreviewPath(); }catch(e){}
+    }
+    var dataUrl = await imageToData(source);
+    if(dataUrl && isData(dataUrl)){
+      ['sourceImage','baseImage','deskImage','fallbackDeskImage'].forEach(function(k){ payload[k] = dataUrl; });
+      if(payload.screenSelected || payload.screenCode || payload.targetType === 'desk_screen') payload.screenImage = dataUrl;
+      payload.sourceImageData = dataUrl;
+      payload.baseImageData = dataUrl;
+      payload.deskImageData = dataUrl;
+      payload.referenceImageIsEmbedded = true;
+      payload.mustUseReferenceImagePixels = true;
+      payload.forbidGeneration = true;
+      payload.forbidNewImage = true;
+      payload.materialEditOnly = true;
+      payload.preserveSourceImage = true;
+      payload.prompt = 'Use the embedded image pixels as the exact canvas. This is image editing/inpainting only. Never create a new product image. Preserve geometry, perspective, background, crop, lighting and shadows. Only map selected material textures/colors to tabletop, legs/frame, and screen panel.\\n' + String(payload.prompt || '');
+    }else{
+      payload.referenceImageLoadFailed = true;
+      payload.forbidGeneration = true;
+      payload.prompt = 'Reference image pixels were not available. Return an error instead of creating a new image.\\n' + String(payload.prompt || '');
+    }
+    return payload;
+  }
+
+  var oldFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = typeof input === 'string' ? input : (input && input.url) || '';
+    if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(url) && init && typeof init.body === 'string'){
+      return Promise.resolve().then(async function(){
+        try{ init = Object.assign({}, init, { body: JSON.stringify(await normalize(JSON.parse(init.body))) }); }
+        catch(e){ console.warn('[codex absolute last] fetch normalize failed', e); }
+        return oldFetch.call(window, input, init);
+      });
+    }
+    return oldFetch.call(window, input, init);
+  };
+
+  var OldXHR = window.XMLHttpRequest;
+  window.XMLHttpRequest = function(){
+    var xhr = new OldXHR();
+    var target = '';
+    var open = xhr.open;
+    var send = xhr.send;
+    xhr.open = function(method, url){ target = String(url || ''); return open.apply(xhr, arguments); };
+    xhr.send = function(body){
+      if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(target) && typeof body === 'string'){
+        Promise.resolve().then(async function(){
+          try{ body = JSON.stringify(await normalize(JSON.parse(body))); }
+          catch(e){ console.warn('[codex absolute last] xhr normalize failed', e); }
+          send.call(xhr, body);
+        });
+        return;
+      }
+      return send.call(xhr, body);
+    };
+    return xhr;
+  };
+})();
+</script>
+
+<!-- === Codex final patch 2026-06-02: reinstall source-pixel guard after all overrides === -->
+<script id="codex-nanobanana-source-pixels-reinstall-last">
+(function(){
+  'use strict';
+  if(typeof window.ffNanoBananaEmbedSourcePixels !== 'function') return;
+
+  var normalize = window.ffNanoBananaEmbedSourcePixels;
+
+  var previousFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = typeof input === 'string' ? input : (input && input.url) || '';
+    if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(url) && init && typeof init.body === 'string'){
+      return Promise.resolve().then(async function(){
+        try{
+          var payload = JSON.parse(init.body);
+          init = Object.assign({}, init, { body: JSON.stringify(await normalize(payload)) });
+        }catch(e){
+          console.warn('[codex-nanobanana-source-pixels-reinstall-last] fetch patch failed', e);
+        }
+        return previousFetch.call(window, input, init);
+      });
+    }
+    return previousFetch.call(window, input, init);
+  };
+
+  var PreviousXHR = window.XMLHttpRequest;
+  window.XMLHttpRequest = function(){
+    var xhr = new PreviousXHR();
+    var targetUrl = '';
+    var open = xhr.open;
+    var send = xhr.send;
+    xhr.open = function(method, url){
+      targetUrl = String(url || '');
+      return open.apply(xhr, arguments);
+    };
+    xhr.send = function(body){
+      if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(targetUrl) && typeof body === 'string'){
+        Promise.resolve().then(async function(){
+          try{
+            var payload = JSON.parse(body);
+            body = JSON.stringify(await normalize(payload));
+          }catch(e){
+            console.warn('[codex-nanobanana-source-pixels-reinstall-last] xhr patch failed', e);
+          }
+          send.call(xhr, body);
+        });
+        return;
+      }
+      return send.call(xhr, body);
+    };
+    return xhr;
+  };
+})();
+</script>
+
+<!-- === Codex final patch 2026-06-02: send real source pixels to Nano Banana === -->
+<script id="codex-nanobanana-source-pixels-final">
+(function(){
+  'use strict';
+
+  var SOURCE_KEYS = ['sourceImage','baseImage','deskImage','fallbackDeskImage','screenImage'];
+  var DATA_KEYS = ['sourceImageData','baseImageData','deskImageData','screenImageData'];
+
+  function isDataImage(v){ return /^data:image\//i.test(String(v || '')); }
+  function isUsableImagePath(v){
+    v = String(v || '').trim();
+    return !!v && !isDataImage(v) && !/^blob:/i.test(v) && !/^about:blank/i.test(v) && !/data:image\/svg\+xml/i.test(v);
+  }
+  function absolutize(src){
+    src = String(src || '').trim();
+    if(!src) return '';
+    try{ return new URL(src, document.baseURI).href; }catch(e){ return src; }
+  }
+  function imageToDataUrl(src){
+    return new Promise(function(resolve){
+      if(!src) return resolve('');
+      if(isDataImage(src)) return resolve(src);
+
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function(){
+        try{
+          var canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          if(!canvas.width || !canvas.height) return resolve('');
+          var ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0);
+          resolve(canvas.toDataURL('image/png'));
+        }catch(e){
+          console.warn('[codex-nanobanana-source-pixels-final] canvas conversion failed', e);
+          resolve('');
+        }
+      };
+      img.onerror = function(){
+        console.warn('[codex-nanobanana-source-pixels-final] source image load failed', src);
+        resolve('');
+      };
+      img.src = absolutize(src);
+    });
+  }
+  async function normalizeSourcePixels(payload){
+    payload = payload && typeof payload === 'object' ? payload : {};
+    if(window.ffNormalizeNanoBananaPayload){
+      try{ payload = window.ffNormalizeNanoBananaPayload(payload, payload.targetType); }catch(e){}
+    }
+
+    var src = '';
+    for(var i = 0; i < SOURCE_KEYS.length; i++){
+      if(payload[SOURCE_KEYS[i]]){ src = payload[SOURCE_KEYS[i]]; break; }
+    }
+    if(!src && typeof window.ffBuildPreviewPath === 'function'){
+      try{ src = window.ffBuildPreviewPath(); }catch(e){}
+    }
+    if(!src) return payload;
+
+    var dataUrl = isDataImage(src) ? src : await imageToDataUrl(src);
+    if(dataUrl){
+      SOURCE_KEYS.forEach(function(key){ payload[key] = dataUrl; });
+      DATA_KEYS.forEach(function(key){ payload[key] = dataUrl; });
+      payload.sourceImageOriginalPath = isDataImage(src) ? (payload.sourceImageOriginalPath || '') : src;
+      payload.referenceImageIsEmbedded = true;
+      payload.mustUseReferenceImagePixels = true;
+      payload.prompt = [
+        'Use the embedded reference image pixels as the canvas.',
+        'This is an image edit/inpaint task, not text-to-image generation.',
+        'Do not invent a new desk, screen, camera angle, layout, size, background, or structure.',
+        'Only recolor/remap the tabletop, legs/frame, and screen material regions according to the supplied material textures/codes.',
+        String(payload.prompt || '')
+      ].join('\n');
+    }else if(isUsableImagePath(src)){
+      payload.referenceImageLoadFailed = true;
+      payload.prompt = [
+        'The source reference image must be loaded before generation. If the reference image is unavailable, return an error instead of creating a new image.',
+        String(payload.prompt || '')
+      ].join('\n');
+    }
+    return payload;
+  }
+
+  var previousFetch = window.fetch;
+  if(previousFetch && !window.__codexNanoSourcePixelsFetchFinal){
+    window.__codexNanoSourcePixelsFetchFinal = true;
+    window.fetch = function(input, init){
+      var url = typeof input === 'string' ? input : (input && input.url) || '';
+      if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(url) && init && typeof init.body === 'string'){
+        return Promise.resolve().then(async function(){
+          try{
+            var payload = JSON.parse(init.body);
+            payload = await normalizeSourcePixels(payload);
+            init = Object.assign({}, init, { body: JSON.stringify(payload) });
+          }catch(e){
+            console.warn('[codex-nanobanana-source-pixels-final] fetch payload patch failed', e);
+          }
+          return previousFetch.call(window, input, init);
+        });
+      }
+      return previousFetch.call(window, input, init);
+    };
+  }
+
+  var PreviousXHR = window.XMLHttpRequest;
+  if(PreviousXHR && !window.__codexNanoSourcePixelsXhrFinal){
+    window.__codexNanoSourcePixelsXhrFinal = true;
+    window.XMLHttpRequest = function(){
+      var xhr = new PreviousXHR();
+      var targetUrl = '';
+      var open = xhr.open;
+      var send = xhr.send;
+      xhr.open = function(method, url){
+        targetUrl = String(url || '');
+        return open.apply(xhr, arguments);
+      };
+      xhr.send = function(body){
+        if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(targetUrl) && typeof body === 'string'){
+          Promise.resolve().then(async function(){
+            try{
+              var payload = JSON.parse(body);
+              body = JSON.stringify(await normalizeSourcePixels(payload));
+            }catch(e){
+              console.warn('[codex-nanobanana-source-pixels-final] xhr payload patch failed', e);
+            }
+            send.call(xhr, body);
+          });
+          return;
+        }
+        return send.call(xhr, body);
+      };
+      return xhr;
+    };
+  }
+
+  window.ffNanoBananaEmbedSourcePixels = normalizeSourcePixels;
+})();
+</script>
+
 <!-- === Codex patch 2026-06-01: robust first product selection advance === -->
 <script id="codex-product-selection-advance-fix">
 (function(){
@@ -17384,6 +17742,7 @@ console.log('DESK MATERIAL CHECK', {
 });
     
  var payload = {
+strict-screen-material-mapping-final-sequential
   materialEditOnly: true,
   preserveSourceImage: true,
   preserveTransparentBackground: true,
@@ -21313,7 +21672,7 @@ button.material-btn{
   window.askLegType = function(catName){
     state.step='choose_desk_options'; state._currentCatName=catName || state._currentCatName || '일반형 데스크';
     if(typeof saveHistory==='function') saveHistory(function(){ window.askLegType(state._currentCatName); });
-    if(typeof addMsg==='function') addMsg('bot', deskOptionHTML(state._currentCatName));
+    if(typeof addMsg==='function') addMsg('bot', deskOptionHTMLAllLegs(state._currentCatName));
     if(typeof scrollBottom==='function') scrollBottom();
   };
   window.askCasterType = function(catName){ return window.askLegType(catName || state._currentCatName); };
@@ -27922,6 +28281,141 @@ legCode: m.legCode || '',
     e.stopPropagation();
     if(e.stopImmediatePropagation) e.stopImmediatePropagation();
     advance(sel);
+    return false;
+  }, true);
+})();
+</script>
+
+<!-- === Codex true-last patch 2026-06-02: embed reference pixels in render payload === -->
+<script id="codex-nanobanana-source-pixels-true-last">
+(function(){
+  'use strict';
+  function isData(v){ return /^data:image\//i.test(String(v || '')); }
+  function toAbs(src){ try{ return new URL(String(src || ''), document.baseURI).href; }catch(e){ return String(src || ''); } }
+  function imageToData(src){
+    return new Promise(function(resolve){
+      if(!src || isData(src)) return resolve(src || '');
+      var img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = function(){
+        try{
+          var c = document.createElement('canvas');
+          c.width = img.naturalWidth || img.width;
+          c.height = img.naturalHeight || img.height;
+          if(!c.width || !c.height) return resolve('');
+          c.getContext('2d').drawImage(img, 0, 0);
+          resolve(c.toDataURL('image/png'));
+        }catch(e){ console.warn('[codex true last] source canvas failed', e); resolve(''); }
+      };
+      img.onerror = function(){ console.warn('[codex true last] source image missing', src); resolve(''); };
+      img.src = toAbs(src);
+    });
+  }
+  async function normalize(payload){
+    payload = payload && typeof payload === 'object' ? payload : {};
+    if(typeof window.ffNormalizeNanoBananaPayload === 'function'){
+      try{ payload = window.ffNormalizeNanoBananaPayload(payload, payload.targetType); }catch(e){}
+    }
+    var source = payload.sourceImage || payload.baseImage || payload.deskImage || payload.screenImage || '';
+    if(!source && typeof window.ffBuildPreviewPath === 'function'){
+      try{ source = window.ffBuildPreviewPath(); }catch(e){}
+    }
+    var dataUrl = await imageToData(source);
+    if(dataUrl && isData(dataUrl)){
+      ['sourceImage','baseImage','deskImage','fallbackDeskImage'].forEach(function(k){ payload[k] = dataUrl; });
+      if(payload.screenSelected || payload.screenCode || payload.targetType === 'desk_screen') payload.screenImage = dataUrl;
+      payload.sourceImageData = dataUrl;
+      payload.baseImageData = dataUrl;
+      payload.deskImageData = dataUrl;
+      payload.referenceImageIsEmbedded = true;
+      payload.mustUseReferenceImagePixels = true;
+      payload.forbidGeneration = true;
+      payload.forbidNewImage = true;
+      payload.materialEditOnly = true;
+      payload.preserveSourceImage = true;
+      payload.prompt = 'Use the embedded image pixels as the exact canvas. This is image editing/inpainting only. Never create a new product image. Preserve geometry, perspective, background, crop, lighting and shadows. Only map selected material textures/colors to tabletop, legs/frame, and screen panel.\n' + String(payload.prompt || '');
+    }else{
+      payload.referenceImageLoadFailed = true;
+      payload.forbidGeneration = true;
+      payload.prompt = 'Reference image pixels were not available. Return an error instead of creating a new image.\n' + String(payload.prompt || '');
+    }
+    return payload;
+  }
+  var oldFetch = window.fetch;
+  window.fetch = function(input, init){
+    var url = typeof input === 'string' ? input : (input && input.url) || '';
+    if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(url) && init && typeof init.body === 'string'){
+      return Promise.resolve().then(async function(){
+        try{ init = Object.assign({}, init, { body: JSON.stringify(await normalize(JSON.parse(init.body))) }); }
+        catch(e){ console.warn('[codex true last] fetch normalize failed', e); }
+        return oldFetch.call(window, input, init);
+      });
+    }
+    return oldFetch.call(window, input, init);
+  };
+  var OldXHR = window.XMLHttpRequest;
+  window.XMLHttpRequest = function(){
+    var xhr = new OldXHR();
+    var target = '';
+    var open = xhr.open;
+    var send = xhr.send;
+    xhr.open = function(method, url){ target = String(url || ''); return open.apply(xhr, arguments); };
+    xhr.send = function(body){
+      if(/\/api\/generate-preview|\/api\/generate-screen-preview/i.test(target) && typeof body === 'string'){
+        Promise.resolve().then(async function(){
+          try{ body = JSON.stringify(await normalize(JSON.parse(body))); }
+          catch(e){ console.warn('[codex true last] xhr normalize failed', e); }
+          send.call(xhr, body);
+        });
+        return;
+      }
+      return send.call(xhr, body);
+    };
+    return xhr;
+  };
+})();
+</script>
+
+<!-- === Codex true-last patch 2026-06-02: L-shape direction keeps flow position === -->
+<script id="codex-lshape-no-repeat-desk-size-true-last">
+(function(){
+  'use strict';
+  function isLshape(v){ return /L형\s*스크린|lshape/i.test(String(v || '')); }
+  function lshapeIndex(s){
+    var cats = Array.isArray(s && s.selectedCategories) ? s.selectedCategories : [];
+    for(var i = 0; i < cats.length; i++){ if(isLshape(cats[i])) return i; }
+    return -1;
+  }
+  function continueFlow(){
+    var s = window.state || {};
+    var idx = lshapeIndex(s);
+    var cur = Number(s.currentCatIdx || 0);
+    if(idx >= 0 && cur <= idx + 1){
+      s.currentCatIdx = idx + 1;
+    }
+    setTimeout(function(){
+      try{ if(typeof window.processNextCategory === 'function') window.processNextCategory(); }
+      catch(err){ console.warn('[codex-lshape-no-repeat-desk-size-true-last] continue failed', err); }
+    }, 0);
+  }
+  window.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('.ff-lshape-confirm');
+    if(!btn) return;
+    var dir = window.__ffPendingLshapeDirection || window.__ffLshapeDirection;
+    if(!dir) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    dir = dir === 'right' ? 'right' : 'left';
+    window.__ffLshapeDirection = dir;
+    window.__ffPendingLshapeDirection = dir;
+    window.__ffLshapeNeedsDirection = false;
+    window.__ffAwaitingLshapeDirection = false;
+    try{ if(typeof window.ffApplyLshapeDirectionToPreviewKey === 'function') window.ffApplyLshapeDirectionToPreviewKey(dir); }catch(err){}
+    btn.disabled = true;
+    btn.classList.add('selected');
+    btn.textContent = '선택 완료';
+    continueFlow();
     return false;
   }, true);
 })();
