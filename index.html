@@ -5915,6 +5915,7 @@ console.log('[PRICE CHECK]', {
   rateKey: rateKey,
   shrink: RATE_TABLE[rateKey].shrink,
   finalPrice: finalPrice
+  
 });
 
 var baseItem = null, stdW = null, stdD = null;
@@ -5993,13 +5994,22 @@ var baseItem = null, stdW = null, stdD = null;
     }
   }
 
-  if (catName === '전면 스크린') {
-    baseItem = ffPickFrontScreenItem(state.color);
-    if (baseItem) {
-      stdW = ffFrontWFromCode(baseItem.code) || null;
-      stdD = null;
-    }
+ if (catName === '전면 스크린') {
+  baseItem = ffPickFrontScreenItem(state.color);
+
+  console.log('[BASE ITEM CHECK]', {
+    color: state.color,
+    h: state.h,
+    code: baseItem ? baseItem.code : null,
+    price: baseItem ? baseItem.price : null,
+    factory: baseItem ? baseItem.factory : null
+  });
+
+  if (baseItem) {
+    stdW = ffFrontWFromCode(baseItem.code) || null;
+    stdD = null;
   }
+}
 
   if (!baseItem) {
     addMsg('bot', '<span class="error-msg">해당 조합의 가격 정보가 없습니다.</span>');
