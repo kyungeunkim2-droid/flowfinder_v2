@@ -19356,7 +19356,8 @@ html, body{ height:100vh !important; overflow:hidden !important; }
     if(typeof window.saveHistory === 'function'){
       try{ window.saveHistory(function(){ window.askLegType(window.state._currentCatName); }); }catch(e){}
     }
-    if(typeof window.addMsg === 'function') window.addMsg('bot', deskOptionHTMLAllLegs(state._currentCatName));
+    if(typeof window.addMsg === 'function')
+    window.addMsg('bot', deskOptionHTMLAllLegs((window.state && window.state._currentCatName) || '일반형 데스크'));
     if(typeof window.scrollBottom === 'function') window.scrollBottom();
   };
 
