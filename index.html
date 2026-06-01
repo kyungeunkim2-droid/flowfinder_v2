@@ -5894,10 +5894,21 @@ function calcAndFinish(catName) {
 
   // ── 공장/요율키 결정 ──
   // F우레탄제품은 충주제품(충주공장1) 요율 사용
-  var factoryForRate = state.factory;
-  if (factoryForRate === 'F우레탄제품') factoryForRate = '충주제품';
-  var rateKey = (factoryForRate && RATE_TABLE[factoryForRate]) ? factoryForRate : '충주1제품';
+var factoryForRate = state.factory;
 
+// 전면/사이드 스크린은 가격표 기준이 안성상품이므로 요율도 안성상품 기준 적용
+if (catName === '전면 스크린' || catName === '사이드 스크린') {
+  factoryForRate = '안성상품';
+}
+
+if (factoryForRate === 'F우레탄제품') factoryForRate = '충주제품';
+
+var rateKey = (factoryForRate && RATE_TABLE[factoryForRate])
+  ? factoryForRate
+  : '충주1제품';
+console.log('rateKey=', rateKey);
+console.log('factory=', factoryForRate);
+console.log('shrink=', RATE_TABLE[rateKey].shrink);
   var baseItem = null, stdW = null, stdD = null;
 
   // ── 세트 데이터: 레그+색상으로 베이스 아이템 찾기 ──
