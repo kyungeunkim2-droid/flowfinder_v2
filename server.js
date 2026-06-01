@@ -268,7 +268,8 @@ guideImage
   : '',
 
 guideImage
-  ? 'Apply frontScreenTexture only to the White area.' 
+  ? 'Apply frontScreenTexture only to the White area. Apply frontScreenTexture only to the White area that overlaps the actual front screen panel surface.
+Apply sideScreenTexture only to the Red area that overlaps the actual side screen panel surface.' 
   : '',
 
 guideImage
@@ -285,6 +286,18 @@ guideImage
 
 guideImage
   ? 'Do not apply materials outside the guide regions.' 
+  : '',
+        
+guideImage
+  ? 'The guide colors are masks for object surfaces only. Do not extend material texture beyond the colored object surface regions.'
+  : '',
+
+guideImage
+  ? 'Any uncolored or transparent area in the guide image must remain completely unchanged from the source image.'
+  : '',
+
+guideImage
+  ? 'Do not apply screen textures to background, empty space, floor, shadow, or transparent areas.'
   : '',
 (effectiveFrontScreenTexture && effectiveSideScreenTexture)
   ? 'If front and side textures are different, they must remain different. Never copy the side texture onto the front panel or the front texture onto the side panel.'
