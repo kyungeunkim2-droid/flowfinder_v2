@@ -2994,7 +2994,6 @@ function _ffProductKeyFromCat(cat) {
   if (cat.indexOf('전면 스크린') !== -1) return 'front';
   if (cat.indexOf('사이드 스크린') !== -1) return 'side';
   if (cat.indexOf('일자형 스크린') !== -1) return 'straight';
-  if (cat.indexOf('우측') !== -1 || cat.indexOf('오른쪽') !== -1 || cat === 'L형 스크린(R)') return 'lshape_R';
   if (cat.indexOf('L형 스크린') !== -1 || cat.indexOf('l형 스크린') !== -1) return 'lshape';
   return '';
 }
@@ -3247,8 +3246,7 @@ function drawDesk(ctx, W, H, pat, code, catKey) {
 /* ── 스크린 ── */
 function drawScreen(ctx, W, pat, code) {
   var H=300, cn=state._currentCatName||'', key='straight';
-  if(cn.indexOf('우측')!==-1 || cn.indexOf('오른쪽')!==-1 || cn==='L형 스크린(R)') key='lshape';
-  else if(cn.indexOf('L형')!==-1) key='lshape';
+  if(cn.indexOf('L형')!==-1) key='lshape';
   else if(cn.indexOf('전면')!==-1) key='front';
   else if(cn.indexOf('사이드')!==-1) key='side';
   var svg=SVG_PATHS[key];
@@ -3309,7 +3307,7 @@ function updateScreenComposite(type, colorCode, texUrl) {
   if (type === '전면 스크린') _screenPreviewState.front = entry;
   if (type === '사이드 스크린') _screenPreviewState.side = entry;
   if (type === '일자형 스크린') _screenPreviewState.straight = entry;
-  if (type === 'L형 스크린' || type === 'L형 스크린(L)' || type === 'L형 스크린(우측)' || type === 'L형 스크린(R)' || (type && type.indexOf('L형 스크린') !== -1)) _screenPreviewState.lshape = entry;
+  if (type === 'L형 스크린') _screenPreviewState.lshape = entry;
   _screenPreviewState.latest = entry;
   window.__ffPreviewScreen = colorCode;
   window.__ffActiveGlowPart = 'screen';
@@ -3342,9 +3340,7 @@ function _ffScreenProductKey(type) {
   if (type === '전면 스크린') return 'front';
   if (type === '사이드 스크린') return 'side';
   if (type === '일자형 스크린') return 'straight';
-  if (type && (type.indexOf('L형 스크린') !== -1 || type.indexOf('l형 스크린') !== -1)) {
-    return (type.indexOf('우측') !== -1 || type.indexOf('오른쪽') !== -1 || type === 'L형 스크린(R)') ? 'lshape_R' : 'lshape';
-  }
+  if (type === 'L형 스크린') return 'lshape';
   return 'front';
 }
 function _ffDrawActualScreenPreview(ctx, W, H, entry) {
@@ -6689,7 +6685,6 @@ function setPreviewGlow(part) {
     if (cat.indexOf('전면 스크린') !== -1) return 'front';
     if (cat.indexOf('사이드 스크린') !== -1) return 'side';
     if (cat.indexOf('일자형 스크린') !== -1) return 'straight';
-    if (cat.indexOf('우측') !== -1 || cat.indexOf('오른쪽') !== -1 || cat === 'L형 스크린(R)') return 'lshape_R';
     if (cat.indexOf('L형 스크린') !== -1 || cat.indexOf('l형 스크린') !== -1) return 'lshape';
     return '';
   }
