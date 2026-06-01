@@ -263,7 +263,45 @@ isScreenRender ? 'If topTexture or legTexture is provided, it must be applied ev
        effectiveSideScreenTexture
   ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.'
   : '',
+guideImage
+  ? 'Use the guide image for region mapping.' 
+  : '',
 
+guideImage
+  ? 'White area = FRONT SCREEN.' 
+  : '',
+
+guideImage
+  ? 'Red area = SIDE SCREEN.' 
+  : '',
+
+guideImage
+  ? 'Brown area = TABLETOP.' 
+  : '',
+
+guideImage
+  ? 'Dark Gray area = DESK LEGS AND FRAME.' 
+  : '',
+
+guideImage
+  ? 'Apply frontScreenTexture only to the White area.' 
+  : '',
+
+guideImage
+  ? 'Apply sideScreenTexture only to the Red area.' 
+  : '',
+
+guideImage
+  ? 'Apply topTexture only to the Brown area.' 
+  : '',
+
+guideImage
+  ? 'Apply legTexture only to the Dark Gray area.' 
+  : '',
+
+guideImage
+  ? 'Do not apply materials outside the guide regions.' 
+  : '',
 (effectiveFrontScreenTexture && effectiveSideScreenTexture)
   ? 'If front and side textures are different, they must remain different. Never copy the side texture onto the front panel or the front texture onto the side panel.'
   : '',
