@@ -16780,7 +16780,7 @@ window.showPanel = function(){
     if(fs){ setFrontsideState(); }
 
     console.log('SCREEN RENDER CHECK', {
-  suffix: suffix,
+  suffix: (typeof suffix !== 'undefined' ? suffix : (fs ? 'frontside' : (isScreen ? 'screen' : 'desk'))),
   screenTexture: scr.tex,
   screenCode: scr.code,
   screenImage: base
@@ -19364,6 +19364,238 @@ html, body{ height:100vh !important; overflow:hidden !important; }
   window.ffDeskOptionHTMLAllLegs = deskOptionHTMLAllLegs;
 })();
 </script>
+
+
+<!-- === FF_PATCH_PRODUCT_ADD_SNAPSHOT_AND_FINAL_RENDER_FIX === -->
+<script id="ff-product-add-snapshot-final-render-fix">
+(function(){
+  if (window.__ffProductAddSnapshotFinalRenderFix) return;
+  window.__ffProductAddSnapshotFinalRenderFix = true;
+
+  function $(id){ return document.getElementById(id); }
+  function esc(v){
+    return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function good(src){
+    src = String(src || '').trim();
+    if (!src) return false;
+    if (/^about:blank/i.test(src)) return false;
+    if (/data:image\/svg\+xml/i.test(src)) return false;
+    if (/blank|placeholder/i.test(src) && !/^data:image\//i.test(src)) return false;
+    return /^(data:image\/|blob:|https?:\/\/|\.\/|\/|images\/|products\/)/i.test(src);
+  }
+  function canvasData(id){
+    var c = $(id);
+    if (!c || !c.tagName || c.tagName.toLowerCase() !== 'canvas') return '';
+    if (!c.width || !c.height || c.width < 20 || c.height < 20) return '';
+    try { return c.toDataURL('image/png'); } catch(e){ return ''; }
+  }
+  function visibleImg(id){
+    var im = $(id);
+    if (!im) return '';
+    var src = im.currentSrc || im.src || im.getAttribute('src') || '';
+    if (!good(src)) return '';
+    try {
+      var st = window.getComputedStyle(im);
+      if (st.display === 'none' || st.visibility === 'hidden') return '';
+    } catch(e){}
+    return src;
+  }
+
+  window.ffCaptureCurrentRenderSnapshot = function(){
+    // 1순위: 실제 화면에 합성되어 있는 canvas. 제품추가/최종견적서에서 재생성하지 않고 이 스냅샷을 쓴다.
+    var canvasIds = [
+      'ff-clean-preview-canvas',
+      'ff-hero-canvas',
+      'ff-render-canvas',
+      'screen-composite-canvas',
+      'set-composite-canvas',
+      'product-3d-canvas'
+    ];
+    for (var i=0;i<canvasIds.length;i++){
+      var data = canvasData(canvasIds[i]);
+      if (good(data)) return data;
+    }
+
+    // 2순위: 이미 표시된 결과 이미지
+    var imgIds = [
+      'ff-clean-preview-img',
+      'ff-render-result-img',
+      'ff-ai-live-img',
+      'ff-hero-img',
+      'screen-composite-img',
+      'product-preview-img'
+    ];
+    for (var j=0;j<imgIds.length;j++){
+      var src = visibleImg(imgIds[j]);
+      if (good(src)) return src;
+    }
+
+    // 3순위: 패널 내부의 가장 최근 이미지
+    var imgs = document.querySelectorAll('#preview-panel img, #quick-ai-preview-note img, .ai-result img');
+    for (var k=imgs.length-1;k>=0;k--){
+      var im = imgs[k];
+      var s = im.currentSrc || im.src || im.getAttribute('src') || '';
+      if (good(s)) return s;
+    }
+    return '';
+  };
+
+  function attachSnapshotToLastItem(){
+    var img = window.ffCaptureCurrentRenderSnapshot ? window.ffCaptureCurrentRenderSnapshot() : '';
+    if (!good(img)) return '';
+
+    window.__ffFrozenFinalQuoteRenderImage = img;
+    window.__ffFinalQuoteRenderImage = img;
+
+    if (window.PREVIEW) window.PREVIEW.finalRenderImage = img;
+    if (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) {
+      window.FlowFinderFastPreview.state.finalRenderImage = img;
+    }
+
+    var st = window.state || {};
+    var items = st.cartItems || [];
+    if (items.length) {
+      var last = items[items.length - 1];
+      last.renderImage = img;
+      last.finalRenderImage = img;
+      last._ffSnapshotImage = img;
+    }
+    return img;
+  }
+
+  // cartItems.push 직후 자동으로 현재 렌더 스냅샷을 붙인다.
+  var originalUpdatePreview = window.updatePreview;
+  if (typeof originalUpdatePreview === 'function' && !originalUpdatePreview.__ffSnapshotWrapped) {
+    var wrappedUpdatePreview = function(){
+      var r = originalUpdatePreview.apply(this, arguments);
+      setTimeout(function(){
+        try {
+          var st = window.state || {};
+          var items = st.cartItems || [];
+          if (!items.length) return;
+          var last = items[items.length - 1];
+          if (!last.renderImage && !last.finalRenderImage && !last._ffSnapshotImage) {
+            attachSnapshotToLastItem();
+          }
+        } catch(e){}
+      }, 80);
+      return r;
+    };
+    wrappedUpdatePreview.__ffSnapshotWrapped = true;
+    window.updatePreview = wrappedUpdatePreview;
+  }
+
+  // 제품 추가 버튼은 유지하되, 누르기 직전에 현재 렌더 이미지를 저장한다.
+  function wrapButtonAction(name){
+    var fn = window[name];
+    if (typeof fn !== 'function' || fn.__ffSnapshotWrapped) return;
+    var wrapped = function(){
+      attachSnapshotToLastItem();
+      return fn.apply(this, arguments);
+    };
+    wrapped.__ffSnapshotWrapped = true;
+    window[name] = wrapped;
+  }
+  wrapButtonAction('addNewItem');
+  wrapButtonAction('addNewItemFromFinal');
+  wrapButtonAction('confirmFinalQuote');
+
+  // 최종견적서는 API 재생성 이미지를 다시 고르지 않고, 저장된 스냅샷 1장만 표시한다.
+  function quoteImage(){
+    var st = window.state || {};
+    var items = st.cartItems || [];
+    for (var i=items.length-1;i>=0;i--){
+      var it = items[i] || {};
+      var src = it.renderImage || it.finalRenderImage || it._ffSnapshotImage || '';
+      if (good(src)) return src;
+    }
+    var frozen = window.__ffFrozenFinalQuoteRenderImage || window.__ffFinalQuoteRenderImage || (window.PREVIEW && window.PREVIEW.finalRenderImage) || '';
+    if (good(frozen)) return frozen;
+    return window.ffCaptureCurrentRenderSnapshot ? window.ffCaptureCurrentRenderSnapshot() : '';
+  }
+
+  function applyFinalQuoteImage(){
+    var modal = $('final-quote-modal');
+    if (!modal) return;
+    var renderBox = modal.querySelector('.ff-step6-render');
+    if (!renderBox) return;
+    var img = quoteImage();
+    if (!good(img)) return;
+    renderBox.innerHTML = '<img src="'+esc(img)+'" alt="최종 렌더링 이미지">';
+  }
+
+  var baseShowFinalQuote = window.showFinalQuote;
+  if (typeof baseShowFinalQuote === 'function' && !baseShowFinalQuote.__ffSnapshotFinalWrapped) {
+    var wrappedShow = function(){
+      attachSnapshotToLastItem();
+      var r = baseShowFinalQuote.apply(this, arguments);
+      setTimeout(applyFinalQuoteImage, 60);
+      setTimeout(applyFinalQuoteImage, 220);
+      return r;
+    };
+    wrappedShow.__ffSnapshotFinalWrapped = true;
+    window.showFinalQuote = wrappedShow;
+  }
+
+  // PDF는 최종견적서 모달만 출력.
+  window.printFinalQuote = function(){
+    if (!document.getElementById('final-quote-modal') && typeof window.showFinalQuote === 'function') {
+      window.showFinalQuote();
+    }
+    setTimeout(function(){
+      applyFinalQuoteImage();
+      window.print();
+    }, 160);
+  };
+
+  // Enter/click 등 후속 UI가 함수를 다시 덮어써도 마지막에 한 번 더 보정.
+  document.addEventListener('click', function(){
+    setTimeout(function(){
+      wrapButtonAction('addNewItem');
+      wrapButtonAction('addNewItemFromFinal');
+      wrapButtonAction('confirmFinalQuote');
+      if (document.getElementById('final-quote-modal')) applyFinalQuoteImage();
+    }, 80);
+  }, true);
+})();
+</script>
+
+<style id="ff-product-add-snapshot-final-print-css">
+@media print {
+  body * { visibility:hidden !important; }
+  #final-quote-modal, #final-quote-modal * { visibility:visible !important; }
+  #final-quote-modal {
+    position:absolute !important;
+    inset:0 auto auto 0 !important;
+    width:100% !important;
+    background:#fff !important;
+    display:block !important;
+    padding:0 !important;
+    overflow:visible !important;
+    backdrop-filter:none !important;
+  }
+  .final-modal-close,
+  .final-actions,
+  .ff-post-final-actions {
+    display:none !important;
+  }
+  .final-quote-wrap.ff-step6-quote-wrap {
+    width:190mm !important;
+    max-width:190mm !important;
+    transform:none !important;
+    margin:0 auto !important;
+    padding:7mm !important;
+    border:0 !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
+    page-break-after:avoid !important;
+  }
+}
+</style>
+<!-- === /FF_PATCH_PRODUCT_ADD_SNAPSHOT_AND_FINAL_RENDER_FIX === -->
 
 </body>
 
