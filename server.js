@@ -243,6 +243,21 @@ console.log('[RENDER BODY]', {
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
         isScreenRender
+  ? 'CRITICAL: The screen panel already exists in the source image. Do not create, add, redraw, replace, enlarge, move, or reconstruct any screen panel.'
+  : '',
+
+isScreenRender
+  ? 'This is not a screen generation task. This is only a material replacement task on the existing screen surface.'
+  : '',
+
+isScreenRender
+  ? 'Keep the exact same source image, composition, object boundaries, background, shadow, camera angle, crop, desk shape, and screen shape.'
+  : '',
+
+isScreenRender
+  ? 'If the existing screen panel area is unclear, leave it unchanged. Never invent a new screen, wall, panel, backdrop, or colored background.'
+  : '',
+        isScreenRender
   ? 'At each step, do not modify any other region. Keep all non-target areas exactly as they already are in the current source image.'
   : '',
 
