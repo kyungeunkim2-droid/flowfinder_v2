@@ -16701,6 +16701,14 @@ window.showPanel = function(){
     var s=S(); var isScreen=(targetType==='screen') || (targetType!=='desk' && (window.__ffNanoTarget==='screen' || /스크린|screen|frontside|front|side|straight|lshape/i.test(selectedText())));
     var fs=isScreen && isFrontside(); var base=baseImage(isScreen); var top=material('top'), leg=material('leg'), scr=material('screen');
     if(fs){ setFrontsideState(); }
+
+    console.log('SCREEN RENDER CHECK', {
+  suffix: suffix,
+  screenTexture: scr.tex,
+  screenCode: scr.code,
+  screenImage: base
+});
+
     var payload={
       mode:isScreen?'strict-screen-material-mapping-final-sequential':'strict-desk-material-mapping-final-sequential',
       materialEditOnly:true,
@@ -16716,12 +16724,16 @@ productType:isScreen?'screen':'desk',
       screenImage:isScreen?base:'',
       screenLabel:isScreen?(fs?'전면+사이드 스크린':'스크린'):'',
     
-      screenTexture:(isScreen&&!fs)?scr.tex:'',
+     screenTexture:(isScreen && !fs)
+  ? (scr.tex || s.screenTex || s.screenTexture || '')
+  : '',
     topTexture:top.tex || s.topTex || s.topTexture || '',
 legTexture:leg.tex || s.legTex || s.legTexture || '',
 topCode:top.code || s.top || s.topCode || '',
 legCode:leg.code || s.leg || s.legCode || '',
-      screenCode:(isScreen&&!fs)?scr.code:'',
+     screenCode:(isScreen && !fs)
+  ? (scr.code || s.screen || s.screenCode || '')
+  : '',
       frontScreenCode:fs?(s.frontScreenCode||''):'',
       sideScreenCode:fs?(s.sideScreenCode||''):'',
       frontScreenTexture:fs?normUrl(s.frontScreenTexture||''):'',
