@@ -268,8 +268,7 @@ guideImage
   : '',
 
 guideImage
-  ? 'Apply frontScreenTexture only to the White area. Apply frontScreenTexture only to the White area that overlaps the actual front screen panel surface.
-Apply sideScreenTexture only to the Red area that overlaps the actual side screen panel surface.' 
+  ? 'Apply frontScreenTexture only to the White area that overlaps the actual front screen panel surface. Apply sideScreenTexture only to the Red area that overlaps the actual side screen panel surface.'
   : '',
 
 guideImage
