@@ -21038,7 +21038,7 @@ button.material-btn{
   window.askLegType = function(catName){
     state.step='choose_desk_options'; state._currentCatName=catName || state._currentCatName || '일반형 데스크';
     if(typeof saveHistory==='function') saveHistory(function(){ window.askLegType(state._currentCatName); });
-    if(typeof addMsg==='function') addMsg('bot', deskOptionHTML(state._currentCatName));
+    if(typeof addMsg==='function') addMsg('bot', deskOptionHTMLAllLegs(state._currentCatName));
     if(typeof scrollBottom==='function') scrollBottom();
   };
   window.askCasterType = function(catName){ return window.askLegType(catName || state._currentCatName); };
