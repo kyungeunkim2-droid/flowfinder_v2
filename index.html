@@ -8045,6 +8045,7 @@ body.ff-dashboard-preview #preview-panel{
     var s=pv();
     var deskKey=s.deskKey || 'desk_standard';
     var screenKey=s.screenKey || '';
+    var isFrontside = screenKey === 'frontside';
     var payload={
       mode:'nano-banana-reference-workflow',
       // Local product photos are used for Nano Banana reference editing.
@@ -8058,7 +8059,22 @@ body.ff-dashboard-preview #preview-panel{
       legType:s.legType || s.legShape || '',
       casterType:s.casterType || s.mobility || '',
       topShape:s.topShape || '',
-      size:s.size || {}
+      size:s.size || {},
+      // 스크린 재질 정보 추가
+      screenKey: screenKey,
+      screenLabel: isFrontside ? 'frontside' : screenKey,
+      screenType: isFrontside ? 'frontside' : screenKey,
+      screenImage: isFrontside ? (s.frontscreenImage || localProductImage('frontside') || '') : (localProductImage(screenKey) || ''),
+      screenTexture: isFrontside ? '' : existingTexture(s.screenTex),
+      screenCode: isFrontside ? '' : (s.screen || ''),
+      frontScreenTexture: isFrontside ? existingTexture(s.frontScreenTex || s.screenTex) : '',
+      sideScreenTexture: isFrontside ? existingTexture(s.sideScreenTex) : '',
+      frontScreenCode: isFrontside ? (s.frontScreen || window.__ffFrontScreen || '') : '',
+      sideScreenCode: isFrontside ? (s.sideScreen || window.__ffSideScreen || '') : '',
+      screenGuide: isFrontside ? './images/guides/frontside_guide.png' : '',
+      screenInstruction: isFrontside
+        ? 'Use screenGuide to separate areas. White guide area means FRONT screen. Red guide area means SIDE screen. Apply frontScreenTexture only to the white/front area. Apply sideScreenTexture only to the red/side area. Do not apply one texture to both screens. Do not redraw or create a new screen.'
+        : 'Apply screenTexture only to the existing screen area. Do not redraw or create a new screen.'
     };
     if(note){
       note.classList.remove('ai-result');
