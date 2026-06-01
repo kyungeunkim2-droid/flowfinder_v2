@@ -234,6 +234,7 @@ console.log('[RENDER BODY]', {
 'Use the exact input image as a locked base image. Only replace material pixels on existing surfaces.',
 'Do not change the desk legs, tabletop shape, screen position, camera angle, crop, or background.',
 'Do not add cross bars, braces, panels, floors, shadows, or any new geometry.',
+        
 'If an object part is not clearly visible in the source image, leave it unchanged instead of inventing it.',
         topTexture ? 'Apply the provided top material texture naturally only to the desktop/tabletop surface.' : 'No top texture provided: keep the tabletop unchanged.',
         legTexture ? 'Apply the provided leg material naturally only to the vertical desk legs.' : 'No leg texture provided: keep the legs/frame unchanged.',
@@ -244,7 +245,12 @@ console.log('[RENDER BODY]', {
 isScreenRender ? 'The tabletop and desk legs are editable material areas. Do not treat them as background.' : '',
 
 isScreenRender ? 'Preserve the original product photo exactly. Do not create a black floor, black backdrop, studio scene, new room, new desk, or new lighting.' : '',
-
+isScreenRender ? 'The desk inside the screen preview image must also be edited. Do not ignore the desk.' : '',
+isScreenRender ? 'Apply topTexture to the tabletop area in the screen preview image. The tabletop is usually the horizontal board in front of the screen.' : '',
+isScreenRender ? 'Apply legTexture to every visible desk leg and desk frame in the screen preview image.' : '',
+isScreenRender ? 'The screen preview image contains three editable material areas: tabletop, legs/frame, and screen panel.' : '',
+isScreenRender ? 'If topTexture or legTexture is provided, it must be applied even when targetType is screen.' : '',
+        
 (effectiveFrontScreenTexture && effectiveSideScreenTexture)
   ? 'The source image contains TWO different screen panels. FRONT screen and SIDE screen must be treated as separate material areas.'
   : '',
