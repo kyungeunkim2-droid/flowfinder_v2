@@ -17101,11 +17101,12 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
     }
 
     var base = previewPath(suffix);
+var fp = (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};
 console.log('DESK MATERIAL CHECK', {
   topTexture: topTex,
   legTexture: legTex,
-  topCode: top.code,
-  legCode: leg.code
+  topCode: fp.top || S().topCode || S().top || '',
+  legCode: fp.leg || S().legCode || S().leg || ''
 });
     
     var payload = {
@@ -17129,18 +17130,18 @@ console.log('DESK MATERIAL CHECK', {
   topTexture: topTex,
   legTexture: legTex,
 
-  screenTexture: PREVIEW.screenKey === 'frontside' ? '' : (PREVIEW.screenTex || ''),
+  screenTexture: suffix === 'frontside' ? '' : (m.screenTexture || ''),
 
-frontScreenTexture: PREVIEW.screenKey === 'frontside'
-  ? (PREVIEW.frontScreenTex || window.__ffFrontScreenTex || '')
+frontScreenTexture: suffix === 'frontside'
+  ? (m.frontScreenTexture || window.__ffFrontScreenTex || '')
   : '',
 
-sideScreenTexture: PREVIEW.screenKey === 'frontside'
-  ? (PREVIEW.sideScreenTex || window.__ffSideScreenTex || '')
+sideScreenTexture: suffix === 'frontside'
+  ? (m.sideScreenTexture || window.__ffSideScreenTex || '')
   : '',
 
-screenLabel: PREVIEW.screenKey === 'frontside' ? 'frontside' : PREVIEW.screenKey,
-screenGuide: PREVIEW.screenKey === 'frontside' ? './images/guides/frontside_guide.png' : '',
+screenLabel: suffix === 'frontside' ? 'frontside' : suffix,
+screenGuide: suffix === 'frontside' ? './images/guides/frontside_guide.png' : '',
   screenCode: m.screenCode,
   size: {
     screenH: S().screenH || '',
