@@ -264,23 +264,7 @@ isScreenRender ? 'If topTexture or legTexture is provided, it must be applied ev
   ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.'
   : '',
 guideImage
-  ? 'Use the guide image for region mapping.' 
-  : '',
-
-guideImage
-  ? 'White area = FRONT SCREEN.' 
-  : '',
-
-guideImage
-  ? 'Red area = SIDE SCREEN.' 
-  : '',
-
-guideImage
-  ? 'Brown area = TABLETOP.' 
-  : '',
-
-guideImage
-  ? 'Dark Gray area = DESK LEGS AND FRAME.' 
+  ? 'Use the guide image for region mapping. White=front screen, Red=side screen, Brown=tabletop, Dark Gray=desk legs/frame.'
   : '',
 
 guideImage
