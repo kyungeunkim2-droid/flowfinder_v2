@@ -1776,6 +1776,118 @@ body.ff-pro-dashboard #preview-panel{
 })();
 </script>
 
+<!-- === Codex patch 2026-06-01: robust first product selection advance === -->
+<script id="codex-product-selection-advance-fix">
+(function(){
+  'use strict';
+
+  function $(id){ return document.getElementById(id); }
+  function text(el){ return String((el && (el.getAttribute && el.getAttribute('data-name'))) || (el && el.textContent) || '').trim(); }
+  function uniq(arr){
+    var seen = {};
+    return (arr || []).filter(function(v){
+      v = String(v || '').trim();
+      if(!v || seen[v]) return false;
+      seen[v] = true;
+      return true;
+    });
+  }
+  function selectedProducts(){
+    var picked = [];
+    if(Array.isArray(window._setSelected)) picked = picked.concat(window._setSelected);
+    try{
+      document.querySelectorAll('.ff71-choice-btn.active[data-name], .selected-set-card[data-set-name], [data-set-name].selected').forEach(function(el){
+        picked.push(text(el));
+      });
+    }catch(e){}
+    return uniq(picked);
+  }
+  function isLshapeSelection(sel){
+    return (sel || []).some(function(v){ return /L형\s*스크린/i.test(v) && !/우측|오른쪽|right/i.test(v); });
+  }
+  function hideInitialSelectors(){
+    ['set-product-selector','set-composite-area','set-pegboard-note'].forEach(function(id){
+      var el = $(id);
+      if(el) el.style.display = 'none';
+    });
+    var start = document.querySelector('.ff71-start-card');
+    if(start) start.style.display = 'none';
+  }
+  function addUserSelection(sel){
+    if(window.__codexLastProductSelectionMsg === sel.join('|')) return;
+    window.__codexLastProductSelectionMsg = sel.join('|');
+    try{
+      if(typeof window.addMsg === 'function') window.addMsg('user', sel.join(', '));
+    }catch(e){}
+  }
+  function advanceWithSelection(sel){
+    window.state = window.state || {};
+    window.state.current = window.state.current || {};
+    window.state.type = window.state.type || 'FlowFinder';
+    window.state.step = 'choose_products';
+    window.state.current.product = sel.join(' + ');
+    window.state.selectedCategories = sel.slice();
+    window.state.currentCatIdx = 0;
+
+    try{ if(typeof window.saveHistory === 'function') window.saveHistory(window.askSetCategories || function(){}); }catch(e){}
+    hideInitialSelectors();
+    addUserSelection(sel);
+    try{ if(typeof window.updateCurrent === 'function') window.updateCurrent(); }catch(e){}
+    try{ if(typeof window.updateFlowBar === 'function') window.updateFlowBar(); }catch(e){}
+
+    setTimeout(function(){
+      try{
+        if(typeof window.processNextCategory === 'function') window.processNextCategory();
+      }catch(err){
+        console.warn('[codex-product-selection-advance-fix] processNextCategory failed', err);
+      }
+    }, 0);
+  }
+
+  var previousConfirm = window.confirmSetSelection;
+  window.confirmSetSelection = function(){
+    var sel = selectedProducts();
+    if(!sel.length) return false;
+
+    if(isLshapeSelection(sel) && typeof previousConfirm === 'function'){
+      try{ return previousConfirm.apply(this, arguments); }catch(e){}
+    }
+
+    advanceWithSelection(sel);
+    return false;
+  };
+
+  window.ff71ConfirmProducts = function(){
+    return window.confirmSetSelection();
+  };
+
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('#set-confirm-btn, #ff71-confirm-btn');
+    if(!btn) return;
+    var sel = selectedProducts();
+    if(!sel.length) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    window.confirmSetSelection();
+    return false;
+  }, true);
+
+  document.addEventListener('click', function(e){
+    var card = e.target && e.target.closest && e.target.closest('.ff71-choice-btn[data-name], [data-set-name]');
+    if(!card) return;
+    setTimeout(function(){
+      var sel = selectedProducts();
+      var btn = $('ff71-confirm-btn') || $('set-confirm-btn');
+      if(btn){
+        btn.disabled = !sel.length;
+        btn.textContent = sel.length ? '선택 완료 (' + sel.length + '개) ✓' : '선택 완료';
+      }
+    }, 0);
+  }, true);
+})();
+</script>
+
 <!-- === Codex patch 2026-06-01: force Nano Banana to edit source preview only === -->
 <script id="codex-nanobanana-material-map-only">
 (function(){
@@ -27743,5 +27855,75 @@ legCode: m.legCode || '',
     if(window.state){ state.step='done'; }
     if(typeof updateFlowBar==='function') updateFlowBar();
   };
+})();
+</script>
+
+<!-- === Codex final patch 2026-06-01: product selection must advance after later overrides === -->
+<script id="codex-product-selection-final-override">
+(function(){
+  'use strict';
+  function $(id){ return document.getElementById(id); }
+  function uniq(arr){
+    var seen = {};
+    return (arr || []).map(function(v){ return String(v || '').trim(); }).filter(function(v){
+      if(!v || seen[v]) return false;
+      seen[v] = true;
+      return true;
+    });
+  }
+  function selectedProducts(){
+    var picked = [];
+    if(Array.isArray(window._setSelected)) picked = picked.concat(window._setSelected);
+    document.querySelectorAll('.ff71-choice-btn.active[data-name], .selected-set-card[data-set-name], [data-set-name].selected').forEach(function(el){
+      picked.push(el.getAttribute('data-name') || el.getAttribute('data-set-name') || el.textContent || '');
+    });
+    return uniq(picked);
+  }
+  function addUser(sel){
+    var key = sel.join('|');
+    if(window.__codexFinalProductMsg === key) return;
+    window.__codexFinalProductMsg = key;
+    try{ if(typeof window.addMsg === 'function') window.addMsg('user', sel.join(', ')); }catch(e){}
+  }
+  function hideSelectors(){
+    ['set-product-selector','set-composite-area','set-pegboard-note'].forEach(function(id){
+      var el = $(id);
+      if(el) el.style.display = 'none';
+    });
+    var card = document.querySelector('.ff71-start-card');
+    if(card) card.style.display = 'none';
+  }
+  function advance(sel){
+    if(!sel.length) return false;
+    window.state = window.state || {};
+    window.state.current = window.state.current || {};
+    window.state.type = window.state.type || 'FlowFinder';
+    window.state.step = 'choose_products';
+    window.state.current.product = sel.join(' + ');
+    window.state.selectedCategories = sel.slice();
+    window.state.currentCatIdx = 0;
+    hideSelectors();
+    addUser(sel);
+    try{ if(typeof window.updateCurrent === 'function') window.updateCurrent(); }catch(e){}
+    try{ if(typeof window.updateFlowBar === 'function') window.updateFlowBar(); }catch(e){}
+    setTimeout(function(){
+      try{ if(typeof window.processNextCategory === 'function') window.processNextCategory(); }
+      catch(err){ console.warn('[codex-product-selection-final-override] next step failed', err); }
+    }, 0);
+    return false;
+  }
+  window.confirmSetSelection = function(){ return advance(selectedProducts()); };
+  window.ff71ConfirmProducts = function(){ return advance(selectedProducts()); };
+  document.addEventListener('click', function(e){
+    var btn = e.target && e.target.closest && e.target.closest('#set-confirm-btn, #ff71-confirm-btn');
+    if(!btn) return;
+    var sel = selectedProducts();
+    if(!sel.length) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if(e.stopImmediatePropagation) e.stopImmediatePropagation();
+    advance(sel);
+    return false;
+  }, true);
 })();
 </script>
