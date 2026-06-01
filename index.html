@@ -13016,8 +13016,26 @@ if(isCustom){
     var topCode=text('quick-top-code')||S().topCode||S().topColor||S().top||'';
     var legCode=text('quick-leg-code')||S().legCode||S().legColor||S().leg||'';
     var screenCode=text('quick-screen-code')||S().screenCode||S().screenColor||'';
-    var topTex=bgUrl('quick-top-chip')||texturePath(topCode,'top','데스크');
-    var legTex=bgUrl('quick-leg-chip')||texturePath(legCode,'leg','데스크');
+ var fp = (window.FlowFinderFastPreview && window.FlowFinderFastPreview.state) || {};
+var pv = window.PREVIEW || {};
+
+var topTex =
+  bgUrl('quick-top-chip') ||
+  pv.topTex ||
+  fp.topTex ||
+  S().topTexture ||
+  S().topTex ||
+  S().topMaterialImg ||
+  '';
+
+var legTex =
+  bgUrl('quick-leg-chip') ||
+  pv.legTex ||
+  fp.legTex ||
+  S().legTexture ||
+  S().legTex ||
+  S().legMaterialImg ||
+  '';
     var screenTex=bgUrl('quick-screen-chip')||texturePath(screenCode,'screen',cat||'전면 스크린');
     async function apply(maskSrc,texSrc,colorCode){
       var mask=await loadImg(maskSrc); if(!mask)return;
@@ -17000,7 +17018,7 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
   preserveTransparentBackground: true,
   canvasAspect: '16:9',
   targetType: 'desk_screen',
-  productType: 'screen',
+  productType: 'desk_screen',
 
   deskImage: base,
   fallbackDeskImage: base,
