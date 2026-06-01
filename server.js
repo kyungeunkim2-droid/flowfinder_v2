@@ -242,6 +242,17 @@ console.log('[RENDER BODY]', {
         legTexture ? 'Apply the provided leg material naturally only to the vertical desk legs.' : 'No leg texture provided: keep the legs/frame unchanged.',
         isDeskRender ? 'This is DESK RENDERING. Do not add, recolor, or modify any screen panel. Apply only desktop and leg materials.' : '',
         isScreenRender ? 'This is SCREEN RENDERING. Use the base desk+screen product image exactly as the source, and apply desk and screen materials to the matching existing parts.' : '',
+        isScreenRender
+  ? 'At each step, do not modify any other region. Keep all non-target areas exactly as they already are in the current source image.'
+  : '',
+
+isScreenRender
+  ? 'When applying a front screen material, change only the front screen panel area. Keep the side screen, tabletop, legs, background, shadows, and all other areas unchanged.'
+  : '',
+
+isScreenRender
+  ? 'When applying a side screen material, change only the side screen panel area. Keep the front screen, tabletop, legs, background, shadows, and all other areas unchanged.'
+  : '',
         isScreenRender ? 'Important: the base image contains a desk and screen. During screen rendering, also apply topTexture to the tabletop and legTexture to the desk legs/frame whenever those textures are provided.' : '',
 
 isScreenRender ? 'The tabletop and desk legs are editable material areas. Do not treat them as background.' : '',
@@ -272,6 +283,10 @@ isScreenRender ? 'If topTexture or legTexture is provided, it must be applied ev
   ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.'
   : '',
 hasGuide ? 'Use the guide image for region mapping. White=front screen, Red=side screen, Brown=tabletop, Dark Gray=desk legs/frame.'
+  : '',
+      
+hasGuide
+  ? 'The guide image is a strict region map. Do not apply any material outside the guide-colored target region.'
   : '',
 
 hasGuide
