@@ -12541,6 +12541,15 @@ ${map.move[move] || move}
     try{
       var health=await timeoutFetch('/api/health',{cache:'no-store'},6000).catch(function(){return null;});
       if(!health || !health.ok) throw new Error('서버 연결 실패: Render 배포 또는 npm run dev 상태를 확인해주세요.');
+      console.log('[NANO PAYLOAD]', payload);
+console.log('[NANO CHECK]', {
+  isScreen: isScreen,
+  deskImage: payload.deskImage,
+  screenImage: payload.screenImage,
+  targetType: payload.targetType,
+  productType: payload.productType,
+  mode: payload.mode
+});
       var res=await timeoutFetch('/api/generate-preview',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)},45000);
       var data=await res.json().catch(function(){return {};});
       if(!res.ok) throw new Error(data.error || data.detail || '재질 적용 실패');
