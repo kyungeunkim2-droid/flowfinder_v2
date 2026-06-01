@@ -216,7 +216,9 @@ console.log('[RENDER BODY]', {
     const effectiveGuideImage = isDeskRender ? '' : guideImage;
     const isFrontSideRender = Boolean(frontScreenTexture || sideScreenTexture || /frontside|front_side/i.test(String(screenImage || deskImage || mode || '')));
     const effectiveGuideCandidates = (isDeskRender || !isFrontSideRender) ? [] : ffFrontsideGuideCandidates(effectiveGuideImage, effectiveScreenImage || deskImage);
+    const hasGuide = Boolean(effectiveGuideCandidates && effectiveGuideCandidates.length);
     console.log('[GUIDE CANDIDATES]', effectiveGuideCandidates);
+    console.log('[HAS GUIDE]', hasGuide);
     const effectiveFrontScreenTexture = isDeskRender ? '' : frontScreenTexture;
     const effectiveSideScreenTexture = isDeskRender ? '' : sideScreenTexture;
     const effectiveFrontScreenCode = isDeskRender ? '' : frontScreenCode;
@@ -258,45 +260,43 @@ isScreenRender ? 'If topTexture or legTexture is provided, it must be applied ev
 (effectiveFrontScreenTexture && effectiveSideScreenTexture)
   ? 'Apply frontScreenTexture only to the FRONT screen panel. Apply sideScreenTexture only to the SIDE screen panel.'
   : '',
+(effectiveFrontScreenTexture && effectiveSideScreenTexture && hasGuide)
+  ? 'For FRONTSIDE rendering, the guide image is the highest priority area map. White pixels mean FRONT SCREEN ONLY. Red pixels mean SIDE SCREEN ONLY. Never apply one screen texture to both panels.'
+  : '',
+(effectiveFrontScreenTexture && effectiveSideScreenTexture && hasGuide)
+  ? 'If the front and side screen regions are ambiguous, follow the guide colors over visual similarity. Do not merge the two screen panels into one material area.'
+  : '',
         effectiveScreenTexture ? 'Apply the provided screen material texture naturally only to the existing screen panel area.' : '',
         effectiveFrontScreenTexture ? 'Apply the provided front screen material only to the FRONT screen panel identified by the guide image.' : '',
        effectiveSideScreenTexture
   ? 'Apply the provided side screen material only to the SIDE screen panel identified by the guide image.'
   : '',
-guideImage
-  ? 'Use the guide image for region mapping. White=front screen, Red=side screen, Brown=tabletop, Dark Gray=desk legs/frame.'
+hasGuide ? 'Use the guide image for region mapping. White=front screen, Red=side screen, Brown=tabletop, Dark Gray=desk legs/frame.'
   : '',
 
-guideImage
+hasGuide
   ? 'Apply frontScreenTexture only to the White area that overlaps the actual front screen panel surface. Apply sideScreenTexture only to the Red area that overlaps the actual side screen panel surface.'
   : '',
 
-guideImage
-  ? 'Apply sideScreenTexture only to the Red area.' 
+hasGuide ? 'Apply sideScreenTexture only to the Red area.' 
   : '',
 
-guideImage
-  ? 'Apply topTexture only to the Brown area.' 
+hasGuide ? 'Apply topTexture only to the Brown area.' 
   : '',
 
-guideImage
-  ? 'Apply legTexture only to the Dark Gray area.' 
+hasGuide ? 'Apply legTexture only to the Dark Gray area.' 
   : '',
 
-guideImage
-  ? 'Do not apply materials outside the guide regions.' 
+hasGuide ? 'Do not apply materials outside the guide regions.' 
   : '',
         
-guideImage
-  ? 'The guide colors are masks for object surfaces only. Do not extend material texture beyond the colored object surface regions.'
+hasGuide ? 'The guide colors are masks for object surfaces only. Do not extend material texture beyond the colored object surface regions.'
   : '',
 
-guideImage
-  ? 'Any uncolored or transparent area in the guide image must remain completely unchanged from the source image.'
+hasGuide ? 'Any uncolored or transparent area in the guide image must remain completely unchanged from the source image.'
   : '',
 
-guideImage
-  ? 'Do not apply screen textures to background, empty space, floor, shadow, or transparent areas.'
+hasGuide ? 'Do not apply screen textures to background, empty space, floor, shadow, or transparent areas.'
   : '',
 (effectiveFrontScreenTexture && effectiveSideScreenTexture)
   ? 'If front and side textures are different, they must remain different. Never copy the side texture onto the front panel or the front texture onto the side panel.'
