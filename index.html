@@ -17024,6 +17024,13 @@ var legTex = bgUrl('quick-leg-chip') || S().legTexture || S().legTex || S().legM
     }
 
     var base = previewPath(suffix);
+console.log('DESK MATERIAL CHECK', {
+  topTexture: topTex,
+  legTexture: legTex,
+  topCode: top.code,
+  legCode: leg.code
+});
+    
  var payload = {
   mode: 'strict-screen-texture-only-preview-path-v4',
   materialEditOnly: true,
@@ -26621,13 +26628,14 @@ const ORDER_LEG_COLORS=['DCR','TS'];
       screenImage: screen ? base : '',
       screenSelected: !!screen,
       screenLabel: screen ? (s.screenLabel || s.screen || suffix || '스크린') : '',
-      topTexture: screen ? '' : m.topTexture,
-      legTexture: screen ? '' : m.legTexture,
+    topTexture: m.topTexture || '',
+legTexture: m.legTexture || '',
+topCode: m.topCode || '',
+legCode: m.legCode || '',
       screenTexture: screen ? m.screenTexture : '',
       frontScreenTexture: (screen && suffix === 'frontside') ? (m.frontScreenTexture || m.screenTexture) : '',
       sideScreenTexture: (screen && suffix === 'frontside') ? (m.sideScreenTexture || m.screenTexture) : '',
-      topCode: screen ? '' : m.topCode,
-      legCode: screen ? '' : m.legCode,
+     
       screenCode: screen ? m.screenCode : '',
       legType: s.legType || s.legShape || '',
       casterType: s.casterType || s.mobility || '',
